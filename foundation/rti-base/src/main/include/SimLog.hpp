@@ -88,41 +88,21 @@ private:
 		static int Time_handle;
 		return Time_handle;
 	}
-	static int &get_sourceFed_handle_var( void ) {
-		static int sourceFed_handle;
-		return sourceFed_handle;
-	}
 	static int &get_FedName_handle_var( void ) {
 		static int FedName_handle;
 		return FedName_handle;
 	}
-	static int &get_originFed_handle_var( void ) {
-		static int originFed_handle;
-		return originFed_handle;
-	}
 	static int &get_Comment_handle_var( void ) {
 		static int Comment_handle;
 		return Comment_handle;
-	}
-	static int &get_actualLogicalGenerationTime_handle_var( void ) {
-		static int actualLogicalGenerationTime_handle;
-		return actualLogicalGenerationTime_handle;
-	}
-	static int &get_federateFilter_handle_var( void ) {
-		static int federateFilter_handle;
-		return federateFilter_handle;
 	}
 	
 public:
 	
 	
 	static int get_Time_handle( void ) { return get_Time_handle_var(); }
-	static int get_sourceFed_handle( void ) { return get_sourceFed_handle_var(); }
 	static int get_FedName_handle( void ) { return get_FedName_handle_var(); }
-	static int get_originFed_handle( void ) { return get_originFed_handle_var(); }
 	static int get_Comment_handle( void ) { return get_Comment_handle_var(); }
-	static int get_actualLogicalGenerationTime_handle( void ) { return get_actualLogicalGenerationTime_handle_var(); }
-	static int get_federateFilter_handle( void ) { return get_federateFilter_handle_var(); }
 	
 
 
@@ -236,40 +216,20 @@ private:
 	
 	double _Time;
 	
-	std::string _sourceFed;
-	
 	std::string _FedName;
 	
-	std::string _originFed;
-	
 	std::string _Comment;
-	
-	double _actualLogicalGenerationTime;
-	
-	std::string _federateFilter;
 	
 public:
 		
 	void set_Time( double Time ) { _Time = Time; }
 	double get_Time( void ) const { return _Time; }
 	
-	void set_sourceFed( const std::string & sourceFed ) { _sourceFed = sourceFed; }
-	const std::string & get_sourceFed( void ) const { return _sourceFed; }
-	
 	void set_FedName( const std::string & FedName ) { _FedName = FedName; }
 	const std::string & get_FedName( void ) const { return _FedName; }
 	
-	void set_originFed( const std::string & originFed ) { _originFed = originFed; }
-	const std::string & get_originFed( void ) const { return _originFed; }
-	
 	void set_Comment( const std::string & Comment ) { _Comment = Comment; }
 	const std::string & get_Comment( void ) const { return _Comment; }
-	
-	void set_actualLogicalGenerationTime( double actualLogicalGenerationTime ) { _actualLogicalGenerationTime = actualLogicalGenerationTime; }
-	double get_actualLogicalGenerationTime( void ) const { return _actualLogicalGenerationTime; }
-	
-	void set_federateFilter( const std::string & federateFilter ) { _federateFilter = federateFilter; }
-	const std::string & get_federateFilter( void ) const { return _federateFilter; }
 	
 
 
@@ -285,23 +245,11 @@ public:
 		if ( "Time" == datamemberName ) {
 			return TypeMedley( get_Time() );
 		}
-		else if ( "sourceFed" == datamemberName ) {
-			return TypeMedley( get_sourceFed() );
-		}
 		else if ( "FedName" == datamemberName ) {
 			return TypeMedley( get_FedName() );
 		}
-		else if ( "originFed" == datamemberName ) {
-			return TypeMedley( get_originFed() );
-		}
 		else if ( "Comment" == datamemberName ) {
 			return TypeMedley( get_Comment() );
-		}
-		else if ( "actualLogicalGenerationTime" == datamemberName ) {
-			return TypeMedley( get_actualLogicalGenerationTime() );
-		}
-		else if ( "federateFilter" == datamemberName ) {
-			return TypeMedley( get_federateFilter() );
 		} else {
 			return Super::getParameter( datamemberName );
 		}
@@ -313,23 +261,11 @@ public:
 		if ( get_Time_handle() == datamemberHandle ) {
 			return TypeMedley( get_Time() );
 		}
-		else if ( get_sourceFed_handle() == datamemberHandle ) {
-			return TypeMedley( get_sourceFed() );
-		}
 		else if ( get_FedName_handle() == datamemberHandle ) {
 			return TypeMedley( get_FedName() );
 		}
-		else if ( get_originFed_handle() == datamemberHandle ) {
-			return TypeMedley( get_originFed() );
-		}
 		else if ( get_Comment_handle() == datamemberHandle ) {
 			return TypeMedley( get_Comment() );
-		}
-		else if ( get_actualLogicalGenerationTime_handle() == datamemberHandle ) {
-			return TypeMedley( get_actualLogicalGenerationTime() );
-		}
-		else if ( get_federateFilter_handle() == datamemberHandle ) {
-			return TypeMedley( get_federateFilter() );
 		} else {
 			return Super::getParameter( datamemberHandle );
 		}
@@ -343,23 +279,11 @@ protected:
 		if ( param_handle == get_Time_handle() ) {
 			set_Time(  TypeMedley( val )  );
 		}
-		else if ( param_handle == get_sourceFed_handle() ) {
-			set_sourceFed(  TypeMedley( val )  );
-		}
 		else if ( param_handle == get_FedName_handle() ) {
 			set_FedName(  TypeMedley( val )  );
 		}
-		else if ( param_handle == get_originFed_handle() ) {
-			set_originFed(  TypeMedley( val )  );
-		}
 		else if ( param_handle == get_Comment_handle() ) {
 			set_Comment(  TypeMedley( val )  );
-		}
-		else if ( param_handle == get_actualLogicalGenerationTime_handle() ) {
-			set_actualLogicalGenerationTime(  TypeMedley( val )  );
-		}
-		else if ( param_handle == get_federateFilter_handle() ) {
-			set_federateFilter(  TypeMedley( val )  );
 		} else {
 			retval = Super::setParameterAux( param_handle, val );
 		}
@@ -373,23 +297,11 @@ protected:
 		if ( "Time" == datamemberName ) {
 			set_Time(  TypeMedley( val )  );
 		}
-		else if ( "sourceFed" == datamemberName ) {
-			set_sourceFed(  TypeMedley( val )  );
-		}
 		else if ( "FedName" == datamemberName ) {
 			set_FedName(  TypeMedley( val )  );
 		}
-		else if ( "originFed" == datamemberName ) {
-			set_originFed(  TypeMedley( val )  );
-		}
 		else if ( "Comment" == datamemberName ) {
 			set_Comment(  TypeMedley( val )  );
-		}
-		else if ( "actualLogicalGenerationTime" == datamemberName ) {
-			set_actualLogicalGenerationTime(  TypeMedley( val )  );
-		}
-		else if ( "federateFilter" == datamemberName ) {
-			set_federateFilter(  TypeMedley( val )  );
 		} else {
 			retval = Super::setParameterAux( datamemberName, val );
 		}
@@ -404,23 +316,11 @@ protected:
 		if ( "Time" == datamemberName ) {\
 			set_Time( val );
 		}
-		else if ( "sourceFed" == datamemberName ) {\
-			set_sourceFed( val );
-		}
 		else if ( "FedName" == datamemberName ) {\
 			set_FedName( val );
 		}
-		else if ( "originFed" == datamemberName ) {\
-			set_originFed( val );
-		}
 		else if ( "Comment" == datamemberName ) {\
 			set_Comment( val );
-		}
-		else if ( "actualLogicalGenerationTime" == datamemberName ) {\
-			set_actualLogicalGenerationTime( val );
-		}
-		else if ( "federateFilter" == datamemberName ) {\
-			set_federateFilter( val );
 		} else {
 			retval = Super::setParameterAux( datamemberName, val );
 		}

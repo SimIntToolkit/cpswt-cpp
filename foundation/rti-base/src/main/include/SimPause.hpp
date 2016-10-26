@@ -84,30 +84,10 @@ public:
 private:
 	
 	
-	static int &get_sourceFed_handle_var( void ) {
-		static int sourceFed_handle;
-		return sourceFed_handle;
-	}
-	static int &get_originFed_handle_var( void ) {
-		static int originFed_handle;
-		return originFed_handle;
-	}
-	static int &get_actualLogicalGenerationTime_handle_var( void ) {
-		static int actualLogicalGenerationTime_handle;
-		return actualLogicalGenerationTime_handle;
-	}
-	static int &get_federateFilter_handle_var( void ) {
-		static int federateFilter_handle;
-		return federateFilter_handle;
-	}
 	
 public:
 	
 	
-	static int get_sourceFed_handle( void ) { return get_sourceFed_handle_var(); }
-	static int get_originFed_handle( void ) { return get_originFed_handle_var(); }
-	static int get_actualLogicalGenerationTime_handle( void ) { return get_actualLogicalGenerationTime_handle_var(); }
-	static int get_federateFilter_handle( void ) { return get_federateFilter_handle_var(); }
 	
 
 
@@ -219,145 +199,14 @@ public:
 private:
 	
 	
-	std::string _sourceFed;
-	
-	std::string _originFed;
-	
-	double _actualLogicalGenerationTime;
-	
-	std::string _federateFilter;
-	
 public:
 		
-	void set_sourceFed( const std::string & sourceFed ) { _sourceFed = sourceFed; }
-	const std::string & get_sourceFed( void ) const { return _sourceFed; }
-	
-	void set_originFed( const std::string & originFed ) { _originFed = originFed; }
-	const std::string & get_originFed( void ) const { return _originFed; }
-	
-	void set_actualLogicalGenerationTime( double actualLogicalGenerationTime ) { _actualLogicalGenerationTime = actualLogicalGenerationTime; }
-	double get_actualLogicalGenerationTime( void ) const { return _actualLogicalGenerationTime; }
-	
-	void set_federateFilter( const std::string & federateFilter ) { _federateFilter = federateFilter; }
-	const std::string & get_federateFilter( void ) const { return _federateFilter; }
-	
 
 
 	SimPause( const RTI::ParameterHandleValuePairSet &datamemberMap ) : Super( datamemberMap ) { }
 	
 	SimPause( const RTI::ParameterHandleValuePairSet &datamemberMap, const RTIfedTime &logicalTime ) : Super( datamemberMap, logicalTime ) { }
 	
-	
-public:
-	TypeMedley getParameter( const std::string &datamemberName ) const {
-		
-		
-		if ( "sourceFed" == datamemberName ) {
-			return TypeMedley( get_sourceFed() );
-		}
-		else if ( "originFed" == datamemberName ) {
-			return TypeMedley( get_originFed() );
-		}
-		else if ( "actualLogicalGenerationTime" == datamemberName ) {
-			return TypeMedley( get_actualLogicalGenerationTime() );
-		}
-		else if ( "federateFilter" == datamemberName ) {
-			return TypeMedley( get_federateFilter() );
-		} else {
-			return Super::getParameter( datamemberName );
-		}
-	}
-	
-	TypeMedley getParameter( int datamemberHandle ) const {
-		
-		
-		if ( get_sourceFed_handle() == datamemberHandle ) {
-			return TypeMedley( get_sourceFed() );
-		}
-		else if ( get_originFed_handle() == datamemberHandle ) {
-			return TypeMedley( get_originFed() );
-		}
-		else if ( get_actualLogicalGenerationTime_handle() == datamemberHandle ) {
-			return TypeMedley( get_actualLogicalGenerationTime() );
-		}
-		else if ( get_federateFilter_handle() == datamemberHandle ) {
-			return TypeMedley( get_federateFilter() );
-		} else {
-			return Super::getParameter( datamemberHandle );
-		}
-	}
-
-protected:
-	virtual bool setParameterAux( int param_handle, const std::string &val ) {
-		bool retval = true;		
-		
-		
-		if ( param_handle == get_sourceFed_handle() ) {
-			set_sourceFed(  TypeMedley( val )  );
-		}
-		else if ( param_handle == get_originFed_handle() ) {
-			set_originFed(  TypeMedley( val )  );
-		}
-		else if ( param_handle == get_actualLogicalGenerationTime_handle() ) {
-			set_actualLogicalGenerationTime(  TypeMedley( val )  );
-		}
-		else if ( param_handle == get_federateFilter_handle() ) {
-			set_federateFilter(  TypeMedley( val )  );
-		} else {
-			retval = Super::setParameterAux( param_handle, val );
-		}
-		return retval;
-	}
-	
-	virtual bool setParameterAux( const std::string &datamemberName, const std::string &val ) {
-		bool retval = true;
-		
-		
-		if ( "sourceFed" == datamemberName ) {
-			set_sourceFed(  TypeMedley( val )  );
-		}
-		else if ( "originFed" == datamemberName ) {
-			set_originFed(  TypeMedley( val )  );
-		}
-		else if ( "actualLogicalGenerationTime" == datamemberName ) {
-			set_actualLogicalGenerationTime(  TypeMedley( val )  );
-		}
-		else if ( "federateFilter" == datamemberName ) {
-			set_federateFilter(  TypeMedley( val )  );
-		} else {
-			retval = Super::setParameterAux( datamemberName, val );
-		}
-		
-		return retval;
-	}
-	
-	virtual bool setParameterAux( const std::string &datamemberName, const TypeMedley &val ) {
-		bool retval = true;
-		
-		
-		if ( "sourceFed" == datamemberName ) {\
-			set_sourceFed( val );
-		}
-		else if ( "originFed" == datamemberName ) {\
-			set_originFed( val );
-		}
-		else if ( "actualLogicalGenerationTime" == datamemberName ) {\
-			set_actualLogicalGenerationTime( val );
-		}
-		else if ( "federateFilter" == datamemberName ) {\
-			set_federateFilter( val );
-		} else {
-			retval = Super::setParameterAux( datamemberName, val );
-		}
-		
-		return retval;
-	}
-
-	virtual ParameterHandleValuePairSetSP createDatamemberHandleValuePairSet( RTI::ULong count );
-
-	virtual ParameterHandleValuePairSetSP createDatamemberHandleValuePairSet( ) {
-		return createDatamemberHandleValuePairSet( 0 );
-	}
 	
 	
 };

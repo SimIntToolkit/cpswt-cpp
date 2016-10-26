@@ -526,7 +526,7 @@
 							</arguments>
 							<environmentVariables>
 								<EXEDIR>${project.basedir}/target/${federate.name}</EXEDIR>
-								<LD_LIBRARY_PATH>${project.basedir}/target/nar/lib/${nar.aol}/shared/:${env.RTI_HOME}/lib/gcc4/:${env.RTI_HOME}/jre/lib/amd64/server:${project.basedir}/target/nar/lib/${nar.aol}/static/</LD_LIBRARY_PATH>
+								<LD_LIBRARY_PATH>${project.basedir}/target/nar/lib/${nar.aol}/shared/:${env.RTI_HOME}/lib/gcc4/:${env.RTI_HOME}/jre/lib/amd64/server:${project.basedir}/target/nar/lib/${nar.aol}/static/:/home/vagrant/c2wt-dev/dependency/inet/inetmanet-2.0-inetmanet-2.2/out/gcc-debug/src</LD_LIBRARY_PATH>
 							</environmentVariables>
 						</configuration>
 					</plugin>

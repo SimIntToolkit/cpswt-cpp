@@ -18,4 +18,4 @@ export LD_LIBRARY_PATH=$RTI_HOME/jre/lib/amd64/server/
 
 
 
-mvn package exec:exec -P OmnetFed,OmnetFederate
+mvn exec:exec -P OmnetFed,OmnetFederate

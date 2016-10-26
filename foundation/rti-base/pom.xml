@@ -27,6 +27,7 @@
             <artifactId>nar-maven-plugin</artifactId>
             <extensions>true</extensions>
             <configuration>
+              <resourceIncludeDir>src/main/c++</resourceIncludeDir>
                 <libraries>
                     <library> 
                         <type>static</type>
