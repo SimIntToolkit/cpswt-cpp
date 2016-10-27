@@ -28,7 +28,7 @@
               <extensions>true</extensions>
               <configuration>
                 <libraries>
-                    <library> 
+                    <library>
                         <type>shared</type>
                     </library>
                 </libraries>
