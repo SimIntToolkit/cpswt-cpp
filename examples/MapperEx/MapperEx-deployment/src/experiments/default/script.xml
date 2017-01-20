@@ -2,10 +2,10 @@
 <script>
   <expect federateType="OmnetFederate"/>
   <expect federateType="ICICIBank"/>
-  <expect federateType="BankOfAmerica"/>
-  <expect federateType="SocieteGenerale"/>
-  <expect federateType="ComplexMapper"/>
-  <expect federateType="BasicMapper"/>
-  <expect federateType="DirectMapper"/>
-  <expect federateType="DataConversionMapper"/>
+  <!--<expect federateType="BankOfAmerica"/>-->
+  <!--<expect federateType="SocieteGenerale"/>-->
+  <!--<expect federateType="ComplexMapper"/>-->
+  <!--<expect federateType="BasicMapper"/>-->
+  <!--<expect federateType="DirectMapper"/>-->
+  <!--<expect federateType="DataConversionMapper"/>-->
 </script>

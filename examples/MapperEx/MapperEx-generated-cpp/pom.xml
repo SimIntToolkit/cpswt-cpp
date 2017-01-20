@@ -5,6 +5,7 @@
   <artifactId>MapperEx_root</artifactId>
   <version>0.0.1-SNAPSHOT</version>
   <packaging>pom</packaging>
+  <name>C++ MapperEx generated</name>
   <modules>
     <module>cpp-federates</module>
     <module>java-federates</module>

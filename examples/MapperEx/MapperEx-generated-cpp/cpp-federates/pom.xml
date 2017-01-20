@@ -17,7 +17,7 @@
     <modules>
         <module>MapperEx-base-cpp</module>
         <module>MapperEx-omnet-cpp</module>
-      <module>MapperEx-rti-cpp</module> 
+        <module>MapperEx-rti-cpp</module>
     </modules>  
 
     <properties>

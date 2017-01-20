@@ -7,8 +7,10 @@
   <fileSets>
     <fileSet>
       <directory>${project.basedir}/target/nar/bin/${nar.aol}</directory>
-      <outputDirectory></outputDirectory>      
+      <outputDirectory></outputDirectory>
       <includes>
+        <include>gcc-debug/</include>
+        <include>gcc-debug/messages</include>
         <include>*</include>
       </includes>
       <excludes>

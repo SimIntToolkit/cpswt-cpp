@@ -7,7 +7,7 @@
    </parent>
 
   <!--<groupId>org.c2w.MapperEx_cpp</groupId>-->
-  <artifactId>MapperEx</artifactId>
+  <artifactId>MapperEx-NOTUSED</artifactId>
   <version>0.0.1-SNAPSHOT</version>
   <packaging>pom</packaging>
   <name>C2 Windtunnel C++ MapperEx Example</name>

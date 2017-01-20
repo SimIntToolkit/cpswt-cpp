@@ -29,7 +29,8 @@
               <configuration>
                 <libraries>
                     <library>
-                        <type>shared</type>
+                        <!--<type>shared</type>-->
+                        <type>static</type>
                     </library>
                 </libraries>
             </configuration>

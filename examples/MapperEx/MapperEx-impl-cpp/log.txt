@@ -1,0 +1,496 @@
+Maven Compiling....
+[INFO] Scanning for projects...
+[INFO] ------------------------------------------------------------------------
+[INFO] Reactor Build Order:
+[INFO] 
+[INFO] C++ MapperEx example implementation- TOP
+[INFO] C++ MapperEx example OmnetFederate implementation
+[INFO]                                                                         
+[INFO] ------------------------------------------------------------------------
+[INFO] Building C++ MapperEx example implementation- TOP 0.0.1-SNAPSHOT
+[INFO] ------------------------------------------------------------------------
+[INFO] 
+[INFO] --- maven-clean-plugin:2.5:clean (default-clean) @ MapperEx ---
+[INFO] 
+[INFO] --- maven-install-plugin:2.3:install (default-install) @ MapperEx ---
+[INFO] Installing /home/vagrant/c2wt-dev/c2wt-cpp/c2wtng-cpp/examples/MapperEx/MapperEx-impl-cpp/pom.xml to /home/vagrant/.m2/repository/org/c2w/MapperEx_cpp/MapperEx/0.0.1-SNAPSHOT/MapperEx-0.0.1-SNAPSHOT.pom
+[INFO]                                                                         
+[INFO] ------------------------------------------------------------------------
+[INFO] Building C++ MapperEx example OmnetFederate implementation 0.0.1-SNAPSHOT
+[INFO] ------------------------------------------------------------------------
+Downloading: http://repo.maven.apache.org/maven2/org/apache/maven/plugins/maven-jar-plugin/maven-metadata.xml
+743/743 B               Downloaded: http://repo.maven.apache.org/maven2/org/apache/maven/plugins/maven-jar-plugin/maven-metadata.xml (743 B at 3.2 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/org/apache/maven/plugins/maven-surefire-plugin/maven-metadata.xml
+2/2 KB               Downloaded: http://repo.maven.apache.org/maven2/org/apache/maven/plugins/maven-surefire-plugin/maven-metadata.xml (2 KB at 22.6 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/org/apache/maven/plugins/maven-compiler-plugin/maven-metadata.xml
+893/893 B               Downloaded: http://repo.maven.apache.org/maven2/org/apache/maven/plugins/maven-compiler-plugin/maven-metadata.xml (893 B at 12.5 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/org/apache/maven/plugins/maven-deploy-plugin/maven-metadata.xml
+709/709 B               Downloaded: http://repo.maven.apache.org/maven2/org/apache/maven/plugins/maven-deploy-plugin/maven-metadata.xml (709 B at 9.9 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/org/apache/maven/plugins/maven-resources-plugin/maven-metadata.xml
+812/812 B               Downloaded: http://repo.maven.apache.org/maven2/org/apache/maven/plugins/maven-resources-plugin/maven-metadata.xml (812 B at 12.4 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/org/apache/maven/plugins/maven-install-plugin/maven-metadata.xml
+623/623 B               Downloaded: http://repo.maven.apache.org/maven2/org/apache/maven/plugins/maven-install-plugin/maven-metadata.xml (623 B at 9.8 KB/sec)
+Downloading: http://10.0.2.15:8080/repository/internal/org/c2w/MapperEx_cpp/MapperEx-base-cpp/0.0.1-SNAPSHOT/maven-metadata.xml
+Downloading: http://10.0.2.15:8080/repository/snapshots/org/c2w/MapperEx_cpp/MapperEx-base-cpp/0.0.1-SNAPSHOT/maven-metadata.xml
+375/375 B                           Downloaded: http://10.0.2.15:8080/repository/snapshots/org/c2w/MapperEx_cpp/MapperEx-base-cpp/0.0.1-SNAPSHOT/maven-metadata.xml (375 B at 24.4 KB/sec)
+Downloading: http://10.0.2.15:8080/repository/snapshots/org/c2w/MapperEx_cpp/MapperEx-cpp/0.0.1-SNAPSHOT/maven-metadata.xml
+Downloading: http://10.0.2.15:8080/repository/internal/org/c2w/MapperEx_cpp/MapperEx-cpp/0.0.1-SNAPSHOT/maven-metadata.xml
+            370/370 B               Downloaded: http://10.0.2.15:8080/repository/snapshots/org/c2w/MapperEx_cpp/MapperEx-cpp/0.0.1-SNAPSHOT/maven-metadata.xml (370 B at 36.1 KB/sec)
+Downloading: http://10.0.2.15:8080/repository/snapshots/org/c2w/MapperEx_cpp/MapperEx_root/0.0.1-SNAPSHOT/maven-metadata.xml
+Downloading: http://10.0.2.15:8080/repository/internal/org/c2w/MapperEx_cpp/MapperEx_root/0.0.1-SNAPSHOT/maven-metadata.xml
+            371/371 B               Downloaded: http://10.0.2.15:8080/repository/snapshots/org/c2w/MapperEx_cpp/MapperEx_root/0.0.1-SNAPSHOT/maven-metadata.xml (371 B at 27.9 KB/sec)
+Downloading: http://10.0.2.15:8080/repository/internal/org/c2w/MapperEx_cpp/MapperEx-rti-cpp/0.0.1-SNAPSHOT/maven-metadata.xml
+Downloading: http://10.0.2.15:8080/repository/snapshots/org/c2w/MapperEx_cpp/MapperEx-rti-cpp/0.0.1-SNAPSHOT/maven-metadata.xml
+374/374 B                           Downloaded: http://10.0.2.15:8080/repository/snapshots/org/c2w/MapperEx_cpp/MapperEx-rti-cpp/0.0.1-SNAPSHOT/maven-metadata.xml (374 B at 52.2 KB/sec)
+Downloading: http://10.0.2.15:8080/repository/internal/org/c2w/rti-base-cpp/0.3.0-SNAPSHOT/maven-metadata.xml
+Downloading: http://10.0.2.15:8080/repository/snapshots/org/c2w/rti-base-cpp/0.3.0-SNAPSHOT/maven-metadata.xml
+357/357 B                           Downloaded: http://10.0.2.15:8080/repository/snapshots/org/c2w/rti-base-cpp/0.3.0-SNAPSHOT/maven-metadata.xml (357 B at 43.6 KB/sec)
+Downloading: http://10.0.2.15:8080/repository/snapshots/org/c2w/c2w-cpp-foundation/0.3.0-SNAPSHOT/maven-metadata.xml
+Downloading: http://10.0.2.15:8080/repository/internal/org/c2w/c2w-cpp-foundation/0.3.0-SNAPSHOT/maven-metadata.xml
+            362/362 B               Downloaded: http://10.0.2.15:8080/repository/snapshots/org/c2w/c2w-cpp-foundation/0.3.0-SNAPSHOT/maven-metadata.xml (362 B at 20.8 KB/sec)
+Downloading: http://10.0.2.15:8080/repository/snapshots/org/c2w/C2WConsoleLogger/0.3.0-SNAPSHOT/maven-metadata.xml
+Downloading: http://10.0.2.15:8080/repository/internal/org/c2w/C2WConsoleLogger/0.3.0-SNAPSHOT/maven-metadata.xml
+            361/361 B               Downloaded: http://10.0.2.15:8080/repository/snapshots/org/c2w/C2WConsoleLogger/0.3.0-SNAPSHOT/maven-metadata.xml (361 B at 25.2 KB/sec)
+Downloading: http://10.0.2.15:8080/repository/internal/org/c2w/core-cpp/0.3.0-SNAPSHOT/maven-metadata.xml
+Downloading: http://10.0.2.15:8080/repository/snapshots/org/c2w/core-cpp/0.3.0-SNAPSHOT/maven-metadata.xml
+353/353 B                           Downloaded: http://10.0.2.15:8080/repository/snapshots/org/c2w/core-cpp/0.3.0-SNAPSHOT/maven-metadata.xml (353 B at 43.1 KB/sec)
+Downloading: http://10.0.2.15:8080/repository/internal/org/c2w/OmnetFederate/0.3.0-SNAPSHOT/maven-metadata.xml
+Downloading: http://10.0.2.15:8080/repository/snapshots/org/c2w/OmnetFederate/0.3.0-SNAPSHOT/maven-metadata.xml
+            358/358 B               Downloaded: http://10.0.2.15:8080/repository/snapshots/org/c2w/OmnetFederate/0.3.0-SNAPSHOT/maven-metadata.xml (358 B at 49.9 KB/sec)
+Downloading: http://10.0.2.15:8080/repository/snapshots/org/c2w/SynchronizedFederate/0.3.0-SNAPSHOT/maven-metadata.xml
+Downloading: http://10.0.2.15:8080/repository/internal/org/c2w/SynchronizedFederate/0.3.0-SNAPSHOT/maven-metadata.xml
+            365/365 B               Downloaded: http://10.0.2.15:8080/repository/snapshots/org/c2w/SynchronizedFederate/0.3.0-SNAPSHOT/maven-metadata.xml (365 B at 35.6 KB/sec)
+Downloading: http://10.0.2.15:8080/repository/internal/org/c2w/MapperEx_cpp/MapperEx-omnet-cpp/0.0.1-SNAPSHOT/maven-metadata.xml
+Downloading: http://10.0.2.15:8080/repository/snapshots/org/c2w/MapperEx_cpp/MapperEx-omnet-cpp/0.0.1-SNAPSHOT/maven-metadata.xml
+            376/376 B               Downloaded: http://10.0.2.15:8080/repository/snapshots/org/c2w/MapperEx_cpp/MapperEx-omnet-cpp/0.0.1-SNAPSHOT/maven-metadata.xml (376 B at 24.5 KB/sec)
+[INFO] 
+[INFO] --- maven-clean-plugin:2.5:clean (default-clean) @ MapperEx-OmnetFederate-cpp ---
+[INFO] Deleting /home/vagrant/c2wt-dev/c2wt-cpp/c2wtng-cpp/examples/MapperEx/MapperEx-impl-cpp/OmnetFederate/target
+[INFO] 
+[INFO] --- nar-maven-plugin:3.3.0:nar-validate (default-nar-validate) @ MapperEx-OmnetFederate-cpp ---
+[INFO] Using AOL: amd64-Linux-gpp
+[INFO] 
+[INFO] --- nar-maven-plugin:3.3.0:nar-download (default-nar-download) @ MapperEx-OmnetFederate-cpp ---
+[INFO] Getting Nar dependencies
+[INFO] Getting Nar dependencies
+[INFO] 
+[INFO] --- nar-maven-plugin:3.3.0:nar-unpack (default-nar-unpack) @ MapperEx-OmnetFederate-cpp ---
+[INFO] Getting Nar dependencies
+[INFO] Unpacking 15 dependencies to /home/vagrant/c2wt-dev/c2wt-cpp/c2wtng-cpp/examples/MapperEx/MapperEx-impl-cpp/OmnetFederate/target/nar
+[INFO] + ranlib /home/vagrant/c2wt-dev/c2wt-cpp/c2wtng-cpp/examples/MapperEx/MapperEx-impl-cpp/OmnetFederate/target/nar/MapperEx-base-cpp-0.0.1-SNAPSHOT-amd64-Linux-gpp-static/lib/amd64-Linux-gpp/static/libMapperEx-base-cpp-0.0.1-SNAPSHOT.a
+[INFO] + ranlib /home/vagrant/c2wt-dev/c2wt-cpp/c2wtng-cpp/examples/MapperEx/MapperEx-impl-cpp/OmnetFederate/target/nar/MapperEx-base-cpp-0.0.1-SNAPSHOT-amd64-Linux-gpp-static/lib/amd64-Linux-gpp/static/libMapperEx-base-cpp-0.0.1-SNAPSHOT.a
+[INFO] + ranlib /home/vagrant/c2wt-dev/c2wt-cpp/c2wtng-cpp/examples/MapperEx/MapperEx-impl-cpp/OmnetFederate/target/nar/core-cpp-0.3.0-SNAPSHOT-amd64-Linux-gpp-static/lib/amd64-Linux-gpp/static/libcore-cpp-0.3.0-SNAPSHOT.a
+[INFO] + ranlib /home/vagrant/c2wt-dev/c2wt-cpp/c2wtng-cpp/examples/MapperEx/MapperEx-impl-cpp/OmnetFederate/target/nar/core-cpp-0.3.0-SNAPSHOT-amd64-Linux-gpp-static/lib/amd64-Linux-gpp/static/libcore-cpp-0.3.0-SNAPSHOT.a
+[INFO] + ranlib /home/vagrant/c2wt-dev/c2wt-cpp/c2wtng-cpp/examples/MapperEx/MapperEx-impl-cpp/OmnetFederate/target/nar/rti-base-cpp-0.3.0-SNAPSHOT-amd64-Linux-gpp-static/lib/amd64-Linux-gpp/static/librti-base-cpp-0.3.0-SNAPSHOT.a
+[INFO] + ranlib /home/vagrant/c2wt-dev/c2wt-cpp/c2wtng-cpp/examples/MapperEx/MapperEx-impl-cpp/OmnetFederate/target/nar/rti-base-cpp-0.3.0-SNAPSHOT-amd64-Linux-gpp-static/lib/amd64-Linux-gpp/static/librti-base-cpp-0.3.0-SNAPSHOT.a
+[INFO] + chmod +x /home/vagrant/c2wt-dev/c2wt-cpp/c2wtng-cpp/examples/MapperEx/MapperEx-impl-cpp/OmnetFederate/target/nar/OmnetFederate-0.3.0-SNAPSHOT-amd64-Linux-gpp-executable/bin/amd64-Linux-gpp/gcc-debug/BasicUdpApp.o
+[INFO] + chmod +x /home/vagrant/c2wt-dev/c2wt-cpp/c2wtng-cpp/examples/MapperEx/MapperEx-impl-cpp/OmnetFederate/target/nar/OmnetFederate-0.3.0-SNAPSHOT-amd64-Linux-gpp-executable/bin/amd64-Linux-gpp/gcc-debug/messages/ReplayAttackMsg_m.o
+[INFO] + chmod +x /home/vagrant/c2wt-dev/c2wt-cpp/c2wtng-cpp/examples/MapperEx/MapperEx-impl-cpp/OmnetFederate/target/nar/OmnetFederate-0.3.0-SNAPSHOT-amd64-Linux-gpp-executable/bin/amd64-Linux-gpp/gcc-debug/messages/IPFirewallMsg_m.o
+[INFO] + chmod +x /home/vagrant/c2wt-dev/c2wt-cpp/c2wtng-cpp/examples/MapperEx/MapperEx-impl-cpp/OmnetFederate/target/nar/OmnetFederate-0.3.0-SNAPSHOT-amd64-Linux-gpp-executable/bin/amd64-Linux-gpp/gcc-debug/messages/FilterAttackMsg_m.o
+[INFO] + chmod +x /home/vagrant/c2wt-dev/c2wt-cpp/c2wtng-cpp/examples/MapperEx/MapperEx-impl-cpp/OmnetFederate/target/nar/OmnetFederate-0.3.0-SNAPSHOT-amd64-Linux-gpp-executable/bin/amd64-Linux-gpp/gcc-debug/messages/NetworkAttackMsg_m.o
+[INFO] + chmod +x /home/vagrant/c2wt-dev/c2wt-cpp/c2wtng-cpp/examples/MapperEx/MapperEx-impl-cpp/OmnetFederate/target/nar/OmnetFederate-0.3.0-SNAPSHOT-amd64-Linux-gpp-executable/bin/amd64-Linux-gpp/gcc-debug/messages/RecordReplayAttackMsg_m.o
+[INFO] + chmod +x /home/vagrant/c2wt-dev/c2wt-cpp/c2wtng-cpp/examples/MapperEx/MapperEx-impl-cpp/OmnetFederate/target/nar/OmnetFederate-0.3.0-SNAPSHOT-amd64-Linux-gpp-executable/bin/amd64-Linux-gpp/gcc-debug/messages/ReplayMsg_m.o
+[INFO] + chmod +x /home/vagrant/c2wt-dev/c2wt-cpp/c2wtng-cpp/examples/MapperEx/MapperEx-impl-cpp/OmnetFederate/target/nar/OmnetFederate-0.3.0-SNAPSHOT-amd64-Linux-gpp-executable/bin/amd64-Linux-gpp/gcc-debug/messages/OutOfOrderAttackMsg_m.o
+[INFO] + chmod +x /home/vagrant/c2wt-dev/c2wt-cpp/c2wtng-cpp/examples/MapperEx/MapperEx-impl-cpp/OmnetFederate/target/nar/OmnetFederate-0.3.0-SNAPSHOT-amd64-Linux-gpp-executable/bin/amd64-Linux-gpp/gcc-debug/messages/DropRouteEntryMsg_m.o
+[INFO] + chmod +x /home/vagrant/c2wt-dev/c2wt-cpp/c2wtng-cpp/examples/MapperEx/MapperEx-impl-cpp/OmnetFederate/target/nar/OmnetFederate-0.3.0-SNAPSHOT-amd64-Linux-gpp-executable/bin/amd64-Linux-gpp/gcc-debug/messages/DelayNodeAttackMsg_m.o
+[INFO] + chmod +x /home/vagrant/c2wt-dev/c2wt-cpp/c2wtng-cpp/examples/MapperEx/MapperEx-impl-cpp/OmnetFederate/target/nar/OmnetFederate-0.3.0-SNAPSHOT-amd64-Linux-gpp-executable/bin/amd64-Linux-gpp/gcc-debug/messages/OutOfOrderMsg_m.o
+[INFO] + chmod +x /home/vagrant/c2wt-dev/c2wt-cpp/c2wtng-cpp/examples/MapperEx/MapperEx-impl-cpp/OmnetFederate/target/nar/OmnetFederate-0.3.0-SNAPSHOT-amd64-Linux-gpp-executable/bin/amd64-Linux-gpp/gcc-debug/messages/InteractionMsg_m.o
+[INFO] + chmod +x /home/vagrant/c2wt-dev/c2wt-cpp/c2wtng-cpp/examples/MapperEx/MapperEx-impl-cpp/OmnetFederate/target/nar/OmnetFederate-0.3.0-SNAPSHOT-amd64-Linux-gpp-executable/bin/amd64-Linux-gpp/gcc-debug/messages/SnifferAttackMsg_m.o
+[INFO] + chmod +x /home/vagrant/c2wt-dev/c2wt-cpp/c2wtng-cpp/examples/MapperEx/MapperEx-impl-cpp/OmnetFederate/target/nar/OmnetFederate-0.3.0-SNAPSHOT-amd64-Linux-gpp-executable/bin/amd64-Linux-gpp/gcc-debug/messages/NodeAttackMsg_m.o
+[INFO] + chmod +x /home/vagrant/c2wt-dev/c2wt-cpp/c2wtng-cpp/examples/MapperEx/MapperEx-impl-cpp/OmnetFederate/target/nar/OmnetFederate-0.3.0-SNAPSHOT-amd64-Linux-gpp-executable/bin/amd64-Linux-gpp/gcc-debug/messages/AddRouteEntryMsg_m.o
+[INFO] + chmod +x /home/vagrant/c2wt-dev/c2wt-cpp/c2wtng-cpp/examples/MapperEx/MapperEx-impl-cpp/OmnetFederate/target/nar/OmnetFederate-0.3.0-SNAPSHOT-amd64-Linux-gpp-executable/bin/amd64-Linux-gpp/gcc-debug/messages/ObjectMsg_m.o
+[INFO] + chmod +x /home/vagrant/c2wt-dev/c2wt-cpp/c2wtng-cpp/examples/MapperEx/MapperEx-impl-cpp/OmnetFederate/target/nar/OmnetFederate-0.3.0-SNAPSHOT-amd64-Linux-gpp-executable/bin/amd64-Linux-gpp/gcc-debug/messages/DelayedMsg_m.o
+[INFO] + chmod +x /home/vagrant/c2wt-dev/c2wt-cpp/c2wtng-cpp/examples/MapperEx/MapperEx-impl-cpp/OmnetFederate/target/nar/OmnetFederate-0.3.0-SNAPSHOT-amd64-Linux-gpp-executable/bin/amd64-Linux-gpp/gcc-debug/C2WDHCPClient.o
+[INFO] + chmod +x /home/vagrant/c2wt-dev/c2wt-cpp/c2wtng-cpp/examples/MapperEx/MapperEx-impl-cpp/OmnetFederate/target/nar/OmnetFederate-0.3.0-SNAPSHOT-amd64-Linux-gpp-executable/bin/amd64-Linux-gpp/gcc-debug/libOmnetFederate-0.3.0-SNAPSHOT.a
+[INFO] + chmod +x /home/vagrant/c2wt-dev/c2wt-cpp/c2wtng-cpp/examples/MapperEx/MapperEx-impl-cpp/OmnetFederate/target/nar/OmnetFederate-0.3.0-SNAPSHOT-amd64-Linux-gpp-executable/bin/amd64-Linux-gpp/gcc-debug/C2WDHCPServer.o
+[INFO] + chmod +x /home/vagrant/c2wt-dev/c2wt-cpp/c2wtng-cpp/examples/MapperEx/MapperEx-impl-cpp/OmnetFederate/target/nar/OmnetFederate-0.3.0-SNAPSHOT-amd64-Linux-gpp-executable/bin/amd64-Linux-gpp/gcc-debug/BasicUdpAppWrapper.o
+[INFO] + chmod +x /home/vagrant/c2wt-dev/c2wt-cpp/c2wtng-cpp/examples/MapperEx/MapperEx-impl-cpp/OmnetFederate/target/nar/OmnetFederate-0.3.0-SNAPSHOT-amd64-Linux-gpp-executable/bin/amd64-Linux-gpp/gcc-debug/HLAInterface.o
+[INFO] + chmod +x /home/vagrant/c2wt-dev/c2wt-cpp/c2wtng-cpp/examples/MapperEx/MapperEx-impl-cpp/OmnetFederate/target/nar/OmnetFederate-0.3.0-SNAPSHOT-amd64-Linux-gpp-executable/bin/amd64-Linux-gpp/gcc-debug/HLAScheduler.o
+[INFO] + chmod +x /home/vagrant/c2wt-dev/c2wt-cpp/c2wtng-cpp/examples/MapperEx/MapperEx-impl-cpp/OmnetFederate/target/nar/OmnetFederate-0.3.0-SNAPSHOT-amd64-Linux-gpp-executable/bin/amd64-Linux-gpp/gcc-debug/OmnetFOMInteractions.o
+[INFO] + chmod +x /home/vagrant/c2wt-dev/c2wt-cpp/c2wtng-cpp/examples/MapperEx/MapperEx-impl-cpp/OmnetFederate/target/nar/OmnetFederate-0.3.0-SNAPSHOT-amd64-Linux-gpp-executable/bin/amd64-Linux-gpp/gcc-debug/C2WIPv4.o
+[INFO] + chmod +x /home/vagrant/c2wt-dev/c2wt-cpp/c2wtng-cpp/examples/MapperEx/MapperEx-impl-cpp/OmnetFederate/target/nar/OmnetFederate-0.3.0-SNAPSHOT-amd64-Linux-gpp-executable/bin/amd64-Linux-gpp/gcc-debug/BasicUdpApp.o
+[INFO] + chmod +x /home/vagrant/c2wt-dev/c2wt-cpp/c2wtng-cpp/examples/MapperEx/MapperEx-impl-cpp/OmnetFederate/target/nar/OmnetFederate-0.3.0-SNAPSHOT-amd64-Linux-gpp-executable/bin/amd64-Linux-gpp/gcc-debug/messages/ReplayAttackMsg_m.o
+[INFO] + chmod +x /home/vagrant/c2wt-dev/c2wt-cpp/c2wtng-cpp/examples/MapperEx/MapperEx-impl-cpp/OmnetFederate/target/nar/OmnetFederate-0.3.0-SNAPSHOT-amd64-Linux-gpp-executable/bin/amd64-Linux-gpp/gcc-debug/messages/IPFirewallMsg_m.o
+[INFO] + chmod +x /home/vagrant/c2wt-dev/c2wt-cpp/c2wtng-cpp/examples/MapperEx/MapperEx-impl-cpp/OmnetFederate/target/nar/OmnetFederate-0.3.0-SNAPSHOT-amd64-Linux-gpp-executable/bin/amd64-Linux-gpp/gcc-debug/messages/FilterAttackMsg_m.o
+[INFO] + chmod +x /home/vagrant/c2wt-dev/c2wt-cpp/c2wtng-cpp/examples/MapperEx/MapperEx-impl-cpp/OmnetFederate/target/nar/OmnetFederate-0.3.0-SNAPSHOT-amd64-Linux-gpp-executable/bin/amd64-Linux-gpp/gcc-debug/messages/NetworkAttackMsg_m.o
+[INFO] + chmod +x /home/vagrant/c2wt-dev/c2wt-cpp/c2wtng-cpp/examples/MapperEx/MapperEx-impl-cpp/OmnetFederate/target/nar/OmnetFederate-0.3.0-SNAPSHOT-amd64-Linux-gpp-executable/bin/amd64-Linux-gpp/gcc-debug/messages/RecordReplayAttackMsg_m.o
+[INFO] + chmod +x /home/vagrant/c2wt-dev/c2wt-cpp/c2wtng-cpp/examples/MapperEx/MapperEx-impl-cpp/OmnetFederate/target/nar/OmnetFederate-0.3.0-SNAPSHOT-amd64-Linux-gpp-executable/bin/amd64-Linux-gpp/gcc-debug/messages/ReplayMsg_m.o
+[INFO] + chmod +x /home/vagrant/c2wt-dev/c2wt-cpp/c2wtng-cpp/examples/MapperEx/MapperEx-impl-cpp/OmnetFederate/target/nar/OmnetFederate-0.3.0-SNAPSHOT-amd64-Linux-gpp-executable/bin/amd64-Linux-gpp/gcc-debug/messages/OutOfOrderAttackMsg_m.o
+[INFO] + chmod +x /home/vagrant/c2wt-dev/c2wt-cpp/c2wtng-cpp/examples/MapperEx/MapperEx-impl-cpp/OmnetFederate/target/nar/OmnetFederate-0.3.0-SNAPSHOT-amd64-Linux-gpp-executable/bin/amd64-Linux-gpp/gcc-debug/messages/DropRouteEntryMsg_m.o
+[INFO] + chmod +x /home/vagrant/c2wt-dev/c2wt-cpp/c2wtng-cpp/examples/MapperEx/MapperEx-impl-cpp/OmnetFederate/target/nar/OmnetFederate-0.3.0-SNAPSHOT-amd64-Linux-gpp-executable/bin/amd64-Linux-gpp/gcc-debug/messages/DelayNodeAttackMsg_m.o
+[INFO] + chmod +x /home/vagrant/c2wt-dev/c2wt-cpp/c2wtng-cpp/examples/MapperEx/MapperEx-impl-cpp/OmnetFederate/target/nar/OmnetFederate-0.3.0-SNAPSHOT-amd64-Linux-gpp-executable/bin/amd64-Linux-gpp/gcc-debug/messages/OutOfOrderMsg_m.o
+[INFO] + chmod +x /home/vagrant/c2wt-dev/c2wt-cpp/c2wtng-cpp/examples/MapperEx/MapperEx-impl-cpp/OmnetFederate/target/nar/OmnetFederate-0.3.0-SNAPSHOT-amd64-Linux-gpp-executable/bin/amd64-Linux-gpp/gcc-debug/messages/InteractionMsg_m.o
+[INFO] + chmod +x /home/vagrant/c2wt-dev/c2wt-cpp/c2wtng-cpp/examples/MapperEx/MapperEx-impl-cpp/OmnetFederate/target/nar/OmnetFederate-0.3.0-SNAPSHOT-amd64-Linux-gpp-executable/bin/amd64-Linux-gpp/gcc-debug/messages/SnifferAttackMsg_m.o
+[INFO] + chmod +x /home/vagrant/c2wt-dev/c2wt-cpp/c2wtng-cpp/examples/MapperEx/MapperEx-impl-cpp/OmnetFederate/target/nar/OmnetFederate-0.3.0-SNAPSHOT-amd64-Linux-gpp-executable/bin/amd64-Linux-gpp/gcc-debug/messages/NodeAttackMsg_m.o
+[INFO] + chmod +x /home/vagrant/c2wt-dev/c2wt-cpp/c2wtng-cpp/examples/MapperEx/MapperEx-impl-cpp/OmnetFederate/target/nar/OmnetFederate-0.3.0-SNAPSHOT-amd64-Linux-gpp-executable/bin/amd64-Linux-gpp/gcc-debug/messages/AddRouteEntryMsg_m.o
+[INFO] + chmod +x /home/vagrant/c2wt-dev/c2wt-cpp/c2wtng-cpp/examples/MapperEx/MapperEx-impl-cpp/OmnetFederate/target/nar/OmnetFederate-0.3.0-SNAPSHOT-amd64-Linux-gpp-executable/bin/amd64-Linux-gpp/gcc-debug/messages/ObjectMsg_m.o
+[INFO] + chmod +x /home/vagrant/c2wt-dev/c2wt-cpp/c2wtng-cpp/examples/MapperEx/MapperEx-impl-cpp/OmnetFederate/target/nar/OmnetFederate-0.3.0-SNAPSHOT-amd64-Linux-gpp-executable/bin/amd64-Linux-gpp/gcc-debug/messages/DelayedMsg_m.o
+[INFO] + chmod +x /home/vagrant/c2wt-dev/c2wt-cpp/c2wtng-cpp/examples/MapperEx/MapperEx-impl-cpp/OmnetFederate/target/nar/OmnetFederate-0.3.0-SNAPSHOT-amd64-Linux-gpp-executable/bin/amd64-Linux-gpp/gcc-debug/C2WDHCPClient.o
+[INFO] + chmod +x /home/vagrant/c2wt-dev/c2wt-cpp/c2wtng-cpp/examples/MapperEx/MapperEx-impl-cpp/OmnetFederate/target/nar/OmnetFederate-0.3.0-SNAPSHOT-amd64-Linux-gpp-executable/bin/amd64-Linux-gpp/gcc-debug/libOmnetFederate-0.3.0-SNAPSHOT.a
+[INFO] + chmod +x /home/vagrant/c2wt-dev/c2wt-cpp/c2wtng-cpp/examples/MapperEx/MapperEx-impl-cpp/OmnetFederate/target/nar/OmnetFederate-0.3.0-SNAPSHOT-amd64-Linux-gpp-executable/bin/amd64-Linux-gpp/gcc-debug/C2WDHCPServer.o
+[INFO] + chmod +x /home/vagrant/c2wt-dev/c2wt-cpp/c2wtng-cpp/examples/MapperEx/MapperEx-impl-cpp/OmnetFederate/target/nar/OmnetFederate-0.3.0-SNAPSHOT-amd64-Linux-gpp-executable/bin/amd64-Linux-gpp/gcc-debug/BasicUdpAppWrapper.o
+[INFO] + chmod +x /home/vagrant/c2wt-dev/c2wt-cpp/c2wtng-cpp/examples/MapperEx/MapperEx-impl-cpp/OmnetFederate/target/nar/OmnetFederate-0.3.0-SNAPSHOT-amd64-Linux-gpp-executable/bin/amd64-Linux-gpp/gcc-debug/HLAInterface.o
+[INFO] + chmod +x /home/vagrant/c2wt-dev/c2wt-cpp/c2wtng-cpp/examples/MapperEx/MapperEx-impl-cpp/OmnetFederate/target/nar/OmnetFederate-0.3.0-SNAPSHOT-amd64-Linux-gpp-executable/bin/amd64-Linux-gpp/gcc-debug/HLAScheduler.o
+[INFO] + chmod +x /home/vagrant/c2wt-dev/c2wt-cpp/c2wtng-cpp/examples/MapperEx/MapperEx-impl-cpp/OmnetFederate/target/nar/OmnetFederate-0.3.0-SNAPSHOT-amd64-Linux-gpp-executable/bin/amd64-Linux-gpp/gcc-debug/OmnetFOMInteractions.o
+[INFO] + chmod +x /home/vagrant/c2wt-dev/c2wt-cpp/c2wtng-cpp/examples/MapperEx/MapperEx-impl-cpp/OmnetFederate/target/nar/OmnetFederate-0.3.0-SNAPSHOT-amd64-Linux-gpp-executable/bin/amd64-Linux-gpp/gcc-debug/C2WIPv4.o
+[INFO] + ranlib /home/vagrant/c2wt-dev/c2wt-cpp/c2wtng-cpp/examples/MapperEx/MapperEx-impl-cpp/OmnetFederate/target/nar/MapperEx-omnet-cpp-0.0.1-SNAPSHOT-amd64-Linux-gpp-static/lib/amd64-Linux-gpp/static/libMapperEx-omnet-cpp-0.0.1-SNAPSHOT.a
+[INFO] + ranlib /home/vagrant/c2wt-dev/c2wt-cpp/c2wtng-cpp/examples/MapperEx/MapperEx-impl-cpp/OmnetFederate/target/nar/MapperEx-omnet-cpp-0.0.1-SNAPSHOT-amd64-Linux-gpp-static/lib/amd64-Linux-gpp/static/libMapperEx-omnet-cpp-0.0.1-SNAPSHOT.a
+[INFO] + ranlib /home/vagrant/c2wt-dev/c2wt-cpp/c2wtng-cpp/examples/MapperEx/MapperEx-impl-cpp/OmnetFederate/target/nar/MapperEx-rti-cpp-0.0.1-SNAPSHOT-amd64-Linux-gpp-static/lib/amd64-Linux-gpp/static/libMapperEx-rti-cpp-0.0.1-SNAPSHOT.a
+[INFO] + ranlib /home/vagrant/c2wt-dev/c2wt-cpp/c2wtng-cpp/examples/MapperEx/MapperEx-impl-cpp/OmnetFederate/target/nar/MapperEx-rti-cpp-0.0.1-SNAPSHOT-amd64-Linux-gpp-static/lib/amd64-Linux-gpp/static/libMapperEx-rti-cpp-0.0.1-SNAPSHOT.a
+[INFO] 
+[INFO] --- nar-maven-plugin:3.3.0:nar-gnu-configure (default-nar-gnu-configure) @ MapperEx-OmnetFederate-cpp ---
+[INFO] Copying GNU sources
+[INFO] 
+[INFO] --- nar-maven-plugin:3.3.0:nar-system-generate (default-nar-system-generate) @ MapperEx-OmnetFederate-cpp ---
+[INFO] 
+[INFO] --- nar-maven-plugin:3.3.0:nar-vcproj (default-nar-vcproj) @ MapperEx-OmnetFederate-cpp ---
+[INFO] 
+[INFO] --- maven-resources-plugin:3.0.2:resources (default-resources) @ MapperEx-OmnetFederate-cpp ---
+[WARNING] Using platform encoding (UTF-8 actually) to copy filtered resources, i.e. build is platform dependent!
+[INFO] skip non existing resourceDirectory /home/vagrant/c2wt-dev/c2wt-cpp/c2wtng-cpp/examples/MapperEx/MapperEx-impl-cpp/OmnetFederate/src/main/resources
+[INFO] 
+[INFO] --- nar-maven-plugin:3.3.0:nar-resources (default-nar-resources) @ MapperEx-OmnetFederate-cpp ---
+[INFO] Copied 3 resources
+[INFO] 
+[INFO] --- nar-maven-plugin:3.3.0:nar-gnu-resources (default-nar-gnu-resources) @ MapperEx-OmnetFederate-cpp ---
+[INFO] 
+[INFO] --- maven-compiler-plugin:3.6.0:compile (default-compile) @ MapperEx-OmnetFederate-cpp ---
+[INFO] No sources to compile
+[INFO] 
+[INFO] --- nar-maven-plugin:3.3.0:nar-javah (default-nar-javah) @ MapperEx-OmnetFederate-cpp ---
+[INFO] 
+[INFO] --- nar-maven-plugin:3.3.0:nar-gnu-make (default-nar-gnu-make) @ MapperEx-OmnetFederate-cpp ---
+[INFO] Running GNU make
+[INFO] + cd /home/vagrant/c2wt-dev/c2wt-cpp/c2wtng-cpp/examples/MapperEx/MapperEx-impl-cpp/OmnetFederate/target/nar/gnu/amd64-Linux-gpp/src
+[INFO] + make
+[INFO] Creating executable: ../target/bin//MapperEx-OmnetFederate-cpp
+[ERROR] /home/vagrant/c2wt-dev/c2wt-cpp/c2wtng-cpp/examples/MapperEx/MapperEx-impl-cpp/OmnetFederate/target/nar/OmnetFederate-0.3.0-SNAPSHOT-amd64-Linux-gpp-executable/bin/amd64-Linux-gpp/gcc-debug/libOmnetFederate-0.3.0-SNAPSHOT.a(HLAInterface.o): In function `__static_initialization_and_destruction_0':
+[ERROR] /home/vagrant/c2wt-dev/c2wt-cpp/c2wtng-cpp/foundation/OmnetFederate/target/nar/rti-base-cpp-0.3.0-SNAPSHOT-noarch/include/SimLog.hpp:342: undefined reference to `SimLog::static_init()'
+[ERROR] /home/vagrant/c2wt-dev/c2wt-cpp/c2wtng-cpp/examples/MapperEx/MapperEx-impl-cpp/OmnetFederate/target/nar/OmnetFederate-0.3.0-SNAPSHOT-amd64-Linux-gpp-executable/bin/amd64-Linux-gpp/gcc-debug/libOmnetFederate-0.3.0-SNAPSHOT.a(HLAInterface.o): In function `__static_initialization_and_destruction_0':
+[ERROR] /home/vagrant/c2wt-dev/c2wt-cpp/c2wtng-cpp/foundation/OmnetFederate/target/nar/rti-base-cpp-0.3.0-SNAPSHOT-noarch/include/LowPrio.hpp:216: undefined reference to `LowPrio::static_init()'
+[ERROR] /home/vagrant/c2wt-dev/c2wt-cpp/c2wtng-cpp/examples/MapperEx/MapperEx-impl-cpp/OmnetFederate/target/nar/OmnetFederate-0.3.0-SNAPSHOT-amd64-Linux-gpp-executable/bin/amd64-Linux-gpp/gcc-debug/libOmnetFederate-0.3.0-SNAPSHOT.a(HLAInterface.o): In function `__static_initialization_and_destruction_0':
+[ERROR] /home/vagrant/c2wt-dev/c2wt-cpp/c2wtng-cpp/foundation/OmnetFederate/target/nar/rti-base-cpp-0.3.0-SNAPSHOT-noarch/include/MediumPrio.hpp:216: undefined reference to `MediumPrio::static_init()'
+[ERROR] /home/vagrant/c2wt-dev/c2wt-cpp/c2wtng-cpp/examples/MapperEx/MapperEx-impl-cpp/OmnetFederate/target/nar/OmnetFederate-0.3.0-SNAPSHOT-amd64-Linux-gpp-executable/bin/amd64-Linux-gpp/gcc-debug/libOmnetFederate-0.3.0-SNAPSHOT.a(HLAInterface.o): In function `__static_initialization_and_destruction_0':
+[ERROR] /home/vagrant/c2wt-dev/c2wt-cpp/c2wtng-cpp/foundation/OmnetFederate/target/nar/rti-base-cpp-0.3.0-SNAPSHOT-noarch/include/SimPause.hpp:216: undefined reference to `SimPause::static_init()'
+[ERROR] /home/vagrant/c2wt-dev/c2wt-cpp/c2wtng-cpp/examples/MapperEx/MapperEx-impl-cpp/OmnetFederate/target/nar/OmnetFederate-0.3.0-SNAPSHOT-amd64-Linux-gpp-executable/bin/amd64-Linux-gpp/gcc-debug/libOmnetFederate-0.3.0-SNAPSHOT.a(HLAInterface.o): In function `__static_initialization_and_destruction_0':
+[ERROR] /home/vagrant/c2wt-dev/c2wt-cpp/c2wtng-cpp/foundation/OmnetFederate/target/nar/rti-base-cpp-0.3.0-SNAPSHOT-noarch/include/SimResume.hpp:216: undefined reference to `SimResume::static_init()'
+[ERROR] /home/vagrant/c2wt-dev/c2wt-cpp/c2wtng-cpp/examples/MapperEx/MapperEx-impl-cpp/OmnetFederate/target/nar/OmnetFederate-0.3.0-SNAPSHOT-amd64-Linux-gpp-executable/bin/amd64-Linux-gpp/gcc-debug/libOmnetFederate-0.3.0-SNAPSHOT.a(HLAInterface.o): In function `__static_initialization_and_destruction_0':
+[ERROR] /home/vagrant/c2wt-dev/c2wt-cpp/c2wtng-cpp/foundation/OmnetFederate/target/nar/rti-base-cpp-0.3.0-SNAPSHOT-noarch/include/HighPrio.hpp:216: undefined reference to `HighPrio::static_init()'
+[ERROR] /home/vagrant/c2wt-dev/c2wt-cpp/c2wtng-cpp/examples/MapperEx/MapperEx-impl-cpp/OmnetFederate/target/nar/OmnetFederate-0.3.0-SNAPSHOT-amd64-Linux-gpp-executable/bin/amd64-Linux-gpp/gcc-debug/libOmnetFederate-0.3.0-SNAPSHOT.a(HLAInterface.o): In function `__static_initialization_and_destruction_0':
+[ERROR] /home/vagrant/c2wt-dev/c2wt-cpp/c2wtng-cpp/foundation/OmnetFederate/target/nar/rti-base-cpp-0.3.0-SNAPSHOT-noarch/include/VeryLowPrio.hpp:216: undefined reference to `VeryLowPrio::static_init()'
+[ERROR] collect2: error: ld returned 1 exit status
+[ERROR] make: *** [../target/bin//MapperEx-OmnetFederate-cpp] Error 1
+[WARNING] com.github.maven_nar.NarUtil$2@5a9800f8
+[WARNING] com.github.maven_nar.NarUtil$1@143d9a93
+[WARNING] com.github.maven_nar.NarUtil$3@40226788
+[INFO] ------------------------------------------------------------------------
+[INFO] Reactor Summary:
+[INFO] 
+[INFO] C++ MapperEx example implementation- TOP .......... SUCCESS [0.153s]
+[INFO] C++ MapperEx example OmnetFederate implementation . FAILURE [5.223s]
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD FAILURE
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time: 5.872s
+[INFO] Finished at: Tue Dec 13 18:00:30 UTC 2016
+[INFO] Final Memory: 14M/271M
+[INFO] ------------------------------------------------------------------------
+[ERROR] Failed to execute goal com.github.maven-nar:nar-maven-plugin:3.3.0:nar-gnu-make (default-nar-gnu-make) on project MapperEx-OmnetFederate-cpp: exit code: 2 -> [Help 1]
+[ERROR] 
+[ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
+[ERROR] Re-run Maven using the -X switch to enable full debug logging.
+[ERROR] 
+[ERROR] For more information about the errors and possible solutions, please read the following articles:
+[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/MojoExecutionException
+[ERROR] 
+[ERROR] After correcting the problems, you can resume the build with the command
+[ERROR]   mvn <goals> -rf :MapperEx-OmnetFederate-cpp
+Maven Deploying to the Archiva.....
+[INFO] Scanning for projects...
+[INFO] ------------------------------------------------------------------------
+[INFO] Reactor Build Order:
+[INFO] 
+[INFO] C++ MapperEx example implementation- TOP
+[INFO] C++ MapperEx example OmnetFederate implementation
+[INFO]                                                                         
+[INFO] ------------------------------------------------------------------------
+[INFO] Building C++ MapperEx example implementation- TOP 0.0.1-SNAPSHOT
+[INFO] ------------------------------------------------------------------------
+[INFO] 
+[INFO] --- maven-install-plugin:2.3:install (default-install) @ MapperEx ---
+[INFO] Installing /home/vagrant/c2wt-dev/c2wt-cpp/c2wtng-cpp/examples/MapperEx/MapperEx-impl-cpp/pom.xml to /home/vagrant/.m2/repository/org/c2w/MapperEx_cpp/MapperEx/0.0.1-SNAPSHOT/MapperEx-0.0.1-SNAPSHOT.pom
+[INFO] 
+[INFO] --- maven-deploy-plugin:2.7:deploy (default-deploy) @ MapperEx ---
+Downloading: http://10.0.2.15:8080/repository/snapshots/org/c2w/MapperEx_cpp/MapperEx/0.0.1-SNAPSHOT/maven-metadata.xml
+366/366 B               Downloaded: http://10.0.2.15:8080/repository/snapshots/org/c2w/MapperEx_cpp/MapperEx/0.0.1-SNAPSHOT/maven-metadata.xml (366 B at 2.5 KB/sec)
+Uploading: http://10.0.2.15:8080/repository/snapshots/org/c2w/MapperEx_cpp/MapperEx/0.0.1-SNAPSHOT/MapperEx-0.0.1-20161213.180033-56.pom
+2/11 KB     4/11 KB   6/11 KB   8/11 KB   10/11 KB   11/11 KB              Uploaded: http://10.0.2.15:8080/repository/snapshots/org/c2w/MapperEx_cpp/MapperEx/0.0.1-SNAPSHOT/MapperEx-0.0.1-20161213.180033-56.pom (11 KB at 219.7 KB/sec)
+Downloading: http://10.0.2.15:8080/repository/snapshots/org/c2w/MapperEx_cpp/MapperEx/maven-metadata.xml
+325/325 B               Downloaded: http://10.0.2.15:8080/repository/snapshots/org/c2w/MapperEx_cpp/MapperEx/maven-metadata.xml (325 B at 45.3 KB/sec)
+Uploading: http://10.0.2.15:8080/repository/snapshots/org/c2w/MapperEx_cpp/MapperEx/0.0.1-SNAPSHOT/maven-metadata.xml
+607/607 B               Uploaded: http://10.0.2.15:8080/repository/snapshots/org/c2w/MapperEx_cpp/MapperEx/0.0.1-SNAPSHOT/maven-metadata.xml (607 B at 45.6 KB/sec)
+Uploading: http://10.0.2.15:8080/repository/snapshots/org/c2w/MapperEx_cpp/MapperEx/maven-metadata.xml
+324/324 B               Uploaded: http://10.0.2.15:8080/repository/snapshots/org/c2w/MapperEx_cpp/MapperEx/maven-metadata.xml (324 B at 24.3 KB/sec)
+[INFO]                                                                         
+[INFO] ------------------------------------------------------------------------
+[INFO] Building C++ MapperEx example OmnetFederate implementation 0.0.1-SNAPSHOT
+[INFO] ------------------------------------------------------------------------
+[INFO] 
+[INFO] --- nar-maven-plugin:3.3.0:nar-validate (default-nar-validate) @ MapperEx-OmnetFederate-cpp ---
+[INFO] Using AOL: amd64-Linux-gpp
+[INFO] 
+[INFO] --- nar-maven-plugin:3.3.0:nar-download (default-nar-download) @ MapperEx-OmnetFederate-cpp ---
+[INFO] Getting Nar dependencies
+[INFO] Getting Nar dependencies
+[INFO] 
+[INFO] --- nar-maven-plugin:3.3.0:nar-unpack (default-nar-unpack) @ MapperEx-OmnetFederate-cpp ---
+[INFO] Getting Nar dependencies
+[INFO] Unpacking 15 dependencies to /home/vagrant/c2wt-dev/c2wt-cpp/c2wtng-cpp/examples/MapperEx/MapperEx-impl-cpp/OmnetFederate/target/nar
+[INFO] 
+[INFO] --- nar-maven-plugin:3.3.0:nar-gnu-configure (default-nar-gnu-configure) @ MapperEx-OmnetFederate-cpp ---
+[INFO] Copying GNU sources
+[INFO] 
+[INFO] --- nar-maven-plugin:3.3.0:nar-system-generate (default-nar-system-generate) @ MapperEx-OmnetFederate-cpp ---
+[INFO] 
+[INFO] --- nar-maven-plugin:3.3.0:nar-vcproj (default-nar-vcproj) @ MapperEx-OmnetFederate-cpp ---
+[INFO] 
+[INFO] --- maven-resources-plugin:3.0.2:resources (default-resources) @ MapperEx-OmnetFederate-cpp ---
+[WARNING] Using platform encoding (UTF-8 actually) to copy filtered resources, i.e. build is platform dependent!
+[INFO] skip non existing resourceDirectory /home/vagrant/c2wt-dev/c2wt-cpp/c2wtng-cpp/examples/MapperEx/MapperEx-impl-cpp/OmnetFederate/src/main/resources
+[INFO] 
+[INFO] --- nar-maven-plugin:3.3.0:nar-resources (default-nar-resources) @ MapperEx-OmnetFederate-cpp ---
+[INFO] Copied 3 resources
+[INFO] 
+[INFO] --- nar-maven-plugin:3.3.0:nar-gnu-resources (default-nar-gnu-resources) @ MapperEx-OmnetFederate-cpp ---
+[INFO] 
+[INFO] --- maven-compiler-plugin:3.6.0:compile (default-compile) @ MapperEx-OmnetFederate-cpp ---
+[INFO] No sources to compile
+[INFO] 
+[INFO] --- nar-maven-plugin:3.3.0:nar-javah (default-nar-javah) @ MapperEx-OmnetFederate-cpp ---
+[INFO] 
+[INFO] --- nar-maven-plugin:3.3.0:nar-gnu-make (default-nar-gnu-make) @ MapperEx-OmnetFederate-cpp ---
+[INFO] Running GNU make
+[INFO] + cd /home/vagrant/c2wt-dev/c2wt-cpp/c2wtng-cpp/examples/MapperEx/MapperEx-impl-cpp/OmnetFederate/target/nar/gnu/amd64-Linux-gpp/src
+[INFO] + make
+[INFO] Creating executable: ../target/bin//MapperEx-OmnetFederate-cpp
+[ERROR] /home/vagrant/c2wt-dev/c2wt-cpp/c2wtng-cpp/examples/MapperEx/MapperEx-impl-cpp/OmnetFederate/target/nar/OmnetFederate-0.3.0-SNAPSHOT-amd64-Linux-gpp-executable/bin/amd64-Linux-gpp/gcc-debug/libOmnetFederate-0.3.0-SNAPSHOT.a(HLAInterface.o): In function `__static_initialization_and_destruction_0':
+[ERROR] /home/vagrant/c2wt-dev/c2wt-cpp/c2wtng-cpp/foundation/OmnetFederate/target/nar/rti-base-cpp-0.3.0-SNAPSHOT-noarch/include/SimLog.hpp:342: undefined reference to `SimLog::static_init()'
+[ERROR] /home/vagrant/c2wt-dev/c2wt-cpp/c2wtng-cpp/examples/MapperEx/MapperEx-impl-cpp/OmnetFederate/target/nar/OmnetFederate-0.3.0-SNAPSHOT-amd64-Linux-gpp-executable/bin/amd64-Linux-gpp/gcc-debug/libOmnetFederate-0.3.0-SNAPSHOT.a(HLAInterface.o): In function `__static_initialization_and_destruction_0':
+[ERROR] /home/vagrant/c2wt-dev/c2wt-cpp/c2wtng-cpp/foundation/OmnetFederate/target/nar/rti-base-cpp-0.3.0-SNAPSHOT-noarch/include/LowPrio.hpp:216: undefined reference to `LowPrio::static_init()'
+[ERROR] /home/vagrant/c2wt-dev/c2wt-cpp/c2wtng-cpp/examples/MapperEx/MapperEx-impl-cpp/OmnetFederate/target/nar/OmnetFederate-0.3.0-SNAPSHOT-amd64-Linux-gpp-executable/bin/amd64-Linux-gpp/gcc-debug/libOmnetFederate-0.3.0-SNAPSHOT.a(HLAInterface.o): In function `__static_initialization_and_destruction_0':
+[ERROR] /home/vagrant/c2wt-dev/c2wt-cpp/c2wtng-cpp/foundation/OmnetFederate/target/nar/rti-base-cpp-0.3.0-SNAPSHOT-noarch/include/MediumPrio.hpp:216: undefined reference to `MediumPrio::static_init()'
+[ERROR] /home/vagrant/c2wt-dev/c2wt-cpp/c2wtng-cpp/examples/MapperEx/MapperEx-impl-cpp/OmnetFederate/target/nar/OmnetFederate-0.3.0-SNAPSHOT-amd64-Linux-gpp-executable/bin/amd64-Linux-gpp/gcc-debug/libOmnetFederate-0.3.0-SNAPSHOT.a(HLAInterface.o): In function `__static_initialization_and_destruction_0':
+[ERROR] /home/vagrant/c2wt-dev/c2wt-cpp/c2wtng-cpp/foundation/OmnetFederate/target/nar/rti-base-cpp-0.3.0-SNAPSHOT-noarch/include/SimPause.hpp:216: undefined reference to `SimPause::static_init()'
+[ERROR] /home/vagrant/c2wt-dev/c2wt-cpp/c2wtng-cpp/examples/MapperEx/MapperEx-impl-cpp/OmnetFederate/target/nar/OmnetFederate-0.3.0-SNAPSHOT-amd64-Linux-gpp-executable/bin/amd64-Linux-gpp/gcc-debug/libOmnetFederate-0.3.0-SNAPSHOT.a(HLAInterface.o): In function `__static_initialization_and_destruction_0':
+[ERROR] /home/vagrant/c2wt-dev/c2wt-cpp/c2wtng-cpp/foundation/OmnetFederate/target/nar/rti-base-cpp-0.3.0-SNAPSHOT-noarch/include/SimResume.hpp:216: undefined reference to `SimResume::static_init()'
+[ERROR] /home/vagrant/c2wt-dev/c2wt-cpp/c2wtng-cpp/examples/MapperEx/MapperEx-impl-cpp/OmnetFederate/target/nar/OmnetFederate-0.3.0-SNAPSHOT-amd64-Linux-gpp-executable/bin/amd64-Linux-gpp/gcc-debug/libOmnetFederate-0.3.0-SNAPSHOT.a(HLAInterface.o): In function `__static_initialization_and_destruction_0':
+[ERROR] /home/vagrant/c2wt-dev/c2wt-cpp/c2wtng-cpp/foundation/OmnetFederate/target/nar/rti-base-cpp-0.3.0-SNAPSHOT-noarch/include/HighPrio.hpp:216: undefined reference to `HighPrio::static_init()'
+[ERROR] /home/vagrant/c2wt-dev/c2wt-cpp/c2wtng-cpp/examples/MapperEx/MapperEx-impl-cpp/OmnetFederate/target/nar/OmnetFederate-0.3.0-SNAPSHOT-amd64-Linux-gpp-executable/bin/amd64-Linux-gpp/gcc-debug/libOmnetFederate-0.3.0-SNAPSHOT.a(HLAInterface.o): In function `__static_initialization_and_destruction_0':
+[ERROR] /home/vagrant/c2wt-dev/c2wt-cpp/c2wtng-cpp/foundation/OmnetFederate/target/nar/rti-base-cpp-0.3.0-SNAPSHOT-noarch/include/VeryLowPrio.hpp:216: undefined reference to `VeryLowPrio::static_init()'
+[ERROR] collect2: error: ld returned 1 exit status
+[ERROR] make: *** [../target/bin//MapperEx-OmnetFederate-cpp] Error 1
+[WARNING] com.github.maven_nar.NarUtil$2@23eee4b8
+[WARNING] com.github.maven_nar.NarUtil$1@28952dea
+[WARNING] com.github.maven_nar.NarUtil$3@5a9800f8
+[INFO] ------------------------------------------------------------------------
+[INFO] Reactor Summary:
+[INFO] 
+[INFO] C++ MapperEx example implementation- TOP .......... SUCCESS [0.719s]
+[INFO] C++ MapperEx example OmnetFederate implementation . FAILURE [1.386s]
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD FAILURE
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time: 2.737s
+[INFO] Finished at: Tue Dec 13 18:00:34 UTC 2016
+[INFO] Final Memory: 16M/271M
+[INFO] ------------------------------------------------------------------------
+[ERROR] Failed to execute goal com.github.maven-nar:nar-maven-plugin:3.3.0:nar-gnu-make (default-nar-gnu-make) on project MapperEx-OmnetFederate-cpp: exit code: 2 -> [Help 1]
+[ERROR] 
+[ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
+[ERROR] Re-run Maven using the -X switch to enable full debug logging.
+[ERROR] 
+[ERROR] For more information about the errors and possible solutions, please read the following articles:
+[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/MojoExecutionException
+[ERROR] 
+[ERROR] After correcting the problems, you can resume the build with the command
+[ERROR]   mvn <goals> -rf :MapperEx-OmnetFederate-cpp
+Deployment Completed....
+==================================================================================
+Completed the compilation, installation, deployment of the C2W foundation packages
+==================================================================================
+Maven Compiling....
+[INFO] Scanning for projects...
+[INFO] ------------------------------------------------------------------------
+[INFO] Reactor Build Order:
+[INFO] 
+[INFO] C++ MapperEx example implementation- TOP
+[INFO] C++ MapperEx example OmnetFederate implementation
+[INFO]                                                                         
+[INFO] ------------------------------------------------------------------------
+[INFO] Building C++ MapperEx example implementation- TOP 0.0.1-SNAPSHOT
+[INFO] ------------------------------------------------------------------------
+[INFO] 
+[INFO] --- maven-clean-plugin:2.5:clean (default-clean) @ MapperEx ---
+[INFO] 
+[INFO] --- maven-install-plugin:2.3:install (default-install) @ MapperEx ---
+[INFO] Installing /home/vagrant/c2wt-dev/c2wt-cpp/c2wtng-cpp/examples/MapperEx/MapperEx-impl-cpp/pom.xml to /home/vagrant/.m2/repository/org/c2w/MapperEx_cpp/MapperEx/0.0.1-SNAPSHOT/MapperEx-0.0.1-SNAPSHOT.pom
+[INFO]                                                                         
+[INFO] ------------------------------------------------------------------------
+[INFO] Building C++ MapperEx example OmnetFederate implementation 0.0.1-SNAPSHOT
+[INFO] ------------------------------------------------------------------------
+Downloading: http://repo.maven.apache.org/maven2/org/apache/maven/plugins/maven-jar-plugin/maven-metadata.xml
+743/743 B               Downloaded: http://repo.maven.apache.org/maven2/org/apache/maven/plugins/maven-jar-plugin/maven-metadata.xml (743 B at 3.2 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/org/apache/maven/plugins/maven-surefire-plugin/maven-metadata.xml
+2/2 KB               Downloaded: http://repo.maven.apache.org/maven2/org/apache/maven/plugins/maven-surefire-plugin/maven-metadata.xml (2 KB at 22.6 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/org/apache/maven/plugins/maven-compiler-plugin/maven-metadata.xml
+893/893 B               Downloaded: http://repo.maven.apache.org/maven2/org/apache/maven/plugins/maven-compiler-plugin/maven-metadata.xml (893 B at 13.6 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/org/apache/maven/plugins/maven-deploy-plugin/maven-metadata.xml
+709/709 B               Downloaded: http://repo.maven.apache.org/maven2/org/apache/maven/plugins/maven-deploy-plugin/maven-metadata.xml (709 B at 10.3 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/org/apache/maven/plugins/maven-resources-plugin/maven-metadata.xml
+812/812 B               Downloaded: http://repo.maven.apache.org/maven2/org/apache/maven/plugins/maven-resources-plugin/maven-metadata.xml (812 B at 12.4 KB/sec)
+Downloading: http://repo.maven.apache.org/maven2/org/apache/maven/plugins/maven-install-plugin/maven-metadata.xml
+623/623 B               Downloaded: http://repo.maven.apache.org/maven2/org/apache/maven/plugins/maven-install-plugin/maven-metadata.xml (623 B at 9.4 KB/sec)
+Downloading: http://10.0.2.15:8080/repository/internal/org/c2w/MapperEx_cpp/MapperEx-base-cpp/0.0.1-SNAPSHOT/maven-metadata.xml
+Downloading: http://10.0.2.15:8080/repository/snapshots/org/c2w/MapperEx_cpp/MapperEx-base-cpp/0.0.1-SNAPSHOT/maven-metadata.xml
+            375/375 B               Downloaded: http://10.0.2.15:8080/repository/snapshots/org/c2w/MapperEx_cpp/MapperEx-base-cpp/0.0.1-SNAPSHOT/maven-metadata.xml (375 B at 17.4 KB/sec)
+Downloading: http://10.0.2.15:8080/repository/internal/org/c2w/MapperEx_cpp/MapperEx-cpp/0.0.1-SNAPSHOT/maven-metadata.xml
+Downloading: http://10.0.2.15:8080/repository/snapshots/org/c2w/MapperEx_cpp/MapperEx-cpp/0.0.1-SNAPSHOT/maven-metadata.xml
+            370/370 B               Downloaded: http://10.0.2.15:8080/repository/snapshots/org/c2w/MapperEx_cpp/MapperEx-cpp/0.0.1-SNAPSHOT/maven-metadata.xml (370 B at 27.8 KB/sec)
+Downloading: http://10.0.2.15:8080/repository/internal/org/c2w/MapperEx_cpp/MapperEx_root/0.0.1-SNAPSHOT/maven-metadata.xml
+Downloading: http://10.0.2.15:8080/repository/snapshots/org/c2w/MapperEx_cpp/MapperEx_root/0.0.1-SNAPSHOT/maven-metadata.xml
+            371/371 B               Downloaded: http://10.0.2.15:8080/repository/snapshots/org/c2w/MapperEx_cpp/MapperEx_root/0.0.1-SNAPSHOT/maven-metadata.xml (371 B at 15.1 KB/sec)
+Downloading: http://10.0.2.15:8080/repository/internal/org/c2w/MapperEx_cpp/MapperEx-rti-cpp/0.0.1-SNAPSHOT/maven-metadata.xml
+Downloading: http://10.0.2.15:8080/repository/snapshots/org/c2w/MapperEx_cpp/MapperEx-rti-cpp/0.0.1-SNAPSHOT/maven-metadata.xml
+            374/374 B               Downloaded: http://10.0.2.15:8080/repository/snapshots/org/c2w/MapperEx_cpp/MapperEx-rti-cpp/0.0.1-SNAPSHOT/maven-metadata.xml (374 B at 45.7 KB/sec)
+Downloading: http://10.0.2.15:8080/repository/internal/org/c2w/rti-base-cpp/0.3.0-SNAPSHOT/maven-metadata.xml
+            Downloading: http://10.0.2.15:8080/repository/snapshots/org/c2w/rti-base-cpp/0.3.0-SNAPSHOT/maven-metadata.xml
+357/357 B               Downloaded: http://10.0.2.15:8080/repository/snapshots/org/c2w/rti-base-cpp/0.3.0-SNAPSHOT/maven-metadata.xml (357 B at 13.4 KB/sec)
+Downloading: http://10.0.2.15:8080/repository/snapshots/org/c2w/c2w-cpp-foundation/0.3.0-SNAPSHOT/maven-metadata.xml
+Downloading: http://10.0.2.15:8080/repository/internal/org/c2w/c2w-cpp-foundation/0.3.0-SNAPSHOT/maven-metadata.xml
+362/362 B                           Downloaded: http://10.0.2.15:8080/repository/snapshots/org/c2w/c2w-cpp-foundation/0.3.0-SNAPSHOT/maven-metadata.xml (362 B at 29.5 KB/sec)
+Downloading: http://10.0.2.15:8080/repository/internal/org/c2w/C2WConsoleLogger/0.3.0-SNAPSHOT/maven-metadata.xml
+Downloading: http://10.0.2.15:8080/repository/snapshots/org/c2w/C2WConsoleLogger/0.3.0-SNAPSHOT/maven-metadata.xml
+            361/361 B               Downloaded: http://10.0.2.15:8080/repository/snapshots/org/c2w/C2WConsoleLogger/0.3.0-SNAPSHOT/maven-metadata.xml (361 B at 11.0 KB/sec)
+Downloading: http://10.0.2.15:8080/repository/internal/org/c2w/core-cpp/0.3.0-SNAPSHOT/maven-metadata.xml
+            Downloading: http://10.0.2.15:8080/repository/snapshots/org/c2w/core-cpp/0.3.0-SNAPSHOT/maven-metadata.xml
+353/353 B               Downloaded: http://10.0.2.15:8080/repository/snapshots/org/c2w/core-cpp/0.3.0-SNAPSHOT/maven-metadata.xml (353 B at 28.7 KB/sec)
+Downloading: http://10.0.2.15:8080/repository/internal/org/c2w/OmnetFederate/0.3.0-SNAPSHOT/maven-metadata.xml
+Downloading: http://10.0.2.15:8080/repository/snapshots/org/c2w/OmnetFederate/0.3.0-SNAPSHOT/maven-metadata.xml
+            358/358 B               Downloaded: http://10.0.2.15:8080/repository/snapshots/org/c2w/OmnetFederate/0.3.0-SNAPSHOT/maven-metadata.xml (358 B at 19.4 KB/sec)
+Downloading: http://10.0.2.15:8080/repository/internal/org/c2w/SynchronizedFederate/0.3.0-SNAPSHOT/maven-metadata.xml
+Downloading: http://10.0.2.15:8080/repository/snapshots/org/c2w/SynchronizedFederate/0.3.0-SNAPSHOT/maven-metadata.xml
+            365/365 B               Downloaded: http://10.0.2.15:8080/repository/snapshots/org/c2w/SynchronizedFederate/0.3.0-SNAPSHOT/maven-metadata.xml (365 B at 21.0 KB/sec)
+Downloading: http://10.0.2.15:8080/repository/internal/org/c2w/MapperEx_cpp/MapperEx-omnet-cpp/0.0.1-SNAPSHOT/maven-metadata.xml
+Downloading: http://10.0.2.15:8080/repository/snapshots/org/c2w/MapperEx_cpp/MapperEx-omnet-cpp/0.0.1-SNAPSHOT/maven-metadata.xml
+            376/376 B               Downloaded: http://10.0.2.15:8080/repository/snapshots/org/c2w/MapperEx_cpp/MapperEx-omnet-cpp/0.0.1-SNAPSHOT/maven-metadata.xml (376 B at 10.8 KB/sec)
+[INFO] 
+[INFO] --- maven-clean-plugin:2.5:clean (default-clean) @ MapperEx-OmnetFederate-cpp ---
+[INFO] Deleting /home/vagrant/c2wt-dev/c2wt-cpp/c2wtng-cpp/examples/MapperEx/MapperEx-impl-cpp/OmnetFederate/target
+[INFO] 
+[INFO] --- nar-maven-plugin:3.3.0:nar-validate (default-nar-validate) @ MapperEx-OmnetFederate-cpp ---
+[INFO] Using AOL: amd64-Linux-gpp
+[INFO] 
+[INFO] --- nar-maven-plugin:3.3.0:nar-download (default-nar-download) @ MapperEx-OmnetFederate-cpp ---
+[INFO] Getting Nar dependencies
+[INFO] Getting Nar dependencies
+[INFO] 
+[INFO] --- nar-maven-plugin:3.3.0:nar-unpack (default-nar-unpack) @ MapperEx-OmnetFederate-cpp ---
+[INFO] Getting Nar dependencies
+[INFO] Unpacking 15 dependencies to /home/vagrant/c2wt-dev/c2wt-cpp/c2wtng-cpp/examples/MapperEx/MapperEx-impl-cpp/OmnetFederate/target/nar
+[INFO] + ranlib /home/vagrant/c2wt-dev/c2wt-cpp/c2wtng-cpp/examples/MapperEx/MapperEx-impl-cpp/OmnetFederate/target/nar/MapperEx-base-cpp-0.0.1-SNAPSHOT-amd64-Linux-gpp-static/lib/amd64-Linux-gpp/static/libMapperEx-base-cpp-0.0.1-SNAPSHOT.a
+[INFO] + ranlib /home/vagrant/c2wt-dev/c2wt-cpp/c2wtng-cpp/examples/MapperEx/MapperEx-impl-cpp/OmnetFederate/target/nar/MapperEx-base-cpp-0.0.1-SNAPSHOT-amd64-Linux-gpp-static/lib/amd64-Linux-gpp/static/libMapperEx-base-cpp-0.0.1-SNAPSHOT.a
+[INFO] + ranlib /home/vagrant/c2wt-dev/c2wt-cpp/c2wtng-cpp/examples/MapperEx/MapperEx-impl-cpp/OmnetFederate/target/nar/core-cpp-0.3.0-SNAPSHOT-amd64-Linux-gpp-static/lib/amd64-Linux-gpp/static/libcore-cpp-0.3.0-SNAPSHOT.a
+[INFO] + ranlib /home/vagrant/c2wt-dev/c2wt-cpp/c2wtng-cpp/examples/MapperEx/MapperEx-impl-cpp/OmnetFederate/target/nar/core-cpp-0.3.0-SNAPSHOT-amd64-Linux-gpp-static/lib/amd64-Linux-gpp/static/libcore-cpp-0.3.0-SNAPSHOT.a
+[INFO] + ranlib /home/vagrant/c2wt-dev/c2wt-cpp/c2wtng-cpp/examples/MapperEx/MapperEx-impl-cpp/OmnetFederate/target/nar/rti-base-cpp-0.3.0-SNAPSHOT-amd64-Linux-gpp-static/lib/amd64-Linux-gpp/static/librti-base-cpp-0.3.0-SNAPSHOT.a
+[INFO] + ranlib /home/vagrant/c2wt-dev/c2wt-cpp/c2wtng-cpp/examples/MapperEx/MapperEx-impl-cpp/OmnetFederate/target/nar/rti-base-cpp-0.3.0-SNAPSHOT-amd64-Linux-gpp-static/lib/amd64-Linux-gpp/static/librti-base-cpp-0.3.0-SNAPSHOT.a
+[INFO] + chmod +x /home/vagrant/c2wt-dev/c2wt-cpp/c2wtng-cpp/examples/MapperEx/MapperEx-impl-cpp/OmnetFederate/target/nar/OmnetFederate-0.3.0-SNAPSHOT-amd64-Linux-gpp-executable/bin/amd64-Linux-gpp/gcc-debug/BasicUdpApp.o
+[INFO] + chmod +x /home/vagrant/c2wt-dev/c2wt-cpp/c2wtng-cpp/examples/MapperEx/MapperEx-impl-cpp/OmnetFederate/target/nar/OmnetFederate-0.3.0-SNAPSHOT-amd64-Linux-gpp-executable/bin/amd64-Linux-gpp/gcc-debug/messages/ReplayAttackMsg_m.o
+[INFO] + chmod +x /home/vagrant/c2wt-dev/c2wt-cpp/c2wtng-cpp/examples/MapperEx/MapperEx-impl-cpp/OmnetFederate/target/nar/OmnetFederate-0.3.0-SNAPSHOT-amd64-Linux-gpp-executable/bin/amd64-Linux-gpp/gcc-debug/messages/IPFirewallMsg_m.o
+[INFO] + chmod +x /home/vagrant/c2wt-dev/c2wt-cpp/c2wtng-cpp/examples/MapperEx/MapperEx-impl-cpp/OmnetFederate/target/nar/OmnetFederate-0.3.0-SNAPSHOT-amd64-Linux-gpp-executable/bin/amd64-Linux-gpp/gcc-debug/messages/FilterAttackMsg_m.o
+[INFO] + chmod +x /home/vagrant/c2wt-dev/c2wt-cpp/c2wtng-cpp/examples/MapperEx/MapperEx-impl-cpp/OmnetFederate/target/nar/OmnetFederate-0.3.0-SNAPSHOT-amd64-Linux-gpp-executable/bin/amd64-Linux-gpp/gcc-debug/messages/NetworkAttackMsg_m.o
+[INFO] + chmod +x /home/vagrant/c2wt-dev/c2wt-cpp/c2wtng-cpp/examples/MapperEx/MapperEx-impl-cpp/OmnetFederate/target/nar/OmnetFederate-0.3.0-SNAPSHOT-amd64-Linux-gpp-executable/bin/amd64-Linux-gpp/gcc-debug/messages/RecordReplayAttackMsg_m.o
+[INFO] + chmod +x /home/vagrant/c2wt-dev/c2wt-cpp/c2wtng-cpp/examples/MapperEx/MapperEx-impl-cpp/OmnetFederate/target/nar/OmnetFederate-0.3.0-SNAPSHOT-amd64-Linux-gpp-executable/bin/amd64-Linux-gpp/gcc-debug/messages/ReplayMsg_m.o
+[INFO] + chmod +x /home/vagrant/c2wt-dev/c2wt-cpp/c2wtng-cpp/examples/MapperEx/MapperEx-impl-cpp/OmnetFederate/target/nar/OmnetFederate-0.3.0-SNAPSHOT-amd64-Linux-gpp-executable/bin/amd64-Linux-gpp/gcc-debug/messages/OutOfOrderAttackMsg_m.o
+[INFO] + chmod +x /home/vagrant/c2wt-dev/c2wt-cpp/c2wtng-cpp/examples/MapperEx/MapperEx-impl-cpp/OmnetFederate/target/nar/OmnetFederate-0.3.0-SNAPSHOT-amd64-Linux-gpp-executable/bin/amd64-Linux-gpp/gcc-debug/messages/DropRouteEntryMsg_m.o
+[INFO] + chmod +x /home/vagrant/c2wt-dev/c2wt-cpp/c2wtng-cpp/examples/MapperEx/MapperEx-impl-cpp/OmnetFederate/target/nar/OmnetFederate-0.3.0-SNAPSHOT-amd64-Linux-gpp-executable/bin/amd64-Linux-gpp/gcc-debug/messages/DelayNodeAttackMsg_m.o
+[INFO] + chmod +x /home/vagrant/c2wt-dev/c2wt-cpp/c2wtng-cpp/examples/MapperEx/MapperEx-impl-cpp/OmnetFederate/target/nar/OmnetFederate-0.3.0-SNAPSHOT-amd64-Linux-gpp-executable/bin/amd64-Linux-gpp/gcc-debug/messages/OutOfOrderMsg_m.o
+[INFO] + chmod +x /home/vagrant/c2wt-dev/c2wt-cpp/c2wtng-cpp/examples/MapperEx/MapperEx-impl-cpp/OmnetFederate/target/nar/OmnetFederate-0.3.0-SNAPSHOT-amd64-Linux-gpp-executable/bin/amd64-Linux-gpp/gcc-debug/messages/InteractionMsg_m.o
+[INFO] + chmod +x /home/vagrant/c2wt-dev/c2wt-cpp/c2wtng-cpp/examples/MapperEx/MapperEx-impl-cpp/OmnetFederate/target/nar/OmnetFederate-0.3.0-SNAPSHOT-amd64-Linux-gpp-executable/bin/amd64-Linux-gpp/gcc-debug/messages/SnifferAttackMsg_m.o
+[INFO] + chmod +x /home/vagrant/c2wt-dev/c2wt-cpp/c2wtng-cpp/examples/MapperEx/MapperEx-impl-cpp/OmnetFederate/target/nar/OmnetFederate-0.3.0-SNAPSHOT-amd64-Linux-gpp-executable/bin/amd64-Linux-gpp/gcc-debug/messages/NodeAttackMsg_m.o
+[INFO] + chmod +x /home/vagrant/c2wt-dev/c2wt-cpp/c2wtng-cpp/examples/MapperEx/MapperEx-impl-cpp/OmnetFederate/target/nar/OmnetFederate-0.3.0-SNAPSHOT-amd64-Linux-gpp-executable/bin/amd64-Linux-gpp/gcc-debug/messages/AddRouteEntryMsg_m.o
+[INFO] + chmod +x /home/vagrant/c2wt-dev/c2wt-cpp/c2wtng-cpp/examples/MapperEx/MapperEx-impl-cpp/OmnetFederate/target/nar/OmnetFederate-0.3.0-SNAPSHOT-amd64-Linux-gpp-executable/bin/amd64-Linux-gpp/gcc-debug/messages/ObjectMsg_m.o
+[INFO] + chmod +x /home/vagrant/c2wt-dev/c2wt-cpp/c2wtng-cpp/examples/MapperEx/MapperEx-impl-cpp/OmnetFederate/target/nar/OmnetFederate-0.3.0-SNAPSHOT-amd64-Linux-gpp-executable/bin/amd64-Linux-gpp/gcc-debug/messages/DelayedMsg_m.o
+[INFO] + chmod +x /home/vagrant/c2wt-dev/c2wt-cpp/c2wtng-cpp/examples/MapperEx/MapperEx-impl-cpp/OmnetFederate/target/nar/OmnetFederate-0.3.0-SNAPSHOT-amd64-Linux-gpp-executable/bin/amd64-Linux-gpp/gcc-debug/C2WDHCPClient.o
+[INFO] + chmod +x /home/vagrant/c2wt-dev/c2wt-cpp/c2wtng-cpp/examples/MapperEx/MapperEx-impl-cpp/OmnetFederate/target/nar/OmnetFederate-0.3.0-SNAPSHOT-amd64-Linux-gpp-executable/bin/amd64-Linux-gpp/gcc-debug/libOmnetFederate-0.3.0-SNAPSHOT.a
+[INFO] + chmod +x /home/vagrant/c2wt-dev/c2wt-cpp/c2wtng-cpp/examples/MapperEx/MapperEx-impl-cpp/OmnetFederate/target/nar/OmnetFederate-0.3.0-SNAPSHOT-amd64-Linux-gpp-executable/bin/amd64-Linux-gpp/gcc-debug/C2WDHCPServer.o
+[INFO] + chmod +x /home/vagrant/c2wt-dev/c2wt-cpp/c2wtng-cpp/examples/MapperEx/MapperEx-impl-cpp/OmnetFederate/target/nar/OmnetFederate-0.3.0-SNAPSHOT-amd64-Linux-gpp-executable/bin/amd64-Linux-gpp/gcc-debug/BasicUdpAppWrapper.o
+[INFO] + chmod +x /home/vagrant/c2wt-dev/c2wt-cpp/c2wtng-cpp/examples/MapperEx/MapperEx-impl-cpp/OmnetFederate/target/nar/OmnetFederate-0.3.0-SNAPSHOT-amd64-Linux-gpp-executable/bin/amd64-Linux-gpp/gcc-debug/HLAInterface.o
+[INFO] + chmod +x /home/vagrant/c2wt-dev/c2wt-cpp/c2wtng-cpp/examples/MapperEx/MapperEx-impl-cpp/OmnetFederate/target/nar/OmnetFederate-0.3.0-SNAPSHOT-amd64-Linux-gpp-executable/bin/amd64-Linux-gpp/gcc-debug/HLAScheduler.o
+[INFO] + chmod +x /home/vagrant/c2wt-dev/c2wt-cpp/c2wtng-cpp/examples/MapperEx/MapperEx-impl-cpp/OmnetFederate/target/nar/OmnetFederate-0.3.0-SNAPSHOT-amd64-Linux-gpp-executable/bin/amd64-Linux-gpp/gcc-debug/OmnetFOMInteractions.o
+[INFO] + chmod +x /home/vagrant/c2wt-dev/c2wt-cpp/c2wtng-cpp/examples/MapperEx/MapperEx-impl-cpp/OmnetFederate/target/nar/OmnetFederate-0.3.0-SNAPSHOT-amd64-Linux-gpp-executable/bin/amd64-Linux-gpp/gcc-debug/C2WIPv4.o
+[INFO] + chmod +x /home/vagrant/c2wt-dev/c2wt-cpp/c2wtng-cpp/examples/MapperEx/MapperEx-impl-cpp/OmnetFederate/target/nar/OmnetFederate-0.3.0-SNAPSHOT-amd64-Linux-gpp-executable/bin/amd64-Linux-gpp/gcc-debug/BasicUdpApp.o
+[INFO] + chmod +x /home/vagrant/c2wt-dev/c2wt-cpp/c2wtng-cpp/examples/MapperEx/MapperEx-impl-cpp/OmnetFederate/target/nar/OmnetFederate-0.3.0-SNAPSHOT-amd64-Linux-gpp-executable/bin/amd64-Linux-gpp/gcc-debug/messages/ReplayAttackMsg_m.o
+[INFO] + chmod +x /home/vagrant/c2wt-dev/c2wt-cpp/c2wtng-cpp/examples/MapperEx/MapperEx-impl-cpp/OmnetFederate/target/nar/OmnetFederate-0.3.0-SNAPSHOT-amd64-Linux-gpp-executable/bin/amd64-Linux-gpp/gcc-debug/messages/IPFirewallMsg_m.o
+[INFO] + chmod +x /home/vagrant/c2wt-dev/c2wt-cpp/c2wtng-cpp/examples/MapperEx/MapperEx-impl-cpp/OmnetFederate/target/nar/OmnetFederate-0.3.0-SNAPSHOT-amd64-Linux-gpp-executable/bin/amd64-Linux-gpp/gcc-debug/messages/FilterAttackMsg_m.o
+[INFO] + chmod +x /home/vagrant/c2wt-dev/c2wt-cpp/c2wtng-cpp/examples/MapperEx/MapperEx-impl-cpp/OmnetFederate/target/nar/OmnetFederate-0.3.0-SNAPSHOT-amd64-Linux-gpp-executable/bin/amd64-Linux-gpp/gcc-debug/messages/NetworkAttackMsg_m.o
+[INFO] + chmod +x /home/vagrant/c2wt-dev/c2wt-cpp/c2wtng-cpp/examples/MapperEx/MapperEx-impl-cpp/OmnetFederate/target/nar/OmnetFederate-0.3.0-SNAPSHOT-amd64-Linux-gpp-executable/bin/amd64-Linux-gpp/gcc-debug/messages/RecordReplayAttackMsg_m.o
+[INFO] + chmod +x /home/vagrant/c2wt-dev/c2wt-cpp/c2wtng-cpp/examples/MapperEx/MapperEx-impl-cpp/OmnetFederate/target/nar/OmnetFederate-0.3.0-SNAPSHOT-amd64-Linux-gpp-executable/bin/amd64-Linux-gpp/gcc-debug/messages/ReplayMsg_m.o
+[INFO] + chmod +x /home/vagrant/c2wt-dev/c2wt-cpp/c2wtng-cpp/examples/MapperEx/MapperEx-impl-cpp/OmnetFederate/target/nar/OmnetFederate-0.3.0-SNAPSHOT-amd64-Linux-gpp-executable/bin/amd64-Linux-gpp/gcc-debug/messages/OutOfOrderAttackMsg_m.o
+[INFO] + chmod +x /home/vagrant/c2wt-dev/c2wt-cpp/c2wtng-cpp/examples/MapperEx/MapperEx-impl-cpp/OmnetFederate/target/nar/OmnetFederate-0.3.0-SNAPSHOT-amd64-Linux-gpp-executable/bin/amd64-Linux-gpp/gcc-debug/messages/DropRouteEntryMsg_m.o
+[INFO] + chmod +x /home/vagrant/c2wt-dev/c2wt-cpp/c2wtng-cpp/examples/MapperEx/MapperEx-impl-cpp/OmnetFederate/target/nar/OmnetFederate-0.3.0-SNAPSHOT-amd64-Linux-gpp-executable/bin/amd64-Linux-gpp/gcc-debug/messages/DelayNodeAttackMsg_m.o
+[INFO] + chmod +x /home/vagrant/c2wt-dev/c2wt-cpp/c2wtng-cpp/examples/MapperEx/MapperEx-impl-cpp/OmnetFederate/target/nar/OmnetFederate-0.3.0-SNAPSHOT-amd64-Linux-gpp-executable/bin/amd64-Linux-gpp/gcc-debug/messages/OutOfOrderMsg_m.o
+[INFO] + chmod +x /home/vagrant/c2wt-dev/c2wt-cpp/c2wtng-cpp/examples/MapperEx/MapperEx-impl-cpp/OmnetFederate/target/nar/OmnetFederate-0.3.0-SNAPSHOT-amd64-Linux-gpp-executable/bin/amd64-Linux-gpp/gcc-debug/messages/InteractionMsg_m.o
+[INFO] + chmod +x /home/vagrant/c2wt-dev/c2wt-cpp/c2wtng-cpp/examples/MapperEx/MapperEx-impl-cpp/OmnetFederate/target/nar/OmnetFederate-0.3.0-SNAPSHOT-amd64-Linux-gpp-executable/bin/amd64-Linux-gpp/gcc-debug/messages/SnifferAttackMsg_m.o
+[INFO] + chmod +x /home/vagrant/c2wt-dev/c2wt-cpp/c2wtng-cpp/examples/MapperEx/MapperEx-impl-cpp/OmnetFederate/target/nar/OmnetFederate-0.3.0-SNAPSHOT-amd64-Linux-gpp-executable/bin/amd64-Linux-gpp/gcc-debug/messages/NodeAttackMsg_m.o
+[INFO] + chmod +x /home/vagrant/c2wt-dev/c2wt-cpp/c2wtng-cpp/examples/MapperEx/MapperEx-impl-cpp/OmnetFederate/target/nar/OmnetFederate-0.3.0-SNAPSHOT-amd64-Linux-gpp-executable/bin/amd64-Linux-gpp/gcc-debug/messages/AddRouteEntryMsg_m.o
+[INFO] + chmod +x /home/vagrant/c2wt-dev/c2wt-cpp/c2wtng-cpp/examples/MapperEx/MapperEx-impl-cpp/OmnetFederate/target/nar/OmnetFederate-0.3.0-SNAPSHOT-amd64-Linux-gpp-executable/bin/amd64-Linux-gpp/gcc-debug/messages/ObjectMsg_m.o
+[INFO] + chmod +x /home/vagrant/c2wt-dev/c2wt-cpp/c2wtng-cpp/examples/MapperEx/MapperEx-impl-cpp/OmnetFederate/target/nar/OmnetFederate-0.3.0-SNAPSHOT-amd64-Linux-gpp-executable/bin/amd64-Linux-gpp/gcc-debug/messages/DelayedMsg_m.o
+[INFO] + chmod +x /home/vagrant/c2wt-dev/c2wt-cpp/c2wtng-cpp/examples/MapperEx/MapperEx-impl-cpp/OmnetFederate/target/nar/OmnetFederate-0.3.0-SNAPSHOT-amd64-Linux-gpp-executable/bin/amd64-Linux-gpp/gcc-debug/C2WDHCPClient.o
+[INFO] + chmod +x /home/vagrant/c2wt-dev/c2wt-cpp/c2wtng-cpp/examples/MapperEx/MapperEx-impl-cpp/OmnetFederate/target/nar/OmnetFederate-0.3.0-SNAPSHOT-amd64-Linux-gpp-executable/bin/amd64-Linux-gpp/gcc-debug/libOmnetFederate-0.3.0-SNAPSHOT.a
+[INFO] + chmod +x /home/vagrant/c2wt-dev/c2wt-cpp/c2wtng-cpp/examples/MapperEx/MapperEx-impl-cpp/OmnetFederate/target/nar/OmnetFederate-0.3.0-SNAPSHOT-amd64-Linux-gpp-executable/bin/amd64-Linux-gpp/gcc-debug/C2WDHCPServer.o
+[INFO] + chmod +x /home/vagrant/c2wt-dev/c2wt-cpp/c2wtng-cpp/examples/MapperEx/MapperEx-impl-cpp/OmnetFederate/target/nar/OmnetFederate-0.3.0-SNAPSHOT-amd64-Linux-gpp-executable/bin/amd64-Linux-gpp/gcc-debug/BasicUdpAppWrapper.o
+[INFO] + chmod +x /home/vagrant/c2wt-dev/c2wt-cpp/c2wtng-cpp/examples/MapperEx/MapperEx-impl-cpp/OmnetFederate/target/nar/OmnetFederate-0.3.0-SNAPSHOT-amd64-Linux-gpp-executable/bin/amd64-Linux-gpp/gcc-debug/HLAInterface.o
+[INFO] + chmod +x /home/vagrant/c2wt-dev/c2wt-cpp/c2wtng-cpp/examples/MapperEx/MapperEx-impl-cpp/OmnetFederate/target/nar/OmnetFederate-0.3.0-SNAPSHOT-amd64-Linux-gpp-executable/bin/amd64-Linux-gpp/gcc-debug/HLAScheduler.o
+[INFO] + chmod +x /home/vagrant/c2wt-dev/c2wt-cpp/c2wtng-cpp/examples/MapperEx/MapperEx-impl-cpp/OmnetFederate/target/nar/OmnetFederate-0.3.0-SNAPSHOT-amd64-Linux-gpp-executable/bin/amd64-Linux-gpp/gcc-debug/OmnetFOMInteractions.o
+[INFO] + chmod +x /home/vagrant/c2wt-dev/c2wt-cpp/c2wtng-cpp/examples/MapperEx/MapperEx-impl-cpp/OmnetFederate/target/nar/OmnetFederate-0.3.0-SNAPSHOT-amd64-Linux-gpp-executable/bin/amd64-Linux-gpp/gcc-debug/C2WIPv4.o
+[INFO] + ranlib /home/vagrant/c2wt-dev/c2wt-cpp/c2wtng-cpp/examples/MapperEx/MapperEx-impl-cpp/OmnetFederate/target/nar/MapperEx-omnet-cpp-0.0.1-SNAPSHOT-amd64-Linux-gpp-static/lib/amd64-Linux-gpp/static/libMapperEx-omnet-cpp-0.0.1-SNAPSHOT.a
+[INFO] + ranlib /home/vagrant/c2wt-dev/c2wt-cpp/c2wtng-cpp/examples/MapperEx/MapperEx-impl-cpp/OmnetFederate/target/nar/MapperEx-omnet-cpp-0.0.1-SNAPSHOT-amd64-Linux-gpp-static/lib/amd64-Linux-gpp/static/libMapperEx-omnet-cpp-0.0.1-SNAPSHOT.a
+[INFO] + ranlib /home/vagrant/c2wt-dev/c2wt-cpp/c2wtng-cpp/examples/MapperEx/MapperEx-impl-cpp/OmnetFederate/target/nar/MapperEx-rti-cpp-0.0.1-SNAPSHOT-amd64-Linux-gpp-static/lib/amd64-Linux-gpp/static/libMapperEx-rti-cpp-0.0.1-SNAPSHOT.a
+[INFO] + ranlib /home/vagrant/c2wt-dev/c2wt-cpp/c2wtng-cpp/examples/MapperEx/MapperEx-impl-cpp/OmnetFederate/target/nar/MapperEx-rti-cpp-0.0.1-SNAPSHOT-amd64-Linux-gpp-static/lib/amd64-Linux-gpp/static/libMapperEx-rti-cpp-0.0.1-SNAPSHOT.a
+[INFO] 
+[INFO] --- nar-maven-plugin:3.3.0:nar-gnu-configure (default-nar-gnu-configure) @ MapperEx-OmnetFederate-cpp ---
+[INFO] Copying GNU sources
+[INFO] 
+[INFO] --- nar-maven-plugin:3.3.0:nar-system-generate (default-nar-system-generate) @ MapperEx-OmnetFederate-cpp ---
+[INFO] 
+[INFO] --- nar-maven-plugin:3.3.0:nar-vcproj (default-nar-vcproj) @ MapperEx-OmnetFederate-cpp ---
+[INFO] 
+[INFO] --- maven-resources-plugin:3.0.2:resources (default-resources) @ MapperEx-OmnetFederate-cpp ---
+[WARNING] Using platform encoding (UTF-8 actually) to copy filtered resources, i.e. build is platform dependent!
+[INFO] skip non existing resourceDirectory /home/vagrant/c2wt-dev/c2wt-cpp/c2wtng-cpp/examples/MapperEx/MapperEx-impl-cpp/OmnetFederate/src/main/resources
+[INFO] 
+[INFO] --- nar-maven-plugin:3.3.0:nar-resources (default-nar-resources) @ MapperEx-OmnetFederate-cpp ---
+[INFO] Copied 3 resources
+[INFO] 
+[INFO] --- nar-maven-plugin:3.3.0:nar-gnu-resources (default-nar-gnu-resources) @ MapperEx-OmnetFederate-cpp ---
+[INFO] 
+[INFO] --- maven-compiler-plugin:3.6.0:compile (default-compile) @ MapperEx-OmnetFederate-cpp ---
+[INFO] No sources to compile
+[INFO] 
+[INFO] --- nar-maven-plugin:3.3.0:nar-javah (default-nar-javah) @ MapperEx-OmnetFederate-cpp ---
+[INFO] 
+[INFO] --- nar-maven-plugin:3.3.0:nar-gnu-make (default-nar-gnu-make) @ MapperEx-OmnetFederate-cpp ---
+[INFO] Running GNU make
+[INFO] + cd /home/vagrant/c2wt-dev/c2wt-cpp/c2wtng-cpp/examples/MapperEx/MapperEx-impl-cpp/OmnetFederate/target/nar/gnu/amd64-Linux-gpp/src
+[INFO] + make
+[INFO] Creating executable: ../target/bin//MapperEx-OmnetFederate-cpp
+[ERROR] make: *** Deleting file `../target/bin//MapperEx-OmnetFederate-cpp'
+[ERROR] make: *** wait: No child processes.  Stop.
+[ERROR] make: *** Waiting for unfinished jobs....
+[ERROR] make: *** wait: No child processes.  Stop.
+[WARNING] com.github.maven_nar.NarUtil$2@5a9800f8
+[WARNING] com.github.maven_nar.NarUtil$1@143d9a93
+[WARNING] com.github.maven_nar.NarUtil$3@40226788
+[INFO] ------------------------------------------------------------------------
+[INFO] Reactor Summary:
+[INFO] 

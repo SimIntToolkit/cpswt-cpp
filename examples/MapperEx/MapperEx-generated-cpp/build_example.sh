@@ -20,9 +20,9 @@ export LD_LIBRARY_PATH=$RTI_HOME/jre/lib/amd64/server/
 
 mvn_install_deploy() {
 	echo "Maven Compiling...."
-	mvn clean install
+	mvn clean install -U
 	echo "Maven Deploying to the Archiva....."
-	mvn deploy
+	#mvn deploy
 	echo "Deployment Completed...."
 
 }
