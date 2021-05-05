@@ -23,29 +23,34 @@
 #define _SINK_CLASS
 
 #include "Sink2Base.hpp"
+#include "FederateConfigParser.h"
 
 class Sink2 : public Sink2Base {
 private:
     double _currentTime;
-	PingCount _pingCount;
+    PingCount _pingCount;
     
 public:
     typedef Sink2Base Super;
-	Sink2( int argc, char *argv[] ) : Super( argc, argv ), _currentTime( 0 ) {
-		_pingCount.set_SinkName( "Sink2" );
-		_pingCount.set_RunningCount( 0 );
-	}
+    // Sink2( int argc, char *argv[] ) : Super( argc, argv ), _currentTime( 0 ) {
+    //     _pingCount.set_SinkName( "Sink2" );
+    //     _pingCount.set_RunningCount( 0 );
+    // }
+    Sink2(FederateConfig *fedconfigObj): Super(fedconfigObj) {
+        _pingCount.set_SinkName( "Sink2" );
+        _pingCount.set_RunningCount( 0 );
+    }
 
-	virtual ~Sink2( void )
-	 throw (RTI::FederateInternalError) { }
+    virtual ~Sink2( void )
+     throw (RTI::FederateInternalError) { }
 
     class Sink2ATRCallback : public ATRCallback {
     private:
-    	Sink2 &_sink2;
+        Sink2 &_sink2;
     public:
-    	Sink2ATRCallback( Sink2 &sink2 ) : _sink2( sink2 ) { }
-    	virtual void execute( void ) { _sink2.execute(); }
-		virtual SP clone( void ) { return SP(  new Sink2ATRCallback( *this )  ); }
+        Sink2ATRCallback( Sink2 &sink2 ) : _sink2( sink2 ) { }
+        virtual void execute( void ) { _sink2.execute(); }
+        virtual SP clone( void ) { return SP(  new Sink2ATRCallback( *this )  ); }
     };
 
     void initialize( void );

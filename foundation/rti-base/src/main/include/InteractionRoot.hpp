@@ -458,7 +458,7 @@ public:
 		}
 	}
 
-private:
+protected:
 	bool setParameterAux( int datamemberHandle, const std::string &val ) {
 		const std::string &datamemberName = getParameterName(datamemberHandle);
 		if (datamemberName.empty()) {
@@ -467,14 +467,18 @@ private:
 		return setParameterAux(datamemberName, val);
 	}
 
-protected:
 	virtual bool setParameterAux( const std::string &datamemberName, const std::string &value ) {
 		return false;
 	}
 
-	virtual bool setParameterAux( const std::string &datamemberName, TypeMedley value ) {
+	virtual bool setParameterAux( const std::string &datamemberName, const TypeMedley &value ) {
 		return false;
 	}
+
+	ParameterHandleValuePairSetSP createDatamemberHandleValuePairSet(int count) {
+		ParameterHandleValuePairSetSP datamembers = ParameterHandleValuePairSetSP(RTI::ParameterSetFactory::create(count));
+        return datamembers;
+    }
 
 	ParameterHandleValuePairSetSP createDatamemberHandleValuePairSet() {
 		const StringVector &parameterNames = getAllParameterNames();

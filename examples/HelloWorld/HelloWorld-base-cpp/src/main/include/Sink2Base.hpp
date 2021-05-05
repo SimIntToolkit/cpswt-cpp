@@ -18,163 +18,146 @@
 class Sink2Base : public SynchronizedFederate {
 
 public:
-	typedef SynchronizedFederate Super;
-	
+    typedef SynchronizedFederate Super;
 
-	typedef std::vector< std::string > ArgVector;
-	
-	static double getLookAhead( void ) {
-		static double lookAhead = 0.2;
-		return lookAhead;
-	}
 
-	virtual ~Sink2Base( void )
-	 throw (RTI::FederateInternalError) { }
+    typedef std::vector< std::string > ArgVector;
+
+    static double getLookAhead( void ) {
+        static double lookAhead = 0.2;
+        return lookAhead;
+    }
+
+    virtual ~Sink2Base( void )
+     throw (RTI::FederateInternalError) { }
 
 private:
-	SubscribedInteractionFilter _subscribedInteractionFilter;
+    SubscribedInteractionFilter _subscribedInteractionFilter;
 
 protected:
-	void init( ArgVector argVector ) {
+    void init() {
 
-		createRTI();
-		joinFederation( argVector[ 0 ], argVector[ 1 ] );
-		
-		std::string loglevel="";
-		ArgVector loggerArgVector;
-		if ( argVector.size() == 3 ) {
-			loggerArgVector.push_back( argVector[ 2 ] );
-		} else if ( argVector.size() > 3 ) {
-			loggerArgVector.push_back( argVector[ 3 ] );
-		}
-		_logger->init(loggerArgVector);
-		
-		if ( argVector.size() == 5 ) {
-			loglevel = argVector[ 4 ];
-		}
-			
+        createRTI();
+        // joinFederation( argVector[ 0 ], argVector[ 1 ] );
+        joinFederation();
 
-		enableTimeConstrained();
+        // std::string loglevel="";
+        // ArgVector loggerArgVector;
+        // if ( argVector.size() == 3 ) {
+        //     loggerArgVector.push_back( argVector[ 2 ] );
+        // } else if ( argVector.size() > 3 ) {
+        //     loggerArgVector.push_back( argVector[ 3 ] );
+        // }
+        // _logger->init(loggerArgVector);
 
+        // if ( argVector.size() == 5 ) {
+        //     loglevel = argVector[ 4 ];
+        // }
 
+        enableTimeConstrained();
 
-		enableTimeRegulation( getLookAhead() );
+        enableTimeRegulation( getLookAhead() );
 
-
-
-		enableAsynchronousDelivery();
-
-
+        enableAsynchronousDelivery();
 
         // interaction pubsub
-        
-        
-          
-          
+
         Ping::subscribe( getRTI() );
-		_subscribedInteractionFilter.setFedFilters( Ping::get_handle(), SubscribedInteractionFilter::ORIGIN_FILTER_DISABLED, SubscribedInteractionFilter::SOURCE_FILTER_DISABLED );  
-		
-		// object pubsub
-        
-        
-        
+        _subscribedInteractionFilter.setFedFilters( Ping::get_handle(), SubscribedInteractionFilter::ORIGIN_FILTER_DISABLED, SubscribedInteractionFilter::SOURCE_FILTER_DISABLED );
+
+        // object pubsub
+
         PingCount::publish_RunningCount();
-        PingCount::publish_SinkName();  
-        PingCount::publish( getRTI() );  
+        PingCount::publish_SinkName();
+        PingCount::publish( getRTI() );
 
-         
-          
-   
-        
          // enable pubsub log
-         if( argVector.size() > 2 ){
-			
-			  
-			
-			
-			Ping::enableSubscribeLog("Ping", "Sink2", "NORMAL", loglevel);  
-			
-			
-			
-			PingCount::enablePublishLog("PingCount", "RunningCount", "Sink2", "NORMAL", loglevel);
-			PingCount::enablePublishLog("PingCount", "SinkName", "Sink2", "NORMAL", loglevel);  
-			
-			  
-		}
+        //  if( argVector.size() > 2 ) {
 
-	}
+        //     Ping::enableSubscribeLog("Ping", "Sink2", "NORMAL", loglevel);
 
-	void init( int argc, char *argv[] ) {
-		ArgVector argVector;
-		for( int ix = 1 ; ix < argc ; ++ix ) argVector.push_back( argv[ ix ] );
-		init( argVector );
-	}
-	
-	void init( const std::string &federation_id, const std::string &federate_id ) {
-		ArgVector argVector;
-		argVector.push_back( federation_id );
-		argVector.push_back( federate_id );
-		init( argVector );
-	}
-	
-public:	
-	// default constructor
-	Sink2Base( void ) { }
-	
-	// constructor
-	Sink2Base( const std::string &federation_id, const std::string &federate_id ) { init( federation_id, federate_id ); }
+        //     PingCount::enablePublishLog("PingCount", "RunningCount", "Sink2", "NORMAL", loglevel);
+        //     PingCount::enablePublishLog("PingCount", "SinkName", "Sink2", "NORMAL", loglevel);
 
-	// constructor	
-	Sink2Base( int argc, char *argv[] ) { init( argc, argv ); }
+        // }
 
-	
-	  
+    }
 
-    
+    // void init( int argc, char *argv[] ) {
+    //     ArgVector argVector;
+    //     for( int ix = 1 ; ix < argc ; ++ix ) argVector.push_back( argv[ ix ] );
+    //     init( argVector );
+    // }
+
+    // void init( const std::string &federation_id, const std::string &federate_id ) {
+    //     ArgVector argVector;
+    //     argVector.push_back( federation_id );
+    //     argVector.push_back( federate_id );
+    //     init( argVector );
+    // }
+
+public:
+    // default constructor
+    // Sink2Base( void ) { }
+
+    // constructor
+    // Sink2Base( const std::string &federation_id, const std::string &federate_id ) {
+    //     init( federation_id, federate_id );
+    // }
+
+    // constructor
+    // Sink2Base( int argc, char *argv[] ) {
+    //     init( argc, argv );
+    // }
+
+    Sink2Base(FederateConfig *fedconfig) : Super( fedconfig ) {
+        init();
+    }
+
     virtual void receiveInteraction(
-	 RTI::InteractionClassHandle theInteraction,
-	 const RTI::ParameterHandleValuePairSet& theParameters,
-	 const RTI::FedTime& theTime,
-	 const char *theTag,
-	 RTI::EventRetractionHandle theHandle
-	)
-	 throw ( RTI::InteractionClassNotKnown, RTI::InteractionParameterNotKnown, RTI::InvalidFederationTime, RTI::FederateInternalError) {
+     RTI::InteractionClassHandle theInteraction,
+     const RTI::ParameterHandleValuePairSet& theParameters,
+     const RTI::FedTime& theTime,
+     const char *theTag,
+     RTI::EventRetractionHandle theHandle
+    )
+     throw ( RTI::InteractionClassNotKnown, RTI::InteractionParameterNotKnown, RTI::InvalidFederationTime, RTI::FederateInternalError) {
 
-		if ( getMoreATRs() ) {
-			InteractionRoot::SP interactionRootSP = InteractionRoot::create_interaction( theInteraction, theParameters, theTime );
-			C2WInteractionRootSP c2wInteractionRootSP = boost::dynamic_pointer_cast< C2WInteractionRoot >( interactionRootSP );
-			if ( c2wInteractionRootSP != 0 ) {
+        if ( getMoreATRs() ) {
+            InteractionRoot::SP interactionRootSP = InteractionRoot::create_interaction( theInteraction, theParameters, theTime );
+            C2WInteractionRootSP c2wInteractionRootSP = boost::dynamic_pointer_cast< C2WInteractionRoot >( interactionRootSP );
+            if ( c2wInteractionRootSP != 0 ) {
 
-	            // Filter interaction if src/origin fed requirements (if any) are not met
-	            if (  _subscribedInteractionFilter.filterC2WInteraction( getFederateId(), c2wInteractionRootSP )  ) {
-	            	return;
-	            }
-	        }
+                // Filter interaction if src/origin fed requirements (if any) are not met
+                if (  _subscribedInteractionFilter.filterC2WInteraction( getFederateId(), c2wInteractionRootSP )  ) {
+                    return;
+                }
+            }
 
-	        Super::receiveInteraction( theInteraction, theParameters, theTime, theTag, theHandle );
-	    }
-	}
+            Super::receiveInteraction( theInteraction, theParameters, theTime, theTag, theHandle );
+        }
+    }
 
-	virtual void receiveInteraction(
-	 RTI::InteractionClassHandle theInteraction,
-	 const RTI::ParameterHandleValuePairSet& theParameters,
-	 const char *theTag
-	)
-	 throw ( RTI::InteractionClassNotKnown, RTI::InteractionParameterNotKnown, RTI::FederateInternalError) {
-		if ( getMoreATRs() ) {
-			InteractionRoot::SP interactionRootSP = InteractionRoot::create_interaction( theInteraction, theParameters );
-			C2WInteractionRootSP c2wInteractionRootSP = boost::dynamic_pointer_cast< C2WInteractionRoot >( interactionRootSP );
-			if ( c2wInteractionRootSP != 0 ) {
+    virtual void receiveInteraction(
+     RTI::InteractionClassHandle theInteraction,
+     const RTI::ParameterHandleValuePairSet& theParameters,
+     const char *theTag
+    )
+     throw ( RTI::InteractionClassNotKnown, RTI::InteractionParameterNotKnown, RTI::FederateInternalError) {
+        if ( getMoreATRs() ) {
+            InteractionRoot::SP interactionRootSP = InteractionRoot::create_interaction( theInteraction, theParameters );
+            C2WInteractionRootSP c2wInteractionRootSP = boost::dynamic_pointer_cast< C2WInteractionRoot >( interactionRootSP );
+            if ( c2wInteractionRootSP != 0 ) {
 
-	            // Filter interaction if src/origin fed requirements (if any) are not met
-	            if (  _subscribedInteractionFilter.filterC2WInteraction( getFederateId(), c2wInteractionRootSP )  ) {
-	            	return;
-	            }
-	        }
+                // Filter interaction if src/origin fed requirements (if any) are not met
+                if (  _subscribedInteractionFilter.filterC2WInteraction( getFederateId(), c2wInteractionRootSP )  ) {
+                    return;
+                }
+            }
 
-			Super::receiveInteraction( theInteraction, theParameters, theTag );
-		}
-	}
+            Super::receiveInteraction( theInteraction, theParameters, theTag );
+        }
+    }
 };
 
 #endif

@@ -23,13 +23,13 @@
 
 void Sink1::initialize( void ) {
 
-	Sink1ATRCallback sk2ATRCb( *this );
-	// putAdvanceTimeRequest(  _currentTime, sk2ATRCb  );
+    Sink1ATRCallback sk2ATRCb( *this );
+    // putAdvanceTimeRequest(  _currentTime, sk2ATRCb  );
 
     // readyToPopulate();
     // readyToRun();
 
-_currentTime = 0;
+    _currentTime = 0;
     
     if (this->get_IsLateJoiner()) {
         _currentTime = getLBTS() - getLookAhead();
@@ -43,51 +43,50 @@ _currentTime = 0;
         readyToRun();
     }
 
-//	_pingCount.registerObject( getRTI() );
-//	_pingCount.updateAttributeValues( getRTI(), _currentTime + getLookAhead() );
+// _pingCount.registerObject( getRTI() );
+// _pingCount.updateAttributeValues( getRTI(), _currentTime + getLookAhead() );
 
 }
 
 void Sink1::execute( void ) {
 
-	static const double timeOrderOffsetIncrement = 0.00001;
-	
+    static const double timeOrderOffsetIncrement = 0.00001;
+
     InteractionRoot::SP interactionRootSP;
 
     _currentTime += 1;
 
-	double timeOrderOffset = 0;
+    double timeOrderOffset = 0;
 
-	while(  ( interactionRootSP = getNextInteraction() ) != 0  ) {
-		boost::shared_ptr< Ping1 > pingSP(   boost::static_pointer_cast< Ping1 >( interactionRootSP )  );
-		std::cout << "Sink1: Received Ping interaction #" << pingSP->get_Count() << std::endl;
-//		_pingCount.set_RunningCount( _pingCount.get_RunningCount() + 1 );
-//		_pingCount.updateAttributeValues( getRTI(), _currentTime + getLookAhead() + timeOrderOffset );
-		timeOrderOffset += timeOrderOffsetIncrement;
+    while(  ( interactionRootSP = getNextInteraction() ) != 0  ) {
+        boost::shared_ptr< Ping1 > pingSP(   boost::static_pointer_cast< Ping1 >( interactionRootSP )  );
+        std::cout << "Sink1: Received Ping interaction #" << pingSP->get_Count() << std::endl;
+//        _pingCount.set_RunningCount( _pingCount.get_RunningCount() + 1 );
+//        _pingCount.updateAttributeValues( getRTI(), _currentTime + getLookAhead() + timeOrderOffset );
+        timeOrderOffset += timeOrderOffsetIncrement;
     }
     
-	Sink1ATRCallback sk2ATRCb( *this );
-	putAdvanceTimeRequest(  _currentTime, sk2ATRCb  );
+    Sink1ATRCallback sk2ATRCb( *this );
+    putAdvanceTimeRequest(  _currentTime, sk2ATRCb  );
 
 }
 
 int main( int argc, char *argv[] ) {
 
-	// Sink1 Sink1( argc, argv );
+    // Sink1 Sink1( argc, argv );
 
     FederateConfigParser *parse_obj = new FederateConfigParser();
     FederateConfig *fedconfigObj = parse_obj->parseArgs(argc, argv);
     Sink1 sink1(fedconfigObj);
     std::cout << "Sink1 created" << std::endl;
     
-	std::cout << "Initializing Sink1" << std::endl;
+    std::cout << "Initializing Sink1" << std::endl;
 
-	sink1.initialize();
-    	std::cout << "Sink1 initialized" << std::endl;
+    sink1.initialize();
+    std::cout << "Sink1 initialized" << std::endl;
 
-	
-	sink1.run();
-std::cout << "Running Sink11" << std::endl;
+    sink1.run();
+    std::cout << "Running Sink11" << std::endl;
 
-	return 0;
+    return 0;
 }

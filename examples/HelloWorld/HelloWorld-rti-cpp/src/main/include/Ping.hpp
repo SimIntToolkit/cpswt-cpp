@@ -219,6 +219,9 @@ public:
 	
 	
 public:
+
+	using Super::getParameter;
+
 	TypeMedley getParameter( const std::string &datamemberName ) const {
 		
 		
