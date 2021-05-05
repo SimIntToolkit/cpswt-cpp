@@ -239,6 +239,9 @@ public:
 	C2WInteractionRoot( const RTI::ParameterHandleValuePairSet &datamemberMap, const RTIfedTime &logicalTime ) : Super( datamemberMap, logicalTime ) { }
 
 public:
+
+	using InteractionRoot::getParameter;
+
 	TypeMedley getParameter( const std::string &datamemberName ) const {
 		if ( "actualLogicalGenerationTime" == datamemberName ) {
 			return TypeMedley( get_actualLogicalGenerationTime() );
@@ -254,6 +257,9 @@ public:
 	}
 
 protected:
+
+	using Super::setParameterAux;
+
 	virtual bool setParameterAux( const std::string &datamemberName, const std::string &val ) {
 		bool retval = true;
 		if ( "actualLogicalGenerationTime" == datamemberName ) {
