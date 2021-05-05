@@ -258,6 +258,8 @@ public:
 	FederateResignInteraction( const RTI::ParameterHandleValuePairSet &datamemberMap, const RTIfedTime &logicalTime ) : Super( datamemberMap, logicalTime ) { }
 
 public:
+	using Super::getParameter;
+
 	TypeMedley getParameter( const std::string &datamemberName ) const {
 		if ( "FederateId" == datamemberName ) {
 			return TypeMedley( get_FederateId() );
@@ -271,6 +273,8 @@ public:
 	}
 
 protected:
+	using Super::setParameterAux;
+
 	virtual bool setParameterAux( const std::string &datamemberName, const std::string &val ) {
 		bool retval = true;
 		if ( "FederateId" == datamemberName ) {

@@ -5,16 +5,16 @@
     <artifactId>c2w-cpp-examples</artifactId>
     <version>0.2.0-SNAPSHOT</version>
   </parent>
-  
+
   <artifactId>c2w-HelloWorld-cpp</artifactId>
   <packaging>pom</packaging>
   <name>C2 Windtunnel C++ HelloWorld Example</name>
   <description>Hello World example for C2 Windtunnel with C++ RTI and Federates</description>
 
   <modules>
-    <module>HelloWorld_impl-cpp</module> 
-    <module>Execution</module>  
-  </modules>  
+    <module>HelloWorld_impl-cpp</module>
+    <module>Execution</module>
+  </modules>
 
     <build>
         <plugins>
@@ -56,12 +56,12 @@
                         <incremental>false</incremental>
                         <libs>
                           <lib>
-                            <name>RTI-NG64</name>
+                            <name>RTI-NG_64</name>
                             <type>shared</type>
                             <directory>${build.RTI_LIB_DIR}</directory>
                           </lib>
                           <lib>
-                            <name>FedTime64</name>
+                            <name>FedTime_64</name>
                             <type>shared</type>
                             <directory>${build.RTI_LIB_DIR}</directory>
                           </lib>
@@ -104,9 +104,9 @@
                 <activeByDefault>false</activeByDefault>
             </activation>
           <modules>
-              <module>HelloWorld-base-cpp</module>  
-              <module>HelloWorld-rti-cpp</module>  
-          </modules>  
+              <module>HelloWorld-base-cpp</module>
+              <module>HelloWorld-rti-cpp</module>
+          </modules>
         </profile>
 
         <profile>
@@ -243,5 +243,5 @@
       <developerConnection>https://git.vulcan.isis.vanderbilt.edu/projects/c2wtng/c2wtng-cpp</developerConnection>
       <url>https://vulcan.isis.vanderbilt.edu/projects/c2wtng/c2wtng-cpp/folder/master/</url>
   </scm>
-  
+
 </project>

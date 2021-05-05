@@ -645,7 +645,7 @@ public:
 		}
 	}
 
-private:
+protected:
 	virtual bool setAttributeAux( int datamemberHandle, const std::string &val ) {
 		const std::string &datamemberName = getAttributeName(datamemberHandle);
 		if (datamemberName.empty()) {
@@ -654,13 +654,16 @@ private:
 		return setAttributeAux(datamemberName, val);
 	}
 
-protected:
 	virtual bool setAttributeAux( const std::string &datamemberName, const std::string &value ) {
 		return false;
 	}
 
 	virtual bool setAttributeAux( const std::string &datamemberName, TypeMedley value ) {
 		return false;
+	}
+
+	virtual AttributeHandleValuePairSetSP createDatamemberHandleValuePairSet(RTI::ULong count, bool force ) {
+		return AttributeHandleValuePairSetSP(  RTI::AttributeSetFactory::create(count)  );
 	}
 
 	virtual AttributeHandleValuePairSetSP createDatamemberHandleValuePairSet( bool force ) {
