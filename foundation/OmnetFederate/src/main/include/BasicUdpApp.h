@@ -17,12 +17,11 @@
 #define BASICUDPAPP_H
 
 #include <omnetpp.h>
-#include <UDPSocket.h>
+#include <inet/transportlayer/contract/udp/UdpSocket.h>
 
-#include <InterfaceTable.h>
-#include <IPv4InterfaceData.h>
-#include "InterfaceTableAccess.h"
-#include "NotificationBoard.h"
+#include <inet/networklayer/common/InterfaceTable.h>
+#include <inet/networklayer/ipv4/Ipv4InterfaceData.h>
+#include <inet/common/ModuleAccess.h>
 
 #include "HLAInterface.h"
 
@@ -30,29 +29,29 @@
 /**
  * TODO - Generated class
  */
-class BasicUdpApp : public cSimpleModule, public INotifiable {
+class BasicUdpApp : public omnetpp::cSimpleModule, public omnetpp::cListener {
 
 private:
-    UDPSocket _socket;
+    inet::UdpSocket _socket;
 	std::string _hostName;
-	cModule *_hostModule;
+	inet::cModule *_hostModule;
 	int _port;
 	int _defaultDestPort;
 
-    IInterfaceTable *_interfaceTable;
-    NotificationBoard *_notificationBoard;
+    inet::IInterfaceTable *_interfaceTable;
+    inet::cModule *_notificationBoard;
 
 protected:
-	virtual int numInitStages( void ) const;
-	virtual void initialize( int stage );
-	virtual void receiveChangeNotification( int category, const cPolymorphic *details );
-	virtual void handleMessage(cMessage *msg);
+	virtual int numInitStages( void ) const override;
+	virtual void initialize( int stage ) override;
+	virtual void receiveChangeNotification( int category, const omnetpp::cObject *details );
+	virtual void handleMessage(inet::cMessage *msg) override;
 
-	IInterfaceTable *getInterfaceTable( void ) { return _interfaceTable; }
-	NotificationBoard *getNotificationBoard( void ) { return _notificationBoard; }
+	inet::IInterfaceTable *getInterfaceTable( void ) { return _interfaceTable; }
+	inet::cModule *getNotificationBoard( void ) { return _notificationBoard; }
 
 public:
-	cModule *getHostModule( void ) const {
+	inet::cModule *getHostModule( void ) const {
 		return _hostModule;
 	}
 
@@ -67,7 +66,7 @@ public:
 	    return _defaultDestPort;
 	}
 
-    virtual void sendToUDP( cPacket *msg, const IPv4Address& destAddr, int destPort );
+    virtual void sendToUDP( inet::Packet *msg, const inet::Ipv4Address& destAddr, int destPort );
 };
 
 #endif

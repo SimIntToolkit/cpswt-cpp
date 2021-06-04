@@ -12,15 +12,15 @@
 #include <boost/lexical_cast.hpp>
 
 #include <omnetpp.h>
-#include <IPv4Address.h>
-#include <IPv4Route.h>
+#include <inet/networklayer/contract/ipv4/Ipv4Address.h>
+#include <inet/networklayer/ipv4/Ipv4Route.h>
 
 #include <SynchronizedFederate.hpp>
 
 #include <messages/InteractionMsg_m.h>
 #include <messages/ObjectMsg_m.h>
 
-class HLAInterface : public cSimpleModule, public SynchronizedFederate {
+class HLAInterface : public inet::cSimpleModule, public SynchronizedFederate {
 
 public:
 	typedef SynchronizedFederate Super;
@@ -68,22 +68,22 @@ public:
 			initFromString( networkAddressSpec );
 		}
 
-		NetworkAddress( const IPv4Address &ipAddress ) : _networkIPAddress( ipAddress.getInt() ), _netMask( ipAddress.getNetworkMask().getInt() ) {
+		NetworkAddress( const inet::Ipv4Address &ipAddress ) : _networkIPAddress( ipAddress.getInt() ), _netMask( ipAddress.getNetworkMask().getInt() ) {
 			truncateIPAddress();
 		}
-		NetworkAddress( const IPv4Address *ipAddress ) : _networkIPAddress( ipAddress->getInt() ), _netMask( ipAddress->getNetworkMask().getInt() ) {
+		NetworkAddress( const inet::Ipv4Address *ipAddress ) : _networkIPAddress( ipAddress->getInt() ), _netMask( ipAddress->getNetworkMask().getInt() ) {
 			truncateIPAddress();
 		}
-		NetworkAddress( const IPv4Address &hostIPAddress, const IPv4Address &netmaskIPAddress) :
+		NetworkAddress( const inet::Ipv4Address &hostIPAddress, const inet::Ipv4Address &netmaskIPAddress) :
 		 _networkIPAddress( hostIPAddress.getInt() ), _netMask( netmaskIPAddress.getInt() ) {
 			truncateIPAddress();
 		}
-		NetworkAddress( const IPv4Address *hostIPAddress, const IPv4Address *netmaskIPAddress) :
+		NetworkAddress( const inet::Ipv4Address *hostIPAddress, const inet::Ipv4Address *netmaskIPAddress) :
 		 _networkIPAddress( hostIPAddress->getInt() ), _netMask( netmaskIPAddress->getInt() ) {
 			truncateIPAddress();
 		}
 
-		NetworkAddress( const IPv4Route *ipRoute ) : _networkIPAddress( ipRoute->getDestination().getInt() ), _netMask( ipRoute->getNetmask().getInt() ) {
+		NetworkAddress( const inet::Ipv4Route *ipRoute ) : _networkIPAddress( ipRoute->getDestination().getInt() ), _netMask( ipRoute->getNetmask().getInt() ) {
 			truncateIPAddress();
 		}
 
@@ -103,13 +103,13 @@ public:
 			return ipAddress == _networkIPAddress;
 		}
 
-		bool matches( const IPv4Address &ipAddress ) const {
+		bool matches( const inet::Ipv4Address &ipAddress ) const {
 			return matches( ipAddress.getInt() );
 		}
 
 	};
 
-	friend std::ostream &::operator<<( std::ostream &os, const NetworkAddress &networkAddress );
+	friend std::ostream &operator<<( std::ostream &os, const NetworkAddress &networkAddress );
 
 	struct NetworkAddressComparator {
 		bool operator()( const NetworkAddress &networkAddress1, const NetworkAddress &networkAddress2 );
@@ -122,7 +122,7 @@ public:
 	typedef std::set< cModule * > CModuleSet;
 	typedef std::map< NetworkAddress, CModuleSet, NetworkAddressComparator > NetworkAddressCModuleSetMap;
 
-	typedef std::map< std::string, IPv4Address > InterfaceIPAddressMap;
+	typedef std::map< std::string, inet::Ipv4Address > InterfaceIPAddressMap;
 
 
 	class IPModuleProperties {
@@ -139,9 +139,9 @@ public:
 		cModule *getCModule( void ) {
 			return _cModule;
 		}
-		IPv4Address getIPAddress( const std::string &interfaceName ) {
+		inet::Ipv4Address getIPAddress( const std::string &interfaceName ) {
 			InterfaceIPAddressMap::iterator iimItr = _interfaceIPAddressMap.find( interfaceName );
-			return iimItr == _interfaceIPAddressMap.end() ? IPv4Address(  static_cast< uint32_t >( 0 )  ) : iimItr->second;
+			return iimItr == _interfaceIPAddressMap.end() ? inet::Ipv4Address(  static_cast< uint32_t >( 0 )  ) : iimItr->second;
 		}
 		InterfaceIPAddressMap &getInterfaceIPAddressMap( void ) {
 			return _interfaceIPAddressMap;
@@ -150,7 +150,7 @@ public:
 		void setCModule( cModule *cModule_var ) {
 			_cModule = cModule_var;
 		}
-		void setInterfaceIPAddress( const std::string &interfaceName, const IPv4Address &ipAddress ) {
+		void setInterfaceIPAddress( const std::string &interfaceName, const inet::Ipv4Address &ipAddress ) {
 			_interfaceIPAddressMap[ interfaceName ] = ipAddress;
 		}
 	};
@@ -176,7 +176,7 @@ public:
 		return himItr == _hostNameIPModulePropertiesMap.end() ? (cModule *)0 : himItr->second.getCModule();
 	}
 
-	IPv4Address getIPAddress( const HostName &hostName, const std::string &interfaceName ) {
+	inet::Ipv4Address getIPAddress( const HostName &hostName, const std::string &interfaceName ) {
 		HostNameIPModulePropertiesMap::iterator himItr = _hostNameIPModulePropertiesMap.find( hostName );
 		return himItr->second.getIPAddress( interfaceName );
 	}
@@ -256,9 +256,9 @@ public:
 		cModule *getCModule( void ) {
 			return _cModule;
 		}
-		IPv4Address getIPAddress( const std::string &interfaceName ) {
+		inet::Ipv4Address getIPAddress( const std::string &interfaceName ) {
 			InterfaceIPAddressMap::iterator iimItr = _interfaceIPAddressMap.find( interfaceName );
-			return iimItr == _interfaceIPAddressMap.end() ? IPv4Address(  static_cast< uint32_t >( 0 )  ) : iimItr->second;
+			return iimItr == _interfaceIPAddressMap.end() ? inet::Ipv4Address(  static_cast< uint32_t >( 0 )  ) : iimItr->second;
 		}
 		InterfaceIPAddressMap &getInterfaceIPAddressMap( void ) {
 			return _interfaceIPAddressMap;
@@ -270,7 +270,7 @@ public:
 		void setCModule( cModule *cModule_var ) {
 			_cModule = cModule_var;
 		}
-		void setInterfaceIPAddress( const std::string &interfaceName, const IPv4Address &ipAddress ) {
+		void setInterfaceIPAddress( const std::string &interfaceName, const inet::Ipv4Address &ipAddress ) {
 			_interfaceIPAddressMap[ interfaceName ] = ipAddress;
 		}
 		void setPort( int port ) {
@@ -346,18 +346,18 @@ public:
 		return getAppInterfaceIPAddressMap(  AppSpec( hostName, appName, appIndex )  );
 	}
 
-	IPv4Address getAppSpecIPAddress( const AppSpec &appSpec, const std::string &interfaceName ) {
+	inet::Ipv4Address getAppSpecIPAddress( const AppSpec &appSpec, const std::string &interfaceName ) {
 		AppSpecPropertiesMap::iterator apmItr = _appSpecPropertiesMap.find( appSpec );
-		return apmItr == _appSpecPropertiesMap.end() ? IPv4Address(  static_cast< uint32_t >( 0 )  ) : apmItr->second.getIPAddress( interfaceName );
+		return apmItr == _appSpecPropertiesMap.end() ? inet::Ipv4Address(  static_cast< uint32_t >( 0 )  ) : apmItr->second.getIPAddress( interfaceName );
 	}
-	IPv4Address getAppSpecIPAddress( const HostName &hostName, const std::string &appName, int appIndex, const std::string &interfaceName ) {
+	inet::Ipv4Address getAppSpecIPAddress( const HostName &hostName, const std::string &appName, int appIndex, const std::string &interfaceName ) {
 		return getAppSpecIPAddress(  AppSpec( hostName, appName, appIndex ), interfaceName  );
 	}
 
-	void setAppSpecIPAddress( const AppSpec &appSpec, const std::string &interfaceName, const IPv4Address &ipAddress ) {
+	void setAppSpecIPAddress( const AppSpec &appSpec, const std::string &interfaceName, const inet::Ipv4Address &ipAddress ) {
 		_appSpecPropertiesMap[ appSpec ].setInterfaceIPAddress( interfaceName, ipAddress );
 	}
-	void setAppSpecIPAddress( const HostName &hostName, const std::string &appName, int appIndex, const std::string &interfaceName, const IPv4Address &ipAddress ) {
+	void setAppSpecIPAddress( const HostName &hostName, const std::string &appName, int appIndex, const std::string &interfaceName, const inet::Ipv4Address &ipAddress ) {
 		setAppSpecIPAddress(  AppSpec( hostName, appName, appIndex ), interfaceName, ipAddress  );
 	}
 
@@ -387,7 +387,7 @@ public:
     }
     IntegrityAttackParams &getIntegrityAttackParams( const HostName &hostName ) {
         if( !isIntegrityAttackEnabled( hostName ) ) {
-            throw cRuntimeError(this, "HLAInterface::getIntegrityAttackParams()::ERROR: Integrity attack not set for '%s'", hostName.c_str());
+            throw inet::cRuntimeError(this, "HLAInterface::getIntegrityAttackParams()::ERROR: Integrity attack not set for '%s'", hostName.c_str());
         }
 
         return _integrityAttackParamsMap[hostName];
@@ -471,9 +471,9 @@ private:
 	
 	std::string _logLevel;
 
-	cMessage *_keepAliveMsg;
-	cMessage *_readyToRunMsg;
-	cMessage *_interactionArrivalMsg;
+	inet::cMessage *_keepAliveMsg;
+	inet::cMessage *_readyToRunMsg;
+	inet::cMessage *_interactionArrivalMsg;
 	bool _noInteractionArrivalFlag;
 
 	static HLAInterface *&getHLAInterfacePtr( void ) {
@@ -555,12 +555,12 @@ public:
     
 	virtual int numInitStages( void ) const;
 	virtual void initialize( int stage );
-	virtual void handleMessage( cMessage *msg );
+	virtual void handleMessage( inet::cMessage *msg );
 	virtual void finish() {
 	    SynchronizedFederate::finalizeAndTerminate();
 	}
 
-	ObjectMsg *wrapObject( ObjectRootSP objectRootSP, const std::string &name, simtime_t timestamp ) {
+	ObjectMsg *wrapObject( ObjectRootSP objectRootSP, const std::string &name, inet::simtime_t timestamp ) {
 	
 		Enter_Method( "wrapObject" );
 
@@ -573,10 +573,10 @@ public:
 	}
 	
 	ObjectMsg *wrapObject( ObjectRootSP objectRootSP, const std::string &name ) {
-		return wrapObject( objectRootSP, name, simTime() );
+		return wrapObject( objectRootSP, name, inet::simTime() );
 	}
 	
-	ObjectMsg *wrapObject( ObjectRoot &objectRoot, const std::string &name, simtime_t timestamp ) {
+	ObjectMsg *wrapObject( ObjectRoot &objectRoot, const std::string &name, inet::simtime_t timestamp ) {
 		return wrapObject( objectRoot.clone(), name, timestamp );
 	}
 
@@ -587,35 +587,35 @@ public:
 	void updateObject( ObjectMsg *objectMsgPtr ) {
 		Enter_Method( "updateObject" );
 		take( objectMsgPtr );
-		scheduleAt( simTime(), objectMsgPtr );
+		scheduleAt( inet::simTime(), objectMsgPtr );
 	}
 	
-	void updateObject( ObjectRootSP objectRootSP, const std::string &name, simtime_t timestamp ) {		
+	void updateObject( ObjectRootSP objectRootSP, const std::string &name, inet::simtime_t timestamp ) {		
 		ObjectMsg *objectMsgPtr = wrapObject( objectRootSP, name, timestamp );
 		updateObject( objectMsgPtr );
 	}
 	
 	void updateObject( ObjectRootSP objectRootSP, const std::string &name, double timestamp ) {
-		updateObject(  objectRootSP, name, SimTime( timestamp )  );
+		updateObject(  objectRootSP, name, inet::SimTime( timestamp )  );
 	}
 
 	void updateObject( ObjectRootSP objectRootSP, const std::string &name ) {
-		updateObject( objectRootSP, name, simTime() );
+		updateObject( objectRootSP, name, inet::simTime() );
 	}
 
-	void updateObject( ObjectRoot &objectRoot, const std::string &name, simtime_t timestamp ) {
+	void updateObject( ObjectRoot &objectRoot, const std::string &name, inet::simtime_t timestamp ) {
 		updateObject( objectRoot.clone(), name, timestamp );
 	}
 	
 	void updateObject( ObjectRoot &objectRoot, const std::string &name, double timestamp ) {
-		updateObject(  objectRoot, name, SimTime( timestamp )  );
+		updateObject(  objectRoot, name, inet::SimTime( timestamp )  );
 	}
 	
 	void updateObject( ObjectRoot &objectRoot, const std::string &name ) {
-		updateObject( objectRoot, name, simTime() );
+		updateObject( objectRoot, name, inet::simTime() );
 	}
 
-	static ObjectRootSP unwrapObject( cMessage *msg ) {
+	static ObjectRootSP unwrapObject( inet::cMessage *msg ) {
 		if ( msg->getKind() != OBJECT ) return ObjectRootSP(  static_cast< ObjectRoot * >( 0 )  );
 		return static_cast< ObjectMsg * >( msg )->getObjectRootSP();
 	}	

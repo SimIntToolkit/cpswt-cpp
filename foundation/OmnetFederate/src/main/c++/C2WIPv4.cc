@@ -21,22 +21,22 @@
 
 #include "C2WIPv4.h"
 
-#include "ARPPacket_m.h"
-#include "IARPCache.h"
-#include "ICMPMessage_m.h"
-#include "Ieee802Ctrl_m.h"
-#include "IRoutingTable.h"
-#include "InterfaceTableAccess.h"
-#include "IPSocket.h"
-#include "IPv4ControlInfo.h"
-#include "IPv4Datagram.h"
-#include "IPv4InterfaceData.h"
-#include "NodeOperations.h"
-#include "NodeStatus.h"
-#include "NotificationBoard.h"
-#include "UDPPacket.h"
-#include "TCPSegment.h"
-#include "UDPPacket_m.h"
+#include <inet/networklayer/arp/ipv4/ArpPacket_m.h>
+#include <inet/networklayer/arp/ipv4/Arp.h>
+//#include "ICMPMessage_m.h"
+#include <inet/linklayer/common/Ieee802Ctrl_m.h>
+#include <inet/networklayer/contract/IRoutingTable.h>
+//#include "InterfaceTableAccess.h"
+//#include "IPSocket.h"
+//#include "IPv4ControlInfo.h"
+//#include "IPv4Datagram.h"
+#include <inet/networklayer/ipv4/Ipv4InterfaceData.h>
+//#include "NodeOperations.h"
+#include <inet/common/lifecycle/NodeStatus.h>
+//#include "NotificationBoard.h"
+//#include "UDPPacket.h"
+//#include "TCPSegment.h"
+//#include "UDPPacket_m.h"
 #include "FilterAttackMsg_m.h"
 #include "NodeAttackMsg_m.h"
 #include "NetworkAttackMsg_m.h"
@@ -59,9 +59,9 @@ Define_Module(C2WIPv4);
 // a local interface-k hasznalata eseten szinten hianyozhatnak bizonyos NetFilter hook-ok
 
 #define NEWFRAGMENT
-simsignal_t C2WIPv4::completedARPResolutionSignal = registerSignal("completedARPResolution");
-simsignal_t C2WIPv4::failedARPResolutionSignal = registerSignal("failedARPResolution");
-simsignal_t C2WIPv4::iPv4PromiscousPacket = registerSignal("iPv4PromiscousPacket");
+inet::simsignal_t C2WIPv4::completedARPResolutionSignal = HLAInterface::registerSignal("completedARPResolution");
+inet::simsignal_t C2WIPv4::failedARPResolutionSignal = HLAInterface::registerSignal("failedARPResolution");
+inet::simsignal_t C2WIPv4::iPv4PromiscousPacket = HLAInterface::registerSignal("iPv4PromiscousPacket");
 
 void C2WIPv4::initialize(int stage)
 {
@@ -73,13 +73,13 @@ void C2WIPv4::initialize(int stage)
         QueueBase::initialize();
 
         ift = InterfaceTableAccess().get();
-        rt = check_and_cast<IRoutingTable *>(getModuleByPath(par("routingTableModule")));
+        rt = omnetpp::check_and_cast<IRoutingTable *>(getModuleByPath(par("routingTableModule")));
         nb = NotificationBoardAccess().getIfExists(); // needed only for multicast forwarding
 
         arpInGate = gate("arpIn");
         arpOutGate = gate("arpOut");
         cModule *arpModule = arpOutGate->getPathEndGate()->getOwnerModule();
-        arp = check_and_cast<IARPCache *>(arpModule);
+        arp = omnetpp::check_and_cast<Arp *>(arpModule);
         transportInGateBaseId = gateBaseId("transportIn");
         queueOutGateBaseId = gateBaseId("queueOut");
 
@@ -136,16 +136,16 @@ void C2WIPv4::updateDisplayString()
     getDisplayString().setTagArg("t", 0, buf);
 }
 
-void C2WIPv4::handleMessage(cMessage *msg)
+void C2WIPv4::handleMessage(omnetpp::cMessage *msg)
 {
     if (msg->getKind() == IP_C_REGISTER_PROTOCOL) {
-        IPRegisterProtocolCommand * command = check_and_cast<IPRegisterProtocolCommand *>(msg->getControlInfo());
+        IPRegisterProtocolCommand * command = omnetpp::check_and_cast<IPRegisterProtocolCommand *>(msg->getControlInfo());
         mapping.addProtocolMapping(command->getProtocol(), msg->getArrivalGate()->getIndex());
 
         if (command->getProtocol() == IP_PROT_MANET)
         {
             int gateindex = mapping.getOutputGateForProtocol(IP_PROT_MANET);
-            cGate *manetgate = gate("transportOut", gateindex)->getPathEndGate();
+            omnetpp::cGate *manetgate = gate("transportOut", gateindex)->getPathEndGate();
             cModule *destmod = manetgate->getOwnerModule();
             cProperties *props = destmod->getProperties();
             isDsr = props && props->getAsBool("isDsr");
@@ -279,7 +279,7 @@ void C2WIPv4::handleMessage(cMessage *msg)
                 ReplayMsg *replayMsg = new ReplayMsg;
                 replayMsg->setReplayBufferSP(replayBufferSP);
 
-                scheduleAt(simTime() + replayBufferSP->getNextTimeOffset().dbl(),
+                scheduleAt(omnetpp::simTime() + replayBufferSP->getNextTimeOffset().dbl(),
                         replayMsg);
             } else {
                 replayBufferSP->setPlaying(false);
@@ -300,8 +300,8 @@ void C2WIPv4::handleMessage(cMessage *msg)
             DatagramData &datagramData = *replayBufferSP->getSerial();
 
             IPv4Datagram *ipDatagram = datagramData.getIPDatagram()->dup();
-            cPacket *transportPacket = ipDatagram->decapsulate();
-            cPacket *applicationPacket = transportPacket->decapsulate();
+            omnetpp::cPacket *transportPacket = ipDatagram->decapsulate();
+            omnetpp::cPacket *applicationPacket = transportPacket->decapsulate();
             InteractionMsg *interactionMsg =
                     dynamic_cast<InteractionMsg *>(applicationPacket);
             if (interactionMsg != 0) {
@@ -322,7 +322,7 @@ void C2WIPv4::handleMessage(cMessage *msg)
                 return;
             }
 
-            scheduleAt(simTime() + nextTimeOffset, msg);
+            scheduleAt(omnetpp::simTime() + nextTimeOffset, msg);
             return;
         }
 
@@ -340,7 +340,7 @@ void C2WIPv4::handleMessage(cMessage *msg)
                 OutOfOrderMsg *outOfOrderMsg = new OutOfOrderMsg;
                 outOfOrderMsg->setReplayBufferSP(replayBufferSP);
 
-                scheduleAt(simTime() + replayBufferSP->getRecordDuration(),
+                scheduleAt(omnetpp::simTime() + replayBufferSP->getRecordDuration(),
                         outOfOrderMsg);
             } else {
                 replayBufferSP->setPlayingRandom(false);
@@ -374,9 +374,9 @@ void C2WIPv4::handleMessage(cMessage *msg)
 
             double nextTimeOffset = replayBufferSP->getNextTimeOffset().dbl();
             if (nextTimeOffset < 0) {
-                scheduleAt(simTime() + replayBufferSP->getRecordDuration(), msg);
+                scheduleAt(omnetpp::simTime() + replayBufferSP->getRecordDuration(), msg);
             } else {
-                scheduleAt(simTime() + nextTimeOffset, msg);
+                scheduleAt(omnetpp::simTime() + nextTimeOffset, msg);
             }
 
             return;
@@ -388,13 +388,13 @@ void C2WIPv4::handleMessage(cMessage *msg)
                     addRouteEntryMsg->getRouteEntrySP();
             IPv4Route *ipRoute = new IPv4Route;
             ipRoute->setDestination(
-                    IPv4Address(
+                    inet::Ipv4Address(
                             routeEntrySP->get_networkAddress().getNetworkIPAddress()));
             ipRoute->setNetmask(
-                    IPv4Address(routeEntrySP->get_networkAddress().getNetMask()));
+                    inet::Ipv4Address(routeEntrySP->get_networkAddress().getNetMask()));
             int gatewayAddress =
                     routeEntrySP->get_gatewayAddress().getNetworkIPAddress();
-            ipRoute->setGateway(IPv4Address(gatewayAddress));
+            ipRoute->setGateway(inet::Ipv4Address(gatewayAddress));
             ipRoute->setInterface(
                     ift->getInterfaceByName(
                             routeEntrySP->get_interfaceEntry().c_str()));
@@ -411,13 +411,13 @@ void C2WIPv4::handleMessage(cMessage *msg)
                     dropRouteEntryMsg->getRouteEntrySP();
             IPv4Route *ipRoute = new IPv4Route;
             ipRoute->setDestination(
-                    IPv4Address(
+                    inet::Ipv4Address(
                             routeEntrySP->get_networkAddress().getNetworkIPAddress()));
             ipRoute->setNetmask(
-                    IPv4Address(routeEntrySP->get_networkAddress().getNetMask()));
+                    inet::Ipv4Address(routeEntrySP->get_networkAddress().getNetMask()));
             int gatewayAddress =
                     routeEntrySP->get_gatewayAddress().getNetworkIPAddress();
-            ipRoute->setGateway(IPv4Address(gatewayAddress));
+            ipRoute->setGateway(inet::Ipv4Address(gatewayAddress));
             ipRoute->setInterface(
                     ift->getInterfaceByName(
                             routeEntrySP->get_interfaceEntry().c_str()));
@@ -431,7 +431,7 @@ void C2WIPv4::handleMessage(cMessage *msg)
     }
 }
 
-void C2WIPv4::endService(cPacket *packet)
+void C2WIPv4::endService(omnetpp::cPacket *packet)
 {
     if (!isUp) {
         EV << "IPv4 is down -- discarding message\n";
@@ -450,7 +450,7 @@ void C2WIPv4::endService(cPacket *packet)
     }
     else // from network
     {
-        const InterfaceEntry *fromIE = getSourceInterfaceFrom(packet);
+        const inet::InterfaceEntry *fromIE = getSourceInterfaceFrom(packet);
         if (dynamic_cast<ARPPacket *>(packet))
             handleIncomingARPPacket((ARPPacket *)packet, fromIE);
         else if (dynamic_cast<IPv4Datagram *>(packet))
@@ -463,13 +463,13 @@ void C2WIPv4::endService(cPacket *packet)
         updateDisplayString();
 }
 
-const InterfaceEntry *C2WIPv4::getSourceInterfaceFrom(cPacket *packet)
+const inet::InterfaceEntry *C2WIPv4::getSourceInterfaceFrom(omnetpp::cPacket *packet)
 {
-    cGate *g = packet->getArrivalGate();
+    omnetpp::cGate *g = packet->getArrivalGate();
     return g ? ift->getInterfaceByNetworkLayerGateIndex(g->getIndex()) : NULL;
 }
 
-void C2WIPv4::handleIncomingDatagram(IPv4Datagram *datagram, const InterfaceEntry *fromIE)
+void C2WIPv4::handleIncomingDatagram(IPv4Datagram *datagram, const inet::InterfaceEntry *fromIE)
 {
     ASSERT(datagram);
     ASSERT(fromIE);
@@ -503,12 +503,12 @@ void C2WIPv4::handleIncomingDatagram(IPv4Datagram *datagram, const InterfaceEntr
     }
     else if (rule && rule->getRule()==IPv4RouteRule::ACCEPT)
     {
-        InterfaceEntry *destIE = rule->getInterface();
+        inet::InterfaceEntry *destIE = rule->getInterface();
         EV << "Received datagram `" << datagram->getName() << "' with dest=" << datagram->getDestAddress()  << " processing by rule accept \n";
         // hop counter decrement; FIXME but not if it will be locally delivered
         datagram->setTimeToLive(datagram->getTimeToLive()-1);
         if (!datagram->getDestAddress().isMulticast())
-            preroutingFinish(datagram, fromIE, destIE, IPv4Address::UNSPECIFIED_ADDRESS);
+            preroutingFinish(datagram, fromIE, destIE, inet::Ipv4Address::UNSPECIFIED_ADDRESS);
         else
             forwardMulticastPacket(datagram, fromIE);
         return;
@@ -517,15 +517,15 @@ void C2WIPv4::handleIncomingDatagram(IPv4Datagram *datagram, const InterfaceEntr
 
     EV << "Received datagram `" << datagram->getName() << "' with dest=" << datagram->getDestAddress() << "\n";
 
-    const InterfaceEntry *destIE = NULL;
-    IPv4Address nextHop(IPv4Address::UNSPECIFIED_ADDRESS);
-    if (datagramPreRoutingHook(datagram, fromIE, destIE, nextHop) == INetfilter::IHook::ACCEPT)
+    const inet::InterfaceEntry *destIE = NULL;
+    inet::Ipv4Address nextHop(inet::Ipv4Address::UNSPECIFIED_ADDRESS);
+    if (datagramPreRoutingHook(datagram, fromIE, destIE, nextHop) == inet::INetfilter::IHook::ACCEPT)
         preroutingFinish(datagram, fromIE, destIE, nextHop);
 }
 
-void C2WIPv4::preroutingFinish(IPv4Datagram *datagram, const InterfaceEntry *fromIE, const InterfaceEntry *destIE, IPv4Address nextHopAddr)
+void C2WIPv4::preroutingFinish(IPv4Datagram *datagram, const inet::InterfaceEntry *fromIE, const inet::InterfaceEntry *destIE, inet::Ipv4Address nextHopAddr)
 {
-    IPv4Address &destAddr = datagram->getDestAddress();
+    inet::Ipv4Address &destAddr = datagram->getDestAddress();
 
     // remove control info
     delete datagram->removeControlInfo();
@@ -562,7 +562,7 @@ void C2WIPv4::preroutingFinish(IPv4Datagram *datagram, const InterfaceEntry *fro
     }
     else
     {
-        const InterfaceEntry *broadcastIE = NULL;
+        const inet::InterfaceEntry *broadcastIE = NULL;
 
         // check for local delivery; we must accept also packets coming from the interfaces that
         // do not yet have an IP address assigned. This happens during DHCP requests.
@@ -574,7 +574,7 @@ void C2WIPv4::preroutingFinish(IPv4Datagram *datagram, const InterfaceEntry *fro
         {
             // broadcast datagram on the target subnet if we are a router
             if (broadcastIE && fromIE != broadcastIE && rt->isIPForwardingEnabled())
-                fragmentPostRouting(datagram->dup(), broadcastIE, IPv4Address::ALLONES_ADDRESS);
+                fragmentPostRouting(datagram->dup(), broadcastIE, inet::Ipv4Address::ALLONES_ADDRESS);
 
             EV << "Broadcast received\n";
             reassembleAndDeliver(datagram);
@@ -590,10 +590,10 @@ void C2WIPv4::preroutingFinish(IPv4Datagram *datagram, const InterfaceEntry *fro
     }
 }
 
-void C2WIPv4::handleIncomingARPPacket(ARPPacket *packet, const InterfaceEntry *fromIE)
+void C2WIPv4::handleIncomingARPPacket(ARPPacket *packet, const inet::InterfaceEntry *fromIE)
 {
     // give it to the ARP module
-    Ieee802Ctrl *ctrl = check_and_cast<Ieee802Ctrl*>(packet->getControlInfo());
+    Ieee802Ctrl *ctrl = omnetpp::check_and_cast<Ieee802Ctrl*>(packet->getControlInfo());
     ctrl->setInterfaceId(fromIE->getInterfaceId());
     send(packet, arpOutGate);
 }
@@ -607,7 +607,7 @@ void C2WIPv4::handleIncomingICMP(ICMPMessage *packet)
         case ICMP_TIME_EXCEEDED:
         case ICMP_PARAMETER_PROBLEM: {
             // ICMP errors are delivered to the appropriate higher layer protocol
-            IPv4Datagram *bogusPacket = check_and_cast<IPv4Datagram *>(packet->getEncapsulatedPacket());
+            IPv4Datagram *bogusPacket = omnetpp::check_and_cast<IPv4Datagram *>(packet->getEncapsulatedPacket());
             int protocol = bogusPacket->getTransportProtocol();
             int gateindex = mapping.getOutputGateForProtocol(protocol);
             send(packet, "transportOut", gateindex);
@@ -623,7 +623,7 @@ void C2WIPv4::handleIncomingICMP(ICMPMessage *packet)
     }
 }
 
-void C2WIPv4::handlePacketFromHL(cPacket *packet)
+void C2WIPv4::handlePacketFromHL(omnetpp::cPacket *packet)
 {
     // if no interface exists, do not send datagram
     if (ift->getNumInterfaces() == 0)
@@ -641,31 +641,31 @@ void C2WIPv4::handlePacketFromHL(cPacket *packet)
     if (!datagram) // if HL sends an IPv4Datagram, route the packet
     {
         // encapsulate
-        controlInfo = check_and_cast<IPv4ControlInfo*>(packet->removeControlInfo());
+        controlInfo = omnetpp::check_and_cast<IPv4ControlInfo*>(packet->removeControlInfo());
         datagram = encapsulate(packet, controlInfo);
     }
 
     // extract requested interface and next hop
-    const InterfaceEntry *destIE = controlInfo ? const_cast<const InterfaceEntry *>(ift->getInterfaceById(controlInfo->getInterfaceId())) : NULL;
+    const inet::InterfaceEntry *destIE = controlInfo ? const_cast<const inet::InterfaceEntry *>(ift->getInterfaceById(controlInfo->getInterfaceId())) : NULL;
 
     if (controlInfo)
         datagram->setControlInfo(controlInfo);    //FIXME ne rakjuk bele a cntrInfot!!!!! de kell :( kulonben a hook queue-ban elveszik a multicastloop flag
 
     // TODO:
-    IPv4Address nextHopAddr(IPv4Address::UNSPECIFIED_ADDRESS);
-    if (datagramLocalOutHook(datagram, destIE, nextHopAddr) == INetfilter::IHook::ACCEPT)
+    inet::Ipv4Address nextHopAddr(inet::Ipv4Address::UNSPECIFIED_ADDRESS);
+    if (datagramLocalOutHook(datagram, destIE, nextHopAddr) == inet::INetfilter::IHook::ACCEPT)
         datagramLocalOut(datagram, destIE, nextHopAddr);
 }
 
-void C2WIPv4::handlePacketFromARP(cPacket *packet)
+void C2WIPv4::handlePacketFromARP(omnetpp::cPacket *packet)
 {
     // send out packet on the appropriate interface
-    Ieee802Ctrl *ctrl = check_and_cast<Ieee802Ctrl*>(packet->getControlInfo());
-    InterfaceEntry *destIE = ift->getInterfaceById(ctrl->getInterfaceId());
+    Ieee802Ctrl *ctrl = omnetpp::check_and_cast<Ieee802Ctrl*>(packet->getControlInfo());
+    inet::InterfaceEntry *destIE = ift->getInterfaceById(ctrl->getInterfaceId());
     sendPacketToNIC(packet, destIE);
 }
 
-void C2WIPv4::datagramLocalOut(IPv4Datagram* datagram, const InterfaceEntry* destIE, IPv4Address requestedNextHopAddress)
+void C2WIPv4::datagramLocalOut(IPv4Datagram* datagram, const inet::InterfaceEntry* destIE, inet::Ipv4Address requestedNextHopAddress)
 {
     IPv4ControlInfo *controlInfo = dynamic_cast<IPv4ControlInfo*>(datagram->removeControlInfo());
     bool multicastLoop = true;
@@ -676,7 +676,7 @@ void C2WIPv4::datagramLocalOut(IPv4Datagram* datagram, const InterfaceEntry* des
     }
 
     // send
-    IPv4Address &destAddr = datagram->getDestAddress();
+    inet::Ipv4Address &destAddr = datagram->getDestAddress();
 
     EV << "Sending datagram `" << datagram->getName() << "' with dest=" << destAddr << "\n";
 
@@ -687,7 +687,7 @@ void C2WIPv4::datagramLocalOut(IPv4Datagram* datagram, const InterfaceEntry* des
         // loop back a copy
         if (multicastLoop && (!destIE || !destIE->isLoopback()))
         {
-            const InterfaceEntry *loopbackIF = ift->getFirstLoopbackInterface();
+            const inet::InterfaceEntry *loopbackIF = ift->getFirstLoopbackInterface();
             if (loopbackIF)
                 fragmentPostRouting(datagram->dup(), loopbackIF, destAddr);
         }
@@ -733,9 +733,9 @@ void C2WIPv4::datagramLocalOut(IPv4Datagram* datagram, const InterfaceEntry* des
  *   3. if no route, choose the interface according to the source address
  *   4. or if the source address is unspecified, choose the first MULTICAST interface
  */
-const InterfaceEntry *C2WIPv4::determineOutgoingInterfaceForMulticastDatagram(IPv4Datagram *datagram, const InterfaceEntry *multicastIFOption)
+const inet::InterfaceEntry *C2WIPv4::determineOutgoingInterfaceForMulticastDatagram(IPv4Datagram *datagram, const inet::InterfaceEntry *multicastIFOption)
 {
-    const InterfaceEntry *ie = NULL;
+    const inet::InterfaceEntry *ie = NULL;
     if (multicastIFOption)
     {
         ie = multicastIFOption;
@@ -765,10 +765,10 @@ const InterfaceEntry *C2WIPv4::determineOutgoingInterfaceForMulticastDatagram(IP
 }
 
 
-void C2WIPv4::routeUnicastPacket(IPv4Datagram *datagram, const InterfaceEntry *fromIE, const InterfaceEntry *destIE, IPv4Address requestedNextHopAddress)
+void C2WIPv4::routeUnicastPacket(IPv4Datagram *datagram, const inet::InterfaceEntry *fromIE, const inet::InterfaceEntry *destIE, inet::Ipv4Address requestedNextHopAddress)
 {
-    IPv4Address destAddr = datagram->getDestAddress();
-    IPv4Address srcAddr = datagram->getSrcAddress();
+    inet::Ipv4Address destAddr = datagram->getDestAddress();
+    inet::Ipv4Address srcAddr = datagram->getSrcAddress();
     if (srcAddr.isUnspecified())
         srcAddr = destAddr;
 
@@ -794,7 +794,7 @@ void C2WIPv4::routeUnicastPacket(IPv4Datagram *datagram, const InterfaceEntry *f
                         requestedNextHopAddress));
         delayedMsg->setDatagramDataSP(datagramDataSP);
         double delay = truncnormal(_nodeDelayMean, _nodeDelayStdDev);
-        scheduleAt(simTime() + delay, delayedMsg);
+        scheduleAt(omnetpp::simTime() + delay, delayedMsg);
         std::cout << "Host \"" << _hostFullName << "\":  delaying datagram."
                 << std::endl;
         delete datagram;
@@ -808,13 +808,13 @@ void C2WIPv4::routeUnicastPacket(IPv4Datagram *datagram, const InterfaceEntry *f
         for (IPAddressSet::iterator iasItr = _listenerIPAddressSet.begin();
                 iasItr != _listenerIPAddressSet.end(); ++iasItr) {
             IPv4Datagram *datagramCopy = datagram->dup();
-            const IPv4Address &snifferIPAddress(*iasItr);
+            const inet::Ipv4Address &snifferIPAddress(*iasItr);
             std::cout << "Host \"" << _hostFullName
                     << "\":  sending sniffed datagram to " << snifferIPAddress
                     << std::endl;
             datagramCopy->setDestAddress(snifferIPAddress);
-            continueRouteUnicastPacket(datagramCopy, (const InterfaceEntry*) 0,
-                    (const InterfaceEntry *) 0, IPv4Address());
+            continueRouteUnicastPacket(datagramCopy, (const inet::InterfaceEntry*) 0,
+                    (const inet::InterfaceEntry *) 0, inet::Ipv4Address());
         }
     }
 
@@ -889,9 +889,9 @@ void C2WIPv4::routeUnicastPacket(IPv4Datagram *datagram, const InterfaceEntry *f
     continueRouteUnicastPacket(datagram, fromIE, destIE, requestedNextHopAddress);
 }
 
-void C2WIPv4::continueRouteUnicastPacket(IPv4Datagram *datagram, const InterfaceEntry *fromIE, const InterfaceEntry *destIE, IPv4Address requestedNextHopAddress)
+void C2WIPv4::continueRouteUnicastPacket(IPv4Datagram *datagram, const inet::InterfaceEntry *fromIE, const inet::InterfaceEntry *destIE, inet::Ipv4Address requestedNextHopAddress)
 {
-    IPv4Address destAddr = datagram->getDestAddress();
+    inet::Ipv4Address destAddr = datagram->getDestAddress();
 
     EV << "Routing datagram `" << datagram->getName() << "' with dest=" << destAddr << ": ";
     const IPv4RouteRule *rule = checkOutputRule(datagram,destIE);
@@ -903,7 +903,7 @@ void C2WIPv4::continueRouteUnicastPacket(IPv4Datagram *datagram, const Interface
         delete datagram;
         return;
     }
-    IPv4Address nextHopAddr;
+    inet::Ipv4Address nextHopAddr;
     // if output port was explicitly requested, use that, otherwise use IPv4 routing
     if (destIE)
     {
@@ -959,7 +959,7 @@ void C2WIPv4::continueRouteUnicastPacket(IPv4Datagram *datagram, const Interface
     {
         if (fromIE != NULL)
         {
-            if (datagramForwardHook(datagram, fromIE, destIE, nextHopAddr) != INetfilter::IHook::ACCEPT)
+            if (datagramForwardHook(datagram, fromIE, destIE, nextHopAddr) != inet::INetfilter::IHook::ACCEPT)
                 return;
         }
 
@@ -967,29 +967,29 @@ void C2WIPv4::continueRouteUnicastPacket(IPv4Datagram *datagram, const Interface
     }
 }
 
-void C2WIPv4::routeUnicastPacketFinish(IPv4Datagram *datagram, const InterfaceEntry *fromIE, const InterfaceEntry *destIE, IPv4Address nextHopAddr)
+void C2WIPv4::routeUnicastPacketFinish(IPv4Datagram *datagram, const inet::InterfaceEntry *fromIE, const inet::InterfaceEntry *destIE, inet::Ipv4Address nextHopAddr)
 {
     EV << "output interface is " << destIE->getName() << ", next-hop address: " << nextHopAddr << "\n";
     numForwarded++;
     fragmentPostRouting(datagram, destIE, nextHopAddr);
 }
 
-void C2WIPv4::routeLocalBroadcastPacket(IPv4Datagram *datagram, const InterfaceEntry *destIE)
+void C2WIPv4::routeLocalBroadcastPacket(IPv4Datagram *datagram, const inet::InterfaceEntry *destIE)
 {
     // The destination address is 255.255.255.255 or local subnet broadcast address.
     // We always use 255.255.255.255 as nextHopAddress, because it is recognized by ARP,
     // and mapped to the broadcast MAC address.
     if (destIE!=NULL)
     {
-        fragmentPostRouting(datagram, destIE, IPv4Address::ALLONES_ADDRESS);
+        fragmentPostRouting(datagram, destIE, inet::Ipv4Address::ALLONES_ADDRESS);
     }
     else if (forceBroadcast)
     {
         // forward to each interface including loopback
         for (int i = 0; i<ift->getNumInterfaces(); i++)
         {
-            const InterfaceEntry *ie = ift->getInterface(i);
-            fragmentPostRouting(datagram->dup(), ie, IPv4Address::ALLONES_ADDRESS);
+            const inet::InterfaceEntry *ie = ift->getInterface(i);
+            fragmentPostRouting(datagram->dup(), ie, inet::Ipv4Address::ALLONES_ADDRESS);
         }
         delete datagram;
     }
@@ -1000,16 +1000,16 @@ void C2WIPv4::routeLocalBroadcastPacket(IPv4Datagram *datagram, const InterfaceE
     }
 }
 
-const InterfaceEntry *C2WIPv4::getShortestPathInterfaceToSource(IPv4Datagram *datagram)
+const inet::InterfaceEntry *C2WIPv4::getShortestPathInterfaceToSource(IPv4Datagram *datagram)
 {
     return rt->getInterfaceForDestAddr(datagram->getSrcAddress());
 }
 
-void C2WIPv4::forwardMulticastPacket(IPv4Datagram *datagram, const InterfaceEntry *fromIE)
+void C2WIPv4::forwardMulticastPacket(IPv4Datagram *datagram, const inet::InterfaceEntry *fromIE)
 {
     ASSERT(fromIE);
-    const IPv4Address &srcAddr = datagram->getSrcAddress();
-    const IPv4Address &destAddr = datagram->getDestAddress();
+    const inet::Ipv4Address &srcAddr = datagram->getSrcAddress();
+    const inet::Ipv4Address &destAddr = datagram->getDestAddress();
     ASSERT(destAddr.isMulticast());
     ASSERT(!destAddr.isLinkLocalMulticast());
 
@@ -1058,7 +1058,7 @@ void C2WIPv4::forwardMulticastPacket(IPv4Datagram *datagram, const InterfaceEntr
         for (unsigned int i=0; i<route->getNumOutInterfaces(); i++)
         {
             IPv4MulticastRoute::OutInterface *outInterface = route->getOutInterface(i);
-            const InterfaceEntry *destIE = outInterface->getInterface();
+            const inet::InterfaceEntry *destIE = outInterface->getInterface();
             if (destIE != fromIE && outInterface->isEnabled())
             {
                 int ttlThreshold = destIE->ipv4Data()->getMulticastTtlThreshold();
@@ -1096,13 +1096,13 @@ void C2WIPv4::reassembleAndDeliver(IPv4Datagram *datagram)
            << ", MORE=" << (datagram->getMoreFragments() ? "true" : "false") << ".\n";
 
         // erase timed out fragments in fragmentation buffer; check every 10 seconds max
-        if (simTime() >= lastCheckTime + 10)
+        if (omnetpp::simTime() >= lastCheckTime + 10)
         {
-            lastCheckTime = simTime();
-            fragbuf.purgeStaleFragments(simTime()-fragmentTimeoutTime);
+            lastCheckTime = omnetpp::simTime();
+            fragbuf.purgeStaleFragments(omnetpp::simTime()-fragmentTimeoutTime);
         }
 
-        datagram = fragbuf.addFragment(datagram, simTime());
+        datagram = fragbuf.addFragment(datagram, omnetpp::simTime());
         if (!datagram)
         {
             EV << "No complete datagram yet.\n";
@@ -1111,7 +1111,7 @@ void C2WIPv4::reassembleAndDeliver(IPv4Datagram *datagram)
         EV << "This fragment completes the datagram.\n";
     }
 
-    if (datagramLocalInHook(datagram, getSourceInterfaceFrom(datagram)) != INetfilter::IHook::ACCEPT)
+    if (datagramLocalInHook(datagram, getSourceInterfaceFrom(datagram)) != inet::INetfilter::IHook::ACCEPT)
     {
         return;
     }
@@ -1128,7 +1128,7 @@ void C2WIPv4::reassembleAndDeliverFinish(IPv4Datagram *datagram)
     if (protocol==IP_PROT_ICMP)
     {
         // incoming ICMP packets are handled specially
-        handleIncomingICMP(check_and_cast<ICMPMessage *>(decapsulate(datagram)));
+        handleIncomingICMP(omnetpp::check_and_cast<ICMPMessage *>(decapsulate(datagram)));
         numLocalDeliver++;
     }
     else if (protocol==IP_PROT_IP)
@@ -1142,7 +1142,7 @@ void C2WIPv4::reassembleAndDeliverFinish(IPv4Datagram *datagram)
         // check if the transportOut port are connected, otherwise discard the packet
         if (gateindex >= 0)
         {
-            cGate* outGate = gate("transportOut", gateindex);
+            omnetpp::cGate* outGate = gate("transportOut", gateindex);
             if (outGate->isPathOK())
             {
                 send(decapsulate(datagram), outGate);
@@ -1157,11 +1157,11 @@ void C2WIPv4::reassembleAndDeliverFinish(IPv4Datagram *datagram)
     }
 }
 
-cPacket *C2WIPv4::decapsulate(IPv4Datagram *datagram)
+omnetpp::cPacket *C2WIPv4::decapsulate(IPv4Datagram *datagram)
 {
     // decapsulate transport packet
-    const InterfaceEntry *fromIE = getSourceInterfaceFrom(datagram);
-    cPacket *packet = datagram->decapsulate();
+    const inet::InterfaceEntry *fromIE = getSourceInterfaceFrom(datagram);
+    omnetpp::cPacket *packet = datagram->decapsulate();
 
     // create and fill in control info
     IPv4ControlInfo *controlInfo = new IPv4ControlInfo();
@@ -1181,14 +1181,14 @@ cPacket *C2WIPv4::decapsulate(IPv4Datagram *datagram)
     return packet;
 }
 
-void C2WIPv4::fragmentPostRouting(IPv4Datagram *datagram, const InterfaceEntry *ie, IPv4Address nextHopAddr)
+void C2WIPv4::fragmentPostRouting(IPv4Datagram *datagram, const inet::InterfaceEntry *ie, inet::Ipv4Address nextHopAddr)
 {
-    if (datagramPostRoutingHook(datagram, getSourceInterfaceFrom(datagram), ie, nextHopAddr) == INetfilter::IHook::ACCEPT)
+    if (datagramPostRoutingHook(datagram, getSourceInterfaceFrom(datagram), ie, nextHopAddr) == inet::INetfilter::IHook::ACCEPT)
         fragmentAndSend(datagram, ie, nextHopAddr);
 }
 
 #ifndef NEWFRAGMENT
-void C2WIPv4::fragmentAndSend(IPv4Datagram *datagram, const InterfaceEntry *ie, IPv4Address nextHopAddr)
+void C2WIPv4::fragmentAndSend(IPv4Datagram *datagram, const inet::InterfaceEntry *ie, inet::Ipv4Address nextHopAddr)
 {
     // fill in source address
     if (datagram->getSrcAddress().isUnspecified())
@@ -1270,17 +1270,17 @@ void C2WIPv4::fragmentAndSend(IPv4Datagram *datagram, const InterfaceEntry *ie, 
 }
 #endif
 
-IPv4Datagram *C2WIPv4::encapsulate(cPacket *transportPacket, IPv4ControlInfo *controlInfo)
+IPv4Datagram *C2WIPv4::encapsulate(omnetpp::cPacket *transportPacket, IPv4ControlInfo *controlInfo)
 {
     IPv4Datagram *datagram = createIPv4Datagram(transportPacket->getName());
     datagram->setByteLength(IP_HEADER_BYTES);
     datagram->encapsulate(transportPacket);
 
     // set source and destination address
-    IPv4Address dest = controlInfo->getDestAddr();
+    inet::Ipv4Address dest = controlInfo->getDestAddr();
     datagram->setDestAddress(dest);
 
-    IPv4Address src = controlInfo->getSrcAddr();
+    inet::Ipv4Address src = controlInfo->getSrcAddr();
 
     // when source address was given, use it; otherwise it'll get the address
     // of the outgoing interface after routing
@@ -1324,7 +1324,7 @@ IPv4Datagram *C2WIPv4::createIPv4Datagram(const char *name)
     return new IPv4Datagram(name);
 }
 
-void C2WIPv4::sendDatagramToOutput(IPv4Datagram *datagram, const InterfaceEntry *ie, IPv4Address nextHopAddr)
+void C2WIPv4::sendDatagramToOutput(IPv4Datagram *datagram, const inet::InterfaceEntry *ie, inet::Ipv4Address nextHopAddr)
 {
     {
         bool isIeee802Lan = ie->isBroadcast() && !ie->getMacAddress().isUnspecified(); // we only need/can do ARP on IEEE 802 LANs
@@ -1342,7 +1342,7 @@ void C2WIPv4::sendDatagramToOutput(IPv4Datagram *datagram, const InterfaceEntry 
                 }
             }
 
-            MACAddress nextHopMacAddr;  // unspecified
+            inet::MacAddress nextHopMacAddr;  // unspecified
             nextHopMacAddr = resolveNextHopMacAddress(datagram, nextHopAddr, ie);
 
             if (nextHopMacAddr.isUnspecified())
@@ -1369,13 +1369,13 @@ void C2WIPv4::arpResolutionCompleted(IARPCache::Notification *entry)
     PendingPackets::iterator it = pendingPackets.find(entry->ipv4Address);
     if (it != pendingPackets.end())
     {
-        cPacketQueue& packetQueue = it->second;
+        omnet::cPacketQueue& packetQueue = it->second;
         EV << "ARP resolution completed for " << entry->ipv4Address << ". Sending " << packetQueue.getLength()
                 << " waiting packets from the queue\n";
 
         while (!packetQueue.empty())
         {
-            cPacket *msg = packetQueue.pop();
+            omnetpp::cPacket *msg = packetQueue.pop();
             EV << "Sending out queued packet " << msg << "\n";
             sendPacketToIeee802NIC(msg, entry->ie, entry->macAddress, ETHERTYPE_IPv4);
         }
@@ -1388,24 +1388,24 @@ void C2WIPv4::arpResolutionTimedOut(IARPCache::Notification *entry)
     PendingPackets::iterator it = pendingPackets.find(entry->ipv4Address);
     if (it != pendingPackets.end())
     {
-        cPacketQueue& packetQueue = it->second;
+        omnet::cPacketQueue& packetQueue = it->second;
         EV << "ARP resolution failed for " << entry->ipv4Address << ",  dropping " << packetQueue.getLength() << " packets\n";
         packetQueue.clear();
         pendingPackets.erase(it);
     }
 }
 
-MACAddress C2WIPv4::resolveNextHopMacAddress(cPacket *packet, IPv4Address nextHopAddr, const InterfaceEntry *destIE)
+inet::MacAddress C2WIPv4::resolveNextHopMacAddress(omnetpp::cPacket *packet, inet::Ipv4Address nextHopAddr, const inet::InterfaceEntry *destIE)
 {
     if (nextHopAddr.isLimitedBroadcastAddress() || nextHopAddr == destIE->ipv4Data()->getNetworkBroadcastAddress())
     {
         EV << "destination address is broadcast, sending packet to broadcast MAC address\n";
-        return MACAddress::BROADCAST_ADDRESS;
+        return inet::MacAddress::BROADCAST_ADDRESS;
     }
 
     if (nextHopAddr.isMulticast())
     {
-        MACAddress macAddr = MACAddress::makeMulticastAddress(nextHopAddr);
+        inet::MacAddress macAddr = inet::MacAddress::makeMulticastAddress(nextHopAddr);
         EV << "destination address is multicast, sending packet to MAC address " << macAddr << "\n";
         return macAddr;
     }
@@ -1413,7 +1413,7 @@ MACAddress C2WIPv4::resolveNextHopMacAddress(cPacket *packet, IPv4Address nextHo
     return arp->getMACAddressFor(nextHopAddr);
 }
 
-void C2WIPv4::sendPacketToIeee802NIC(cPacket *packet, const InterfaceEntry *ie, const MACAddress& macAddress, int etherType)
+void C2WIPv4::sendPacketToIeee802NIC(omnetpp::cPacket *packet, const inet::InterfaceEntry *ie, const MACAddress& macAddress, int etherType)
 {
     // remove old control info
     delete packet->removeControlInfo();
@@ -1427,7 +1427,7 @@ void C2WIPv4::sendPacketToIeee802NIC(cPacket *packet, const InterfaceEntry *ie, 
     sendPacketToNIC(packet, ie);
 }
 
-void C2WIPv4::sendPacketToNIC(cPacket *packet, const InterfaceEntry *ie)
+void C2WIPv4::sendPacketToNIC(omnetpp::cPacket *packet, const inet::InterfaceEntry *ie)
 {
     EV << "Sending out packet to interface " << ie->getName() << endl;
     send(packet, queueOutGateBaseId + ie->getNetworkLayerGateIndex());
@@ -1435,13 +1435,13 @@ void C2WIPv4::sendPacketToNIC(cPacket *packet, const InterfaceEntry *ie)
 
 // NetFilter:
 
-void C2WIPv4::registerHook(int priority, INetfilter::IHook* hook)
+void C2WIPv4::registerHook(int priority, inet::INetfilter::IHook* hook)
 {
     Enter_Method("registerHook()");
-    hooks.insert(std::pair<int, INetfilter::IHook*>(priority, hook));
+    hooks.insert(std::pair<int, inet::INetfilter::IHook*>(priority, hook));
 }
 
-void C2WIPv4::unregisterHook(int priority, INetfilter::IHook* hook)
+void C2WIPv4::unregisterHook(int priority, inet::INetfilter::IHook* hook)
 {
     Enter_Method("unregisterHook()");
     for (HookList::iterator iter = hooks.begin(); iter != hooks.end(); iter++) {
@@ -1472,19 +1472,19 @@ void C2WIPv4::reinjectQueuedDatagram(const IPv4Datagram* datagram)
             IPv4Datagram* datagram = iter->datagram;
             take(datagram);
             switch (iter->hookType) {
-                case INetfilter::IHook::LOCALOUT:
+                case inet::INetfilter::IHook::LOCALOUT:
                     datagramLocalOut(datagram, iter->outIE, iter->nextHopAddr);
                     break;
-                case INetfilter::IHook::PREROUTING:
+                case inet::INetfilter::IHook::PREROUTING:
                     preroutingFinish(datagram, iter->inIE, iter->outIE, iter->nextHopAddr);
                     break;
-                case INetfilter::IHook::POSTROUTING:
+                case inet::INetfilter::IHook::POSTROUTING:
                     fragmentAndSend(datagram, iter->outIE, iter->nextHopAddr);
                     break;
-                case INetfilter::IHook::LOCALIN:
+                case inet::INetfilter::IHook::LOCALIN:
                     reassembleAndDeliverFinish(datagram);
                     break;
-                case INetfilter::IHook::FORWARD:
+                case inet::INetfilter::IHook::FORWARD:
                     routeUnicastPacketFinish(datagram, iter->inIE, iter->outIE, iter->nextHopAddr);
                     break;
                 default:
@@ -1497,55 +1497,55 @@ void C2WIPv4::reinjectQueuedDatagram(const IPv4Datagram* datagram)
     }
 }
 
-INetfilter::IHook::Result C2WIPv4::datagramPreRoutingHook(IPv4Datagram* datagram, const InterfaceEntry* inIE, const InterfaceEntry*& outIE, IPv4Address& nextHopAddr)
+inet::INetfilter::IHook::Result C2WIPv4::datagramPreRoutingHook(IPv4Datagram* datagram, const inet::InterfaceEntry* inIE, const inet::InterfaceEntry*& outIE, inet::Ipv4Address& nextHopAddr)
 {
     for (HookList::iterator iter = hooks.begin(); iter != hooks.end(); iter++) {
         IHook::Result r = iter->second->datagramPreRoutingHook(datagram, inIE, outIE, nextHopAddr);
         switch(r)
         {
-            case INetfilter::IHook::ACCEPT: break;   // continue iteration
-            case INetfilter::IHook::DROP:   delete datagram; return r;
-            case INetfilter::IHook::QUEUE:  queuedDatagramsForHooks.push_back(QueuedDatagramForHook(datagram, inIE, outIE, nextHopAddr, INetfilter::IHook::PREROUTING)); return r;
-            case INetfilter::IHook::STOLEN: return r;
+            case inet::INetfilter::IHook::ACCEPT: break;   // continue iteration
+            case inet::INetfilter::IHook::DROP:   delete datagram; return r;
+            case inet::INetfilter::IHook::QUEUE:  queuedDatagramsForHooks.push_back(QueuedDatagramForHook(datagram, inIE, outIE, nextHopAddr, inet::INetfilter::IHook::PREROUTING)); return r;
+            case inet::INetfilter::IHook::STOLEN: return r;
             default: throw cRuntimeError("Unknown Hook::Result value: %d", (int)r);
         }
     }
-    return INetfilter::IHook::ACCEPT;
+    return inet::INetfilter::IHook::ACCEPT;
 }
 
-INetfilter::IHook::Result C2WIPv4::datagramForwardHook(IPv4Datagram* datagram, const InterfaceEntry* inIE, const InterfaceEntry*& outIE, IPv4Address& nextHopAddr)
+inet::INetfilter::IHook::Result C2WIPv4::datagramForwardHook(IPv4Datagram* datagram, const inet::InterfaceEntry* inIE, const inet::InterfaceEntry*& outIE, inet::Ipv4Address& nextHopAddr)
 {
     for (HookList::iterator iter = hooks.begin(); iter != hooks.end(); iter++) {
         IHook::Result r = iter->second->datagramForwardHook(datagram, inIE, outIE, nextHopAddr);
         switch(r)
         {
-            case INetfilter::IHook::ACCEPT: break;   // continue iteration
-            case INetfilter::IHook::DROP:   delete datagram; return r;
-            case INetfilter::IHook::QUEUE:  queuedDatagramsForHooks.push_back(QueuedDatagramForHook(datagram, inIE, outIE, nextHopAddr, INetfilter::IHook::FORWARD)); return r;
-            case INetfilter::IHook::STOLEN: return r;
+            case inet::INetfilter::IHook::ACCEPT: break;   // continue iteration
+            case inet::INetfilter::IHook::DROP:   delete datagram; return r;
+            case inet::INetfilter::IHook::QUEUE:  queuedDatagramsForHooks.push_back(QueuedDatagramForHook(datagram, inIE, outIE, nextHopAddr, inet::INetfilter::IHook::FORWARD)); return r;
+            case inet::INetfilter::IHook::STOLEN: return r;
             default: throw cRuntimeError("Unknown Hook::Result value: %d", (int)r);
         }
     }
-    return INetfilter::IHook::ACCEPT;
+    return inet::INetfilter::IHook::ACCEPT;
 }
 
-INetfilter::IHook::Result C2WIPv4::datagramPostRoutingHook(IPv4Datagram* datagram, const InterfaceEntry* inIE, const InterfaceEntry*& outIE, IPv4Address& nextHopAddr)
+inet::INetfilter::IHook::Result C2WIPv4::datagramPostRoutingHook(IPv4Datagram* datagram, const inet::InterfaceEntry* inIE, const inet::InterfaceEntry*& outIE, inet::Ipv4Address& nextHopAddr)
 {
     for (HookList::iterator iter = hooks.begin(); iter != hooks.end(); iter++) {
         IHook::Result r = iter->second->datagramPostRoutingHook(datagram, inIE, outIE, nextHopAddr);
         switch(r)
         {
-            case INetfilter::IHook::ACCEPT: break;   // continue iteration
-            case INetfilter::IHook::DROP:   delete datagram; return r;
-            case INetfilter::IHook::QUEUE:  queuedDatagramsForHooks.push_back(QueuedDatagramForHook(datagram, inIE, outIE, nextHopAddr, INetfilter::IHook::POSTROUTING)); return r;
-            case INetfilter::IHook::STOLEN: return r;
+            case inet::INetfilter::IHook::ACCEPT: break;   // continue iteration
+            case inet::INetfilter::IHook::DROP:   delete datagram; return r;
+            case inet::INetfilter::IHook::QUEUE:  queuedDatagramsForHooks.push_back(QueuedDatagramForHook(datagram, inIE, outIE, nextHopAddr, inet::INetfilter::IHook::POSTROUTING)); return r;
+            case inet::INetfilter::IHook::STOLEN: return r;
             default: throw cRuntimeError("Unknown Hook::Result value: %d", (int)r);
         }
     }
-    return INetfilter::IHook::ACCEPT;
+    return inet::INetfilter::IHook::ACCEPT;
 }
 
-bool C2WIPv4::handleOperationStage(LifecycleOperation *operation, int stage, IDoneCallback *doneCallback)
+bool C2WIPv4::handleOperationStage(inet::LifecycleOperation *operation, int stage, inet::IDoneCallback *doneCallback)
 {
     Enter_Method_Silent();
     if (dynamic_cast<NodeStartOperation *>(operation)) {
@@ -1588,63 +1588,63 @@ bool C2WIPv4::isNodeUp()
     return !nodeStatus || nodeStatus->getState() == NodeStatus::UP;
 }
 
-INetfilter::IHook::Result C2WIPv4::datagramLocalInHook(IPv4Datagram* datagram, const InterfaceEntry* inIE)
+inet::INetfilter::IHook::Result C2WIPv4::datagramLocalInHook(IPv4Datagram* datagram, const inet::InterfaceEntry* inIE)
 {
     for (HookList::iterator iter = hooks.begin(); iter != hooks.end(); iter++) {
         IHook::Result r = iter->second->datagramLocalInHook(datagram, inIE);
         switch(r)
         {
-            case INetfilter::IHook::ACCEPT: break;   // continue iteration
-            case INetfilter::IHook::DROP:   delete datagram; return r;
-            case INetfilter::IHook::QUEUE:  queuedDatagramsForHooks.push_back(QueuedDatagramForHook(dynamic_cast<IPv4Datagram *>(datagram), inIE, NULL, IPv4Address::UNSPECIFIED_ADDRESS, INetfilter::IHook::LOCALIN)); return r;
-            case INetfilter::IHook::STOLEN: return r;
+            case inet::INetfilter::IHook::ACCEPT: break;   // continue iteration
+            case inet::INetfilter::IHook::DROP:   delete datagram; return r;
+            case inet::INetfilter::IHook::QUEUE:  queuedDatagramsForHooks.push_back(QueuedDatagramForHook(dynamic_cast<IPv4Datagram *>(datagram), inIE, NULL, inet::Ipv4Address::UNSPECIFIED_ADDRESS, inet::INetfilter::IHook::LOCALIN)); return r;
+            case inet::INetfilter::IHook::STOLEN: return r;
             default: throw cRuntimeError("Unknown Hook::Result value: %d", (int)r);
         }
     }
-    return INetfilter::IHook::ACCEPT;
+    return inet::INetfilter::IHook::ACCEPT;
 }
 
-INetfilter::IHook::Result C2WIPv4::datagramLocalOutHook(IPv4Datagram* datagram, const InterfaceEntry*& outIE, IPv4Address& nextHopAddr)
+inet::INetfilter::IHook::Result C2WIPv4::datagramLocalOutHook(IPv4Datagram* datagram, const inet::InterfaceEntry*& outIE, inet::Ipv4Address& nextHopAddr)
 {
     for (HookList::iterator iter = hooks.begin(); iter != hooks.end(); iter++) {
         IHook::Result r = iter->second->datagramLocalOutHook(datagram, outIE, nextHopAddr);
         switch(r)
         {
-            case INetfilter::IHook::ACCEPT: break;   // continue iteration
-            case INetfilter::IHook::DROP:   delete datagram; return r;
-            case INetfilter::IHook::QUEUE:  queuedDatagramsForHooks.push_back(QueuedDatagramForHook(datagram, NULL, outIE, nextHopAddr, INetfilter::IHook::LOCALOUT)); return r;
-            case INetfilter::IHook::STOLEN: return r;
+            case inet::INetfilter::IHook::ACCEPT: break;   // continue iteration
+            case inet::INetfilter::IHook::DROP:   delete datagram; return r;
+            case inet::INetfilter::IHook::QUEUE:  queuedDatagramsForHooks.push_back(QueuedDatagramForHook(datagram, NULL, outIE, nextHopAddr, inet::INetfilter::IHook::LOCALOUT)); return r;
+            case inet::INetfilter::IHook::STOLEN: return r;
             default: throw cRuntimeError("Unknown Hook::Result value: %d", (int)r);
         }
     }
-    return INetfilter::IHook::ACCEPT;
+    return inet::INetfilter::IHook::ACCEPT;
 }
 
-void C2WIPv4::sendOnTransPortOutGateByProtocolId(cPacket *packet, int protocolId)
+void C2WIPv4::sendOnTransPortOutGateByProtocolId(omnetpp::cPacket *packet, int protocolId)
 {
     int gateindex = mapping.getOutputGateForProtocol(protocolId);
-    cGate* outGate = gate("transportOut", gateindex);
+    omnetpp::cGate* outGate = gate("transportOut", gateindex);
     send(packet, outGate);
 }
 
-void C2WIPv4::receiveSignal(cComponent *source, simsignal_t signalID, cObject *obj)
+void C2WIPv4::receiveSignal(omnetpp::cComponent *source, inet::simsignal_t signalID, omnetpp::cObject *obj)
 {
     Enter_Method_Silent();
 
     if (signalID == completedARPResolutionSignal)
     {
-        IARPCache::Notification *entry = check_and_cast<IARPCache::Notification *>(obj);
+        IARPCache::Notification *entry = omnetpp::check_and_cast<IARPCache::Notification *>(obj);
         arpResolutionCompleted(entry);
     }
     if (signalID == failedARPResolutionSignal)
     {
-        IARPCache::Notification *entry = check_and_cast<IARPCache::Notification *>(obj);
+        IARPCache::Notification *entry = omnetpp::check_and_cast<IARPCache::Notification *>(obj);
         arpResolutionTimedOut(entry);
     }
 }
 
 #ifdef NEWFRAGMENT
-void C2WIPv4::fragmentAndSend(IPv4Datagram *datagram, const InterfaceEntry *ie, IPv4Address nextHopAddr)
+void C2WIPv4::fragmentAndSend(IPv4Datagram *datagram, const inet::InterfaceEntry *ie, inet::Ipv4Address nextHopAddr)
 {
     // fill in source address
     if (datagram->getSrcAddress().isUnspecified())
@@ -1686,7 +1686,7 @@ void C2WIPv4::fragmentAndSend(IPv4Datagram *datagram, const InterfaceEntry *ie, 
         return;
     }
 
-    cPacket * payload = datagram->decapsulate();
+    omnetpp::cPacket * payload = datagram->decapsulate();
     int headerLength = datagram->getByteLength();
     int payloadLength = payload->getByteLength();
 
@@ -1714,7 +1714,7 @@ void C2WIPv4::fragmentAndSend(IPv4Datagram *datagram, const InterfaceEntry *ie, 
         bool lastFragment = (offset+fragmentLength >= payloadLength);
         // length equal to fragmentLength, except for last fragment;
         int thisFragmentLength = lastFragment ? payloadLength - offset : fragmentLength;
-        cPacket *payloadFrag = payload->dup();
+        omnetpp::cPacket *payloadFrag = payload->dup();
         payloadFrag->setByteLength(thisFragmentLength);
 
         // FIXME is it ok that full encapsulated packet travels in every datagram fragment?
@@ -1754,23 +1754,23 @@ void C2WIPv4::reassembleAndDeliver(IPv4Datagram *datagram)
            << ", MORE=" << (datagram->getMoreFragments() ? "true" : "false") << ".\n";
 
         // erase timed out fragments in fragmentation buffer; check every 10 seconds max
-        if (simTime() >= lastCheckTime + 10)
+        if (omnetpp::simTime() >= lastCheckTime + 10)
         {
-            lastCheckTime = simTime();
-            fragbuf.purgeStaleFragments(simTime()-fragmentTimeoutTime);
+            lastCheckTime = omnetpp::simTime();
+            fragbuf.purgeStaleFragments(omnetpp::simTime()-fragmentTimeoutTime);
         }
 
         if ((datagram->getTotalPayloadLength()>0) && (datagram->getTotalPayloadLength() != datagram->getEncapsulatedPacket()->getByteLength()))
         {
             int totalLength = datagram->getByteLength();
-            cPacket * payload = datagram->decapsulate();
+            omnetpp::cPacket * payload = datagram->decapsulate();
             datagram->setHeaderLength(datagram->getByteLength());
             payload->setByteLength(datagram->getTotalPayloadLength());
             datagram->encapsulate(payload);
             datagram->setByteLength(totalLength);
         }
 
-        datagram = fragbuf.addFragment(datagram, simTime());
+        datagram = fragbuf.addFragment(datagram, omnetpp::simTime());
         if (!datagram)
         {
             EV << "No complete datagram yet.\n";
@@ -1779,7 +1779,7 @@ void C2WIPv4::reassembleAndDeliver(IPv4Datagram *datagram)
         EV << "This fragment completes the datagram.\n";
     }
 
-    if (datagramLocalInHook(datagram, getSourceInterfaceFrom(datagram)) != INetfilter::IHook::ACCEPT)
+    if (datagramLocalInHook(datagram, getSourceInterfaceFrom(datagram)) != inet::INetfilter::IHook::ACCEPT)
     {
         return;
     }
@@ -1807,14 +1807,14 @@ const IPv4RouteRule * C2WIPv4::checkInputRule(const IPv4Datagram* datagram)
     		dport = aux->getDestPort();
     	}
     	IPv4Datagram *pkt = const_cast<IPv4Datagram*>(datagram);
-    	const InterfaceEntry *iface=getSourceInterfaceFrom(pkt);
+    	const inet::InterfaceEntry *iface=getSourceInterfaceFrom(pkt);
     	const IPv4RouteRule *rule = rt->findRule(false,protocol,sport,datagram->getSrcAddress(),dport,datagram->getDestAddress(),iface);
     	return rule;
     }
     return NULL;
 }
 
-const IPv4RouteRule * C2WIPv4::checkOutputRule(const IPv4Datagram* datagram,const InterfaceEntry *destIE)
+const IPv4RouteRule * C2WIPv4::checkOutputRule(const IPv4Datagram* datagram,const inet::InterfaceEntry *destIE)
 {
     if (rt->getNumRules(true)>0)
     {
@@ -1832,9 +1832,9 @@ const IPv4RouteRule * C2WIPv4::checkOutputRule(const IPv4Datagram* datagram,cons
     		sport = aux->getSrcPort();
     		dport = aux->getDestPort();
     	}
-    	InterfaceEntry *iface =NULL;
+    	inet::InterfaceEntry *iface =NULL;
     	if (destIE)
-            iface=const_cast<InterfaceEntry*>(destIE);
+            iface=const_cast<inet::InterfaceEntry*>(destIE);
     	else
     	{
             const IPv4Route *re = rt->findBestMatchingRoute(datagram->getDestAddress());
@@ -1865,15 +1865,15 @@ const IPv4RouteRule * C2WIPv4::checkOutputRuleMulticast(const IPv4Datagram* data
     		sport = aux->getSrcPort();
     		dport = aux->getDestPort();
     	}
-    	InterfaceEntry *iface =NULL;
+    	inet::InterfaceEntry *iface =NULL;
     	const IPv4RouteRule *rule = rt->findRule(true,protocol,sport,datagram->getSrcAddress(),dport,datagram->getDestAddress(),iface);
     	return rule;
     }
     return NULL;
 }
 
-bool C2WIPv4::isFiltered(const IPv4Address &sourceIPAddress,
-        const IPv4Address &destinationIPAddress) {
+bool C2WIPv4::isFiltered(const inet::Ipv4Address &sourceIPAddress,
+        const inet::Ipv4Address &destinationIPAddress) {
 
     for (NetworkAddressSDPairSet::iterator nssItr = _filterAttackSet.begin();
             nssItr != _filterAttackSet.end(); ++nssItr) {
@@ -1905,7 +1905,7 @@ C2WIPv4::DatagramDataSP C2WIPv4::ReplayBuffer::getRandom(void) {
     IPv4Datagram *datagram = datagramDataSP->getIPDatagram();
     IPv4Datagram *firstDatagram = _datagramDataSPDeque.front()->getIPDatagram();
 
-    SimTime tempSimTime = datagram->getTimestamp();
+    omnetpp::SimTime tempSimTime = datagram->getTimestamp();
     datagram->setTimestamp(firstDatagram->getTimestamp());
     firstDatagram->setTimestamp(tempSimTime);
 
@@ -1999,9 +1999,9 @@ void C2WIPv4::recordNetworkInformation(void) {
     int noEntries = ift->getNumInterfaces();
     for (int ix = 0; ix < noEntries; ++ix) {
 
-        InterfaceEntry *interfaceEntry = ift->getInterface(ix);
+        inet::InterfaceEntry *interfaceEntry = ift->getInterface(ix);
         IPv4InterfaceData *ipv4InterfaceData = interfaceEntry->ipv4Data();
-        IPv4Address ipAddress = ipv4InterfaceData->getIPAddress();
+        inet::Ipv4Address ipAddress = ipv4InterfaceData->getIPAddress();
         if (ipAddress.isUnspecified()) {
             continue;
         }
@@ -2045,8 +2045,7 @@ void C2WIPv4::recordNetworkInformation(void) {
 
 }
 
-void C2WIPv4::receiveChangeNotification(int category,
-        const cPolymorphic *details) {
+void C2WIPv4::receiveChangeNotification(int category, const omnetpp::cObject *details) {
 
     if (category == NF_INTERFACE_IPv4CONFIG_CHANGED) {
 
@@ -2063,8 +2062,7 @@ void C2WIPv4::receiveChangeNotification(int category,
     }
 }
 
-std::ostream &operator<<(std::ostream &os,
-        const C2WIPv4::ReplayBuffer &replayBuffer) {
+std::ostream &operator<<(std::ostream &os, const C2WIPv4::ReplayBuffer &replayBuffer) {
     os << "ReplayBuffer( DatagramDataSPDeque_size:"
             << replayBuffer._datagramDataSPDeque.size() << ", recordStartTime:"
             << replayBuffer._recordStartTime.dbl() << ", recordDuration:"
@@ -2076,19 +2074,16 @@ std::ostream &operator<<(std::ostream &os,
     return os;
 }
 
-std::ostream &operator<<(std::ostream &os,
-        const C2WIPv4::ReplayBufferSP &replayBufferSP) {
+std::ostream &operator<<(std::ostream &os, const C2WIPv4::ReplayBufferSP &replayBufferSP) {
     return os << *replayBufferSP;
 }
 
-std::ostream &operator<<(std::ostream &os,
-        const C2WIPv4::DatagramData &datagramData) {
+std::ostream &operator<<(std::ostream &os, const C2WIPv4::DatagramData &datagramData) {
     os << "DatagramData()";
     return os;
 }
 
-std::ostream &operator<<(std::ostream &os,
-        const C2WIPv4::DatagramDataSP &datagramDataSP) {
+std::ostream &operator<<(std::ostream &os, const C2WIPv4::DatagramDataSP &datagramDataSP) {
     return os << *datagramDataSP;
 }
 

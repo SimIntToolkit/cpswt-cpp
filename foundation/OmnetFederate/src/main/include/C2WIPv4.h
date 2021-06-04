@@ -18,25 +18,25 @@
 #ifndef __INET_C2WIPV4_H
 #define __INET_C2WIPV4_H
 
-#include "INETDefs.h"
+//#include "INETDefs.h"
 
-#include "IARPCache.h"
-#include "ICMPAccess.h"
-#include "ILifecycle.h"
-#include "INetfilter.h"
-#include "IPv4Datagram.h"
-#include "IPv4FragBuf.h"
-#include "ProtocolMap.h"
-#include "QueueBase.h"
+#include <inet/networklayer/arp/ipv4/Arp.h>
+//#include "ICMPAccess.h"
+#include <inet/common/lifecycle/ILifecycle.h>
+#include <inet/networklayer/contract/INetfilter.h>
+//#include "IPv4Datagram.h"
+#include <inet/networklayer/ipv4/Ipv4FragBuf.h>
+//#include "ProtocolMap.h"
+//#include "QueueBase.h"
 
 
 #ifdef WITH_MANET
 #include "ControlManetRouting_m.h"
 #endif
 
-#include "INotifiable.h"
-#include "IPv4Datagram.h"
-#include "NotificationBoard.h"
+//#include "INotifiable.h"
+//#include "IPv4Datagram.h"
+//#include "NotificationBoard.h"
 
 #include "HLAInterface.h"
 
@@ -55,58 +55,57 @@ class NotificationBoard;
 /**
  * Implements the IPv4 protocol.
  */
-class INET_API C2WIPv4 : public QueueBase, public INetfilter, public ILifecycle, public cListener, public INotifiable
+class INET_API C2WIPv4 : public inet::INetfilter, public inet::ILifecycle, public omnetpp::cListener, public omnetpp::cSimpleModule
 {
   public:
-    typedef QueueBase Super;
     /**
      * Represents an IPv4Datagram, queued by a Hook
      */
     class QueuedDatagramForHook {
       public:
-        QueuedDatagramForHook(IPv4Datagram* datagram, const InterfaceEntry* inIE, const InterfaceEntry* outIE, const IPv4Address& nextHopAddr, IHook::Type hookType) :
+        QueuedDatagramForHook(IPv4Datagram* datagram, const inet::InterfaceEntry* inIE, const inet::InterfaceEntry* outIE, const inet::Ipv4Address& nextHopAddr, IHook::Type hookType) :
                 datagram(datagram), inIE(inIE), outIE(outIE), nextHopAddr(nextHopAddr), hookType(hookType) {}
         virtual ~QueuedDatagramForHook() {}
 
         IPv4Datagram* datagram;
-        const InterfaceEntry* inIE;
-        const InterfaceEntry* outIE;
-        IPv4Address nextHopAddr;
+        const inet::InterfaceEntry* inIE;
+        const inet::InterfaceEntry* outIE;
+        inet::Ipv4Address nextHopAddr;
         const IHook::Type hookType;
     };
-    typedef std::map<IPv4Address, cPacketQueue> PendingPackets;
+    typedef std::map<inet::Ipv4Address, omnetpp::cPacketQueue> PendingPackets;
 
   protected:
     bool isDsr;
-    static simsignal_t completedARPResolutionSignal;
-    static simsignal_t failedARPResolutionSignal;
+    static inet::simsignal_t completedARPResolutionSignal;
+    static inet::simsignal_t failedARPResolutionSignal;
 
     IRoutingTable *rt;
     IInterfaceTable *ift;
     NotificationBoard *nb;
-    IARPCache *arp;
+    inet::Arp *arp;
     ICMPAccess icmpAccess;
-    cGate *arpInGate;
-    cGate *arpOutGate;
+    omnetpp::cGate *arpInGate;
+    omnetpp::cGate *arpOutGate;
     int transportInGateBaseId;
     int queueOutGateBaseId;
 
     // config
     int defaultTimeToLive;
     int defaultMCTimeToLive;
-    simtime_t fragmentTimeoutTime;
+    omnetpp::simtime_t fragmentTimeoutTime;
     bool forceBroadcast;
     bool useProxyARP;
 
     // working vars
     bool isUp;
     long curFragmentId; // counter, used to assign unique fragmentIds to datagrams
-    IPv4FragBuf fragbuf;  // fragmentation reassembly buffer
-    simtime_t lastCheckTime; // when fragbuf was last checked for state fragments
+    inet::Ipv4FragBuf fragbuf;  // fragmentation reassembly buffer
+    omnetpp::simtime_t lastCheckTime; // when fragbuf was last checked for state fragments
     ProtocolMapping mapping; // where to send packets after decapsulation
 
     // ARP related
-    PendingPackets pendingPackets;  // map indexed with IPv4Address for outbound packets waiting for ARP resolution
+    PendingPackets pendingPackets;  // map indexed with inet::Ipv4Address for outbound packets waiting for ARP resolution
 
     // statistics
     int numMulticast;
@@ -131,18 +130,18 @@ public:
     //
     // CODE FOR SNIFFER ATTACK
     //
-    typedef std::set< IPv4Address > IPAddressSet;
+    typedef std::set< inet::Ipv4Address > IPAddressSet;
 
 private:
     IPAddressSet _listenerIPAddressSet;
     bool _hasListeners;
 
-    void addListener( const IPv4Address &ipAddress ) {
+    void addListener( const inet::Ipv4Address &ipAddress ) {
         _listenerIPAddressSet.insert( ipAddress );
         _hasListeners = true;
     }
 
-    void deleteListener( const IPv4Address &ipAddress ) {
+    void deleteListener( const inet::Ipv4Address &ipAddress ) {
         _listenerIPAddressSet.erase( ipAddress );
         if ( _listenerIPAddressSet.empty() ) {
             _hasListeners = false;
@@ -212,7 +211,7 @@ private:
         }
     }
 
-    bool isFiltered( const IPv4Address &sourceIPv4Address, const IPv4Address &destinationIPv4Address );
+    bool isFiltered( const inet::Ipv4Address &sourceIPv4Address, const inet::Ipv4Address &destinationIPv4Address );
 
     //
     // CODE FOR NETWORK ATTACK
@@ -230,27 +229,27 @@ private:
     //
 public:
     class DatagramData {
-        friend std::ostream &::operator<<( std::ostream &os, const DatagramData &datagramData );
+        friend std::ostream &operator<<(std::ostream &os, const DatagramData &datagramData);
     private:
         IPv4Datagram *_datagram;
-        const InterfaceEntry *_fromIE;
-        const InterfaceEntry *_destIE;
-        const IPv4Address _nextHopAddr;
+        const inet::InterfaceEntry *_fromIE;
+        const inet::InterfaceEntry *_destIE;
+        const inet::Ipv4Address _nextHopAddr;
 
     public:
-        DatagramData( IPv4Datagram *datagram, const InterfaceEntry *fromIE, const InterfaceEntry *destIE, const IPv4Address &nextHopAddr ) :
+        DatagramData( IPv4Datagram *datagram, const inet::InterfaceEntry *fromIE, const inet::InterfaceEntry *destIE, const inet::Ipv4Address &nextHopAddr ) :
          _datagram( datagram ), _fromIE( fromIE ), _destIE( destIE ), _nextHopAddr( nextHopAddr ) { }
 
         IPv4Datagram *getIPDatagram( void ) {
             return _datagram;
         }
-        const InterfaceEntry *getFromInterfaceEntry( void ) const {
+        const inet::InterfaceEntry *getFromInterfaceEntry( void ) const {
             return _fromIE;
         }
-        const InterfaceEntry *getDestInterfaceEntry( void ) const {
+        const inet::InterfaceEntry *getDestInterfaceEntry( void ) const {
             return _destIE;
         }
-        const IPv4Address getNextHopAddr( void ) const {
+        const inet::Ipv4Address getNextHopAddr( void ) const {
             return _nextHopAddr;
         }
     };
@@ -259,15 +258,15 @@ public:
     typedef std::deque< DatagramDataSP > DatagramDataSPDeque;
 
     class ReplayBuffer {
-        friend std::ostream &::operator<<( std::ostream &os, const ReplayBuffer &replayBuffer );
+        friend std::ostream &operator<<( std::ostream &os, const ReplayBuffer &replayBuffer );
 
     private:
         DatagramDataSPDeque _datagramDataSPDeque;
 
-        SimTime _recordStartTime;
-        SimTime _lastRecordTime;
+        omnetpp::SimTime _recordStartTime;
+        omnetpp::SimTime _lastRecordTime;
         double _recordDuration;
-        SimTime _recordEndTime;
+        omnetpp::SimTime _recordEndTime;
 
         unsigned int _serialNo;
         bool _playing;
@@ -276,16 +275,16 @@ public:
         ReplayBuffer( void ) : _serialNo( 0 ), _playing( false ) { }
 
         void setRecordDuration( double recordDuration ) {
-            _recordStartTime = simTime();
+            _recordStartTime = omnetpp::simTime();
             _lastRecordTime = _recordStartTime;
             _recordDuration = recordDuration;
             _recordEndTime = _recordStartTime + _recordDuration;
         }
 
     private:
-        void addIPDatagram( IPv4Datagram *datagram, const InterfaceEntry *fromIE, const InterfaceEntry *destIE, const IPv4Address &nextHopAddr ) {
+        void addIPDatagram( IPv4Datagram *datagram, const inet::InterfaceEntry *fromIE, const inet::InterfaceEntry *destIE, const inet::Ipv4Address &nextHopAddr ) {
 
-            SimTime currentSimTime = simTime();
+            omnetpp::SimTime currentSimTime = omnetpp::simTime();
             datagram->setTimestamp( currentSimTime - _lastRecordTime );
             _lastRecordTime = currentSimTime;
 
@@ -294,14 +293,14 @@ public:
         }
 
     public:
-        void addIPDatagramSerial( IPv4Datagram *datagram, const InterfaceEntry *fromIE, const InterfaceEntry *destIE, const IPv4Address &nextHopAddr ) {
-            if ( simTime() > _recordEndTime || _playing  ) {
+        void addIPDatagramSerial( IPv4Datagram *datagram, const inet::InterfaceEntry *fromIE, const inet::InterfaceEntry *destIE, const inet::Ipv4Address &nextHopAddr ) {
+            if ( omnetpp::simTime() > _recordEndTime || _playing  ) {
                 return;
             }
             addIPDatagram( datagram, fromIE, destIE, nextHopAddr );
         }
 
-        void addIPDatagramRandom( IPv4Datagram *datagram, const InterfaceEntry *fromIE, const InterfaceEntry *destIE, const IPv4Address &nextHopAddr ) {
+        void addIPDatagramRandom( IPv4Datagram *datagram, const inet::InterfaceEntry *fromIE, const inet::InterfaceEntry *destIE, const inet::Ipv4Address &nextHopAddr ) {
             addIPDatagram( datagram, fromIE, destIE, nextHopAddr );
         }
 
@@ -330,11 +329,11 @@ public:
             return _recordDuration;
         }
 
-        SimTime getRecordEndTime( void ) const {
+        omnetpp::SimTime getRecordEndTime( void ) const {
             return _recordEndTime;
         }
 
-        SimTime getNextTimeOffset( void ) const {
+        omnetpp::SimTime getNextTimeOffset( void ) const {
             return _datagramDataSPDeque.empty() ? -1 : _datagramDataSPDeque[ _serialNo ]->getIPDatagram()->getTimestamp();
         }
 
@@ -352,7 +351,7 @@ public:
         DatagramDataSP getRandom( void );
 
         void reset( double recordDuration ) {
-            _recordStartTime = simTime();
+            _recordStartTime = omnetpp::simTime();
             _recordDuration = recordDuration;
             _recordEndTime = _recordStartTime + _recordDuration;
             _datagramDataSPDeque.clear();
@@ -421,13 +420,13 @@ public:
     typedef std::list<QueuedDatagramForHook> DatagramQueueForHooks;
     DatagramQueueForHooks queuedDatagramsForHooks;
 
-    static simsignal_t iPv4PromiscousPacket;
+    static inet::simsignal_t iPv4PromiscousPacket;
   protected:
     // utility: look up interface from getArrivalGate()
-    virtual const InterfaceEntry *getSourceInterfaceFrom(cPacket *packet);
+    virtual const inet::InterfaceEntry *getSourceInterfaceFrom(omnetpp::cPacket *packet);
 
     // utility: look up route to the source of the datagram and return its interface
-    virtual const InterfaceEntry *getShortestPathInterfaceToSource(IPv4Datagram *datagram);
+    virtual const inet::InterfaceEntry *getShortestPathInterfaceToSource(IPv4Datagram *datagram);
 
     // utility: show current statistics above the icon
     virtual void updateDisplayString();
@@ -443,7 +442,7 @@ public:
      * the given control info. Override if you subclassed controlInfo and/or
      * want to add options etc to the datagram.
      */
-    virtual IPv4Datagram *encapsulate(cPacket *transportPacket, IPv4ControlInfo *controlInfo);
+    virtual IPv4Datagram *encapsulate(omnetpp::cPacket *transportPacket, IPv4ControlInfo *controlInfo);
 
     /**
      * Creates a blank IPv4 datagram. Override when subclassing IPv4Datagram is needed
@@ -454,32 +453,32 @@ public:
      * Handle IPv4Datagram messages arriving from lower layer.
      * Decrements TTL, then invokes routePacket().
      */
-    virtual void handleIncomingDatagram(IPv4Datagram *datagram, const InterfaceEntry *fromIE);
+    virtual void handleIncomingDatagram(IPv4Datagram *datagram, const inet::InterfaceEntry *fromIE);
 
     // called after PREROUTING Hook (used for reinject, too)
-    virtual void preroutingFinish(IPv4Datagram *datagram, const InterfaceEntry *fromIE, const InterfaceEntry *destIE, IPv4Address nextHopAddr);
+    virtual void preroutingFinish(IPv4Datagram *datagram, const inet::InterfaceEntry *fromIE, const inet::InterfaceEntry *destIE, inet::Ipv4Address nextHopAddr);
 
     /**
      * Handle messages (typically packets to be send in IPv4) from transport or ICMP.
      * Invokes encapsulate(), then routePacket().
      */
-    virtual void handlePacketFromHL(cPacket *packet);
+    virtual void handlePacketFromHL(omnetpp::cPacket *packet);
 
     /**
      * TODO
      */
-    virtual void handlePacketFromARP(cPacket *packet);
+    virtual void handlePacketFromARP(omnetpp::cPacket *packet);
 
     /**
      * Routes and sends datagram received from higher layers.
      * Invokes datagramLocalOutHook(), then routePacket().
      */
-    virtual void datagramLocalOut(IPv4Datagram* datagram, const InterfaceEntry* destIE, IPv4Address nextHopAddr);
+    virtual void datagramLocalOut(IPv4Datagram* datagram, const inet::InterfaceEntry* destIE, inet::Ipv4Address nextHopAddr);
 
     /**
      * Handle incoming ARP packets by sending them over to ARP.
      */
-    virtual void handleIncomingARPPacket(ARPPacket *packet, const InterfaceEntry *fromIE);
+    virtual void handleIncomingARPPacket(ARPPacket *packet, const inet::InterfaceEntry *fromIE);
 
     /**
      * Handle incoming ICMP messages.
@@ -490,27 +489,27 @@ public:
      * Performs unicast routing. Based on the routing decision, it sends the
      * datagram through the outgoing interface.
      */
-    virtual void routeUnicastPacket(IPv4Datagram *datagram, const InterfaceEntry *fromIE, const InterfaceEntry *destIE, IPv4Address requestedNextHopAddress);
-    virtual void continueRouteUnicastPacket(IPv4Datagram *datagram, const InterfaceEntry *fromIE, const InterfaceEntry *destIE, IPv4Address requestedNextHopAddress);
+    virtual void routeUnicastPacket(IPv4Datagram *datagram, const inet::InterfaceEntry *fromIE, const inet::InterfaceEntry *destIE, inet::Ipv4Address requestedNextHopAddress);
+    virtual void continueRouteUnicastPacket(IPv4Datagram *datagram, const inet::InterfaceEntry *fromIE, const inet::InterfaceEntry *destIE, inet::Ipv4Address requestedNextHopAddress);
 
     // called after FORWARD Hook (used for reinject, too)
-    void routeUnicastPacketFinish(IPv4Datagram *datagram, const InterfaceEntry *fromIE, const InterfaceEntry *destIE, IPv4Address nextHopAddr);
+    void routeUnicastPacketFinish(IPv4Datagram *datagram, const inet::InterfaceEntry *fromIE, const inet::InterfaceEntry *destIE, inet::Ipv4Address nextHopAddr);
 
     /**
      * Broadcasts the datagram on the specified interface.
      * When destIE is NULL, the datagram is broadcasted on each interface.
      */
-    virtual void routeLocalBroadcastPacket(IPv4Datagram *datagram, const InterfaceEntry *destIE);
+    virtual void routeLocalBroadcastPacket(IPv4Datagram *datagram, const inet::InterfaceEntry *destIE);
 
     /**
      * Determines the output interface for the given multicast datagram.
      */
-    virtual const InterfaceEntry *determineOutgoingInterfaceForMulticastDatagram(IPv4Datagram *datagram, const InterfaceEntry *multicastIFOption);
+    virtual const inet::InterfaceEntry *determineOutgoingInterfaceForMulticastDatagram(IPv4Datagram *datagram, const inet::InterfaceEntry *multicastIFOption);
 
     /**
      * Forwards packets to all multicast destinations, using fragmentAndSend().
      */
-    virtual void forwardMulticastPacket(IPv4Datagram *datagram, const InterfaceEntry *fromIE);
+    virtual void forwardMulticastPacket(IPv4Datagram *datagram, const inet::InterfaceEntry *fromIE);
 
     /**
      * Perform reassembly of fragmented datagrams, then send them up to the
@@ -524,29 +523,29 @@ public:
     /**
      * Decapsulate and return encapsulated packet after attaching IPv4ControlInfo.
      */
-    virtual cPacket *decapsulate(IPv4Datagram *datagram);
+    virtual omnetpp::cPacket *decapsulate(IPv4Datagram *datagram);
 
     /**
      * Call PostRouting Hook and continue with fragmentAndSend() if accepted
      */
-    virtual void fragmentPostRouting(IPv4Datagram *datagram, const InterfaceEntry *ie, IPv4Address nextHopAddr);
+    virtual void fragmentPostRouting(IPv4Datagram *datagram, const inet::InterfaceEntry *ie, inet::Ipv4Address nextHopAddr);
 
     /**
      * Fragment packet if needed, then send it to the selected interface using
      * sendDatagramToOutput().
      */
-    virtual void fragmentAndSend(IPv4Datagram *datagram, const InterfaceEntry *ie, IPv4Address nextHopAddr);
+    virtual void fragmentAndSend(IPv4Datagram *datagram, const inet::InterfaceEntry *ie, inet::Ipv4Address nextHopAddr);
 
     /**
      * Send datagram on the given interface.
      */
-    virtual void sendDatagramToOutput(IPv4Datagram *datagram, const InterfaceEntry *ie, IPv4Address nextHopAddr);
+    virtual void sendDatagramToOutput(IPv4Datagram *datagram, const inet::InterfaceEntry *ie, inet::Ipv4Address nextHopAddr);
 
-    virtual MACAddress resolveNextHopMacAddress(cPacket *packet, IPv4Address nextHopAddr, const InterfaceEntry *destIE);
+    virtual inet::MacAddress resolveNextHopMacAddress(omnetpp::cPacket *packet, inet::Ipv4Address nextHopAddr, const inet::InterfaceEntry *destIE);
 
-    virtual void sendPacketToIeee802NIC(cPacket *packet, const InterfaceEntry *ie, const MACAddress& macAddress, int etherType);
+    virtual void sendPacketToIeee802NIC(omnetpp::cPacket *packet, const inet::InterfaceEntry *ie, const inet::MacAddress& macAddress, int etherType);
 
-    virtual void sendPacketToNIC(cPacket *packet, const InterfaceEntry *ie);
+    virtual void sendPacketToNIC(omnetpp::cPacket *packet, const inet::InterfaceEntry *ie);
 
   public:
     C2WIPv4() :
@@ -565,45 +564,45 @@ public:
 
     void recordNetworkInformation( void );
 
-    virtual void receiveChangeNotification( int category, const cPolymorphic *details );
+    virtual void receiveChangeNotification( int category, const omnetpp::cObject *details );
     virtual void initialize( int stage );
-    virtual void handleMessage( cMessage *msg );
+    virtual void handleMessage( omnetpp::cMessage *msg );
 
     /**
      * Processing of IPv4 datagrams. Called when a datagram reaches the front
      * of the queue.
      */
-    virtual void endService(cPacket *packet);
+    virtual void endService(omnetpp::cPacket *packet);
 
     // NetFilter functions:
   protected:
     /**
      * called before a packet arriving from the network is routed
      */
-    IHook::Result datagramPreRoutingHook(IPv4Datagram* datagram, const InterfaceEntry* inIE, const InterfaceEntry*& outIE, IPv4Address& nextHopAddr);
+    IHook::Result datagramPreRoutingHook(IPv4Datagram* datagram, const inet::InterfaceEntry* inIE, const inet::InterfaceEntry*& outIE, inet::Ipv4Address& nextHopAddr);
 
     /**
      * called before a packet arriving from the network is delivered via the network
      */
-    IHook::Result datagramForwardHook(IPv4Datagram* datagram, const InterfaceEntry* inIE, const InterfaceEntry*& outIE, IPv4Address& nextHopAddr);
+    IHook::Result datagramForwardHook(IPv4Datagram* datagram, const inet::InterfaceEntry* inIE, const inet::InterfaceEntry*& outIE, inet::Ipv4Address& nextHopAddr);
 
     /**
      * called before a packet is delivered via the network
      */
-    IHook::Result datagramPostRoutingHook(IPv4Datagram* datagram, const InterfaceEntry* inIE, const InterfaceEntry*& outIE, IPv4Address& nextHopAddr);
+    IHook::Result datagramPostRoutingHook(IPv4Datagram* datagram, const inet::InterfaceEntry* inIE, const inet::InterfaceEntry*& outIE, inet::Ipv4Address& nextHopAddr);
 
     /**
      * called before a packet arriving from the network is delivered locally
      */
-    IHook::Result datagramLocalInHook(IPv4Datagram* datagram, const InterfaceEntry* inIE);
+    IHook::Result datagramLocalInHook(IPv4Datagram* datagram, const inet::InterfaceEntry* inIE);
 
     /**
      * called before a packet arriving locally is delivered
      */
-    IHook::Result datagramLocalOutHook(IPv4Datagram* datagram, const InterfaceEntry*& outIE, IPv4Address& nextHopAddr);
+    IHook::Result datagramLocalOutHook(IPv4Datagram* datagram, const inet::InterfaceEntry*& outIE, inet::Ipv4Address& nextHopAddr);
    
     const IPv4RouteRule * checkInputRule(const IPv4Datagram*);
-    const IPv4RouteRule * checkOutputRule(const IPv4Datagram*, const InterfaceEntry*);
+    const IPv4RouteRule * checkOutputRule(const IPv4Datagram*, const inet::InterfaceEntry*);
     const IPv4RouteRule * checkOutputRuleMulticast(const IPv4Datagram*);
 
   public:
@@ -630,15 +629,15 @@ public:
     /**
      * send packet on transportOut gate specified by protocolId
      */
-    void sendOnTransPortOutGateByProtocolId(cPacket *packet, int protocolId);
+    void sendOnTransPortOutGateByProtocolId(omnetpp::cPacket *packet, int protocolId);
 
     /**
-     * ILifecycle method
+     * inet::ILifecycle method
      */
-    virtual bool handleOperationStage(LifecycleOperation *operation, int stage, IDoneCallback *doneCallback);
+    virtual bool handleOperationStage(inet::LifecycleOperation *operation, int stage, inet::IDoneCallback *doneCallback);
 
-    /// cListener method
-    virtual void receiveSignal(cComponent *source, simsignal_t signalID, cObject *obj);
+    /// omnetpp::cListener method
+    virtual void receiveSignal(omnetpp::cComponent *source, inet::simsignal_t signalID, omnetpp::cObject *obj);
 
   protected:
     virtual bool isNodeUp();
@@ -647,8 +646,10 @@ public:
     virtual void flush();
 };
 
+std::ostream &operator<<(std::ostream &os, const C2WIPv4::ReplayBuffer &replayBuffer);
 std::ostream &operator<<( std::ostream &os, const C2WIPv4::ReplayBufferSP &replayBufferSP );
 
+std::ostream &operator<<(std::ostream &os, const C2WIPv4::DatagramData &datagramData);
 std::ostream &operator<<( std::ostream &os, const C2WIPv4::DatagramDataSP &datagramDataSP );
 
 #endif

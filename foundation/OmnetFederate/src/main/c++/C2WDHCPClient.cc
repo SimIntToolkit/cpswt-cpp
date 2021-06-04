@@ -19,12 +19,12 @@
 
 #include "C2WDHCPClient.h"
 
-#include "InterfaceTableAccess.h"
-#include "IPv4InterfaceData.h"
-#include "NodeStatus.h"
-#include "NotifierConsts.h"
-#include "NodeOperations.h"
-#include "RoutingTableAccess.h"
+#include <inet/common/ModuleAccess.h>
+#include <inet/networklayer/ipv4/Ipv4InterfaceData.h>
+#include <inet/common/lifecycle/NodeStatus.h>
+#include <inet/networklayer/ipv4/IIpv4RoutingTable.h>
+#include <inet/common/Simsignals.h>
+
 
 Define_Module(C2WDHCPClient);
 
@@ -54,17 +54,17 @@ void C2WDHCPClient::initialize(int stage)
 {
     if (stage == 0)
     {
-        timerT1 = new cMessage("T1 Timer",T1);
-        timerT2 = new cMessage("T2 Timer",T2);
-        timerTo = new cMessage("DHCP Timeout");
-        leaseTimer = new cMessage("Lease Timeout",LEASE_TIMEOUT);
-        startTimer = new cMessage("Starting DHCP",START_DHCP);
+        timerT1 = new omnetpp::cMessage("T1 Timer",T1);
+        timerT2 = new omnetpp::cMessage("T2 Timer",T2);
+        timerTo = new omnetpp::cMessage("DHCP Timeout");
+        leaseTimer = new omnetpp::cMessage("Lease Timeout",LEASE_TIMEOUT);
+        startTimer = new omnetpp::cMessage("Starting DHCP",START_DHCP);
         startTime = par("startTime");
     }
     else if (stage == 3)
     {
-        NodeStatus *nodeStatus = dynamic_cast<NodeStatus *>(findContainingNode(this)->getSubmodule("status"));
-        isOperational = (!nodeStatus) || nodeStatus->getState() == NodeStatus::UP;
+        inet::NodeStatus *nodeStatus = dynamic_cast<inet::NodeStatus *>(findContainingNode(this)->getSubmodule("status"));
+        isOperational = (!nodeStatus) || nodeStatus->getState() == inet::NodeStatus::UP;
 
         numSent = 0;
         numReceived = 0;
@@ -81,16 +81,16 @@ void C2WDHCPClient::initialize(int stage)
         serverPort = 67; // server
 
         // get the hostname
-        cModule *host = findContainingNode(this);
+        omnetpp::cModule *host = findContainingNode(this);
         hostName = host->getFullName();
-        nb = check_and_cast<NotificationBoard *>(getModuleByPath(par("notificationBoardPath")));
+        nb = omnetpp::check_and_cast<omnetpp::cModule *>(getModuleByPath(par("notificationBoardPath")));
 
         // for a wireless interface subscribe the association event to start the DHCP protocol
-        nb->subscribe(this, NF_L2_ASSOCIATED);
-        nb->subscribe(this, NF_INTERFACE_DELETED);
+        nb->subscribe(inet::l2AssociatedSignal, this);
+        nb->subscribe(inet::interfaceDeletedSignal, this);
 
         // get the routing table to update and subscribe it to the blackboard
-        irt = check_and_cast<IRoutingTable*>(getModuleByPath(par("routingTablePath")));
+        irt = omnetpp::check_and_cast<inet::IIpv4RoutingTable*>(getModuleByPath(par("routingTablePath")));
         // set client to idle state
         clientState = IDLE;
         // get the interface to configure
@@ -104,39 +104,39 @@ void C2WDHCPClient::initialize(int stage)
         }
 
         // Use IP address to bind to the client port
-        this->ipv4Address = ie->ipv4Data()->getIPAddress();
+        this->ipv4Address = ie->getIpv4Address();
     }
 }
 
-InterfaceEntry *C2WDHCPClient::chooseInterface()
+inet::InterfaceEntry *C2WDHCPClient::chooseInterface()
 {
-    IInterfaceTable* ift = check_and_cast<IInterfaceTable*>(getModuleByPath(par("interfaceTablePath")));
+    inet::IInterfaceTable* ift = omnetpp::check_and_cast<inet::IInterfaceTable*>(getModuleByPath(par("interfaceTablePath")));
     const char *interfaceName = par("interface");
-    InterfaceEntry *ie = NULL;
+    inet::InterfaceEntry *ie = NULL;
 
     if (strlen(interfaceName) > 0)
     {
-        ie = ift->getInterfaceByName(interfaceName);
+        ie = ift->findInterfaceByName(interfaceName);
         if (ie == NULL)
-            throw cRuntimeError("Interface \"%s\" does not exist", interfaceName);
+            throw omnetpp::cRuntimeError("Interface \"%s\" does not exist", interfaceName);
     }
     else
     {
         // there should be exactly one non-loopback interface that we want to configure
         for (int i = 0; i < ift->getNumInterfaces(); i++) {
-            InterfaceEntry *current = ift->getInterface(i);
+            inet::InterfaceEntry *current = ift->getInterface(i);
             if (!current->isLoopback()) {
                 if (ie)
-                    throw cRuntimeError("Multiple non-loopback interfaces found, please select explicitly which one you want to configure via DHCP");
+                    throw omnetpp::cRuntimeError("Multiple non-loopback interfaces found, please select explicitly which one you want to configure via DHCP");
                 ie = current;
             }
         }
         if (!ie)
-            throw cRuntimeError("No non-loopback interface found to be configured via DHCP");
+            throw omnetpp::cRuntimeError("No non-loopback interface found to be configured via DHCP");
     }
 
-    if (!ie->ipv4Data()->getIPAddress().isUnspecified())
-        throw cRuntimeError("Refusing to start DHCP on interface \"%s\" that already has an IP address", ie->getName());
+    if (!ie->getIpv4Address().isUnspecified())
+        throw omnetpp::cRuntimeError("Refusing to start DHCP on interface \"%s\" that already has an IP address", dynamic_cast<omnetpp::cModule *>(ie)->getName());
     return ie;
 }
 
@@ -149,8 +149,8 @@ void C2WDHCPClient::finish()
     cancelEvent(startTimer);
 }
 
-static bool routeMatches(const IPv4Route *entry, const IPv4Address& target, const IPv4Address& nmask,
-        const IPv4Address& gw, int metric, const char *dev)
+static bool routeMatches(const inet::Ipv4Route *entry, const inet::Ipv4Address& target, const inet::Ipv4Address& nmask,
+        const inet::Ipv4Address& gw, int metric, const char *dev)
 {
     if (!target.isUnspecified() && !target.equals(entry->getDestination()))
         return false;
@@ -184,20 +184,20 @@ const char *C2WDHCPClient::getStateName(ClientState state)
     }
 }
 
-const char *C2WDHCPClient::getAndCheckMessageTypeName(DHCPMessageType type)
+const char *C2WDHCPClient::getAndCheckMessageTypeName(inet::DhcpMessageType type)
 {
     switch (type)
     {
 #define CASE(X)  case X: return #X;
-    CASE(DHCPDISCOVER);
-    CASE(DHCPOFFER);
-    CASE(DHCPREQUEST);
-    CASE(DHCPDECLINE);
-    CASE(DHCPACK);
-    CASE(DHCPNAK);
-    CASE(DHCPRELEASE);
-    CASE(DHCPINFORM);
-    default: throw cRuntimeError("Unknown or invalid DHCP message type %d",type);
+    CASE(inet::DHCPDISCOVER);
+    CASE(inet::DHCPOFFER);
+    CASE(inet::DHCPREQUEST);
+    CASE(inet::DHCPDECLINE);
+    CASE(inet::DHCPACK);
+    CASE(inet::DHCPNAK);
+    CASE(inet::DHCPRELEASE);
+    CASE(inet::DHCPINFORM);
+    default: throw omnetpp::cRuntimeError("Unknown or invalid DHCP message type %d",type);
 #undef CASE
     }
 }
@@ -206,11 +206,11 @@ void C2WDHCPClient::updateDisplayString()
     getDisplayString().setTagArg("t", 0, getStateName(clientState));
 }
 
-void C2WDHCPClient::handleMessage(cMessage *msg)
+void C2WDHCPClient::handleMessage(omnetpp::cMessage *msg)
 {
     if (!isOperational)
     {
-        EV_ERROR << "Message '" << msg << "' arrived when module status is down, dropping." << endl;
+        EV_ERROR << "Message '" << msg << "' arrived when module status is down, dropping." << std::endl;
         delete msg;
         return;
     }
@@ -220,19 +220,19 @@ void C2WDHCPClient::handleMessage(cMessage *msg)
     }
     else if (msg->arrivedOn("udpIn"))
     {
-        DHCPMessage *dhcpPacket = dynamic_cast<DHCPMessage*>(msg);
+        inet::DhcpMessage *dhcpPacket = dynamic_cast<inet::DhcpMessage*>(msg);
         if (!dhcpPacket)
-            throw cRuntimeError(dhcpPacket, "Unexpected packet received (not a DHCPMessage)");
+            throw omnetpp::cRuntimeError(dhcpPacket, "Unexpected packet received (not a inet::DhcpMessage)");
 
         handleDHCPMessage(dhcpPacket);
         delete msg;
     }
 
-    if (ev.isGUI())
+    if (inet::getEnvir()->isGUI())
         updateDisplayString();
 }
 
-void C2WDHCPClient::handleTimer(cMessage * msg)
+void C2WDHCPClient::handleTimer(omnetpp::cMessage * msg)
 {
     int category = msg->getKind();
 
@@ -252,24 +252,24 @@ void C2WDHCPClient::handleTimer(cMessage * msg)
     }
     else if (category == WAIT_OFFER)
     {
-        EV_DETAIL << "No DHCP offer received within timeout. Restarting. " << endl;
+        EV_DETAIL << "No DHCP offer received within timeout. Restarting. " << std::endl;
         initClient();
     }
     else if (category == WAIT_ACK)
     {
-        EV_DETAIL << "No DHCP ACK received within timeout. Restarting." << endl;
+        EV_DETAIL << "No DHCP ACK received within timeout. Restarting." << std::endl;
         initClient();
     }
     else if (category == T1)
     {
-        EV_DETAIL << "T1 expired. Starting RENEWING state." << endl;
+        EV_DETAIL << "T1 expired. Starting RENEWING state." << std::endl;
         clientState = RENEWING;
         scheduleTimerTO(WAIT_ACK);
         sendRequest();
     }
     else if (category == T2 && clientState == RENEWING)
     {
-        EV_DETAIL << "T2 expired. Starting REBINDING state." << endl;
+        EV_DETAIL << "T2 expired. Starting REBINDING state." << std::endl;
         clientState = REBINDING;
         cancelEvent(timerT1);
         cancelEvent(timerT2);
@@ -282,45 +282,45 @@ void C2WDHCPClient::handleTimer(cMessage * msg)
     else if (category == T2)
     {
         // T1 < T2 always holds by definition and when T1 expires client will move to RENEWING
-        throw cRuntimeError("T2 occurred in wrong state. (T1 must be earlier than T2.)");
+        throw omnetpp::cRuntimeError("T2 occurred in wrong state. (T1 must be earlier than T2.)");
     }
     else if (category == LEASE_TIMEOUT)
     {
-        EV_INFO << "Lease has expired. Starting DHCP process in INIT state." << endl;
+        EV_INFO << "Lease has expired. Starting DHCP process in INIT state." << std::endl;
         unboundLease();
         clientState = INIT;
         initClient();
     }
     else
-        throw cRuntimeError("Unknown self message '%s'", msg->getName());
+        throw omnetpp::cRuntimeError("Unknown self message '%s'", dynamic_cast<omnetpp::cModule *>(msg)->getName());
 }
 
-void C2WDHCPClient::recordOffer(DHCPMessage * dhcpOffer)
+void C2WDHCPClient::recordOffer(inet::DhcpMessage * dhcpOffer)
 {
     if (!dhcpOffer->getYiaddr().isUnspecified())
      {
-         IPv4Address ip = dhcpOffer->getYiaddr();
+         inet::Ipv4Address ip = dhcpOffer->getYiaddr();
 
          //Byte serverIdB = dhcpOffer->getOptions().get(SERVER_ID);
-         IPv4Address serverId = dhcpOffer->getOptions().getServerIdentifier();
+         inet::Ipv4Address serverId = dhcpOffer->getOptions().getServerIdentifier();
 
          // minimal information to configure the interface
          // create the lease to request
-         lease = new DHCPLease();
+         lease = new inet::DhcpLease();
          lease->ip = ip;
          lease->mac = macAddress;
          lease->serverId = serverId;
      }
      else
-         EV_WARN << "DHCPOFFER arrived, but no IP address has been offered. Discarding it and remaining in SELECTING." << endl;
+         EV_WARN << "inet::DHCPOFFER arrived, but no IP address has been offered. Discarding it and remaining in SELECTING." << std::endl;
 }
 
-void C2WDHCPClient::recordLease(DHCPMessage * dhcpACK)
+void C2WDHCPClient::recordLease(inet::DhcpMessage * dhcpACK)
 {
     if (!dhcpACK->getYiaddr().isUnspecified())
     {
-        IPv4Address ip = dhcpACK->getYiaddr();
-        EV_DETAIL << "DHCPACK arrived with " << "IP: " << ip << endl;
+        inet::Ipv4Address ip = dhcpACK->getYiaddr();
+        EV_DETAIL << "inet::DHCPACK arrived with " << "IP: " << ip << std::endl;
 
         lease->subnetMask = dhcpACK->getOptions().getSubnetMask();
 
@@ -335,17 +335,17 @@ void C2WDHCPClient::recordLease(DHCPMessage * dhcpACK)
         lease->renewalTime = dhcpACK->getOptions().getRenewalTime();
         lease->rebindTime = dhcpACK->getOptions().getRebindingTime();
 
-        // std::cout << lease->leaseTime << " " << lease->renewalTime << " " << lease->rebindTime << endl;
+        // std::cout << lease->leaseTime << " " << lease->renewalTime << " " << lease->rebindTime << std::endl;
 
     }
     else
-        EV_ERROR << "DHCPACK arrived, but no IP address confirmed." << endl;
+        EV_ERROR << "inet::DHCPACK arrived, but no IP address confirmed." << std::endl;
 }
 
 void C2WDHCPClient::bindLease()
 {
-    ie->ipv4Data()->setIPAddress(lease->ip);
-    ie->ipv4Data()->setNetmask(lease->ip.getNetworkMask());
+    ie->getIpv4Address().set(lease->ip.getInt());
+    ie->getIpv4Netmask().set(lease->ip.getNetworkMask().getInt());
 
     std::string banner = "Got IP " + lease->ip.str();
     this->getParentModule()->bubble(banner.c_str());
@@ -353,19 +353,19 @@ void C2WDHCPClient::bindLease()
     /*
         The client SHOULD perform a final check on the parameters (ping, ARP).
         If the client detects that the address is already in use:
-        EV_INFO << "The offered IP " << lease->ip << " is not available." << endl;
+        EV_INFO << "The offered IP " << lease->ip << " is not available." << std::endl;
         sendDecline(lease->ip);
         initClient();
     */
 
     EV_INFO << "The requested IP " << lease->ip << "/" << lease->subnetMask << " is available. Assigning it to "
-            << this->getParentModule()->getFullName() << "." << endl;
+            << this->getParentModule()->getFullName() << "." << std::endl;
 
-    IPv4Route * iroute = NULL;
+    inet::Ipv4Route * iroute = NULL;
     for (int i = 0; i < irt->getNumRoutes(); i++)
     {
-        IPv4Route * e = irt->getRoute(i);
-        if (routeMatches(e, IPv4Address(), IPv4Address(), lease->gateway, 0, ie->getName()))
+        inet::Ipv4Route * e = irt->getRoute(i);
+        if (routeMatches(e, inet::Ipv4Address(), inet::Ipv4Address(), lease->gateway, 0, dynamic_cast<omnetpp::cModule *>(ie)->getName()))
         {
             iroute = e;
             break;
@@ -374,23 +374,23 @@ void C2WDHCPClient::bindLease()
     if (iroute == NULL)
     {
         // create gateway route
-        route = new IPv4Route();
-        route->setDestination(IPv4Address());
-        route->setNetmask(IPv4Address());
+        route = new inet::Ipv4Route();
+        route->setDestination(inet::Ipv4Address());
+        route->setNetmask(inet::Ipv4Address());
         route->setGateway(lease->gateway);
         route->setInterface(ie);
-        route->setSourceType(IPv4Route::MANUAL);
+        route->setSourceType(inet::Ipv4Route::MANUAL);
         irt->addRoute(route);
     }
 
     // update the routing table
     cancelEvent(leaseTimer);
-    scheduleAt(simTime() + lease->leaseTime, leaseTimer);
+    scheduleAt(omnetpp::simTime() + lease->leaseTime, leaseTimer);
 }
 
 void C2WDHCPClient::unboundLease()
 {
-    EV_INFO << "Unbound lease on " << ie->getName() << "." << endl;
+    EV_INFO << "Unbound lease on " << dynamic_cast<omnetpp::cModule *>(ie)->getName() << "." << std::endl;
 
     cancelEvent(timerT1);
     cancelEvent(timerT2);
@@ -398,13 +398,13 @@ void C2WDHCPClient::unboundLease()
     cancelEvent(leaseTimer);
 
     irt->deleteRoute(route);
-    ie->ipv4Data()->setIPAddress(IPv4Address());
-    ie->ipv4Data()->setNetmask(IPv4Address::ALLONES_ADDRESS);
+    ie->getIpv4Address().set(inet::Ipv4Address().getInt());
+    ie->getIpv4Netmask().set(inet::Ipv4Address::ALLONES_ADDRESS.getInt());
 }
 
 void C2WDHCPClient::initClient()
 {
-    EV_INFO << "Starting DHCP configuration process." << endl;
+    EV_INFO << "Starting DHCP configuration process." << std::endl;
 
     cancelEvent(timerT1);
     cancelEvent(timerT2);
@@ -423,146 +423,146 @@ void C2WDHCPClient::initRebootedClient()
      clientState = REBOOTING;
 }
 
-void C2WDHCPClient::handleDHCPMessage(DHCPMessage * msg)
+void C2WDHCPClient::handleDHCPMessage(inet::DhcpMessage * msg)
 {
     ASSERT(isOperational && ie != NULL);
 
-    if (msg->getOp() != BOOTREPLY)
+    if (msg->getOp() != inet::BOOTREPLY)
     {
-        EV_WARN << "Client received a non-BOOTREPLY message, dropping." << endl;
+        EV_WARN << "Client received a non-inet::BOOTREPLY message, dropping." << std::endl;
         return;
     }
 
     if (msg->getXid() != xid)
     {
-        EV_WARN << "Message transaction ID is not valid, dropping." << endl;
+        EV_WARN << "Message transaction ID is not valid, dropping." << std::endl;
         return;
     }
 
-    DHCPMessageType messageType = (DHCPMessageType)msg->getOptions().getMessageType();
+    inet::DhcpMessageType messageType = static_cast<inet::DhcpMessageType>(msg->getOptions().getMessageType());
     switch (clientState)
     {
         case INIT:
-            EV_WARN << getAndCheckMessageTypeName(messageType) << " message arrived in INIT state. In this state, client does not wait for any message at all, dropping." << endl;
+            EV_WARN << getAndCheckMessageTypeName(messageType) << " message arrived in INIT state. In this state, client does not wait for any message at all, dropping." << std::endl;
             break;
         case SELECTING:
-            if (messageType == DHCPOFFER)
+            if (messageType == inet::DHCPOFFER)
             {
-                EV_INFO << "DHCPOFFER message arrived in SELECTING state with IP address: " << msg->getYiaddr() << "." << endl;
+                EV_INFO << "inet::DHCPOFFER message arrived in SELECTING state with IP address: " << msg->getYiaddr() << "." << std::endl;
                 scheduleTimerTO(WAIT_ACK);
                 clientState = REQUESTING;
                 recordOffer(msg);
                 sendRequest(); // we accept the first offer
             }
             else
-                EV_WARN << "Client is in SELECTING and the arriving packet is not a DHCPOFFER, dropping." << endl;
+                EV_WARN << "Client is in SELECTING and the arriving packet is not a inet::DHCPOFFER, dropping." << std::endl;
             break;
         case REQUESTING:
-            if (messageType == DHCPOFFER)
+            if (messageType == inet::DHCPOFFER)
             {
-                EV_WARN << "We don't accept DHCPOFFERs in REQUESTING state, dropping." << endl; // remains in REQUESTING
+                EV_WARN << "We don't accept DHCPOFFERs in REQUESTING state, dropping." << std::endl; // remains in REQUESTING
             }
-            else if (messageType == DHCPACK)
+            else if (messageType == inet::DHCPACK)
             {
-                EV_INFO << "DHCPACK message arrived in REQUESTING state. The requested IP address is available in the server's pool of addresses." << endl;
+                EV_INFO << "inet::DHCPACK message arrived in REQUESTING state. The requested IP address is available in the server's pool of addresses." << std::endl;
                 handleDHCPACK(msg);
                 clientState = BOUND;
             }
-            else if (messageType == DHCPNAK)
+            else if (messageType == inet::DHCPNAK)
             {
-                EV_INFO << "DHCPNAK message arrived in REQUESTING state. Restarting the configuration process." << endl;
+                EV_INFO << "inet::DHCPNAK message arrived in REQUESTING state. Restarting the configuration process." << std::endl;
                 initClient();
             }
             else
             {
-                EV_WARN << getAndCheckMessageTypeName(messageType) << " message arrived in REQUESTING state. In this state, client does not expect messages of this type, dropping." << endl;
+                EV_WARN << getAndCheckMessageTypeName(messageType) << " message arrived in REQUESTING state. In this state, client does not expect messages of this type, dropping." << std::endl;
             }
             break;
         case BOUND:
-            EV_DETAIL << "We are in BOUND, discard all DHCP messages." << endl; // remain in BOUND
+            EV_DETAIL << "We are in BOUND, discard all DHCP messages." << std::endl; // remain in BOUND
             break;
         case RENEWING:
-            if (messageType == DHCPACK)
+            if (messageType == inet::DHCPACK)
             {
                 handleDHCPACK(msg);
-                EV_INFO << "DHCPACK message arrived in RENEWING state. The renewing process was successful." << endl;
+                EV_INFO << "inet::DHCPACK message arrived in RENEWING state. The renewing process was successful." << std::endl;
                 clientState = BOUND;
             }
-            else if (messageType == DHCPNAK)
+            else if (messageType == inet::DHCPNAK)
             {
-                EV_INFO << "DHPCNAK message arrived in RENEWING state. The renewing process was unsuccessful. Restarting the DHCP configuration process." << endl;
+                EV_INFO << "inet::DHCPNAK message arrived in RENEWING state. The renewing process was unsuccessful. Restarting the DHCP configuration process." << std::endl;
                 unboundLease(); // halt network (remove address)
                 initClient();
             }
             else
             {
-                EV_WARN << getAndCheckMessageTypeName(messageType) << " message arrived in RENEWING state. In this state, client does not expect messages of this type, dropping." << endl;
+                EV_WARN << getAndCheckMessageTypeName(messageType) << " message arrived in RENEWING state. In this state, client does not expect messages of this type, dropping." << std::endl;
             }
             break;
         case REBINDING:
-            if (messageType == DHCPNAK)
+            if (messageType == inet::DHCPNAK)
             {
-                EV_INFO << "DHPCNAK message arrived in REBINDING state. The rebinding process was unsuccessful. Restarting the DHCP configuration process." << endl;
+                EV_INFO << "DHPCNAK message arrived in REBINDING state. The rebinding process was unsuccessful. Restarting the DHCP configuration process." << std::endl;
                 unboundLease(); // halt network (remove address)
                 initClient();
             }
-            else if (messageType == DHCPACK)
+            else if (messageType == inet::DHCPACK)
             {
                 handleDHCPACK(msg);
-                EV_INFO << "DHCPACK message arrived in REBINDING state. The rebinding process was successful." << endl;
+                EV_INFO << "inet::DHCPACK message arrived in REBINDING state. The rebinding process was successful." << std::endl;
                 clientState = BOUND;
             }
             else
             {
-                EV_WARN << getAndCheckMessageTypeName(messageType) << " message arrived in REBINDING state. In this state, client does not expect messages of this type, dropping." << endl;
+                EV_WARN << getAndCheckMessageTypeName(messageType) << " message arrived in REBINDING state. In this state, client does not expect messages of this type, dropping." << std::endl;
             }
             break;
         case REBOOTING:
-            if (messageType == DHCPACK)
+            if (messageType == inet::DHCPACK)
             {
                 handleDHCPACK(msg);
-                EV_INFO << "DHCPACK message arrived in REBOOTING state. Initialization with known IP address was successful." << endl;
+                EV_INFO << "inet::DHCPACK message arrived in REBOOTING state. Initialization with known IP address was successful." << std::endl;
                 clientState = BOUND;
             }
-            else if (messageType == DHCPNAK)
+            else if (messageType == inet::DHCPNAK)
             {
-                EV_INFO << "DHCPNAK message arrived in REBOOTING. Initialization with known IP address was unsuccessful." << endl;
+                EV_INFO << "inet::DHCPNAK message arrived in REBOOTING. Initialization with known IP address was unsuccessful." << std::endl;
                 initClient();
             }
             else
             {
-                EV_WARN << getAndCheckMessageTypeName(messageType) << " message arrived in REBOOTING state. In this state, client does not expect messages of this type, dropping." << endl;
+                EV_WARN << getAndCheckMessageTypeName(messageType) << " message arrived in REBOOTING state. In this state, client does not expect messages of this type, dropping." << std::endl;
             }
             break;
         default:
-            throw cRuntimeError("Unknown or invalid client state %d",clientState);
+            throw omnetpp::cRuntimeError("Unknown or invalid client state %d",clientState);
     }
 }
 
-void C2WDHCPClient::receiveChangeNotification(int category, const cPolymorphic *details)
+void C2WDHCPClient::receiveChangeNotification(int category, const omnetpp::cObject *details)
 {
     Enter_Method_Silent();
-    printNotificationBanner(category, details);
+    inet::printSignalBanner(category, details, details);
 
     // host associated. link is up. change the state to init.
-    if (category == NF_L2_ASSOCIATED)
+    if (category == inet::l2AssociatedSignal)
     {
-        InterfaceEntry *associatedIE = NULL;
+        inet::InterfaceEntry *associatedIE = NULL;
         if (details)
         {
-            cPolymorphic *detailsAux = const_cast<cPolymorphic*>(details);
-            associatedIE = dynamic_cast<InterfaceEntry*>(detailsAux);
+            omnetpp::cObject *detailsAux = const_cast<omnetpp::cObject*>(details);
+            associatedIE = dynamic_cast<inet::InterfaceEntry*>(detailsAux);
         }
         if (associatedIE && ie == associatedIE)
         {
-            EV_INFO << "Interface associated, starting DHCP." << endl;
+            EV_INFO << "Interface associated, starting DHCP." << std::endl;
             initClient();
         }
     }
-    else if (category == NF_INTERFACE_DELETED)
+    else if (category == inet::interfaceDeletedSignal)
     {
         if (isOperational)
-            throw cRuntimeError("Reacting to interface deletions is not implemented in this module");
+            throw omnetpp::cRuntimeError("Reacting to interface deletions is not implemented in this module");
     }
 }
 
@@ -571,70 +571,74 @@ void C2WDHCPClient::sendRequest()
     // setting the xid
     xid = intuniform(0, RAND_MAX); // generating a new xid for each transmission
 
-    DHCPMessage * request = new DHCPMessage("DHCPREQUEST");
-    request->setOp(BOOTREQUEST);
-    request->setByteLength(280); // DHCP request packet size
+    inet::DhcpMessage * request = new inet::DhcpMessage();
+    request->setOp(inet::BOOTREQUEST);
     request->setHtype(1); // ethernet
     request->setHlen(6); // hardware Address length (6 octets)
     request->setHops(0);
     request->setXid(xid); // transaction id
     request->setSecs(0); // 0 seconds from transaction started
     request->setBroadcast(false); // unicast
-    request->setYiaddr(IPv4Address()); // no 'your IP' addr
-    request->setGiaddr(IPv4Address()); // no DHCP Gateway Agents
+    request->setYiaddr(inet::Ipv4Address()); // no 'your IP' addr
+    request->setGiaddr(inet::Ipv4Address()); // no DHCP Gateway Agents
     request->setChaddr(macAddress); // my mac address;
     request->setSname(""); // no server name given
     request->setFile(""); // no file given
-    request->getOptions().setMessageType(DHCPREQUEST);
-    request->getOptions().setClientIdentifier(macAddress);
+    request->getOptionsForUpdate().setMessageType(inet::DHCPREQUEST);
+    request->getOptionsForUpdate().setClientIdentifier(macAddress);
 
     // set the parameters to request
-    request->getOptions().setParameterRequestListArraySize(4);
-    request->getOptions().setParameterRequestList(0,SUBNET_MASK);
-    request->getOptions().setParameterRequestList(1,ROUTER);
-    request->getOptions().setParameterRequestList(2,DNS);
-    request->getOptions().setParameterRequestList(3,NTP_SRV);
+    request->getOptionsForUpdate().setParameterRequestListArraySize(4);
+    request->getOptionsForUpdate().setParameterRequestList(0,inet::SUBNET_MASK);
+    request->getOptionsForUpdate().setParameterRequestList(1,inet::ROUTER);
+    request->getOptionsForUpdate().setParameterRequestList(2,inet::DNS);
+    request->getOptionsForUpdate().setParameterRequestList(3,inet::NTP_SRV);
+
+    inet::Ptr<inet::DhcpMessage> requestPtr(request);
+    inet::Packet *dhcpPacket = new inet::Packet("DHCPREQUEST", requestPtr);
+    dhcpPacket->setByteLength(280); // DHCP request packet size
 
     // RFC 4.3.6 Table 4
     if (clientState == INIT_REBOOT)
     {
-        request->getOptions().setRequestedIp(lease->ip);
-        request->setCiaddr(IPv4Address()); // zero
-        EV_INFO << "Sending DHCPREQUEST asking for IP " << lease->ip << " via broadcast." << endl;
-        sendToUDP(request, clientPort, IPv4Address::ALLONES_ADDRESS, serverPort);
+        request->getOptionsForUpdate().setRequestedIp(lease->ip);
+        request->setCiaddr(inet::Ipv4Address()); // zero
+        EV_INFO << "Sending inet::DHCPREQUEST asking for IP " << lease->ip << " via broadcast." << std::endl;
+        sendToUDP(dhcpPacket, clientPort, inet::Ipv4Address::ALLONES_ADDRESS, serverPort);
     }
     else if (clientState == REQUESTING)
     {
-        request->getOptions().setServerIdentifier(lease->serverId);
-        request->getOptions().setRequestedIp(lease->ip);
-        request->setCiaddr(IPv4Address()); // zero
-        EV_INFO << "Sending DHCPREQUEST asking for IP " << lease->ip << " via broadcast." << endl;
-        sendToUDP(request, clientPort, IPv4Address::ALLONES_ADDRESS, serverPort);
+        request->getOptionsForUpdate().setServerIdentifier(lease->serverId);
+        request->getOptionsForUpdate().setRequestedIp(lease->ip);
+        request->setCiaddr(inet::Ipv4Address()); // zero
+        EV_INFO << "Sending inet::DHCPREQUEST asking for IP " << lease->ip << " via broadcast." << std::endl;
+        sendToUDP(dhcpPacket, clientPort, inet::Ipv4Address::ALLONES_ADDRESS, serverPort);
     }
     else if (clientState == RENEWING)
     {
         request->setCiaddr(lease->ip); // the client IP
-        EV_INFO << "Sending DHCPREQUEST extending lease for IP " << lease->ip << " via unicast to " << lease->serverId << "." << endl;
-        sendToUDP(request, clientPort, lease->serverId, serverPort);
+        EV_INFO << "Sending inet::DHCPREQUEST extending lease for IP " << lease->ip << " via unicast to " << lease->serverId << "." << std::endl;
+        sendToUDP(dhcpPacket, clientPort, lease->serverId, serverPort);
     }
     else if (clientState == REBINDING)
     {
         request->setCiaddr(lease->ip); // the client IP
-        EV_INFO << "Sending DHCPREQUEST renewing the IP " << lease->ip << " via broadcast." << endl;
-        sendToUDP(request, clientPort, IPv4Address::ALLONES_ADDRESS, serverPort);
+        EV_INFO << "Sending inet::DHCPREQUEST renewing the IP " << lease->ip << " via broadcast." << std::endl;
+        sendToUDP(dhcpPacket, clientPort, inet::Ipv4Address::ALLONES_ADDRESS, serverPort);
     }
     else
-        throw cRuntimeError("Invalid state");
+        delete dhcpPacket;
+        throw omnetpp::cRuntimeError("Invalid state");
 }
 
 void C2WDHCPClient::sendDiscover()
 {
     // setting the xid
     xid = intuniform(0, RAND_MAX);
-    //std::cout << xid << endl;
-    DHCPMessage* discover = new DHCPMessage("DHCPDISCOVER");
-    discover->setOp(BOOTREQUEST);
-    discover->setByteLength(280); // DHCP Discover packet size;
+    //std::cout << xid << std::endl;
+    inet::DhcpMessage* discover = new inet::DhcpMessage();
+    discover->setOp(inet::BOOTREQUEST);
+    discover->setChunkLength(inet::units::values::b(280 * 8)); // DHCP Discover packet size;
     discover->setHtype(1); // ethernet
     discover->setHlen(6); // hardware Address lenght (6 octets)
     discover->setHops(0);
@@ -644,27 +648,30 @@ void C2WDHCPClient::sendDiscover()
     discover->setChaddr(macAddress); // my mac address
     discover->setSname(""); // no server name given
     discover->setFile(""); // no file given
-    discover->getOptions().setMessageType(DHCPDISCOVER);
-    discover->getOptions().setClientIdentifier(macAddress);
-    discover->getOptions().setRequestedIp(IPv4Address());
+    discover->getOptionsForUpdate().setMessageType(inet::DHCPDISCOVER);
+    discover->getOptionsForUpdate().setClientIdentifier(macAddress);
+    discover->getOptionsForUpdate().setRequestedIp(inet::Ipv4Address());
 
     // set the parameters to request
-    discover->getOptions().setParameterRequestListArraySize(4);
-    discover->getOptions().setParameterRequestList(0,SUBNET_MASK);
-    discover->getOptions().setParameterRequestList(1,ROUTER);
-    discover->getOptions().setParameterRequestList(2,DNS);
-    discover->getOptions().setParameterRequestList(3,NTP_SRV);
+    discover->getOptionsForUpdate().setParameterRequestListArraySize(4);
+    discover->getOptionsForUpdate().setParameterRequestList(0,inet::SUBNET_MASK);
+    discover->getOptionsForUpdate().setParameterRequestList(1,inet::ROUTER);
+    discover->getOptionsForUpdate().setParameterRequestList(2,inet::DNS);
+    discover->getOptionsForUpdate().setParameterRequestList(3,inet::NTP_SRV);
 
-    EV_INFO << "Sending DHCPDISCOVER." << endl;
-    sendToUDP(discover, clientPort, IPv4Address::ALLONES_ADDRESS, serverPort);
+    inet::Ptr<inet::DhcpMessage> discoverPtr(discover);
+    inet::Packet *dhcpPacket = new inet::Packet("DHCPDISCOVER", discoverPtr);
+
+    EV_INFO << "Sending DHCPDISCOVER." << std::endl;
+    sendToUDP(dhcpPacket, clientPort, inet::Ipv4Address::ALLONES_ADDRESS, serverPort);
 }
 
-void C2WDHCPClient::sendDecline(IPv4Address declinedIp)
+void C2WDHCPClient::sendDecline(inet::Ipv4Address declinedIp)
 {
     xid = intuniform(0, RAND_MAX);
-    DHCPMessage * decline = new DHCPMessage("DHCPDECLINE");
-    decline->setOp(BOOTREQUEST);
-    decline->setByteLength(280); // DHCPDECLINE packet size
+    inet::DhcpMessage * decline = new inet::DhcpMessage();
+    decline->setOp(inet::BOOTREQUEST);
+    decline->setChunkLength(inet::units::values::b(280 * 8)); // DHCPDECLINE packet size
     decline->setHtype(1); // ethernet
     decline->setHlen(6); // hardware Address length (6 octets)
     decline->setHops(0);
@@ -674,13 +681,17 @@ void C2WDHCPClient::sendDecline(IPv4Address declinedIp)
     decline->setChaddr(macAddress); // my MAC address
     decline->setSname(""); // no server name given
     decline->setFile(""); // no file given
-    decline->getOptions().setMessageType(DHCPDECLINE);
-    decline->getOptions().setRequestedIp(declinedIp);
-    EV_INFO << "Sending DHCPDECLINE." << endl;
-    sendToUDP(decline, clientPort, IPv4Address::ALLONES_ADDRESS, serverPort);
+    decline->getOptionsForUpdate().setMessageType(inet::DHCPDECLINE);
+    decline->getOptionsForUpdate().setRequestedIp(declinedIp);
+    EV_INFO << "Sending DHCPDECLINE." << std::endl;
+
+    inet::Ptr<inet::DhcpMessage> declinePtr(decline);
+    inet::Packet *dhcpPacket = new inet::Packet("DHCPDECLINE", declinePtr);
+
+    sendToUDP(dhcpPacket, clientPort, inet::Ipv4Address::ALLONES_ADDRESS, serverPort);
 }
 
-void C2WDHCPClient::handleDHCPACK(DHCPMessage * msg)
+void C2WDHCPClient::handleDHCPACK(inet::DhcpMessage * msg)
 {
     recordLease(msg);
     cancelEvent(timerTo);
@@ -694,29 +705,27 @@ void C2WDHCPClient::scheduleTimerTO(TimerType type)
     // cancel the previous timeout
     cancelEvent(timerTo);
     timerTo->setKind(type);
-    scheduleAt(simTime() + responseTimeout, timerTo);
+    scheduleAt(omnetpp::simTime() + responseTimeout, timerTo);
 }
 
 void C2WDHCPClient::scheduleTimerT1()
 {
     // cancel the previous T1
     cancelEvent(timerT1);
-    scheduleAt(simTime() + (lease->renewalTime), timerT1); // RFC 2131 4.4.5
+    scheduleAt(omnetpp::simTime() + (lease->renewalTime), timerT1); // RFC 2131 4.4.5
 }
 
 void C2WDHCPClient::scheduleTimerT2()
 {
     // cancel the previous T2
     cancelEvent(timerT2);
-    scheduleAt(simTime() + (lease->rebindTime), timerT2); // RFC 2131 4.4.5
+    scheduleAt(omnetpp::simTime() + (lease->rebindTime), timerT2); // RFC 2131 4.4.5
 }
 
-void C2WDHCPClient::sendToUDP(cPacket *msg, int srcPort, const IPvXAddress& destAddr, int destPort)
+void C2WDHCPClient::sendToUDP(inet::Packet *msg, int srcPort, const inet::L3Address& destAddr, int destPort)
 {
-    EV_INFO << "Sending packet " << msg << endl;
-    UDPSocket::SendOptions options;
-    options.outInterfaceId = ie->getInterfaceId();
-    socket.sendTo(msg, destAddr, destPort, &options);
+    EV_INFO << "Sending packet " << msg << std::endl;
+    socket.sendTo(msg, destAddr, destPort);
 }
 
 void C2WDHCPClient::openSocket()
@@ -726,12 +735,12 @@ void C2WDHCPClient::openSocket()
     socket.bind(ipv4Address, clientPort);
 
     socket.setBroadcast(true);
-    EV_INFO << "DHCP server bound to port " << serverPort << "." << endl;
+    EV_INFO << "DHCP server bound to port " << serverPort << "." << std::endl;
 }
 
 void C2WDHCPClient::startApp()
 {
-    simtime_t start = std::max(startTime, simTime());
+    omnetpp::simtime_t start = std::max(startTime, omnetpp::simTime());
     ie = chooseInterface();
     scheduleAt(start, startTimer);
 }
@@ -749,36 +758,33 @@ void C2WDHCPClient::stopApp()
     // TODO: socket.close();
 }
 
-bool C2WDHCPClient::handleOperationStage(LifecycleOperation *operation, int stage, IDoneCallback *doneCallback)
+bool C2WDHCPClient::handleOperationStage(inet::LifecycleOperation *operation, inet::IDoneCallback *doneCallback)
 {
     Enter_Method_Silent();
-    if (dynamic_cast<NodeStartOperation *>(operation))
+    if (dynamic_cast<inet::ModuleStartOperation *>(operation))
     {
-        if (stage == NodeStartOperation::STAGE_APPLICATION_LAYER)
-        {
+        if (operation->getCurrentStage() == inet::ModuleStartOperation::STAGE_APPLICATION_LAYER) {
             startApp();
             isOperational = true;
         }
     }
-    else if (dynamic_cast<NodeShutdownOperation *>(operation))
+    else if (dynamic_cast<inet::ModuleStopOperation *>(operation))
     {
-        if (stage == NodeShutdownOperation::STAGE_APPLICATION_LAYER)
-        {
+        if (operation->getCurrentStage() == inet::ModuleStopOperation::STAGE_APPLICATION_LAYER) {
             stopApp();
             isOperational = false;
             ie = NULL;
         }
     }
-    else if (dynamic_cast<NodeCrashOperation *>(operation))
+    else if (dynamic_cast<inet::ModuleCrashOperation *>(operation))
     {
-        if (stage == NodeCrashOperation::STAGE_CRASH)
-        {
+        if (operation->getCurrentStage() == inet::ModuleCrashOperation::STAGE_CRASH) {
             stopApp();
             isOperational = false;
             ie = NULL;
         }
     }
     else
-        throw cRuntimeError("Unsupported lifecycle operation '%s'", operation->getClassName());
+        throw omnetpp::cRuntimeError("Unsupported lifecycle operation '%s'", operation->getClassName());
     return true;
 }

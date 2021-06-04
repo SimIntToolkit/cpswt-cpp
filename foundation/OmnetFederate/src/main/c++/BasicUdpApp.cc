@@ -13,11 +13,11 @@
 // along with this program.  If not, see http://www.gnu.org/licenses/.
 // 
 
-#include <InterfaceTable.h>
-#include <IPv4InterfaceData.h>
+#include <inet/networklayer/common/InterfaceTable.h>
+#include <inet/networklayer/ipv4/Ipv4InterfaceData.h>
 
 #include "BasicUdpApp.h"
-#include "InteractionMsg_m.h"
+#include <messages/InteractionMsg_m.h>
 
 #include "HLAInterface.h"
 
@@ -33,16 +33,16 @@ void BasicUdpApp::initialize( int stage ) {
 
     switch( stage ) {
         case 0: {
-            _interfaceTable = InterfaceTableAccess().get();
-            _notificationBoard = NotificationBoardAccess().get();
+            _interfaceTable = inet::getModuleFromPar<inet::IInterfaceTable>(par("interfaceTableModule"), this);
+            _notificationBoard = inet::getContainingNode(this);
             break;
         }
         case 3: {
             _hostModule = getParentModule();
             _hostName = _hostModule->getFullPath();
 
-            _port = par( "port" ).longValue();
-            _defaultDestPort = par( "destPort" ).longValue();
+            _port = par( "port" );
+            _defaultDestPort = par( "destPort" );
 
             _socket.setOutputGate(  gate( "udpOut" )  );
             _socket.bind( _port );
@@ -50,35 +50,35 @@ void BasicUdpApp::initialize( int stage ) {
             break;
         }
         case 4: {
-            _notificationBoard->subscribe( this, NF_INTERFACE_IPv4CONFIG_CHANGED );
+            _notificationBoard->subscribe( inet::interfaceIpv4ConfigChangedSignal, this );
             break;
         }
     }
 
 }
 
-void BasicUdpApp::receiveChangeNotification( int category, const cPolymorphic *details ) {
+void BasicUdpApp::receiveChangeNotification( int category, const omnetpp::cObject *details ) {
 
     Enter_Method_Silent( "receiveChangeNotification" );
 
-    if ( category == NF_INTERFACE_IPv4CONFIG_CHANGED ) {
+    if ( category == inet::interfaceIpv4ConfigChangedSignal ) {
 
         // NOP
 
     } else {
 
-        std::cerr << "WARNING:  unexpected notification \"" << notificationCategoryName( category ) << "\" from NotificationBoard:  unsubscribing.";
-// THE FOLLOWING LINE WILL CAUSE A SEGFAULT DUE TO THE USE OF VECTORS IN NotificationBoard MODULE FOR LISTENERS.
+        std::cerr << "WARNING:  unexpected notification \"" << category << "\" from the cModule that is the NotificationBoard:  unsubscribing.";
+// THE FOLLOWING LINE WILL CAUSE A SEGFAULT DUE TO THE USE OF VECTORS IN cModule that is the NotificationBoard MODULE FOR LISTENERS.
 //      _notificationBoard->unsubscribe( this, category );
 
     }
 }
 
-void BasicUdpApp::handleMessage( cMessage *msg ) {
+void BasicUdpApp::handleMessage( omnetpp::cMessage *msg ) {
 
-	cPacket* msgPkt = dynamic_cast< cPacket * > ( msg );
+	inet::Packet* msgPkt = dynamic_cast< inet::Packet * > ( msg );
 	if ( msgPkt == 0 ) {
-		std::cerr << "WARNING:  Hostname \"" << _hostName << "\":  BasicUdpApp:  handleMessage method:  received message is not a cPacket:  ignoring." << std::endl;
+		std::cerr << "WARNING:  Hostname \"" << _hostName << "\":  BasicUdpApp:  handleMessage method:  received message is not a omnetpp::cPacket:  ignoring." << std::endl;
 		cancelAndDelete( msg );
 		return;
 	}
@@ -91,10 +91,10 @@ void BasicUdpApp::handleMessage( cMessage *msg ) {
 		return;
 	}
 
-    sendToUDP(   msgPkt, IPv4Address(  static_cast< uint32_t >( 0 )  ), getDefaultDestPort()   );
+    sendToUDP(   msgPkt, inet::Ipv4Address(  static_cast< uint32_t >( 0 )  ), getDefaultDestPort()   );
 }
 
-void BasicUdpApp::sendToUDP( cPacket *msgPkt, const IPv4Address& destAddr, int destPort ){
+void BasicUdpApp::sendToUDP( inet::Packet *msgPkt, const inet::Ipv4Address& destAddr, int destPort ){
     // std::cout << "BasicUdpApp:  sendToUDP:  sending packet to " << destAddr << "(" << destPort << ")" << std::endl;
     _socket.sendTo( msgPkt, destAddr, destPort );
 }

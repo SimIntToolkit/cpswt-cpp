@@ -3,7 +3,7 @@
 //
 
 cplusplus {{
-#include "../HLAInterface.h"
+#include "HLAInterface.h"
 }};
 
 class noncobject HLAInterface::RouteEntrySP;

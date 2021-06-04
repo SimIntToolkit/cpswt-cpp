@@ -30,14 +30,13 @@ void BasicUdpAppWrapper::recordInterfaceIPAddresses( void ) {
 	int noEntries = getInterfaceTable()->getNumInterfaces();
 	for( int ix = 0 ; ix < noEntries ; ++ix ) {
 
-		InterfaceEntry *interfaceEntry = getInterfaceTable()->getInterface( ix );
-		IPv4InterfaceData *ipv4InterfaceData = interfaceEntry->ipv4Data();
-		IPv4Address ipAddress = ipv4InterfaceData->getIPAddress();
+		inet::InterfaceEntry *interfaceEntry = getInterfaceTable()->getInterface( ix );
+		inet::Ipv4Address ipAddress = interfaceEntry->getIpv4Address();
 		if ( ipAddress.isUnspecified() ) {
 			continue;
 		}
 
-		interfaceIPAddressMap.insert(  std::make_pair( interfaceEntry->getName(), ipAddress )  );
+		interfaceIPAddressMap.insert(  std::make_pair( dynamic_cast<cModule *>(interfaceEntry)->getName(), ipAddress )  );
 	}
 }
 
@@ -59,7 +58,7 @@ void BasicUdpAppWrapper::initialize( int stage ) {
 			break;
 		}
 		case 4: {
-			getNotificationBoard()->fireChangeNotification( NF_L2_ASSOCIATED );
+			getNotificationBoard()->emit(inet::l2AssociatedSignal, this);
 			break;
 		}
 		case 5: {
@@ -70,24 +69,24 @@ void BasicUdpAppWrapper::initialize( int stage ) {
 
 }
 
-void BasicUdpAppWrapper::receiveChangeNotification( int category, const cPolymorphic *details ) {
+void BasicUdpAppWrapper::receiveChangeNotification( int category, const omnetpp::cObject *details ) {
 
 //    Super::receiveChangeNotification( category, details );
 
-	if ( category == NF_INTERFACE_IPv4CONFIG_CHANGED ) {
+	if ( category == inet::interfaceIpv4ConfigChangedSignal ) {
 
 		recordInterfaceIPAddresses();
 
 	} else {
 
-		std::cerr << "WARNING:  unexpected notification \"" << notificationCategoryName( category ) << "\" from NotificationBoard:  unsubscribing.";
+		std::cerr << "WARNING:  unexpected notification \"" << category << "\" from NotificationBoard:  unsubscribing.";
 // THE FOLLOWING LINE WILL CAUSE A SEGFAULT DUE TO THE USE OF VECTORS IN NotificationBoard MODULE FOR LISTENERS.
 //		_notificationBoard->unsubscribe( this, category );
 
 	}
 }
 
-void BasicUdpAppWrapper::handleMessage( cMessage *msg ) {
+void BasicUdpAppWrapper::handleMessage( omnetpp::cMessage *msg ) {
 
 	InteractionMsg *interactionMsg = dynamic_cast< InteractionMsg * >( msg );
 	if ( interactionMsg != 0 ) {
@@ -104,7 +103,7 @@ void BasicUdpAppWrapper::handleMessage( cMessage *msg ) {
 	Super::handleMessage( msg );
 }
 
-void BasicUdpAppWrapper::sendToUDP( cPacket *msg, const IPv4Address& destAddr, int destPort ) {
+void BasicUdpAppWrapper::sendToUDP( inet::Packet *msg, const inet::Ipv4Address& destAddr, int destPort ) {
 
 	InteractionMsg *interactionMsg = dynamic_cast< InteractionMsg * >( msg );
 	if ( interactionMsg == 0 ) {
@@ -190,7 +189,7 @@ void BasicUdpAppWrapper::sendToUDP( cPacket *msg, const IPv4Address& destAddr, i
 		return;
 	}
 
-	IPv4Address destinationIPAddress = appProperties.getIPAddress( receiverAppInterface );
+	inet::Ipv4Address destinationIPAddress = appProperties.getIPAddress( receiverAppInterface );
 	int destinationPort = appProperties.getPort();
 	// std::cerr << "BasicUDPAppWrapper: sending packet to " << destinationIPAddress << "(" << destinationPort << ")" << std::endl;
 
