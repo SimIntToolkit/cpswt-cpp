@@ -15,6 +15,7 @@
 
 #include "BasicUdpAppWrapper.h"
 #include <boost/lexical_cast.hpp>
+#include <inet/common/packet/chunk/cPacketChunk.h>
 
 
 Define_Module(BasicUdpAppWrapper);
@@ -36,7 +37,7 @@ void BasicUdpAppWrapper::recordInterfaceIPAddresses( void ) {
 			continue;
 		}
 
-		interfaceIPAddressMap.insert(  std::make_pair( dynamic_cast<cModule *>(interfaceEntry)->getName(), ipAddress )  );
+		interfaceIPAddressMap.insert(  std::make_pair( static_cast<cModule *>(interfaceEntry)->getName(), ipAddress )  );
 	}
 }
 
@@ -49,19 +50,13 @@ void BasicUdpAppWrapper::initialize( int stage ) {
 	Super::initialize( stage );
 
 	switch( stage ) {
-		case 0: {
-			setName( getAppName().c_str() );
-			break;
-		}
-		case 3: {
+		case inet::INITSTAGE_LOCAL: {
+		    setName( getAppName().c_str() );
 			HLAInterface::get_InstancePtr()->registerAppSpecProperties( getHostName(), getAppName(), getIndex(), this, getPort() );
-			break;
-		}
-		case 4: {
 			getNotificationBoard()->emit(inet::l2AssociatedSignal, this);
 			break;
 		}
-		case 5: {
+		case inet::INITSTAGE_LAST: {
 			recordInterfaceIPAddresses();
 			break;
 		}
@@ -69,46 +64,15 @@ void BasicUdpAppWrapper::initialize( int stage ) {
 
 }
 
-void BasicUdpAppWrapper::receiveChangeNotification( int category, const omnetpp::cObject *details ) {
+void BasicUdpAppWrapper::sendToUDP( inet::Packet *packet, const inet::Ipv4Address& destAddr, int destPort ) {
 
-//    Super::receiveChangeNotification( category, details );
+    auto c_packetChunkPtr = packet->template peekAtFront<inet::cPacketChunk>();
+    inet::cPacket *c_packetPtr = c_packetChunkPtr->getPacket();
 
-	if ( category == inet::interfaceIpv4ConfigChangedSignal ) {
-
-		recordInterfaceIPAddresses();
-
-	} else {
-
-		std::cerr << "WARNING:  unexpected notification \"" << category << "\" from NotificationBoard:  unsubscribing.";
-// THE FOLLOWING LINE WILL CAUSE A SEGFAULT DUE TO THE USE OF VECTORS IN NotificationBoard MODULE FOR LISTENERS.
-//		_notificationBoard->unsubscribe( this, category );
-
-	}
-}
-
-void BasicUdpAppWrapper::handleMessage( omnetpp::cMessage *msg ) {
-
-	InteractionMsg *interactionMsg = dynamic_cast< InteractionMsg * >( msg );
-	if ( interactionMsg != 0 ) {
-		int messageNo = interactionMsg->getMessageNo();
-		if ( !interactionMsg->getToHLA() && !_messageTracker.addInt( messageNo )  ) {
-//			std::cout << "BasicUdpAppWrapper: \"" << getHostName() << "\" dropping duplicate message (" << messageNo << ")." << std::endl;
-			cancelAndDelete( msg );
-			return;  // DROP MESSAGE
-		}
-		interactionMsg->setToHLA( !interactionMsg->getToHLA() );
-	}
-	// std::cout << "BasicUdpAppWrapper: \"" << getHostName() << "\" received message, forwarding to wrapped module." << std::endl;
-
-	Super::handleMessage( msg );
-}
-
-void BasicUdpAppWrapper::sendToUDP( inet::Packet *msg, const inet::Ipv4Address& destAddr, int destPort ) {
-
-	InteractionMsg *interactionMsg = dynamic_cast< InteractionMsg * >( msg );
+    InteractionMsg *interactionMsg = dynamic_cast< InteractionMsg * >( c_packetPtr );
 	if ( interactionMsg == 0 ) {
-		std::cerr << "Hostname \"" << getHostName() << "\":  BasicUdpAppWrapper:  handleMessage method:  sending non-InteractionMsg into network." << std::endl;
-		Super::sendToUDP( msg, destAddr, destPort );
+		std::cerr << "Hostname \"" << getHostName() << "\":  BasicUdpAppWrapper:  sendToUDP method:  sending non-InteractionMsg-containing-Packet into network." << std::endl;
+		Super::sendToUDP( packet, destAddr, destPort );
 		return;
 	}
 
@@ -146,17 +110,17 @@ void BasicUdpAppWrapper::sendToUDP( inet::Packet *msg, const inet::Ipv4Address& 
 
 		cModule *cModulePtr = HLAInterface::get_InstancePtr();
 		if ( cModulePtr != 0 ) {
-			sendDirect( msg, HLAInterface::get_InstancePtr(), "hlaOut" );
+			sendDirect( packet, HLAInterface::get_InstancePtr(), "hlaOut" );
 		} else {
 			std::cerr << "ERROR:  BasicUdpAppWrapper:  \"" << getHostName() << "\" NULL POINTER TO HLAInterface:  dropping message." << std::endl;
-			cancelAndDelete( msg );
+			cancelAndDelete( packet );
 		}
 		return;
 	}
 
 	if (  !NetworkPacket::match( interactionRootSP->getClassHandle() )  ) {
 		std::cerr << "WARNING:  Hostname \"" << getHostName() << "\":  BasicUdpAppWrapper:  handleMessage method:  Wrapped interaction is not of type \"NetworkPacket\":  ignoring" << std::endl;
-		cancelAndDelete( msg );
+		cancelAndDelete( packet );
 		return;
 	}
 
@@ -173,11 +137,11 @@ void BasicUdpAppWrapper::sendToUDP( inet::Packet *msg, const inet::Ipv4Address& 
 	std::string receiverAppInterface( networkPacketSP->get_receiverAppInterface() );
 
 	// Update message length
-	msg->setByteLength( networkPacketSP->get_numBytes() );
+	packet->setByteLength( networkPacketSP->get_numBytes() );
 
 	if ( receiverAppIndex == -1 ) {
 		// std::cerr << "Hostname \"" << getHostName() << "\":  BasicUdpAppWrapper:  handleMessage method:  sending InteractionMsg to application-specified destination in network." << std::endl;
-		Super::sendToUDP( msg, destAddr, destPort );
+		Super::sendToUDP( packet, destAddr, destPort );
 
 	}
 
@@ -185,7 +149,7 @@ void BasicUdpAppWrapper::sendToUDP( inet::Packet *msg, const inet::Ipv4Address& 
 	HLAInterface::AppProperties appProperties = HLAInterface::get_InstancePtr()->getAppSpecProperties( appSpec );
 	if ( appProperties.getPort() == -1 ) {
 		// std::cerr << "ERROR:  Hostname \"" << getHostName() << "\":  BasicUdpAppWrapper:  handleMessage method:  Could not find app properties for \"" << appSpec << "\":  dropping message." << std::endl;
-		cancelAndDelete( msg );
+		cancelAndDelete( packet );
 		return;
 	}
 
@@ -194,7 +158,7 @@ void BasicUdpAppWrapper::sendToUDP( inet::Packet *msg, const inet::Ipv4Address& 
 	// std::cerr << "BasicUDPAppWrapper: sending packet to " << destinationIPAddress << "(" << destinationPort << ")" << std::endl;
 
 	// std::cerr << "Hostname \"" << getHostName() << "\":  BasicUdpAppWrapper:  handleMessage method:  sending InteractionMsg to NetworkPacket-specified destination in network." << std::endl;
-	Super::sendToUDP( msg, destinationIPAddress, destinationPort );
+	Super::sendToUDP( packet, destinationIPAddress, destinationPort );
 }
 
 NetworkPacketSP BasicUdpAppWrapper::modifyIncoming( NetworkPacketSP networkPacketSP ) {

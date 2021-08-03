@@ -17,17 +17,16 @@
 
 package OmnetFederate;
 
-import inet.base.NotificationBoard;
-import inet.battery.IBattery;
-import inet.linklayer.IExternalNic;
-import inet.linklayer.IWiredNic;
-import inet.linklayer.IWirelessNic;
+import inet.power.storage.SimpleCcBattery;
+import inet.linklayer.contract.IExternalInterface;
+import inet.linklayer.contract.IWiredInterface;
+import inet.linklayer.contract.IWirelessInterface;
 import inet.linklayer.loopback.LoopbackInterface;
 import inet.mobility.contract.IMobility;
 import inet.networklayer.common.InterfaceTable;
-import inet.networklayer.ipv4.RoutingTable;
-import inet.status.NodeStatus;
-import inet.util.PcapRecorder;
+import inet.networklayer.ipv4.Ipv4RoutingTable;
+import inet.common.lifecycle.NodeStatus;
+import inet.common.packet.recorder.PcapRecorder;
 
 
 //
@@ -53,7 +52,7 @@ module C2WNodeBase
         string routingFile = default("");
         bool IPForward = default(true);
         bool forwardMulticast = default(false);
-        string batteryType = default("");
+    //        string batteryType = default("");
     gates:
         input radioIn[numRadios] @directIn;
         inout pppg[] @labels(PPPFrame-conn);
@@ -63,33 +62,33 @@ module C2WNodeBase
             @display("p=50,50");
         }
 
-        notificationBoard: NotificationBoard {
-            parameters:
-                @display("p=53,155;is=s");
-        }
+//        notificationBoard: NotificationBoard {
+//            parameters:
+//                @display("p=53,155;is=s");
+//        }
 
-        battery: <batteryType> like IBattery if batteryType != "" {
+        battery: SimpleCcBattery {
             parameters:
-                @display("p=53,77;i=block/plug;is=s");
+                @display("p=53,106;i=block/plug;is=s");
         }
 
         // optional mobility module. Required only if wireless cards are present
         mobility: <mobilityType> like IMobility if mobilityType != "" {
             parameters:
-                @display("p=53,111");
+                @display("p=53,167");
         }
 
         // network layer
         networkLayer: C2WNetworkLayer {
             parameters:
-                @display("p=329,287;q=queue");
+                @display("p=574,287;q=queue");
         }
 
-        routingTable: RoutingTable {
+        routingTable: Ipv4RoutingTable {
             parameters:
                 @display("p=53,225;is=s");
-                IPForward = IPForward;
-                forwardMulticast = forwardMulticast;
+                forwarding = IPForward;
+                multicastForwarding = forwardMulticast;
                 routingFile = routingFile;
         }
 
@@ -104,23 +103,23 @@ module C2WNodeBase
         }
 
         lo0: LoopbackInterface {
-            @display("p=78,406");
+            @display("p=310,398");
         }
-        wlan[numRadios]: <default("Ieee80211Nic")> like IWirelessNic {
+        wlan[numRadios]: <default("Ieee80211Interface")> like IWirelessInterface {
             parameters:
-                @display("p=216,406,row,60;q=queue");
+                @display("p=574,398,row,60;q=queue");
         }
-        eth[sizeof(ethg)]: <default("EthernetInterface")> like IWiredNic {
+        eth[sizeof(ethg)]: <default("EthernetInterface")> like IWiredInterface {
             parameters:
-                @display("p=368,406,row,60;q=txQueue");
+                @display("p=710,398,row,60;q=txQueue");
         }
-        ppp[sizeof(pppg)]: <default("PPPInterface")> like IWiredNic {
+        ppp[sizeof(pppg)]: <default("PppInterface")> like IWiredInterface {
             parameters:
-                @display("p=558,406,row,60;q=txQueue");
+                @display("p=841,398,row,60;q=txQueue");
         }
-        ext[numExtInterfaces]: <default("ExtInterface")> like IExternalNic {
+        ext[numExtInterfaces]: <default("ExtInterface")> like IExternalInterface {
             parameters:
-                @display("p=149,406,row,10;q=txQueue;i=block/ifcard");
+                @display("p=422,398,row,10;q=txQueue;i=block/ifcard");
         }
 
     connections allowunconnected:

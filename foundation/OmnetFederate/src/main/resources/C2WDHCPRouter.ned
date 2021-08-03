@@ -17,11 +17,11 @@
 
 package OmnetFederate;
 
-import inet.networklayer.bgpv4.BGPRouting;
-import inet.networklayer.ospfv2.OSPFRouting;
-import inet.networklayer.routing.rip.RIPRouting;
-import inet.transport.ITCP;
-import inet.transport.IUDP;
+import inet.routing.bgpv4.Bgp;
+import inet.routing.ospfv2.Ospfv2;
+import inet.routing.rip.Rip;
+import inet.transportlayer.contract.ITcp;
+import inet.transportlayer.contract.IUdp;
 
 //
 // IPv4 router that supports wireless, Ethernet, PPP and external interfaces.
@@ -62,22 +62,22 @@ module C2WDHCPRouter extends C2WNodeBase
             parameters:
                 @display("p=336,54");
         }
-        ospf: OSPFRouting if hasOSPF {
+        ospf: Ospfv2 if hasOSPF {
             parameters:
                 @display("p=465,287,row");
         }
-        bgp: BGPRouting if hasBGP {
+        bgp: Bgp if hasBGP {
             parameters:
                 @display("p=214,80;i=block/network");
         }
-        tcp: <tcpType> like ITCP if hasBGP {
+        tcp: <tcpType> like ITcp if hasBGP {
             parameters:
                 @display("p=214,180;i=block/transport");
         }
-        rip: RIPRouting if hasRIP {
+        rip: Rip if hasRIP {
             @display("p=404,80");
         }
-        udp: <udpType> like IUDP if hasRIP || numC2WDHCPServers>0 {
+        udp: <udpType> like IUdp if hasRIP || numC2WDHCPServers>0 {
             @display("p=404,180");
         }
     connections allowunconnected:
@@ -88,21 +88,21 @@ module C2WDHCPRouter extends C2WNodeBase
         }
 
         if hasBGP {
-            bgp.tcpOut --> tcp.appIn++;
-            bgp.tcpIn <-- tcp.appOut++;
+            bgp.socketOut --> tcp.appIn;
+            bgp.socketIn <-- tcp.appOut;
 
             tcp.ipOut --> networkLayer.transportIn++;
             tcp.ipIn <-- networkLayer.transportOut++;
         }
 
         if hasRIP {
-            rip.udpOut --> udp.appIn++;
-            rip.udpIn <-- udp.appOut++;
+            rip.socketOut --> udp.appIn;
+            rip.socketIn <-- udp.appOut;
         }
         
         for i=0..numC2WDHCPServers-1 {
-	        c2wDHCPServer[i].udpOut --> udp.appIn++;
-    	    c2wDHCPServer[i].udpIn <-- udp.appOut++;
+	        c2wDHCPServer[i].udpOut --> udp.appIn;
+    	    c2wDHCPServer[i].udpIn <-- udp.appOut;
         }
 	    
 	    if hasRIP {

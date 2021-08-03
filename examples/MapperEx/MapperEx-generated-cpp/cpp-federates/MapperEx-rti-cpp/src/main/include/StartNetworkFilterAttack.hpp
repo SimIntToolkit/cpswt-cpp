@@ -92,9 +92,9 @@ private:
 		static int srcNetworkAddress_handle;
 		return srcNetworkAddress_handle;
 	}
-	static int &get_recordingNodeFullPath_handle_var( void ) {
-		static int recordingNodeFullPath_handle;
-		return recordingNodeFullPath_handle;
+	static int &get_nodeFullPath_handle_var( void ) {
+		static int nodeFullPath_handle;
+		return nodeFullPath_handle;
 	}
 	
 public:
@@ -102,7 +102,7 @@ public:
 	
 	static int get_dstNetworkAddress_handle( void ) { return get_dstNetworkAddress_handle_var(); }
 	static int get_srcNetworkAddress_handle( void ) { return get_srcNetworkAddress_handle_var(); }
-	static int get_recordingNodeFullPath_handle( void ) { return get_recordingNodeFullPath_handle_var(); }
+	static int get_nodeFullPath_handle( void ) { return get_nodeFullPath_handle_var(); }
 	
 
 
@@ -218,7 +218,7 @@ private:
 	
 	std::string _srcNetworkAddress;
 	
-	std::string _recordingNodeFullPath;
+	std::string _nodeFullPath;
 	
 public:
 		
@@ -228,8 +228,8 @@ public:
 	void set_srcNetworkAddress( const std::string & srcNetworkAddress ) { _srcNetworkAddress = srcNetworkAddress; }
 	const std::string & get_srcNetworkAddress( void ) const { return _srcNetworkAddress; }
 	
-	void set_recordingNodeFullPath( const std::string & recordingNodeFullPath ) { _recordingNodeFullPath = recordingNodeFullPath; }
-	const std::string & get_recordingNodeFullPath( void ) const { return _recordingNodeFullPath; }
+	void set_nodeFullPath( const std::string & nodeFullPath ) { _nodeFullPath = nodeFullPath; }
+	const std::string & get_nodeFullPath( void ) const { return _nodeFullPath; }
 	
 
 
@@ -248,8 +248,8 @@ public:
 		else if ( "srcNetworkAddress" == datamemberName ) {
 			return TypeMedley( get_srcNetworkAddress() );
 		}
-		else if ( "recordingNodeFullPath" == datamemberName ) {
-			return TypeMedley( get_recordingNodeFullPath() );
+		else if ( "nodeFullPath" == datamemberName ) {
+			return TypeMedley( get_nodeFullPath() );
 		} else {
 			return Super::getParameter( datamemberName );
 		}
@@ -264,8 +264,8 @@ public:
 		else if ( get_srcNetworkAddress_handle() == datamemberHandle ) {
 			return TypeMedley( get_srcNetworkAddress() );
 		}
-		else if ( get_recordingNodeFullPath_handle() == datamemberHandle ) {
-			return TypeMedley( get_recordingNodeFullPath() );
+		else if ( get_nodeFullPath_handle() == datamemberHandle ) {
+			return TypeMedley( get_nodeFullPath() );
 		} else {
 			return Super::getParameter( datamemberHandle );
 		}
@@ -282,8 +282,8 @@ protected:
 		else if ( param_handle == get_srcNetworkAddress_handle() ) {
 			set_srcNetworkAddress(  TypeMedley( val )  );
 		}
-		else if ( param_handle == get_recordingNodeFullPath_handle() ) {
-			set_recordingNodeFullPath(  TypeMedley( val )  );
+		else if ( param_handle == get_nodeFullPath_handle() ) {
+			set_nodeFullPath(  TypeMedley( val )  );
 		} else {
 			retval = Super::setParameterAux( param_handle, val );
 		}
@@ -300,8 +300,8 @@ protected:
 		else if ( "srcNetworkAddress" == datamemberName ) {
 			set_srcNetworkAddress(  TypeMedley( val )  );
 		}
-		else if ( "recordingNodeFullPath" == datamemberName ) {
-			set_recordingNodeFullPath(  TypeMedley( val )  );
+		else if ( "nodeFullPath" == datamemberName ) {
+			set_nodeFullPath(  TypeMedley( val )  );
 		} else {
 			retval = Super::setParameterAux( datamemberName, val );
 		}
@@ -319,8 +319,8 @@ protected:
 		else if ( "srcNetworkAddress" == datamemberName ) {\
 			set_srcNetworkAddress( val );
 		}
-		else if ( "recordingNodeFullPath" == datamemberName ) {\
-			set_recordingNodeFullPath( val );
+		else if ( "nodeFullPath" == datamemberName ) {\
+			set_nodeFullPath( val );
 		} else {
 			retval = Super::setParameterAux( datamemberName, val );
 		}

@@ -15,20 +15,21 @@
 
 package OmnetFederate;
 
-import inet.applications.IUDPApp;
+import inet.applications.contract.IApp;
 
 //
 // TODO auto-generated module
 //
-simple BasicUdpApp like IUDPApp
+simple BasicUdpApp like IApp
 {
-	
 	parameters:
+	    // THE PATH TO THE InterfaceTable MODULE -- AUTOMATICALLY SET BY LinkLayerNodeBase SUPERCLASS OF StandardHost
+	    string interfaceTableModule;
+
 		int port = default( 60 );
 		int destPort = default( 60 );
 
 	gates:
-        input udpIn @labels(UDPControlInfo/up);
-        output udpOut @labels(UDPControlInfo/down);
-		
+        input socketIn @labels(UdpControlInfo/up);
+        output socketOut @labels(UdpControlInfo/down);
 }

@@ -19,8 +19,7 @@
 #include <omnetpp.h>
 #include "BasicUdpApp.h"
 #include "HLAInterface.h"
-#include "NetworkPacket.hpp"
-
+#include <NetworkPacket.hpp>
 
 /**
  * TODO - Generated class
@@ -68,8 +67,6 @@ protected:
 	void recordInterfaceIPAddresses( void );
 	virtual int numInitStages( void ) const override;
 	virtual void initialize( int stage ) override;
-	virtual void receiveChangeNotification( int category, const omnetpp::cObject *details ) override;
-	virtual void handleMessage(omnetpp::cMessage *msg) override;
 	virtual void sendToUDP( inet::Packet *msg, const inet::Ipv4Address& destAddr, int destPort ) override;
 	virtual NetworkPacketSP modifyIncoming( NetworkPacketSP networkPacketSP );
 	virtual NetworkPacketSP modifyOutgoing( NetworkPacketSP networkPacketSP );

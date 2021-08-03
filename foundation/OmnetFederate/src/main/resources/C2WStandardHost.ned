@@ -18,14 +18,17 @@
 
 package OmnetFederate;
 
-import inet.applications.IPingApp;
-import inet.applications.ISCTPApp;
-import inet.applications.ITCPApp;
-import inet.applications.IUDPApp;
-import inet.transport.ISCTP;
-import inet.transport.ITCP;
-import inet.transport.IUDP;
+import inet.applications.contract.IApp;
+import inet.transportlayer.contract.ISctp;
+import inet.transportlayer.contract.ITcp;
+import inet.transportlayer.contract.IUdp;
 
+import inet.applications.tcpapp.TcpClientApp;
+import inet.applications.tcpapp.TcpServerApp;
+import inet.applications.udpapp.UdpApp;
+import inet.applications.sctpapp.SctpClient;
+import inet.applications.sctpapp.SctpServer;
+import inet.applications.pingapp.PingApp;
 
 //
 // IPv4 host with SCTP, TCP, UDP layers and applications.
@@ -48,72 +51,112 @@ module C2WStandardHost extends C2WNodeBase
 {
     parameters:
         @display("i=device/pc2");
-        int numTcpApps = default(0);  // no of TCP apps. Specify the app types in INI file with tcpApp[0..1].typename="TCPEchoApp" syntax
-        int numUdpApps = default(0);  // no of UDP apps. Specify the app types in INI file with udpApp[0..1].typename="UDPVideoStreamCli" syntax
-        int numSctpApps = default(0); // no of SCTP apps. Specify the app types in INI file with sctpApp[0..1].typename="SCTPServer" syntax
+        int numTcpClientApps = default(0);  // no of TCP client apps. These should all inherit from TcpClientApp
+        bool hasTcpClientApps = default(numTcpClientApps > 0);
+
+        int numTcpServerApps = default(0);  // no of TCP server apps. These should all inherit from TcpServerApp
+        bool hasTcpServerApps = default(numTcpClientApps > 0);
+
+        bool hasTcpApps = hasTcpClientApps || hasTcpServerApps;
+
+        string tcpType = default(firstAvailable("Tcp", "TcpLwip", "TcpNsc", "TcpNone"));  // tcp implementation (e.g. ~TCP, ~TCP_lwIP, ~TCP_NSC) or ~TCPSpoof
+
+        int numUdpApps = default(0);  // no of UDP apps. They should all inherit from UdpApp.
+        bool hasUdpApps = default(numUdpApps > 0);
+        string udpType = default(firstAvailable("Udp","UdpNone"));
+
+        int numSctpClientApps = default(0); // no of SCTP client apps. They should all inherit from SctpClientApp
+        bool hasSctpClientApps = default(numSctpClientApps > 0);
+
+        int numSctpServerApps = default(0); // no of SCTP server apps. They should all inherit from SctpServerApp
+        bool hasSctpServerApps = default(numSctpServerApps > 0);
+
+        bool hasSctpApps = hasSctpClientApps || hasSctpServerApps;
+
+        string sctpType = default(firstAvailable("Sctp","SctpNone"));
+
         int numPingApps = default(0);  // no of PING apps. Specify the app types in INI file with pingApp[0..1].typename="PingApp" syntax
-        bool hasTcp = default(numTcpApps>0);
-        bool hasUdp = default(numUdpApps>0);
-        bool hasSctp = default(numSctpApps>0);
-        string tcpType = default(firstAvailable("TCP", "TCP_lwIP", "TCP_NSC", "TCP_None"));  // tcp implementation (e.g. ~TCP, ~TCP_lwIP, ~TCP_NSC) or ~TCPSpoof
-        string udpType = default(firstAvailable("UDP","UDP_None"));
-        string sctpType = default(firstAvailable("SCTP","SCTP_None"));
+        bool hasPingApps = numPingApps > 0;
+
         IPForward = default(false);  // disable routing by default
-        networkLayer.proxyARP = default(false);
+    //        networkLayer.proxyARP = default(false);
     submodules:
-        tcpApp[numTcpApps]: <> like ITCPApp if hasTcp {
+        tcpClientApp[numTcpClientApps]: TcpClientApp if hasTcpClientApps {
             parameters:
-                @display("p=147,54,row,60");
+                @display("p=212,42,row,60");
         }
-        tcp: <tcpType> like ITCP if hasTcp {
+        tcpServerApp[numTcpServerApps]: TcpServerApp if hasTcpServerApps {
             parameters:
-                @display("p=147,141");
+                @display("p=400,58,row,60");
         }
-        udpApp[numUdpApps]: <> like IUDPApp if hasUdp {
+        tcp: <tcpType> like ITcp if hasTcpApps {
             parameters:
-                @display("p=329,54,row,60");
-        }
-        udp: <udpType> like IUDP if hasUdp {
-            parameters:
-                @display("p=329,141");
-        }
-        sctpApp[numSctpApps]: <> like ISCTPApp if hasSctp {
-            parameters:
-                @display("p=527,54,row,60");
-        }
-        sctp: <sctpType> like ISCTP if hasSctp {
-            @display("p=527,141");
-        }
-        pingApp[numPingApps]: <default("PingApp")> like IPingApp {
-            parameters:
-                @display("p=635,141,row,60");
-        }
-    connections allowunconnected:
-        for i=0..numTcpApps-1 {
-            tcpApp[i].tcpOut --> tcp.appIn++;
-            tcpApp[i].tcpIn <-- tcp.appOut++;
+                @display("p=264,141");
         }
 
-        tcp.ipOut --> networkLayer.transportIn++ if hasTcp;
-        tcp.ipIn <-- networkLayer.transportOut++ if hasTcp;
+        udpApp[numUdpApps]: UdpApp if hasUdpApps {
+            parameters:
+                @display("p=559,42,row,60");
+        }
+        udp: <udpType> like IUdp if hasUdpApps || numC2WDHCPClients > 0 {
+            parameters:
+                @display("p=559,141");
+        }
+
+        sctpClientApp[numSctpClientApps]: SctpClient if hasSctpClientApps {
+            parameters:
+                @display("p=693,58,row,60");
+        }
+        sctpServerApp[numSctpServerApps]: SctpServer if hasSctpServerApps {
+            parameters:
+                @display("p=849,42,row,60");
+        }
+        sctp: <sctpType> like ISctp if hasSctpApps {
+            @display("p=773,141");
+        }
+
+        pingApp[numPingApps]: PingApp if hasPingApps {
+            parameters:
+                @display("p=773,269,row,60");
+        }
+
+    connections allowunconnected:
+        for i=0..numTcpClientApps-1 {
+            tcpClientApp[i].socketOut --> tcp.appIn;
+            tcpClientApp[i].socketIn <-- tcp.appOut;
+        }
+
+        for i=0..numTcpServerApps-1 {
+            tcpServerApp[i].socketOut --> tcp.appIn;
+            tcpServerApp[i].socketIn <-- tcp.appOut;
+        }
+
+        tcp.ipOut --> networkLayer.transportIn++ if hasTcpApps;
+        tcp.ipIn <-- networkLayer.transportOut++ if hasTcpApps;
 
         for i=0..numUdpApps-1 {
-            udpApp[i].udpOut --> udp.appIn++;
-            udpApp[i].udpIn <-- udp.appOut++;
+            udpApp[i].socketOut --> udp.appIn;
+            udpApp[i].socketIn <-- udp.appOut;
         }
 
-        udp.ipOut --> networkLayer.transportIn++ if hasUdp;
-        udp.ipIn <-- networkLayer.transportOut++ if hasUdp;
+        udp.ipOut --> networkLayer.transportIn++ if hasUdpApps;
+        udp.ipIn <-- networkLayer.transportOut++ if hasUdpApps;
 
-        for i=0..numSctpApps-1 {
-            sctpApp[i].sctpOut --> sctp.from_appl++;
-            sctp.to_appl++ --> sctpApp[i].sctpIn;
+        for i=0..numSctpClientApps-1 {
+            sctpClientApp[i].socketOut --> sctp.appIn;
+            sctp.appOut --> sctpClientApp[i].socketIn;
         }
-        sctp.to_ip --> networkLayer.transportIn++ if hasSctp;
-        networkLayer.transportOut++ --> sctp.from_ip if hasSctp;
+
+        for i=0..numSctpServerApps-1 {
+            sctpServerApp[i].socketOut --> sctp.appIn;
+            sctp.appOut --> sctpServerApp[i].socketIn;
+        }
+
+        sctp.ipOut --> networkLayer.transportIn++ if hasSctpApps;
+        networkLayer.transportOut++ --> sctp.ipIn if hasSctpApps;
 
         for i=0..numPingApps-1 {
-            networkLayer.pingOut++ --> pingApp[i].pingIn;
-            networkLayer.pingIn++ <-- pingApp[i].pingOut;
+            networkLayer.pingOut++ --> pingApp[i].socketIn;
+            networkLayer.pingIn++ <-- pingApp[i].socketOut;
         }
 }

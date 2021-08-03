@@ -23,6 +23,8 @@
 #include <inet/networklayer/ipv4/Ipv4InterfaceData.h>
 #include <inet/common/ModuleAccess.h>
 
+#include <inet/common/INETDefs.h>
+
 #include "HLAInterface.h"
 
 
@@ -42,9 +44,9 @@ private:
     inet::cModule *_notificationBoard;
 
 protected:
-	virtual int numInitStages( void ) const override;
+    virtual int numInitStages() const override { return inet::NUM_INIT_STAGES; }
 	virtual void initialize( int stage ) override;
-	virtual void receiveChangeNotification( int category, const omnetpp::cObject *details );
+	virtual void receiveSignal(omnetpp::cComponent *source, omnetpp::simsignal_t signalID, omnetpp::cObject *obj, omnetpp::cObject *details) override;
 	virtual void handleMessage(inet::cMessage *msg) override;
 
 	inet::IInterfaceTable *getInterfaceTable( void ) { return _interfaceTable; }

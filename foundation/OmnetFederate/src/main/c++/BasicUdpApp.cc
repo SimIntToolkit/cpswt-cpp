@@ -23,21 +23,15 @@
 
 Define_Module(BasicUdpApp);
 
-int BasicUdpApp::numInitStages( void ) const {
-	return 6;
-}
-
 void BasicUdpApp::initialize( int stage ) {
 
 	// REGISTER HOST IN HOSTNAME-IPADDRESS MAP
 
     switch( stage ) {
-        case 0: {
+        case inet::INITSTAGE_LOCAL: {
             _interfaceTable = inet::getModuleFromPar<inet::IInterfaceTable>(par("interfaceTableModule"), this);
             _notificationBoard = inet::getContainingNode(this);
-            break;
-        }
-        case 3: {
+
             _hostModule = getParentModule();
             _hostName = _hostModule->getFullPath();
 
@@ -49,7 +43,8 @@ void BasicUdpApp::initialize( int stage ) {
 
             break;
         }
-        case 4: {
+        case inet::INITSTAGE_LAST: {
+            // SHOULD BE LAST BECAUSE MODULE WHERE SUBSCRIPTION TAKES PLACE MUST EXIST -- COULD BE ANY NODE
             _notificationBoard->subscribe( inet::interfaceIpv4ConfigChangedSignal, this );
             break;
         }
@@ -57,17 +52,17 @@ void BasicUdpApp::initialize( int stage ) {
 
 }
 
-void BasicUdpApp::receiveChangeNotification( int category, const omnetpp::cObject *details ) {
+void BasicUdpApp::receiveSignal(omnetpp::cComponent *source, omnetpp::simsignal_t signalID, omnetpp::cObject *obj, omnetpp::cObject *details) {
 
     Enter_Method_Silent( "receiveChangeNotification" );
 
-    if ( category == inet::interfaceIpv4ConfigChangedSignal ) {
+    if ( signalID == inet::interfaceIpv4ConfigChangedSignal ) {
 
         // NOP
 
     } else {
 
-        std::cerr << "WARNING:  unexpected notification \"" << category << "\" from the cModule that is the NotificationBoard:  unsubscribing.";
+        std::cerr << "WARNING:  unexpected notification \"" << getSignalName(signalID) << "\" from the cModule that is the NotificationBoard.";
 // THE FOLLOWING LINE WILL CAUSE A SEGFAULT DUE TO THE USE OF VECTORS IN cModule that is the NotificationBoard MODULE FOR LISTENERS.
 //      _notificationBoard->unsubscribe( this, category );
 
@@ -76,22 +71,14 @@ void BasicUdpApp::receiveChangeNotification( int category, const omnetpp::cObjec
 
 void BasicUdpApp::handleMessage( omnetpp::cMessage *msg ) {
 
-	inet::Packet* msgPkt = dynamic_cast< inet::Packet * > ( msg );
-	if ( msgPkt == 0 ) {
-		std::cerr << "WARNING:  Hostname \"" << _hostName << "\":  BasicUdpApp:  handleMessage method:  received message is not a omnetpp::cPacket:  ignoring." << std::endl;
+	inet::Packet* packet = dynamic_cast< inet::Packet * > ( msg );
+	if ( packet == nullptr ) {
+		std::cerr << "WARNING:  Hostname \"" << _hostName << "\":  BasicUdpApp:  handleMessage method:  received message is not an inet::Packet:  ignoring." << std::endl;
 		cancelAndDelete( msg );
 		return;
 	}
 
-	InteractionMsg *interactionMsg = dynamic_cast< InteractionMsg * >( msg );
-	if ( interactionMsg == 0 ) {
-		std::cerr << "WARNING:  Hostname \"" << _hostName << "\":  BasicUdpApp:  handleMessage method:  routing of non-InteractionMsg packet not implemented:  dropping packet." << std::endl;
-//		TODO:		BasicUdpApp::sendToUDP( msg, srcPort, destAddr, destPort );
-		cancelAndDelete( msg );
-		return;
-	}
-
-    sendToUDP(   msgPkt, inet::Ipv4Address(  static_cast< uint32_t >( 0 )  ), getDefaultDestPort()   );
+    sendToUDP(   packet, inet::Ipv4Address(  static_cast< uint32_t >( 0 )  ), getDefaultDestPort()   );
 }
 
 void BasicUdpApp::sendToUDP( inet::Packet *msgPkt, const inet::Ipv4Address& destAddr, int destPort ){

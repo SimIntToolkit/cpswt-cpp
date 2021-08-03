@@ -110,17 +110,17 @@ private:
 protected:
 	static C2WLogger* _logger;
 
-	// SynchronizedFederate( void ) : _federateId( "" ), _federationId( "" ), _timeConstrainedNotEnabled( true ), _timeRegulationNotEnabled( true ), _simEndNotSubscribed( true ), _currentTime( 0 ), _lookahead( 0 ), _IsLateJoiner(false), _FederateType("")
-	// {
-	// 	  setpgid( 0, 0 );
-	// 	  _lockFileName = getenv( "EXEDIR" );
-	// 	  if ( !_lockFileName.empty() ) {
-	// 	      _lockFileName += "/";
-	// 	  }
-	// 	  _lockFileName += "__lock__";
+	 SynchronizedFederate( void ) : _federateId( "" ), _federationId( "" ), _timeConstrainedNotEnabled( true ), _timeRegulationNotEnabled( true ), _simEndNotSubscribed( true ), _currentTime( 0 ), _lookahead( 0 ), _IsLateJoiner(false), _FederateType("")
+	 {
+	 	  setpgid( 0, 0 );
+	 	  _lockFileName = getenv( "EXEDIR" );
+	 	  if ( !_lockFileName.empty() ) {
+	 	      _lockFileName += "/";
+	 	  }
+	 	  _lockFileName += "__lock__";
 
-	// 	  _timeAdvanceMode = SF_TIME_ADVANCE_REQUEST;
-	// }
+	 	  _timeAdvanceMode = SF_TIME_ADVANCE_REQUEST;
+	 }
 
 
 

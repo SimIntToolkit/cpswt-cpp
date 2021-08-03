@@ -327,6 +327,10 @@ private:
 	IntegrityAttackParamsMap _integrityAttackParamsMap;
 
 public:
+	static std::string getInteractionMessageLabel(void) {
+	    static std::string interactionMessageLabel("Interaction+Msg");
+	    return interactionMessageLabel;
+	}
 	void registerAppSpecProperties( const HostName &hostName, const std::string &appName, int appIndex, cModule *cModule_var, int port ) {
 		_appSpecPropertiesMap.insert(   std::make_pair(  AppSpec( hostName, appName, appIndex ), AppProperties( cModule_var, port )  )   );
 	}

@@ -17,11 +17,11 @@
 // TODO generated message class
 //
 cplusplus {{
-#include "C2WIPv4.h"
+#include "CPSWTIpv4.h"
 }};
 
-class noncobject C2WIPv4::ReplayBufferSP;
+class noncobject CPSWTIpv4::ReplayBufferSP;
 
 message OutOfOrderMsg extends cMessage {
-    C2WIPv4::ReplayBufferSP replayBufferSP;
+    CPSWTIpv4::ReplayBufferSP replayBufferSP;
 }

@@ -18,12 +18,11 @@
 
 package OmnetFederate;
 
-import inet.networklayer.arp.ARP;
-import inet.networklayer.autorouting.ipv4.IPv4NodeConfigurator;
-import inet.networklayer.ipv4.ErrorHandling;
-import inet.networklayer.ipv4.ICMP;
-import inet.networklayer.ipv4.IIGMP;
-import inet.networklayer.ipv4.IPv4;
+import inet.networklayer.arp.ipv4.Arp;
+import inet.networklayer.configurator.ipv4.Ipv4NodeConfigurator;
+import inet.networklayer.ipv4.Icmp;
+import inet.networklayer.ipv4.IIgmp;
+import inet.networklayer.ipv4.Ipv4;
 
 
 //
@@ -34,7 +33,6 @@ import inet.networklayer.ipv4.IPv4;
 module C2WNetworkLayer
 {
     parameters:
-        bool proxyARP = default(true);
         string igmpType = default("IGMPv2");
         *.routingTableModule = default("^.^.routingTable");
         @display("i=block/fork");
@@ -49,7 +47,7 @@ module C2WNetworkLayer
         output igmpOut;
 
     submodules:
-        configurator: IPv4NodeConfigurator {
+        configurator: Ipv4NodeConfigurator {
             @display("p=39,158");
         }
         ip: C2WIPv4 {
@@ -60,23 +58,22 @@ module C2WNetworkLayer
                 queueIn[sizeof(ifIn)];
                 queueOut[sizeof(ifOut)];
         }
-        arp: ARP {
+        arp: Arp {
             parameters:
-                respondToProxyARP = proxyARP;
                 @display("p=202,142;q=pendingQueue");
         }
-        icmp: ICMP {
+        icmp: Icmp {
             parameters:
                 @display("p=160,63");
         }
-        igmp: <igmpType> like IIGMP {
+        igmp: <igmpType> like IIgmp {
             parameters:
                 @display("p=39,33");
         }
-        errorHandling: ErrorHandling {
-            parameters:
-                @display("p=239,63");
-        }
+//        errorHandling: ErrorHandling {
+//            parameters:
+//                @display("p=239,63");
+//        }
 
     connections allowunconnected:
         for i=0..sizeof(transportIn)-1 {
@@ -86,20 +83,20 @@ module C2WNetworkLayer
             ip.transportOut++ --> { @display("m=n"); } --> transportOut[i];
         }
 
-        ip.transportOut++ --> icmp.localIn;
-        ip.transportIn++ <-- icmp.sendOut;
+        ip.transportOut++ --> icmp.ipIn;
+        ip.transportIn++ <-- icmp.ipOut;
 
         ip.transportOut++ --> igmp.ipIn;
         ip.transportIn++ <-- igmp.ipOut;
 
         for i=0..sizeof(pingOut)-1 {
-            icmp.pingOut++ --> { @display("m=n"); } --> pingOut[i];
+            icmp.transportOut --> { @display("m=n"); } --> pingOut[i];
         }
         for i=0..sizeof(pingIn)-1 {
-            icmp.pingIn++ <-- { @display("m=n"); } <-- pingIn[i];
+            icmp.ipIn <-- { @display("m=n"); } <-- pingIn[i];
         }
 
-        icmp.errorOut --> errorHandling.in;
+//        icmp.errorOut --> errorHandling.in;
 
         ip.arpOut --> arp.netwIn;
         ip.arpIn <-- arp.netwOut;

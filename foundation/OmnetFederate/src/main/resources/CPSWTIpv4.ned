@@ -13,16 +13,19 @@
 // along with this program.  If not, see http://www.gnu.org/licenses/.
 // 
 
+import inet.networklayer.ipv4.Ipv4;
+
+package OmnetFederate;
+
 //
-// TODO generated message class
+// TODO auto-generated type
 //
+network CPSWTIpv4 extends Ipv4
+{
+    parameters:
+	    @class(CPSWTIpv4);
+        @display("i=block/routing");
 
-cplusplus {{
-#include "C2WIPv4.h"
-}};
-
-class noncobject C2WIPv4::DatagramDataSP;
-
-message DelayedMsg extends cMessage {
-    C2WIPv4::DatagramDataSP datagramDataSP;
+    gates:
+        input hlaIn @direct;
 }

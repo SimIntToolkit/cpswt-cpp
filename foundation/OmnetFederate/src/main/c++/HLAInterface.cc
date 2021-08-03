@@ -4,7 +4,7 @@
  */
 
 #include <HLAInterface.h>
-#include "C2WLogger.hpp"
+#include "C2WConsoleLogger.hpp"
 //#include <stdlib.h>
 #include <boost/lexical_cast.hpp>
 #include <boost/regex.hpp>
@@ -15,7 +15,9 @@
 
 #include "SubscribedInteractionFilter.hpp"
 
-#include "C2WIPv4.h"
+#include <inet/common/packet/Packet.h>
+
+#include "CPSWTIpv4.h"
 
 
 Define_Module(HLAInterface);
@@ -87,7 +89,7 @@ std::string HLAInterface::listIPModuleNetworks( void ) {
 		retval += "Hosts in network " + boost::lexical_cast< std::string >( ncmItr->first ) + ":\n";
 		CModuleSet &cModuleSet = ncmItr->second;
 		for( CModuleSet::const_iterator cmsCit = cModuleSet.begin() ; cmsCit != cModuleSet.end() ; ++cmsCit ) {
-			C2WIPv4 *c2wipv4 = static_cast< C2WIPv4 * >( *cmsCit );
+			CPSWTIpv4 *c2wipv4 = static_cast< CPSWTIpv4 * >( *cmsCit );
 			retval += "\t" + c2wipv4->getHostFullName() + "\n";
 		}
 		retval += "\n";
@@ -122,19 +124,22 @@ void HLAInterface::processInteractions( void ) {
 
 		if (  NetworkPacket::match( classHandle )  ) {
 			NetworkPacketSP networkPacketSP = boost::static_pointer_cast< NetworkPacket >( interactionRootSP );
-			InteractionMsg *interactionMsg = new InteractionMsg( "Interaction+Msg" );
-			interactionMsg->setToHLA( true );
-			interactionMsg->setMessageNo( getUniqueNo() );
-			interactionMsg->setInteractionRootSP( networkPacketSP );
-	 		interactionMsg->setTimestamp( networkPacketSP->getTime() );
+			InteractionMsg *interactionMsgPtr = new InteractionMsg( getInteractionMessageLabel() );
+			interactionMsgPtr->setToHLA( true );
+			interactionMsgPtr->setMessageNo( getUniqueNo() );
+			interactionMsgPtr->setInteractionRootSP( networkPacketSP );
+			interactionMsgPtr->setTimestamp( networkPacketSP->getTime() );
 
 	 		std::string hostName = networkPacketSP->get_senderHost();
 	 		std::string appName = networkPacketSP->get_senderHostApp();
 	 		int appIndex = networkPacketSP->get_senderAppIndex();
 
+			auto c_packetChunk = inet::makeShared<inet::cPacketChunk>(interactionMsgPtr);
+			inet::Packet *packet = new inet::Packet("Interaction+Msg", c_packetChunk);
+
 	 		cModule *udpAppWrapperModule = getAppSpecModule( hostName, appName, appIndex );
 	 		if ( udpAppWrapperModule != 0 ) {
-		 		sendDirect( interactionMsg, udpAppWrapperModule, "hlaIn" );
+				sendDirect( packet, udpAppWrapperModule, "hlaIn" );
 	 		} else {
 		 		std::cerr << "WARNING:  HLAInterface:  could not find module corresponding to (hostname,appName) = (" <<
 	 			 hostName << "," << appName << ")" << std::endl;
@@ -616,7 +621,7 @@ void HLAInterface::processInteractions( void ) {
 void HLAInterface::interactionArrival( void ) {
 	Enter_Method_Silent( "interactionArrival" );
 	if ( _noInteractionArrivalFlag ) {
-		scheduleAt( simTime(), _interactionArrivalMsg );
+		scheduleAt( omnetpp::simTime(), _interactionArrivalMsg );
 		_noInteractionArrivalFlag = false;
 	}
 }
@@ -698,7 +703,7 @@ HLAInterface::HLAInterface( void ) :
  _time( 0.0 ),
  _lookahead( 0.01 ),
  _step( 0.1 ),
- _interactionArrivalMsg(  new cMessage( "interactionArrival" )  ),
+ _interactionArrivalMsg(  new omnetpp::cMessage( "interactionArrival" )  ),
  _noInteractionArrivalFlag( true )
 { 
 	setInstancePtr( this );
@@ -739,14 +744,21 @@ void HLAInterface::setup() {
 	std::string dbname(  getenv( "C2WDBFILE" )  );
 	
 	if ( !dbname.empty() ) {
-	    if ( dburl.empty() ) C2WLogger::get_singleton().init( dbname );
-	    else                 C2WLogger::get_singleton().init( dbname, dburl );
-	    _logLevel = getenv( "C2WLOGLEVEL" );
+
+        ArgVector argVector;
+        argVector.push_back(dbname);
+
+        if ( !dburl.empty() ) {
+	        argVector.push_back(dburl);
+	    }
+        C2WConsoleLogger::get_singleton().init( argVector );
+
+        _logLevel = getenv( "C2WLOGLEVEL" );
 	}
 	    
     // Join the federation
     createRTI();
-    joinFederation( _federation_name, _name );
+    joinFederation();
 
     enableTimeConstrained();
     enableTimeRegulation( _lookahead );
@@ -772,8 +784,8 @@ void HLAInterface::setup() {
     StopMasqueradingAttack::subscribe( getRTI() );
     CeaseReplayAttack::subscribe( getRTI() );
     RecordPacketsForReplayAttack::subscribe( getRTI() );
-    StopDNSPoisiningAttack::subscribe( getRTI() );
-    StartDNSPoisiningAttack::subscribe( getRTI() );
+    StopDNSPoisoningAttack::subscribe( getRTI() );
+    StartDNSPoisoningAttack::subscribe( getRTI() );
     OmnetCommand::subscribe( getRTI() );
     StartReplayAttack::subscribe( getRTI() );
     TerminateReplayAttack::subscribe( getRTI() );
@@ -821,8 +833,8 @@ void HLAInterface::setup() {
     	StopMasqueradingAttack::enableSubscribeLog("StopMasqueradingAttack", "OmnetFederate", "NORMAL", _logLevel);
     	CeaseReplayAttack::enableSubscribeLog("CeaseReplayAttack", "OmnetFederate", "NORMAL", _logLevel);
     	RecordPacketsForReplayAttack::enableSubscribeLog("RecordPacketsForReplayAttack", "OmnetFederate", "NORMAL", _logLevel);
-    	StopDNSPoisiningAttack::enableSubscribeLog("StopDNSPoisiningAttack", "OmnetFederate", "NORMAL", _logLevel);
-    	StartDNSPoisiningAttack::enableSubscribeLog("StartDNSPoisiningAttack", "OmnetFederate", "NORMAL", _logLevel);
+    	StopDNSPoisoningAttack::enableSubscribeLog("StopDNSPoisoningAttack", "OmnetFederate", "NORMAL", _logLevel);
+    	StartDNSPoisoningAttack::enableSubscribeLog("StartDNSPoisoningAttack", "OmnetFederate", "NORMAL", _logLevel);
     	OmnetCommand::enableSubscribeLog("OmnetCommand", "OmnetFederate", "NORMAL", _logLevel);
     	StartReplayAttack::enableSubscribeLog("StartReplayAttack", "OmnetFederate", "NORMAL", _logLevel);
     	TerminateReplayAttack::enableSubscribeLog("TerminateReplayAttack", "OmnetFederate", "NORMAL", _logLevel);
@@ -848,14 +860,14 @@ void HLAInterface::setup() {
     _time = getCurrentTime();
 
     // Keep a message in the queue so the simulation doesn't end too soon
-    _keepAliveMsg = new cMessage( "keepAlive" );
-    scheduleAt( simTime(), _keepAliveMsg );
+    _keepAliveMsg = new omnetpp::cMessage( "keepAlive" );
+    scheduleAt( omnetpp::simTime(), _keepAliveMsg );
 
-    _readyToRunMsg = new cMessage ( "readyToRun" );
-    scheduleAt( simTime(), _readyToRunMsg );
+    _readyToRunMsg = new omnetpp::cMessage ( "readyToRun" );
+    scheduleAt( omnetpp::simTime(), _readyToRunMsg );
 }
 
-void HLAInterface::handleMessage( cMessage* msg ) {
+void HLAInterface::handleMessage( omnetpp::cMessage* msg ) {
 
 	// Check ready to run message
 	if( msg == _readyToRunMsg ) {
@@ -884,8 +896,19 @@ void HLAInterface::handleMessage( cMessage* msg ) {
 
 	std::string msgName = msg->getName();
 	
-	if ( msgName == "Interaction+Msg" ) {
-		InteractionMsg *interactionMsg = static_cast< InteractionMsg * >( msg );
+	if ( msgName == getInteractionMessageLabel() ) {
+	    inet::Packet* packet = dynamic_cast< inet::Packet * > ( msg );
+	    if ( packet == nullptr ) {
+	        std::cerr << "WARNING:  HLAInterace received message of name \"" << getInteractionMessageLabel() << "\" but received message is not an inet::Packet:  ignoring." << std::endl;
+	        cancelAndDelete( msg );
+	        return;
+	    }
+
+	    auto c_packetChunkPtr = packet->peekAtFront<inet::cPacketChunk>();
+	    inet::cPacket *c_packetPtr = c_packetChunkPtr->getPacket();
+
+	    InteractionMsg *interactionMsg = dynamic_cast< InteractionMsg * >( c_packetPtr );
+
 		NetworkPacketSP networkPacketSP = boost::static_pointer_cast< NetworkPacket >( interactionMsg->getInteractionRootSP() );
 		networkPacketSP->set_sourceFed( getFederateId() );
 		networkPacketSP->sendInteraction( getRTI(), timestamp );
@@ -904,7 +927,7 @@ void HLAInterface::handleMessage( cMessage* msg ) {
 }
 
 void HLAInterface::sendKeepAliveMsg() {
-    scheduleAt(simTime() + _step, _keepAliveMsg);
+    scheduleAt(omnetpp::simTime() + _step, _keepAliveMsg);
 }
 
 std::ostream &operator<<( std::ostream &os, const HLAInterface::AppSpec &appSpec ) {

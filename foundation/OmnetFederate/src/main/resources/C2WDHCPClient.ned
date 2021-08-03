@@ -19,8 +19,6 @@
 
 package OmnetFederate;
 
-import inet.applications.IUDPApp;
-
 //
 // Implements the DHCP client protocol. DHCP (Dynamic Host Configuration Protocol),
 // described in RFC 2131, provides configuration parameters to Internet hosts.
@@ -28,7 +26,7 @@ import inet.applications.IUDPApp;
 //
 // @see DHCPServer, DHCPMessage
 //
-simple C2WDHCPClient like IUDPApp
+simple C2WDHCPClient
 {
     parameters:
         string interface = default("");  // which NIC should be configured (i.e. wlan0, eth1 etc.); can be left  empty if there is only one non-loopback interface
