@@ -84,15 +84,15 @@ public:
 private:
 	
 	
-	static int &get_recordingNodeFullPath_handle_var( void ) {
-		static int recordingNodeFullPath_handle;
-		return recordingNodeFullPath_handle;
+	static int &get_nodeFullPath_handle_var( void ) {
+		static int nodeFullPath_handle;
+		return nodeFullPath_handle;
 	}
 	
 public:
 	
 	
-	static int get_recordingNodeFullPath_handle( void ) { return get_recordingNodeFullPath_handle_var(); }
+	static int get_nodeFullPath_handle( void ) { return get_nodeFullPath_handle_var(); }
 	
 
 
@@ -204,12 +204,12 @@ public:
 private:
 	
 	
-	std::string _recordingNodeFullPath;
+	std::string _nodeFullPath;
 	
 public:
 		
-	void set_recordingNodeFullPath( const std::string & recordingNodeFullPath ) { _recordingNodeFullPath = recordingNodeFullPath; }
-	const std::string & get_recordingNodeFullPath( void ) const { return _recordingNodeFullPath; }
+	void set_nodeFullPath( const std::string & nodeFullPath ) { _nodeFullPath = nodeFullPath; }
+	const std::string & get_nodeFullPath( void ) const { return _nodeFullPath; }
 	
 
 
@@ -222,8 +222,8 @@ public:
 	TypeMedley getParameter( const std::string &datamemberName ) const {
 		
 		
-		if ( "recordingNodeFullPath" == datamemberName ) {
-			return TypeMedley( get_recordingNodeFullPath() );
+		if ( "nodeFullPath" == datamemberName ) {
+			return TypeMedley( get_nodeFullPath() );
 		} else {
 			return Super::getParameter( datamemberName );
 		}
@@ -232,8 +232,8 @@ public:
 	TypeMedley getParameter( int datamemberHandle ) const {
 		
 		
-		if ( get_recordingNodeFullPath_handle() == datamemberHandle ) {
-			return TypeMedley( get_recordingNodeFullPath() );
+		if ( get_nodeFullPath_handle() == datamemberHandle ) {
+			return TypeMedley( get_nodeFullPath() );
 		} else {
 			return Super::getParameter( datamemberHandle );
 		}
@@ -244,8 +244,8 @@ protected:
 		bool retval = true;		
 		
 		
-		if ( param_handle == get_recordingNodeFullPath_handle() ) {
-			set_recordingNodeFullPath(  TypeMedley( val )  );
+		if ( param_handle == get_nodeFullPath_handle() ) {
+			set_nodeFullPath(  TypeMedley( val )  );
 		} else {
 			retval = Super::setParameterAux( param_handle, val );
 		}
@@ -256,8 +256,8 @@ protected:
 		bool retval = true;
 		
 		
-		if ( "recordingNodeFullPath" == datamemberName ) {
-			set_recordingNodeFullPath(  TypeMedley( val )  );
+		if ( "nodeFullPath" == datamemberName ) {
+			set_nodeFullPath(  TypeMedley( val )  );
 		} else {
 			retval = Super::setParameterAux( datamemberName, val );
 		}
@@ -269,8 +269,8 @@ protected:
 		bool retval = true;
 		
 		
-		if ( "recordingNodeFullPath" == datamemberName ) {\
-			set_recordingNodeFullPath( val );
+		if ( "nodeFullPath" == datamemberName ) {\
+			set_nodeFullPath( val );
 		} else {
 			retval = Super::setParameterAux( datamemberName, val );
 		}
