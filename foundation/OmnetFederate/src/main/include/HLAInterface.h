@@ -20,7 +20,10 @@
 #include <messages/InteractionMsg_m.h>
 #include <messages/ObjectMsg_m.h>
 
-class HLAInterface : public inet::cSimpleModule, public SynchronizedFederate {
+#include <inet/common/INETDefs.h>
+
+
+class HLAInterface : public omnetpp::cSimpleModule, public SynchronizedFederate {
 
 public:
 	typedef SynchronizedFederate Super;
@@ -469,10 +472,6 @@ private:
 	std::string _federation_name;
 	std::string _name;
 
-	double _time;
-	double _lookahead;
-	double _step;
-	
 	std::string _logLevel;
 
 	inet::cMessage *_keepAliveMsg;
@@ -497,9 +496,6 @@ private:
 public:
 	static HLAInterface *get_InstancePtr( void ) { return getHLAInterfacePtr(); }
 	
-	double getStepSize() { return _step; }
-	double getLookahead() { return _lookahead; }
-
 	HLAInterface( void );
 	virtual ~HLAInterface( void ) throw();
 
@@ -523,14 +519,14 @@ public:
      const char *theTag,
 	 RTI::EventRetractionHandle theHandle
 	)
-	 throw ( RTI::InteractionClassNotKnown, RTI::InteractionParameterNotKnown, RTI::InvalidFederationTime, RTI::FederateInternalError );
+	 throw ( RTI::InteractionClassNotKnown, RTI::InteractionParameterNotKnown, RTI::InvalidFederationTime, RTI::FederateInternalError ) override;
 
 	virtual void receiveInteraction(
 	 RTI::InteractionClassHandle theInteraction,
 	 const RTI::ParameterHandleValuePairSet& theParameters,
      const char *theTag
 	)
-	 throw ( RTI::InteractionClassNotKnown, RTI::InteractionParameterNotKnown, RTI::FederateInternalError );
+	 throw ( RTI::InteractionClassNotKnown, RTI::InteractionParameterNotKnown, RTI::FederateInternalError ) override;
 
 
     void processObjectReflectors( void );
@@ -541,13 +537,13 @@ public:
      const RTI::FedTime& theTime,
      const char *theTag,
      RTI::EventRetractionHandle theHandle
-    ) throw ( RTI::ObjectNotKnown, RTI::AttributeNotKnown, RTI::FederateOwnsAttributes, RTI::InvalidFederationTime, RTI::FederateInternalError ) {
+    ) throw ( RTI::ObjectNotKnown, RTI::AttributeNotKnown, RTI::FederateOwnsAttributes, RTI::InvalidFederationTime, RTI::FederateInternalError ) override {
         SynchronizedFederate::reflectAttributeValues( theObject, theAttributes, theTime, theTag, theHandle );
         processObjectReflectors();
     }
 
     void reflectAttributeValues ( RTI::ObjectHandle theObject, const RTI::AttributeHandleValuePairSet& theAttributes, const char *theTag )
-     throw ( RTI::ObjectNotKnown, RTI::AttributeNotKnown, RTI::FederateOwnsAttributes, RTI::FederateInternalError ) {
+     throw ( RTI::ObjectNotKnown, RTI::AttributeNotKnown, RTI::FederateOwnsAttributes, RTI::FederateInternalError ) override {
         SynchronizedFederate::reflectAttributeValues( theObject, theAttributes, theTag );
         processObjectReflectors();
     }
@@ -557,10 +553,10 @@ public:
     // OMNET CMODULE METHODS
     //
     
-	virtual int numInitStages( void ) const;
-	virtual void initialize( int stage );
-	virtual void handleMessage( inet::cMessage *msg );
-	virtual void finish() {
+    virtual int numInitStages() const override { return inet::NUM_INIT_STAGES; }
+	virtual void initialize( int stage ) override;
+	virtual void handleMessage( inet::cMessage *msg ) override;
+	virtual void finish() override {
 	    SynchronizedFederate::finalizeAndTerminate();
 	}
 

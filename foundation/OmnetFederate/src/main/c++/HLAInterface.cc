@@ -124,7 +124,7 @@ void HLAInterface::processInteractions( void ) {
 
 		if (  NetworkPacket::match( classHandle )  ) {
 			NetworkPacketSP networkPacketSP = boost::static_pointer_cast< NetworkPacket >( interactionRootSP );
-			InteractionMsg *interactionMsgPtr = new InteractionMsg( getInteractionMessageLabel() );
+			InteractionMsg *interactionMsgPtr = new InteractionMsg( getInteractionMessageLabel().c_str() );
 			interactionMsgPtr->setToHLA( true );
 			interactionMsgPtr->setMessageNo( getUniqueNo() );
 			interactionMsgPtr->setInteractionRootSP( networkPacketSP );
@@ -700,9 +700,6 @@ HLAInterface::HLAInterface( void ) :
  cSimpleModule(), SynchronizedFederate(),
  _federation_name( "" ),
  _name( "" ),
- _time( 0.0 ),
- _lookahead( 0.01 ),
- _step( 0.1 ),
  _interactionArrivalMsg(  new omnetpp::cMessage( "interactionArrival" )  ),
  _noInteractionArrivalFlag( true )
 { 
@@ -712,27 +709,20 @@ HLAInterface::HLAInterface( void ) :
 HLAInterface::~HLAInterface( void ) throw() { }
 
 
-int HLAInterface::numInitStages() const {
-
-	// UDPEndpointApp registers at stage 0
-	// HLAInterface initializes at stage 1
-	return 6;
-}
-
 void HLAInterface::initialize(int stage) {	
 	// UDPEndpointApp registers at stage 0
 	// HLAInterface initializes at stage 1
-	if ( stage == 3 ) {
+	if ( stage == inet::INITSTAGE_LOCAL ) {
 
 		this->_federation_name = par( "federation_name" ).stringValue();
 		this->_name = par( "federate_name" ).stringValue();
-		this->_step = par( "federate_step_size" ).doubleValue();
-		this->_lookahead = par( "federate_lookahead" ).doubleValue();
+		setStepSize(par( "federate_step_size" ).doubleValue());
+		setLookahead(par( "federate_lookahead" ).doubleValue());
 
 		setup();
 	}
 
-	if ( stage == 5 ) {
+	if ( stage == inet::INITSTAGE_LAST ) {
 		std::cerr << "AppSpecProperties:" << std::endl;
 		std::cerr << listAppSpecProperties() << std::endl;
 	}
@@ -761,7 +751,7 @@ void HLAInterface::setup() {
     joinFederation();
 
     enableTimeConstrained();
-    enableTimeRegulation( _lookahead );
+    enableTimeRegulation( getLookahead() );
     enableAsynchronousDelivery();
 
     // publish interactions
@@ -857,8 +847,6 @@ void HLAInterface::setup() {
     readyToPopulate();
     // readyToRun();
 
-    _time = getCurrentTime();
-
     // Keep a message in the queue so the simulation doesn't end too soon
     _keepAliveMsg = new omnetpp::cMessage( "keepAlive" );
     scheduleAt( omnetpp::simTime(), _keepAliveMsg );
@@ -896,7 +884,7 @@ void HLAInterface::handleMessage( omnetpp::cMessage* msg ) {
 
 	std::string msgName = msg->getName();
 	
-	if ( msgName == getInteractionMessageLabel() ) {
+	if ( msgName == getInteractionMessageLabel().c_str() ) {
 	    inet::Packet* packet = dynamic_cast< inet::Packet * > ( msg );
 	    if ( packet == nullptr ) {
 	        std::cerr << "WARNING:  HLAInterace received message of name \"" << getInteractionMessageLabel() << "\" but received message is not an inet::Packet:  ignoring." << std::endl;
@@ -927,7 +915,7 @@ void HLAInterface::handleMessage( omnetpp::cMessage* msg ) {
 }
 
 void HLAInterface::sendKeepAliveMsg() {
-    scheduleAt(omnetpp::simTime() + _step, _keepAliveMsg);
+    scheduleAt(omnetpp::simTime() + getStepSize(), _keepAliveMsg);
 }
 
 std::ostream &operator<<( std::ostream &os, const HLAInterface::AppSpec &appSpec ) {
