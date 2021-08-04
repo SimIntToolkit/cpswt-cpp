@@ -95,11 +95,24 @@ private:
 
 	double _currentTime;
 	double _lookahead;
+    double _stepSize;
 	TimeAdvanceMode _timeAdvanceMode;
 
 public:
-	void setLookahead( double lookahead ) { _lookahead = lookahead; }
-	double getLookahead() { return _lookahead; }
+    void setStepSize(double stepSize) {
+        _stepSize = stepSize;
+    }
+    double getStepSize(void) {
+        return _stepSize;
+    }
+
+	void setLookahead( double lookahead ) {
+	    _lookahead = lookahead;
+	}
+	double getLookahead() {
+	    return _lookahead;
+	}
+
 	void setTimeAdvanceMode ( TimeAdvanceMode timeAdvanceMode ) { _timeAdvanceMode = timeAdvanceMode; }
 	TimeAdvanceMode getTimeAdvanceMode() { return _timeAdvanceMode; }
 
@@ -132,10 +145,10 @@ protected:
 		  this->_timeRegulationNotEnabled = true;
 		 this->_simEndNotSubscribed = true;
 		//   _currentTime = fedconfig->  
-		 this->_lookahead = fedconfig->lookAhead;
+		 setLookahead(fedconfig->lookAhead);
 		 this->_IsLateJoiner= fedconfig->isLateJoiner;
 		 this->_FederateType = fedconfig->federateType;
-		 this->_stepSize = fedconfig->stepSize;
+		 setStepSize(fedconfig->stepSize);
 
 
 
@@ -256,8 +269,6 @@ private:
 		static ATRQueue atrQueue;
 		return atrQueue;
 	}
-
-	double _stepSize;
 
 	static void noMoreATRs( void ) { getMoreATRs() = false; }
 
