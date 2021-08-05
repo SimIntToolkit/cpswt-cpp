@@ -17,14 +17,16 @@
 #include <boost/lexical_cast.hpp>
 #include <inet/common/packet/chunk/cPacketChunk.h>
 
+#include <messages/InteractionMsg_m.h>
+
 
 Define_Module(BasicUdpAppWrapper);
 
 
 void BasicUdpAppWrapper::recordInterfaceIPAddresses( void ) {
 
-	HLAInterface::InterfaceIPAddressMap &interfaceIPAddressMap =
-	 HLAInterface::get_InstancePtr()->getAppInterfaceIPAddressMap( getHostName(), getAppName(), getIndex() );
+	AttackCoordinator::InterfaceIPAddressMap &interfaceIPAddressMap =
+	 AttackCoordinator::getSingleton().getAppInterfaceIPAddressMap( getHostName(), getAppName(), getIndex() );
 
 	interfaceIPAddressMap.clear();
 
@@ -52,12 +54,17 @@ void BasicUdpAppWrapper::initialize( int stage ) {
 	switch( stage ) {
 		case inet::INITSTAGE_LOCAL: {
 		    setName( getAppName().c_str() );
-			HLAInterface::get_InstancePtr()->registerAppSpecProperties( getHostName(), getAppName(), getIndex(), this, getPort() );
+			AttackCoordinator::getSingleton().registerAppSpecProperties( getHostName(), getAppName(), getIndex(), this, getPort() );
 			getNotificationBoard()->emit(inet::l2AssociatedSignal, this);
 			break;
 		}
 		case inet::INITSTAGE_LAST: {
 			recordInterfaceIPAddresses();
+			_hlaModulePtr = getModuleByPath("hlaInterface");
+            if (_hlaModulePtr == nullptr) {
+                std::cerr << "ERROR:  BasicUdpAppWrapper:  \"" << getHostName() << "\" no hlaInterface detected:  ceasing execution." << std::endl;
+                throw omnetpp::cException(omnetpp::E_CANCEL);
+            }
 			break;
 		}
 	}
@@ -79,7 +86,7 @@ void BasicUdpAppWrapper::sendToUDP( inet::Packet *packet, const inet::Ipv4Addres
     InteractionRootSP interactionRootSP = interactionMsg->getInteractionRootSP();
 
     // Integrity attack, if any
-    if ( NetworkPacket::match( interactionRootSP->getClassHandle() ) && HLAInterface::get_InstancePtr()->isIntegrityAttackEnabled( getHostName() ) ) {
+    if ( NetworkPacket::match( interactionRootSP->getClassHandle() ) && AttackCoordinator::getSingleton().isIntegrityAttackEnabled( getHostName() ) ) {
 
         // std::cout << "Got network packet, and integrity attack is enabled" << std::endl;
         // std::cout << "Got interaction is: " << interactionRootSP << std::endl;
@@ -93,7 +100,7 @@ void BasicUdpAppWrapper::sendToUDP( inet::Packet *packet, const inet::Ipv4Addres
         //     std::cout << "NULL";
         // }
 
-        HLAInterface::IntegrityAttackParams &iap = HLAInterface::get_InstancePtr()->getIntegrityAttackParams( getHostName() );
+        AttackCoordinator::IntegrityAttackParams &iap = AttackCoordinator::getSingleton().getIntegrityAttackParams( this, getHostName() );
         networkPacketSP = tweakIncoming( networkPacketSP, iap.getIntMultiplier(), iap.getIntAdder(), iap.getLongMultiplier(), iap.getLongAdder(), iap.getDoubleMultiplier(), iap.getDoubleAdder(), iap.getBooleanEnableFlip(), iap.getStringReplacement() );
         interactionMsg->setInteractionRootSP(  boost::static_pointer_cast< InteractionRoot >( networkPacketSP )  );
     }
@@ -102,19 +109,15 @@ void BasicUdpAppWrapper::sendToUDP( inet::Packet *packet, const inet::Ipv4Addres
 
         // std::cout << "BasicUdpAppWrapper: \"" << getHostName() << "\" sending cPacket to HLA" << std::endl;
 
-		if (  NetworkPacket::match( interactionRootSP->getClassHandle() ) && HLAInterface::get_InstancePtr()->modifyToHLAPackets( getHostName() )  ) {
+		if (  NetworkPacket::match( interactionRootSP->getClassHandle() ) && AttackCoordinator::getSingleton().modifyToHLAPackets( getHostName() )  ) {
 		    NetworkPacketSP networkPacketSP = boost::static_pointer_cast< NetworkPacket >( interactionRootSP );
 		    networkPacketSP = modifyOutgoing( networkPacketSP );
 		    interactionMsg->setInteractionRootSP(  boost::static_pointer_cast< InteractionRoot >( networkPacketSP )  );
 		}
 
-		cModule *cModulePtr = HLAInterface::get_InstancePtr();
-		if ( cModulePtr != 0 ) {
-			sendDirect( packet, HLAInterface::get_InstancePtr(), "hlaOut" );
-		} else {
-			std::cerr << "ERROR:  BasicUdpAppWrapper:  \"" << getHostName() << "\" NULL POINTER TO HLAInterface:  dropping message." << std::endl;
-			cancelAndDelete( packet );
-		}
+        sendDirect( packet, _hlaModulePtr, "hlaOut" );
+        cancelAndDelete( packet );
+
 		return;
 	}
 
@@ -125,7 +128,7 @@ void BasicUdpAppWrapper::sendToUDP( inet::Packet *packet, const inet::Ipv4Addres
 	}
 
 	NetworkPacketSP networkPacketSP = boost::static_pointer_cast< NetworkPacket >( interactionRootSP );
-	if (  HLAInterface::get_InstancePtr()->modifyFromHLAPackets( getHostName() )  ) {
+	if (  AttackCoordinator::getSingleton().modifyFromHLAPackets( getHostName() )  ) {
         networkPacketSP = modifyIncoming( networkPacketSP );
         interactionRootSP = boost::static_pointer_cast< InteractionRoot >( networkPacketSP );
         interactionMsg->setInteractionRootSP( interactionRootSP );
@@ -145,8 +148,8 @@ void BasicUdpAppWrapper::sendToUDP( inet::Packet *packet, const inet::Ipv4Addres
 
 	}
 
-	HLAInterface::AppSpec appSpec( receiverHost, receiverHostApp, receiverAppIndex );
-	HLAInterface::AppProperties appProperties = HLAInterface::get_InstancePtr()->getAppSpecProperties( appSpec );
+	AttackCoordinator::AppSpec appSpec( receiverHost, receiverHostApp, receiverAppIndex );
+	AttackCoordinator::AppProperties appProperties = AttackCoordinator::getSingleton().getAppSpecProperties( appSpec );
 	if ( appProperties.getPort() == -1 ) {
 		// std::cerr << "ERROR:  Hostname \"" << getHostName() << "\":  BasicUdpAppWrapper:  handleMessage method:  Could not find app properties for \"" << appSpec << "\":  dropping message." << std::endl;
 		cancelAndDelete( packet );

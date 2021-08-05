@@ -18,7 +18,7 @@
 
 #include <omnetpp.h>
 #include "BasicUdpApp.h"
-#include "HLAInterface.h"
+#include "AttackCoordinator.h"
 #include <NetworkPacket.hpp>
 
 /**
@@ -55,6 +55,7 @@ private:
 
 	const std::string _appName;
 	MessageTracker _messageTracker;
+	omnetpp::cModule *_hlaModulePtr;
 
 public:
 	BasicUdpAppWrapper( void ) : _appName( "BasicUdpAppWrapper" ) { }

@@ -3,11 +3,11 @@
 //
 
 cplusplus {{
-#include "HLAInterface.h"
+#include "AttackCoordinator.h"
 }};
 
-class noncobject HLAInterface::RouteEntrySP;
+class noncobject AttackCoordinator::RouteEntrySP;
 
 message DropRouteEntryMsg extends cPacket {
-    HLAInterface::RouteEntrySP routeEntrySP;
+    AttackCoordinator::RouteEntrySP routeEntrySP;
 }

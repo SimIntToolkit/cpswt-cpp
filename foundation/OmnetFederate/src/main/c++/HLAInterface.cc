@@ -7,7 +7,6 @@
 #include "C2WConsoleLogger.hpp"
 //#include <stdlib.h>
 #include <boost/lexical_cast.hpp>
-#include <boost/regex.hpp>
 
 #include "OmnetFOMInteractions.h"
 #include "RTIRootHeaders.hpp"
@@ -17,101 +16,13 @@
 
 #include <inet/common/packet/Packet.h>
 
+#include <messages/InteractionMsg_m.h>
+
 #include "CPSWTIpv4.h"
 
 
 Define_Module(HLAInterface);
 
-
-void HLAInterface::NetworkAddress::initFromString( std::string networkAddressSpec ) {
-
-	// PATTERN FOR MATCHING A NETWORK ADDRESS
-	static boost::regex networkIdPattern( "(\\d{1,3})\\.(\\d{1,3}).(\\d{1,3}).(\\d{1,3})/(\\d{1,2})" );
-	static boost::regex whitespacePattern( "\\s" );
-	//
-	networkAddressSpec = boost::regex_replace( networkAddressSpec, whitespacePattern, "" );
-	const std::string &constNetworkAddressSpec = networkAddressSpec;
-
-	boost::match_results< std::string::const_iterator > results;
-	if (  !regex_match( constNetworkAddressSpec.begin(), constNetworkAddressSpec.end(), results, networkIdPattern )  ) {
-		return;
-	}
-
-	_networkIPAddress = 0;
-	for( int ix = 1 ; ix <= 4 ; ++ix ) {
-		_networkIPAddress <<= 8;
-		int byte = boost::lexical_cast< unsigned int >(  std::string( results[ ix ].first, results[ ix ].second )  );
-		_networkIPAddress |= byte;
-	}
-
-	int bits = boost::lexical_cast< unsigned int >(  std::string( results[ 5 ].first, results[ 5 ].second )  );
-	_netMask = bits == 0 ? 0 : ~(  ( 1UL << (32 - bits) ) - 1  );
-
-	truncateIPAddress();
-
-}
-
-bool HLAInterface::NetworkAddressComparator::operator()( const NetworkAddress &networkAddress1, const NetworkAddress &networkAddress2 ) {
-	if ( networkAddress1.getNetworkIPAddress() < networkAddress2.getNetworkIPAddress() ) {
-		return true;
-	}
-	if ( networkAddress1.getNetworkIPAddress() > networkAddress2.getNetworkIPAddress() ) {
-		return false;
-	}
-
-	if ( networkAddress1.getNetMask() < networkAddress2.getNetMask() ) {
-		return true;
-	}
-	return false;
-}
-
-std::string HLAInterface::listIPModuleProperties( void ) {
-	std::string retval;
-	for(
-	 HostNameIPModulePropertiesMap::iterator himItr = _hostNameIPModulePropertiesMap.begin() ; himItr != _hostNameIPModulePropertiesMap.end() ; ++himItr
-	) {
-		retval += himItr->first + ":\n";
-		IPModuleProperties &ipModuleProperties = himItr->second;
-		retval += "\tModule address: " + boost::lexical_cast< std::string >( ipModuleProperties.getCModule() ) + "\n";
-		retval += "\tIPAddresses:\n";
-		InterfaceIPAddressMap interfaceIPAddressMap = ipModuleProperties.getInterfaceIPAddressMap();
-		for( InterfaceIPAddressMap::iterator iimItr = interfaceIPAddressMap.begin() ; iimItr != interfaceIPAddressMap.end() ; ++iimItr ) {
-			retval += "\t\t" + iimItr->first + ":\t" + iimItr->second.str() + "\n";
-		}
-	}
-	return retval;
-}
-
-std::string HLAInterface::listIPModuleNetworks( void ) {
-	std::string retval;
-
-	for( NetworkAddressCModuleSetMap::iterator ncmItr = _networkAddressCModuleSetMap.begin() ; ncmItr != _networkAddressCModuleSetMap.end() ; ++ncmItr ) {
-		retval += "Hosts in network " + boost::lexical_cast< std::string >( ncmItr->first ) + ":\n";
-		CModuleSet &cModuleSet = ncmItr->second;
-		for( CModuleSet::const_iterator cmsCit = cModuleSet.begin() ; cmsCit != cModuleSet.end() ; ++cmsCit ) {
-			CPSWTIpv4 *c2wipv4 = static_cast< CPSWTIpv4 * >( *cmsCit );
-			retval += "\t" + c2wipv4->getHostFullName() + "\n";
-		}
-		retval += "\n";
-	}
-
-	return retval;
-}
-
-std::string HLAInterface::listAppSpecProperties( void ) {
-	std::string retval;
-	for( AppSpecPropertiesMap::iterator apmItr = _appSpecPropertiesMap.begin() ; apmItr != _appSpecPropertiesMap.end() ; ++apmItr ) {
-		retval += apmItr->first.getSpec() + ":\n";
-		retval += "\tIPAddresses:\n";
-		AppProperties &appProperties = apmItr->second;
-		InterfaceIPAddressMap interfaceIPAddressMap = appProperties.getInterfaceIPAddressMap();
-		for( InterfaceIPAddressMap::iterator iimItr = interfaceIPAddressMap.begin() ; iimItr != interfaceIPAddressMap.end() ; ++iimItr ) {
-			retval += "\t\t" + iimItr->first + ":\t" + iimItr->second.str() + "\n";
-		}
-		retval += "\tPort: " + boost::lexical_cast< std::string >( appProperties.getPort() ) + "\n\n";
-	}
-	return retval;
-}
 
 void HLAInterface::processInteractions( void ) {
 
@@ -126,7 +37,7 @@ void HLAInterface::processInteractions( void ) {
 			NetworkPacketSP networkPacketSP = boost::static_pointer_cast< NetworkPacket >( interactionRootSP );
 			InteractionMsg *interactionMsgPtr = new InteractionMsg( getInteractionMessageLabel().c_str() );
 			interactionMsgPtr->setToHLA( true );
-			interactionMsgPtr->setMessageNo( getUniqueNo() );
+			interactionMsgPtr->setMessageNo( AttackCoordinator::getUniqueNo() );
 			interactionMsgPtr->setInteractionRootSP( networkPacketSP );
 			interactionMsgPtr->setTimestamp( networkPacketSP->getTime() );
 
@@ -137,14 +48,14 @@ void HLAInterface::processInteractions( void ) {
 			auto c_packetChunk = inet::makeShared<inet::cPacketChunk>(interactionMsgPtr);
 			inet::Packet *packet = new inet::Packet("Interaction+Msg", c_packetChunk);
 
-	 		cModule *udpAppWrapperModule = getAppSpecModule( hostName, appName, appIndex );
+	 		cModule *udpAppWrapperModule = AttackCoordinator::getSingleton().getAppSpecModule( hostName, appName, appIndex );
 	 		if ( udpAppWrapperModule != 0 ) {
 				sendDirect( packet, udpAppWrapperModule, "hlaIn" );
 	 		} else {
 		 		std::cerr << "WARNING:  HLAInterface:  could not find module corresponding to (hostname,appName) = (" <<
 	 			 hostName << "," << appName << ")" << std::endl;
 	 			std::cerr << "Current modules are: " << std::endl;
-	 			std::cerr << listAppSpecProperties();
+	 			std::cerr << AttackCoordinator::getSingleton().listAppSpecProperties();
 	 			std::cerr << std::endl;
 	 		}
 	 		continue;
@@ -159,7 +70,7 @@ void HLAInterface::processInteractions( void ) {
 			NodeAttackMsg *nodeAttackMsg = new NodeAttackMsg;
 			nodeAttackMsg->setAttackInProgress( true );
 
-			cModule *cModulePtr = getIPModule( nodeFullPath );
+			cModule *cModulePtr = AttackCoordinator::getSingleton().getIPModule( nodeFullPath );
 			if ( cModulePtr != 0 ) {
 				sendDirect(  nodeAttackMsg, cModulePtr, "hlaIn"  );
 			} else {
@@ -177,7 +88,9 @@ void HLAInterface::processInteractions( void ) {
 			NodeAttackMsg *nodeAttackMsg = new NodeAttackMsg;
 			nodeAttackMsg->setAttackInProgress( false );
 
-			cModule *cModulePtr = getIPModule( nodeFullPath );
+
+
+			cModule *cModulePtr = AttackCoordinator::getSingleton().getIPModule( nodeFullPath );
 			if ( cModulePtr != 0 ) {
 				sendDirect(  nodeAttackMsg, cModulePtr, "hlaIn"  );
 			} else {
@@ -197,7 +110,7 @@ void HLAInterface::processInteractions( void ) {
 			delayNodeAttackMsg->setDelayMean( startDelayNodeAttackSP->get_delayMean() );
 			delayNodeAttackMsg->setDelayStdDev( startDelayNodeAttackSP->get_delayStdDev() );
 
-			cModule *cModulePtr = getIPModule( nodeFullPath );
+			cModule *cModulePtr = AttackCoordinator::getSingleton().getIPModule( nodeFullPath );
 			if ( cModulePtr != 0 ) {
 				sendDirect(  delayNodeAttackMsg, cModulePtr, "hlaIn"  );
 			} else {
@@ -215,7 +128,7 @@ void HLAInterface::processInteractions( void ) {
 			DelayNodeAttackMsg *delayNodeAttackMsg = new DelayNodeAttackMsg;
 			delayNodeAttackMsg->setAttackInProgress( false );
 
-			cModule *cModulePtr = getIPModule( nodeFullPath );
+			cModule *cModulePtr = AttackCoordinator::getSingleton().getIPModule( nodeFullPath );
 			if ( cModulePtr != 0 ) {
 				sendDirect(  delayNodeAttackMsg, cModulePtr, "hlaIn"  );
 			} else {
@@ -235,13 +148,13 @@ void HLAInterface::processInteractions( void ) {
 			snifferAttackMsg->setListenerInterface( startSnifferAttackSP->get_listenerInterface().c_str() );
 			snifferAttackMsg->setListen( true );
 
-			cModule *cModulePtr = getIPModule( nodeFullPath );
+			cModule *cModulePtr = AttackCoordinator::getSingleton().getIPModule( nodeFullPath );
 			if ( cModulePtr != 0 ) {
 				sendDirect(  snifferAttackMsg, cModulePtr, "hlaIn"  );
 			} else {
 				std::cout << "WARNING:  StartSnifferAttack:  NO MODULE FOR NODE \"" << nodeFullPath << "\"" << std::endl;
 				std::cout << "Current modules are:" << std::endl;
-				std::cout << listIPModuleProperties() << std::endl;
+				std::cout << AttackCoordinator::getSingleton().listIPModuleProperties() << std::endl;
 			}
 			continue;
 		}
@@ -256,13 +169,13 @@ void HLAInterface::processInteractions( void ) {
 			snifferAttackMsg->setListenerInterface( stopSnifferAttackSP->get_listenerInterface().c_str() );
 			snifferAttackMsg->setListen( false );
 
-			cModule *cModulePtr = getIPModule( nodeFullPath );
+			cModule *cModulePtr = AttackCoordinator::getSingleton().getIPModule( nodeFullPath );
 			if ( cModulePtr != 0 ) {
 				sendDirect(  snifferAttackMsg, cModulePtr, "hlaIn"  );
 			} else {
 				std::cout << "WARNING:  StopSnifferAttack:  NO MODULE FOR NODE \"" << nodeFullPath << "\"" << std::endl;
 				std::cout << "Current modules are:" << std::endl;
-				std::cout << listIPModuleProperties() << std::endl;
+				std::cout << AttackCoordinator::getSingleton().listIPModuleProperties() << std::endl;
 			}
 			continue;
 		}
@@ -277,7 +190,7 @@ void HLAInterface::processInteractions( void ) {
 			filterAttackMsg->setDestinationNetworkAddress( startNetworkFilterAttackSP->get_dstNetworkAddress().c_str() );
 			filterAttackMsg->setEnable( true );
 
-			cModule *cModulePtr = getIPModule( nodeFullPath );
+			cModule *cModulePtr = AttackCoordinator::getSingleton().getIPModule( nodeFullPath );
 			if ( cModulePtr != 0 ) {
 				sendDirect(  filterAttackMsg, cModulePtr, "hlaIn"  );
 			} else {
@@ -296,7 +209,7 @@ void HLAInterface::processInteractions( void ) {
 			filterAttackMsg->setDestinationNetworkAddress( stopNetworkFilterAttackSP->get_dstNetworkAddress().c_str() );
 			filterAttackMsg->setEnable( false );
 
-			cModule *cModulePtr = getIPModule( nodeFullPath );
+			cModule *cModulePtr = AttackCoordinator::getSingleton().getIPModule( nodeFullPath );
 			if ( cModulePtr != 0 ) {
 				sendDirect(  filterAttackMsg, cModulePtr, "hlaIn"  );
 			} else {
@@ -315,7 +228,7 @@ void HLAInterface::processInteractions( void ) {
             ipFirewallMsg->setDestinationNetworkAddress( startNetworkIPFirewallSP->get_dstNetworkAddress().c_str() );
             ipFirewallMsg->setEnable( true );
 
-            cModule *cModulePtr = getIPModule( nodeFullPath );
+            cModule *cModulePtr = AttackCoordinator::getSingleton().getIPModule( nodeFullPath );
             if ( cModulePtr != 0 ) {
                 sendDirect(  ipFirewallMsg, cModulePtr, "hlaIn"  );
             } else {
@@ -334,7 +247,7 @@ void HLAInterface::processInteractions( void ) {
             ipFirewallMsg->setDestinationNetworkAddress( stopNetworkIPFirewallSP->get_dstNetworkAddress().c_str() );
             ipFirewallMsg->setEnable( false );
 
-            cModule *cModulePtr = getIPModule( nodeFullPath );
+            cModule *cModulePtr = AttackCoordinator::getSingleton().getIPModule( nodeFullPath );
             if ( cModulePtr != 0 ) {
                 sendDirect(  ipFirewallMsg, cModulePtr, "hlaIn"  );
             } else {
@@ -349,19 +262,18 @@ void HLAInterface::processInteractions( void ) {
 
 			std::string networkAddressStr = startDisableNetworkAttackSP->get_networkAddress();
 
-			NetworkAddress networkAddress( networkAddressStr );
-			NetworkAddressCModuleSetMap::iterator ncmItr = _networkAddressCModuleSetMap.find( networkAddress );
-			if ( ncmItr != _networkAddressCModuleSetMap.end() ) {
-				CModuleSet &cModuleSet = ncmItr->second;
-				for( CModuleSet::iterator cmsItr = cModuleSet.begin() ; cmsItr != cModuleSet.end() ; ++cmsItr ) {
-					NetworkAttackMsg *networkAttackMsg = new NetworkAttackMsg;
-					networkAttackMsg->setNetworkAddress( networkAddressStr.c_str() );
-					networkAttackMsg->setEnable( true );
+            AttackCoordinator::NetworkAddress networkAddress( networkAddressStr );
+            AttackCoordinator::CModuleSet cModuleSet = AttackCoordinator::getSingleton().getCModuleSet(networkAddress);
 
-					sendDirect(  networkAttackMsg, *cmsItr, "hlaIn"  );
-				}
-			}
-			continue;
+            for( AttackCoordinator::CModuleSet::iterator cmsItr = cModuleSet.begin() ; cmsItr != cModuleSet.end() ; ++cmsItr ) {
+                NetworkAttackMsg *networkAttackMsg = new NetworkAttackMsg;
+                networkAttackMsg->setNetworkAddress( networkAddressStr.c_str() );
+                networkAttackMsg->setEnable( true );
+
+                sendDirect(  networkAttackMsg, *cmsItr, "hlaIn"  );
+            }
+
+            continue;
 		}
 
 		if (  StopDisableNetworkAttack::match( classHandle )  ) {
@@ -369,19 +281,18 @@ void HLAInterface::processInteractions( void ) {
 
 			std::string networkAddressStr = stopDisableNetworkAttackSP->get_networkAddress();
 
-			NetworkAddress networkAddress( networkAddressStr );
-			NetworkAddressCModuleSetMap::iterator ncmItr = _networkAddressCModuleSetMap.find( networkAddress );
-			if ( ncmItr != _networkAddressCModuleSetMap.end() ) {
-				CModuleSet &cModuleSet = ncmItr->second;
-				for( CModuleSet::iterator cmsItr = cModuleSet.begin() ; cmsItr != cModuleSet.end() ; ++cmsItr ) {
-					NetworkAttackMsg *networkAttackMsg = new NetworkAttackMsg;
-					networkAttackMsg->setNetworkAddress( networkAddressStr.c_str() );
-					networkAttackMsg->setEnable( false );
+			AttackCoordinator::NetworkAddress networkAddress( networkAddressStr );
+            AttackCoordinator::CModuleSet cModuleSet = AttackCoordinator::getSingleton().getCModuleSet(networkAddress);
 
-					sendDirect(  networkAttackMsg, *cmsItr, "hlaIn"  );
-				}
-			}
-			continue;
+            for( AttackCoordinator::CModuleSet::iterator cmsItr = cModuleSet.begin() ; cmsItr != cModuleSet.end() ; ++cmsItr ) {
+                NetworkAttackMsg *networkAttackMsg = new NetworkAttackMsg;
+                networkAttackMsg->setNetworkAddress( networkAddressStr.c_str() );
+                networkAttackMsg->setEnable( false );
+
+                sendDirect(  networkAttackMsg, *cmsItr, "hlaIn"  );
+            }
+
+            continue;
 		}
 
 		if (  RecordPacketsForReplayAttack::match( classHandle )  ) {
@@ -395,7 +306,7 @@ void HLAInterface::processInteractions( void ) {
 			recordReplayAttackMsg->setRecordDuration( recordPacketsForReplayAttackSP->get_recordDurationInSecs() );
 			recordReplayAttackMsg->setEnable( true );
 
-			cModule *cModulePtr = getIPModule( nodeFullPath );
+			cModule *cModulePtr = AttackCoordinator::getSingleton().getIPModule( nodeFullPath );
 			if ( cModulePtr != 0 ) {
 				sendDirect(  recordReplayAttackMsg, cModulePtr, "hlaIn"  );
 			} else {
@@ -415,7 +326,7 @@ void HLAInterface::processInteractions( void ) {
 			recordReplayAttackMsg->setRecordDuration( -1 );
 			recordReplayAttackMsg->setEnable( false );
 
-			cModule *cModulePtr = getIPModule( nodeFullPath );
+			cModule *cModulePtr = AttackCoordinator::getSingleton().getIPModule( nodeFullPath );
 			if ( cModulePtr != 0 ) {
 				sendDirect(  recordReplayAttackMsg, cModulePtr, "hlaIn"  );
 			} else {
@@ -434,7 +345,7 @@ void HLAInterface::processInteractions( void ) {
 			replayAttackMsg->setDestinationNetworkAddress( startReplayAttackSP->get_dstNetworkAddress().c_str() );
 			replayAttackMsg->setPlay( true );
 
-			cModule *cModulePtr = getIPModule( nodeFullPath );
+			cModule *cModulePtr = AttackCoordinator::getSingleton().getIPModule( nodeFullPath );
 			if ( cModulePtr != 0 ) {
 				sendDirect(  replayAttackMsg, cModulePtr, "hlaIn"  );
 			} else {
@@ -453,7 +364,7 @@ void HLAInterface::processInteractions( void ) {
 			replayAttackMsg->setDestinationNetworkAddress( ceaseReplayAttackSP->get_dstNetworkAddress().c_str() );
 			replayAttackMsg->setPlay( false );
 
-			cModule *cModulePtr = getIPModule( nodeFullPath );
+			cModule *cModulePtr = AttackCoordinator::getSingleton().getIPModule( nodeFullPath );
 			if ( cModulePtr != 0 ) {
 				sendDirect(  replayAttackMsg, cModulePtr, "hlaIn"  );
 			} else {
@@ -473,7 +384,7 @@ void HLAInterface::processInteractions( void ) {
 			outOfOrderAttackMsg->setRecordDuration( startOutOfOrderPacketsAttackSP->get_recordDurationInSecs() );
 			outOfOrderAttackMsg->setPlay( true );
 
-			cModule *cModulePtr = getIPModule( nodeFullPath );
+			cModule *cModulePtr = AttackCoordinator::getSingleton().getIPModule( nodeFullPath );
 			if ( cModulePtr != 0 ) {
 				sendDirect(  outOfOrderAttackMsg, cModulePtr, "hlaIn"  );
 			} else {
@@ -493,7 +404,7 @@ void HLAInterface::processInteractions( void ) {
 			outOfOrderAttackMsg->setRecordDuration( -1 );
 			outOfOrderAttackMsg->setPlay( false );
 
-			cModule *cModulePtr = getIPModule( nodeFullPath );
+			cModule *cModulePtr = AttackCoordinator::getSingleton().getIPModule( nodeFullPath );
 			if ( cModulePtr != 0 ) {
 				sendDirect(  outOfOrderAttackMsg, cModulePtr, "hlaIn"  );
 			} else {
@@ -508,15 +419,15 @@ void HLAInterface::processInteractions( void ) {
 
 			std::string nodeFullPath = addRouteToRoutingTableSP->get_nodeFullPath();
 			std::string interfaceEntry = addRouteToRoutingTableSP->get_interfaceEntry();
-			NetworkAddress networkAddress( addRouteToRoutingTableSP->get_networkAddress() );
-			NetworkAddress gatewayAddress( addRouteToRoutingTableSP->get_gatewayAddress() );
+			AttackCoordinator::NetworkAddress networkAddress( addRouteToRoutingTableSP->get_networkAddress() );
+			AttackCoordinator::NetworkAddress gatewayAddress( addRouteToRoutingTableSP->get_gatewayAddress() );
 
-			RouteEntrySP routeEntrySP = createRouteEntrySP( nodeFullPath, interfaceEntry, networkAddress, gatewayAddress );
+			AttackCoordinator::RouteEntrySP routeEntrySP = AttackCoordinator::getSingleton().createRouteEntrySP( nodeFullPath, interfaceEntry, networkAddress, gatewayAddress );
 
 			AddRouteEntryMsg *addRouteEntryMsg = new AddRouteEntryMsg;
 			addRouteEntryMsg->setRouteEntrySP( routeEntrySP );
 
-			cModule *cModulePtr = getIPModule( nodeFullPath );
+			cModule *cModulePtr = AttackCoordinator::getSingleton().getIPModule( nodeFullPath );
 			if ( cModulePtr != 0 ) {
 				sendDirect( addRouteEntryMsg, cModulePtr, "hlaIn" );
 			} else {
@@ -531,15 +442,15 @@ void HLAInterface::processInteractions( void ) {
 
 			std::string nodeFullPath = dropRouteFromRoutingTableSP->get_nodeFullPath();
 			std::string interfaceEntry = dropRouteFromRoutingTableSP->get_interfaceEntry();
-			NetworkAddress networkAddress( dropRouteFromRoutingTableSP->get_networkAddress() );
-			NetworkAddress gatewayAddress( dropRouteFromRoutingTableSP->get_gatewayAddress() );
+			AttackCoordinator::NetworkAddress networkAddress( dropRouteFromRoutingTableSP->get_networkAddress() );
+			AttackCoordinator::NetworkAddress gatewayAddress( dropRouteFromRoutingTableSP->get_gatewayAddress() );
 
-			RouteEntrySP routeEntrySP = createRouteEntrySP( nodeFullPath, interfaceEntry, networkAddress, gatewayAddress );
+			AttackCoordinator::RouteEntrySP routeEntrySP = AttackCoordinator::getSingleton().createRouteEntrySP( nodeFullPath, interfaceEntry, networkAddress, gatewayAddress );
 
 			DropRouteEntryMsg *dropRouteEntryMsg = new DropRouteEntryMsg;
 			dropRouteEntryMsg->setRouteEntrySP( routeEntrySP );
 
-			cModule *cModulePtr = getIPModule( nodeFullPath );
+			cModule *cModulePtr = AttackCoordinator::getSingleton().getIPModule( nodeFullPath );
 			if ( cModulePtr != 0 ) {
 				sendDirect( dropRouteEntryMsg, cModulePtr, "hlaIn" );
 			} else {
@@ -554,7 +465,7 @@ void HLAInterface::processInteractions( void ) {
 
             std::string nodeFullPath = startModifyToHLAPacketsAttackSP->get_nodeFullPath();
 
-            setModifyToHLAPackets( nodeFullPath, true );
+            AttackCoordinator::getSingleton().setModifyToHLAPackets( nodeFullPath, true );
             continue;
         }
 
@@ -564,7 +475,7 @@ void HLAInterface::processInteractions( void ) {
 
             std::string nodeFullPath = stopModifyToHLAPacketsAttackSP->get_nodeFullPath();
 
-            setModifyToHLAPackets( nodeFullPath, false );
+            AttackCoordinator::getSingleton().setModifyToHLAPackets( nodeFullPath, false );
             continue;
         }
 
@@ -574,7 +485,7 @@ void HLAInterface::processInteractions( void ) {
 
             std::string nodeFullPath = startModifyFromHLAPacketsAttackSP->get_nodeFullPath();
 
-            setModifyFromHLAPackets( nodeFullPath, true );
+            AttackCoordinator::getSingleton().setModifyFromHLAPackets( nodeFullPath, true );
             continue;
         }
 
@@ -584,7 +495,7 @@ void HLAInterface::processInteractions( void ) {
 
             std::string nodeFullPath = stopModifyFromHLAPacketsAttackSP->get_nodeFullPath();
 
-            setModifyFromHLAPackets( nodeFullPath, false );
+            AttackCoordinator::getSingleton().setModifyFromHLAPackets( nodeFullPath, false );
             continue;
         }
 
@@ -594,7 +505,17 @@ void HLAInterface::processInteractions( void ) {
 
             std::string nodeFullPath = startIntegrityAttackSP->get_nodeFullPath();
 
-            enableIntegrityAttack( nodeFullPath, startIntegrityAttackSP->get_intMultiplier(), startIntegrityAttackSP->get_intAdder(), startIntegrityAttackSP->get_longMultiplier(), startIntegrityAttackSP->get_longAdder(), startIntegrityAttackSP->get_doubleMultiplier(), startIntegrityAttackSP->get_doubleAdder(), startIntegrityAttackSP->get_booleanEnableFlip(), startIntegrityAttackSP->get_stringReplacement() );
+            AttackCoordinator::getSingleton().enableIntegrityAttack(
+                    nodeFullPath,
+                    startIntegrityAttackSP->get_intMultiplier(),
+                    startIntegrityAttackSP->get_intAdder(),
+                    startIntegrityAttackSP->get_longMultiplier(),
+                    startIntegrityAttackSP->get_longAdder(),
+                    startIntegrityAttackSP->get_doubleMultiplier(),
+                    startIntegrityAttackSP->get_doubleAdder(),
+                    startIntegrityAttackSP->get_booleanEnableFlip(),
+                    startIntegrityAttackSP->get_stringReplacement()
+            );
             continue;
         }
 
@@ -603,7 +524,7 @@ void HLAInterface::processInteractions( void ) {
              boost::static_pointer_cast< StopIntegrityAttack >( interactionRootSP );
 
             std::string nodeFullPath = stopIntegrityAttackSP->get_nodeFullPath();
-            disableIntegrityAttack( nodeFullPath );
+            AttackCoordinator::getSingleton().disableIntegrityAttack( nodeFullPath );
             continue;
         }
 
@@ -637,7 +558,7 @@ void HLAInterface::receiveInteraction(
 
     static bool notPrinted = true;
     if ( notPrinted ) {
-        std::cerr << listAppSpecProperties() << std::endl;
+        std::cerr << AttackCoordinator::getSingleton().listAppSpecProperties() << std::endl;
         notPrinted = false;
     }
 
@@ -702,7 +623,7 @@ HLAInterface::HLAInterface( void ) :
  _name( "" ),
  _interactionArrivalMsg(  new omnetpp::cMessage( "interactionArrival" )  ),
  _noInteractionArrivalFlag( true )
-{ 
+{
 	setInstancePtr( this );
 }
 
@@ -724,7 +645,7 @@ void HLAInterface::initialize(int stage) {
 
 	if ( stage == inet::INITSTAGE_LAST ) {
 		std::cerr << "AppSpecProperties:" << std::endl;
-		std::cerr << listAppSpecProperties() << std::endl;
+		std::cerr << AttackCoordinator::getSingleton().listAppSpecProperties() << std::endl;
 	}
 }
 
@@ -918,44 +839,4 @@ void HLAInterface::sendKeepAliveMsg() {
     scheduleAt(omnetpp::simTime() + getStepSize(), _keepAliveMsg);
 }
 
-std::ostream &operator<<( std::ostream &os, const HLAInterface::AppSpec &appSpec ) {
-	os << appSpec.getSpec();
-	return os;
-}
 
-std::ostream &operator<<( std::ostream &os, const HLAInterface::NetworkAddress &networkAddress ) {
-	std::string output;
-
-	unsigned int networkIPAddress = networkAddress.getNetworkIPAddress();
-	bool first = true;
-	for( int ix = 0 ; ix < 4 ; ++ix ) {
-		if ( first ) {
-			first = false;
-		} else {
-			output = "." + output;
-		}
-		unsigned int byte = networkIPAddress & 0xFF;
-		output = boost::lexical_cast< std::string >( byte ) + output;
-		networkIPAddress >>= 8;
-	}
-
-	unsigned int netMask = networkAddress.getNetMask();
-	int bits = HLAInterface::NetworkAddress::countBits( netMask );
-	if ( bits != 32 ) {
-		output += "/" + boost::lexical_cast< std::string >( bits );
-	}
-
-	os << output;
-	return os;
-}
-
-
-std::ostream &operator<<( std::ostream &os, const HLAInterface::RouteEntry &routeEntry ) {
-	os << "RouteEntry( nodeName:" << routeEntry.get_nodeName() << ", interfaceEntry:" << routeEntry.get_interfaceEntry() <<
-	 ", networkAddress:" << routeEntry.get_networkAddress() << ", gateway:" << routeEntry.get_gatewayAddress() << ")";
-	return os;
-}
-
-std::ostream &operator<<( std::ostream &os, const HLAInterface::RouteEntrySP &routeEntrySP ) {
-	return os << *routeEntrySP;
-}

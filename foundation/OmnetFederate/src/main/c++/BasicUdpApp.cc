@@ -19,8 +19,6 @@
 #include "BasicUdpApp.h"
 #include <messages/InteractionMsg_m.h>
 
-#include "HLAInterface.h"
-
 Define_Module(BasicUdpApp);
 
 void BasicUdpApp::initialize( int stage ) {

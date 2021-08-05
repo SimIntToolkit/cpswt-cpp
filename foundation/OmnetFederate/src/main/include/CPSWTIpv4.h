@@ -24,7 +24,7 @@
 //class IPv4Datagram;
 
 
-#include "HLAInterface.h"
+#include "AttackCoordinator.h"
 
 
 class CPSWTIpv4: public inet::Ipv4 {
@@ -79,9 +79,9 @@ private:
     bool _hasFilters;
 
 public:
-    typedef HLAInterface::NetworkAddress NetworkAddress;
-    typedef HLAInterface::NetworkAddressComparator NetworkAddressComparator;
-    typedef HLAInterface::NetworkAddressSet NetworkAddressSet;
+    typedef AttackCoordinator::NetworkAddress NetworkAddress;
+    typedef AttackCoordinator::NetworkAddressComparator NetworkAddressComparator;
+    typedef AttackCoordinator::NetworkAddressSet NetworkAddressSet;
 
     typedef std::pair< NetworkAddress, NetworkAddress > NetworkAddressSDPair;
 

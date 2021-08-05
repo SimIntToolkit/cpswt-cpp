@@ -25,8 +25,6 @@
 
 #include <inet/common/INETDefs.h>
 
-#include "HLAInterface.h"
-
 
 /**
  * TODO - Generated class

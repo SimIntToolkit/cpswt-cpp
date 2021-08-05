@@ -14,6 +14,8 @@
 
 #include <inet/networklayer/ipv4/Ipv4InterfaceData.h>
 
+#include "InteractionMsg_m.h"
+
 #include "FilterAttackMsg_m.h"
 #include "NodeAttackMsg_m.h"
 #include "NetworkAttackMsg_m.h"
@@ -40,7 +42,7 @@ void CPSWTIpv4::initialize(int stage) {
 
         _hostFullName = getParentModule()->getFullPath();
 
-        HLAInterface::get_InstancePtr()->registerIPModule(_hostFullName, this);
+        AttackCoordinator::getSingleton().registerIPModule(_hostFullName, this);
 
     } else if (stage == inet::INITSTAGE_LAST) {
 
@@ -104,11 +106,11 @@ void CPSWTIpv4::handleMessageWhenUp(omnetpp::cMessage *msg) {
 
         if (snifferAttackMsg->getListen()) {
 
-            addListener(HLAInterface::get_InstancePtr()->getIPAddress(hostName, interface));
+            addListener(AttackCoordinator::getSingleton().getIPAddress(hostName, interface));
 
         } else {
 
-            deleteListener(HLAInterface::get_InstancePtr()->getIPAddress(hostName, interface));
+            deleteListener(AttackCoordinator::getSingleton().getIPAddress(hostName, interface));
 
         }
 
@@ -269,7 +271,7 @@ void CPSWTIpv4::handleMessageWhenUp(omnetpp::cMessage *msg) {
         InteractionMsg *interactionMsg = dynamic_cast< InteractionMsg * >( c_packetPtr );
 
         if (interactionMsg != 0) {
-            interactionMsg->setMessageNo(HLAInterface::getUniqueNo());
+            interactionMsg->setMessageNo(AttackCoordinator::getUniqueNo());
         }
         Super::routeUnicastPacket(packet);
 
@@ -501,7 +503,7 @@ void CPSWTIpv4::removeSerialReplayBufferSP(const NetworkAddress &sourceNetworkAd
 
 void CPSWTIpv4::recordNetworkInformation(void) {
 
-    HLAInterface::InterfaceIPAddressMap &interfaceIPAddressMap = HLAInterface::get_InstancePtr()->getIPModuleInterfaceIPAddressMap(_hostFullName);
+    AttackCoordinator::InterfaceIPAddressMap &interfaceIPAddressMap = AttackCoordinator::getSingleton().getIPModuleInterfaceIPAddressMap(_hostFullName);
 
     interfaceIPAddressMap.clear();
 
@@ -529,7 +531,7 @@ void CPSWTIpv4::recordNetworkInformation(void) {
 //    }
 //    std::cerr << std::endl;
 
-    HLAInterface::get_InstancePtr()->unregisterIPModuleNetworks(this, _networkAddressSet);
+    AttackCoordinator::getSingleton().unregisterIPModuleNetworks(this, _networkAddressSet);
     _networkAddressSet.clear();
     _networkAddressInterfaceNameMap.clear();
 
@@ -545,7 +547,7 @@ void CPSWTIpv4::recordNetworkInformation(void) {
 //      std::cerr << "Host \"" << _hostFullName << "\" adding (" << networkAddress << "," << ipRoute->getInterfaceName() << ") to _networkAddressInterfaceNameMap " << std::endl;
     }
 
-    HLAInterface::get_InstancePtr()->registerIPModuleNetworks(this, _networkAddressSet);
+    AttackCoordinator::getSingleton().registerIPModuleNetworks(this, _networkAddressSet);
 }
 
 
