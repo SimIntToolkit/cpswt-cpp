@@ -68,6 +68,7 @@ protected:
 	void recordInterfaceIPAddresses( void );
 	virtual int numInitStages( void ) const override;
 	virtual void initialize( int stage ) override;
+	virtual void handleMessage(cMessage *msg);
 	virtual void sendToUDP( inet::Packet *msg, const inet::Ipv4Address& destAddr, int destPort ) override;
 	virtual NetworkPacketSP modifyIncoming( NetworkPacketSP networkPacketSP );
 	virtual NetworkPacketSP modifyOutgoing( NetworkPacketSP networkPacketSP );

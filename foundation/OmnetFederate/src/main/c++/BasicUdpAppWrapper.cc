@@ -71,6 +71,23 @@ void BasicUdpAppWrapper::initialize( int stage ) {
 
 }
 
+void BasicUdpAppWrapper::handleMessage( cMessage *msg ) {
+
+    InteractionMsg *interactionMsg = dynamic_cast< InteractionMsg * >( msg );
+    if ( interactionMsg != 0 ) {
+        int messageNo = interactionMsg->getMessageNo();
+        if ( !interactionMsg->getToHLA() && !_messageTracker.addInt( messageNo )  ) {
+//          std::cout << "BasicUdpAppWrapper: \"" << getHostName() << "\" dropping duplicate message (" << messageNo << ")." << std::endl;
+            cancelAndDelete( msg );
+            return;  // DROP MESSAGE
+        }
+        interactionMsg->setToHLA( !interactionMsg->getToHLA() );
+    }
+    // std::cout << "BasicUdpAppWrapper: \"" << getHostName() << "\" received message, forwarding to wrapped module." << std::endl;
+
+    Super::handleMessage( msg );
+}
+
 void BasicUdpAppWrapper::sendToUDP( inet::Packet *packet, const inet::Ipv4Address& destAddr, int destPort ) {
 
     auto c_packetChunkPtr = packet->template peekAtFront<inet::cPacketChunk>();
