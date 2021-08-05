@@ -73,7 +73,17 @@ void BasicUdpAppWrapper::initialize( int stage ) {
 
 void BasicUdpAppWrapper::handleMessage( cMessage *msg ) {
 
-    InteractionMsg *interactionMsg = dynamic_cast< InteractionMsg * >( msg );
+    inet::Packet* packet = dynamic_cast< inet::Packet * > ( msg );
+    if ( packet == nullptr ) {
+        std::cerr << "WARNING:  Hostname \"" << _hostName << "\":  BasicUdpAppWrapper:  handleMessage method:  received message is not an inet::Packet:  ignoring." << std::endl;
+        cancelAndDelete( msg );
+        return;
+    }
+
+    auto c_packetChunkPtr = packet->template peekAtFront<inet::cPacketChunk>();
+    inet::cPacket *c_packetPtr = c_packetChunkPtr->getPacket();
+
+    InteractionMsg *interactionMsg = dynamic_cast< InteractionMsg * >( c_packetPtr );
     if ( interactionMsg != 0 ) {
         int messageNo = interactionMsg->getMessageNo();
         if ( !interactionMsg->getToHLA() && !_messageTracker.addInt( messageNo )  ) {
