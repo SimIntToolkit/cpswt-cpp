@@ -71,11 +71,11 @@ void BasicUdpAppWrapper::initialize( int stage ) {
 
 }
 
-void BasicUdpAppWrapper::handleMessage( cMessage *msg ) {
+void BasicUdpAppWrapper::handleMessage( omnetpp::cMessage *msg ) {
 
     inet::Packet* packet = dynamic_cast< inet::Packet * > ( msg );
     if ( packet == nullptr ) {
-        std::cerr << "WARNING:  Hostname \"" << _hostName << "\":  BasicUdpAppWrapper:  handleMessage method:  received message is not an inet::Packet:  ignoring." << std::endl;
+        std::cerr << "WARNING:  Hostname \"" << getHostName() << "\":  BasicUdpAppWrapper:  handleMessage method:  received message is not an inet::Packet:  ignoring." << std::endl;
         cancelAndDelete( msg );
         return;
     }
@@ -128,7 +128,17 @@ void BasicUdpAppWrapper::sendToUDP( inet::Packet *packet, const inet::Ipv4Addres
         // }
 
         AttackCoordinator::IntegrityAttackParams &iap = AttackCoordinator::getSingleton().getIntegrityAttackParams( this, getHostName() );
-        networkPacketSP = tweakIncoming( networkPacketSP, iap.getIntMultiplier(), iap.getIntAdder(), iap.getLongMultiplier(), iap.getLongAdder(), iap.getDoubleMultiplier(), iap.getDoubleAdder(), iap.getBooleanEnableFlip(), iap.getStringReplacement() );
+        networkPacketSP = tweakIncoming(
+                networkPacketSP,
+                iap.getIntMultiplier(),
+                iap.getIntAdder(),
+                iap.getLongMultiplier(),
+                iap.getLongAdder(),
+                iap.getDoubleMultiplier(),
+                iap.getDoubleAdder(),
+                iap.getBooleanEnableFlip(),
+                iap.getStringReplacement()
+        );
         interactionMsg->setInteractionRootSP(  boost::static_pointer_cast< InteractionRoot >( networkPacketSP )  );
     }
 

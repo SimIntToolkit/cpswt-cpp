@@ -47,7 +47,7 @@ protected:
     virtual int numInitStages() const override { return inet::NUM_INIT_STAGES; }
 
 public:
-    std::string getHostFullName( void ) {
+    const std::string &getHostFullName( void ) {
         return _hostFullName;
     }
 
@@ -368,7 +368,7 @@ public:
         _nodeDelayMean( 0.0 ),
         _nodeDelayStdDev( 0.0 ) { }
 
-    virtual ~CPSWTIpv4();
+    virtual ~CPSWTIpv4() {}
 
 protected:
     void recordNetworkInformation( void );

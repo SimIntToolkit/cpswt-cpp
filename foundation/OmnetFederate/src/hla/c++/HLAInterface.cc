@@ -46,7 +46,7 @@ void HLAInterface::processInteractions( void ) {
 	 		int appIndex = networkPacketSP->get_senderAppIndex();
 
 			auto c_packetChunk = inet::makeShared<inet::cPacketChunk>(interactionMsgPtr);
-			inet::Packet *packet = new inet::Packet("Interaction+Msg", c_packetChunk);
+			inet::Packet *packet = new inet::Packet(getInteractionMessageLabel().c_str(), c_packetChunk);
 
 	 		cModule *udpAppWrapperModule = AttackCoordinator::getSingleton().getAppSpecModule( hostName, appName, appIndex );
 	 		if ( udpAppWrapperModule != 0 ) {

@@ -68,11 +68,21 @@ protected:
 	void recordInterfaceIPAddresses( void );
 	virtual int numInitStages( void ) const override;
 	virtual void initialize( int stage ) override;
-	virtual void handleMessage(cMessage *msg);
+	virtual void handleMessage(omnetpp::cMessage *msg) override;
 	virtual void sendToUDP( inet::Packet *msg, const inet::Ipv4Address& destAddr, int destPort ) override;
 	virtual NetworkPacketSP modifyIncoming( NetworkPacketSP networkPacketSP );
 	virtual NetworkPacketSP modifyOutgoing( NetworkPacketSP networkPacketSP );
-	virtual NetworkPacketSP tweakIncoming( NetworkPacketSP networkPacketSP, int intMultuplier = 1, int intAdder = 0, long longMultiplier = 1, long longAdder = 0, double doubleMultiplier = 1.0, double doubleAdder = 0.0, bool booleanEnableFlip = false, const std::string &stringReplacement = "");
+	virtual NetworkPacketSP tweakIncoming(
+	        NetworkPacketSP networkPacketSP,
+	        int intMultuplier = 1,
+	        int intAdder = 0,
+	        long longMultiplier = 1,
+	        long longAdder = 0,
+	        double doubleMultiplier = 1.0,
+	        double doubleAdder = 0.0,
+	        bool booleanEnableFlip = false,
+	        const std::string &stringReplacement = ""
+	);
 };
 
 #endif

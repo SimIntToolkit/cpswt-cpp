@@ -8,6 +8,7 @@
 #include <boost/regex.hpp>
 
 #include "AttackCoordinator.h"
+#include <CPSWTIpv4.h>
 
 
 void AttackCoordinator::NetworkAddress::initFromString( std::string networkAddressSpec ) {

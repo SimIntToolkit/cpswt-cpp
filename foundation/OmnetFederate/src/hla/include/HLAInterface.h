@@ -32,7 +32,7 @@ public:
 	//
 
 public:
-	static std::string getInteractionMessageLabel(void) {
+	static const std::string &getInteractionMessageLabel(void) {
 	    static std::string interactionMessageLabel("Interaction+Msg");
 	    return interactionMessageLabel;
 	}
