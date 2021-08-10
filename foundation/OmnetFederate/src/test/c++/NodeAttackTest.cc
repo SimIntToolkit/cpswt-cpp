@@ -11,11 +11,13 @@
 
 #include <inet/common/packet/chunk/cPacketChunk.h>
 
+Define_Module(NodeAttackTest);
+
 
 NetworkPacketSP NodeAttackTest::createNetworkPacketSP(const std::string &senderHostName, const std::string &receiverHostName) {
     NetworkPacketSP networkPacketSP(new NetworkPacket());
 
-    networkPacketSP->set_packetType(0);
+    networkPacketSP->set_packetType("NetworkPacket");
     networkPacketSP->set_data("data");
     networkPacketSP->set_numBytes(1024);
 
@@ -26,7 +28,7 @@ NetworkPacketSP NodeAttackTest::createNetworkPacketSP(const std::string &senderH
     networkPacketSP->set_receiverHost(receiverHostName);
     networkPacketSP->set_receiverHostApp(getAppName());
     networkPacketSP->set_receiverAppIndex(0);
-    networkPacketSP->set_receiverAppInterface("eth0");
+    networkPacketSP->set_receiverAppInterface("eth");
 
     return networkPacketSP;
 }
@@ -38,6 +40,7 @@ InteractionMsg *NodeAttackTest::createInteractionMsgPtr(NetworkPacketSP &network
     interactionMsgPtr->setMessageNo( uniqueNumber );
     interactionMsgPtr->setInteractionRootSP( networkPacketSP );
     interactionMsgPtr->setTimestamp( omnetpp::simTime().dbl() );
+    interactionMsgPtr->setByteLength(networkPacketSP->get_numBytes());
 
     return interactionMsgPtr;
 }
@@ -74,8 +77,13 @@ int NodeAttackTest::sendPacket(const std::string &senderHostName, const std::str
 
     cModule *udpAppWrapperModule = AttackCoordinator::getSingleton().getAppSpecModule( hostName, appName, appIndex );
     if ( udpAppWrapperModule != 0 ) {
-        std::cout << "Sending packet to \"" << senderHostName << "\", which should send it to \"" << receiverHostName << "\"" << std::endl;
-        std::cout << "\"" << _host3Name << "\" should send the packet back to this test";
+        if (_nodeAttackInProgress && senderHostName == _host1Name) {
+            std::cout << "Sending packet to \"" << senderHostName << "\", which will try to send it to \"" << receiverHostName << "\"" << std::endl;
+            std::cout << "However, this should fail due to a node attack." << std::endl;
+        } else {
+            std::cout << "Sending packet to \"" << senderHostName << "\", which should send it to \"" << receiverHostName << "\"" << std::endl;
+            std::cout << "\"" << receiverHostName << "\" should send the packet back to this test" << std::endl;
+        }
         sendDirect( packet, udpAppWrapperModule, "hlaIn" );
     } else {
         std::cerr << "WARNING: AttackCoordinator:  could not find module corresponding to (hostname,appName) = (" <<
@@ -92,15 +100,15 @@ void NodeAttackTest::checkPacket(omnetpp::cMessage *msg, const std::string &send
 
     inet::Packet *packet = dynamic_cast<inet::Packet *>(msg);
     if (packet == nullptr) {
-        cancelAndDelete(packet);
+        delete packet;
         std::cerr << "Test failed.  Did not receive packet from \"" << senderHostName << "\"" << std::endl;
         exit(1);
     }
 
-    omnetpp::cModule *receiverModule = packet->getSenderModule();
-    std::string receiverModuleName(receiverModule->getName());
+    omnetpp::cModule *receiverModule = packet->getSenderModule()->getParentModule();
+    std::string receiverModuleName(receiverModule->getFullPath());
     if (receiverModuleName != receiverHostName) {
-        cancelAndDelete(packet);
+        delete packet;
         std::cerr << "Test failed.  Received packet from host \"" << receiverModuleName << "\", should have been \"" << receiverHostName << "\"" << std::endl;
         exit(1);
     }
@@ -111,16 +119,19 @@ void NodeAttackTest::checkPacket(omnetpp::cMessage *msg, const std::string &send
 
     if (receivedMessageNumber != messageNumber) {
         std::cerr << "Test failed.  Received packet had incorrect message number (" << receivedMessageNumber << ") -- should be (" << messageNumber << ")" << std::endl;
-        cancelAndDelete(packet);
+        delete packet;
         exit(1);
     } else {
         std::cout << "Received packet had correct message number {" << messageNumber << ")" << std::endl;
-        cancelAndDelete(packet);
+        delete packet;
     }
 
 }
 
 void NodeAttackTest::setNodeAttack(bool attackInProgress) {
+
+    _nodeAttackInProgress = attackInProgress;
+
     const std::string attackAction = attackInProgress ? "Starting" : "Stopping";
 
     std::cout << attackAction << " node attack on \"" << _router1Name << "\" ..." << std::endl;
@@ -144,15 +155,18 @@ void NodeAttackTest::handleMessage(omnetpp::cMessage *msg) {
 
     if (msg == _keepAliveMsg) {
         sendKeepAliveMsg();
-        return;
+        if (_stateCounter != 0) {
+            return;
+        }
     }
 
-    int uniqueNumber = 0; // GLOBAL OVER IFS BELOW
+    static int uniqueNumber = 0; // GLOBAL OVER IFS BELOW
     if (_stateCounter == 0) {
         uniqueNumber = sendPacket(_host1Name, _host3Name);
 
         scheduleAt(omnetpp::simTime() + _waitSeconds, _timingMsg);
         ++_stateCounter;
+        return;
     }
 
     if (_stateCounter == 1) {
@@ -171,6 +185,7 @@ void NodeAttackTest::handleMessage(omnetpp::cMessage *msg) {
 
         scheduleAt(omnetpp::simTime() + _waitSeconds, _timingMsg);
         ++_stateCounter;
+        return;
     }
 
     if (_stateCounter == 2) {
@@ -178,11 +193,13 @@ void NodeAttackTest::handleMessage(omnetpp::cMessage *msg) {
             std::cerr << "Test failed.  Packet from \"" << _host1Name << "\" to \"" << _host3Name << "\" was apparently received and should not have been" << std::endl;
             exit(1);
         }
+        std::cout << "Packet sent from \"" << _host1Name << "\" to \"" << _host3Name << "\" dropped as expected." << std::endl;
 
         uniqueNumber = sendPacket(_host2Name, _host3Name);
 
         scheduleAt(omnetpp::simTime() + _waitSeconds, _timingMsg);
         ++_stateCounter;
+        return;
     }
 
     if (_stateCounter == 3) {
@@ -201,6 +218,7 @@ void NodeAttackTest::handleMessage(omnetpp::cMessage *msg) {
 
         scheduleAt(omnetpp::simTime() + _waitSeconds, _timingMsg);
         ++_stateCounter;
+        return;
     }
 
     if (_stateCounter == 4) {
@@ -213,8 +231,9 @@ void NodeAttackTest::handleMessage(omnetpp::cMessage *msg) {
 
         checkPacket(msg, _host1Name, _host3Name, uniqueNumber);
 
-        std::cout << "TEST PASSED";
+        std::cout << "TEST PASSED" << std::endl;
         cancelEvent(_keepAliveMsg);
+        return;
     }
 
 }

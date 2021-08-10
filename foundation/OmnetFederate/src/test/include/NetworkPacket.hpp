@@ -97,19 +97,18 @@ public:
         return true;
     }
 
-public:
 	typedef InteractionRoot Super;
 	typedef boost::shared_ptr< NetworkPacket > SP;
 
 	NetworkPacket( void ) { }
-	
+	virtual ~NetworkPacket(void) { }
 	
 	static bool match( int handle ) { return handle == get_handle(); }
 
 	virtual int getClassHandle( void ) const override { return get_handle(); }
     virtual std::string getClassName( void ) const override { return get_class_name(); }
 
-	virtual StringVector getParameterNames( void ) const { return get_parameter_names(); }
+	virtual StringVector getParameterNames( void ) const override { return get_parameter_names(); }
 
 private:
 	

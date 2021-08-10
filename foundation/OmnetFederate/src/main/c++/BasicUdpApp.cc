@@ -36,12 +36,12 @@ void BasicUdpApp::initialize( int stage ) {
             _port = par( "port" );
             _defaultDestPort = par( "destPort" );
 
-            _socket.setOutputGate(  gate( "udpOut" )  );
-            _socket.bind( _port );
-
             break;
         }
         case inet::INITSTAGE_LAST: {
+            _socket.setOutputGate(  gate( "socketOut" )  );
+            _socket.bind( _port );
+
             // SHOULD BE LAST BECAUSE MODULE WHERE SUBSCRIPTION TAKES PLACE MUST EXIST -- COULD BE ANY NODE
             _notificationBoard->subscribe( inet::interfaceIpv4ConfigChangedSignal, this );
             break;

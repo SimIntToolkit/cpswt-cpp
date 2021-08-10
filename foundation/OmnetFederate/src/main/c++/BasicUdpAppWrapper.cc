@@ -19,6 +19,7 @@
 
 #include <messages/InteractionMsg_m.h>
 
+#include <typeinfo>
 
 Define_Module(BasicUdpAppWrapper);
 
@@ -76,7 +77,7 @@ void BasicUdpAppWrapper::handleMessage( omnetpp::cMessage *msg ) {
     inet::Packet* packet = dynamic_cast< inet::Packet * > ( msg );
     if ( packet == nullptr ) {
         std::cerr << "WARNING:  Hostname \"" << getHostName() << "\":  BasicUdpAppWrapper:  handleMessage method:  received message is not an inet::Packet:  ignoring." << std::endl;
-        cancelAndDelete( msg );
+        delete msg;
         return;
     }
 
@@ -88,7 +89,7 @@ void BasicUdpAppWrapper::handleMessage( omnetpp::cMessage *msg ) {
         int messageNo = interactionMsg->getMessageNo();
         if ( !interactionMsg->getToHLA() && !_messageTracker.addInt( messageNo )  ) {
 //          std::cout << "BasicUdpAppWrapper: \"" << getHostName() << "\" dropping duplicate message (" << messageNo << ")." << std::endl;
-            cancelAndDelete( msg );
+            delete msg;
             return;  // DROP MESSAGE
         }
         interactionMsg->setToHLA( !interactionMsg->getToHLA() );
@@ -153,14 +154,13 @@ void BasicUdpAppWrapper::sendToUDP( inet::Packet *packet, const inet::Ipv4Addres
 		}
 
         sendDirect( packet, _hlaModulePtr, "hlaOut" );
-        cancelAndDelete( packet );
 
 		return;
 	}
 
 	if (  !NetworkPacket::match( interactionRootSP->getClassHandle() )  ) {
 		std::cerr << "WARNING:  Hostname \"" << getHostName() << "\":  BasicUdpAppWrapper:  handleMessage method:  Wrapped interaction is not of type \"NetworkPacket\":  ignoring" << std::endl;
-		cancelAndDelete( packet );
+		delete packet;
 		return;
 	}
 
@@ -176,8 +176,8 @@ void BasicUdpAppWrapper::sendToUDP( inet::Packet *packet, const inet::Ipv4Addres
 	int receiverAppIndex( networkPacketSP->get_receiverAppIndex() );
 	std::string receiverAppInterface( networkPacketSP->get_receiverAppInterface() );
 
-	// Update message length
-	packet->setByteLength( networkPacketSP->get_numBytes() );
+	// Udpate message length
+	interactionMsg->setByteLength( networkPacketSP->get_numBytes() );
 
 	if ( receiverAppIndex == -1 ) {
 		// std::cerr << "Hostname \"" << getHostName() << "\":  BasicUdpAppWrapper:  handleMessage method:  sending InteractionMsg to application-specified destination in network." << std::endl;
@@ -189,7 +189,7 @@ void BasicUdpAppWrapper::sendToUDP( inet::Packet *packet, const inet::Ipv4Addres
 	AttackCoordinator::AppProperties appProperties = AttackCoordinator::getSingleton().getAppSpecProperties( appSpec );
 	if ( appProperties.getPort() == -1 ) {
 		// std::cerr << "ERROR:  Hostname \"" << getHostName() << "\":  BasicUdpAppWrapper:  handleMessage method:  Could not find app properties for \"" << appSpec << "\":  dropping message." << std::endl;
-		cancelAndDelete( packet );
+		delete packet;
 		return;
 	}
 

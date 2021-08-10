@@ -37,6 +37,8 @@
  */
 class INET_API C2WDHCPClient : public omnetpp::cSimpleModule, public omnetpp::cListener, public inet::ILifecycle
 {
+    using cListener::finish;
+
     protected:
         int serverPort;
         int clientPort;

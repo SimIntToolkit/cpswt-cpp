@@ -28,10 +28,12 @@ private:
 public:
     static bool match( int handle ) { return handle == get_handle(); }
 
+    virtual ~InteractionRoot(void) { }
+
     virtual int getClassHandle( void ) const { return get_handle(); }
     virtual std::string getClassName( void ) const { return get_class_name(); }
 
-    virtual StringVector getParameterNames(void) {
+    virtual StringVector getParameterNames(void) const {
         return StringVector();
     }
 

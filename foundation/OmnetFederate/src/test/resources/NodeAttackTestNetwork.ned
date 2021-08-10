@@ -13,7 +13,7 @@
 // along with this program.  If not, see http://www.gnu.org/licenses/.
 // 
 
-package NodeAttackTest.OmnetFederate;
+package OmnetFederate;
 
 
 //
@@ -28,7 +28,6 @@ import inet.node.inet.Router;
 import inet.node.inet.StandardHost;
 
 import OmnetFederate.CPSWTIpv4;
-import OmnetFederate.HLAInterface;
 import OmnetFederate.BasicUdpAppWrapper;
 
 channel FO1 extends DatarateChannel
@@ -40,42 +39,43 @@ channel FO1 extends DatarateChannel
     ber = 0;
 }
 
-network NodeAttackTest
+network NodeAttackTestNetwork
 {
     parameters:
         @display("bgb=708,404");
 
         host*.numApps = 1;
-        host*.app[0].typename = BasicUdpAppWrapper;
+        host*.app[0].typename = "BasicUdpAppWrapper";
 
-        host*.ipv4.ip.typename = CPSWTIpv4;
-        router*.ipv4.ip.typename = CPSWTIpv4;
+        host*.ipv4.ip.typename = "CPSWTIpv4";
+        router*.ipv4.ip.typename = "CPSWTIpv4";
 
     submodules:
         configurator: Ipv4NetworkConfigurator {
             @display("p=174,29");
         }
-        hlaInterface: HLAInterface {
+        hlaInterface: NodeAttackTest {
             @display("p=49,29;i=block/dispatch");
         }
         host1: StandardHost {
-            @display("p=98,198;i=,yellow");
+            @display("p=98,266;i=,yellow");
         }
         host2: StandardHost {
-            @display("p=324,198;i=,yellow");
+            @display("p=338,154;i=,yellow");
         }
         host3: StandardHost {
-            @display("p=560,198;i=,yellow");
+            @display("p=560,266;i=,yellow");
         }
         router1: Router {
-            @display("p=208,197;i=old/router2,lavender");
+            @display("p=246,265;i=old/router2,lavender");
         }
         router2: Router {
-            @display("p=441,197;i=old/router2,lavender");
+            @display("p=413,265;i=old/router2,lavender");
         }
     connections:
         host1.ethg++ <--> FO1 <--> router1.ethg++;
         router1.ethg++ <--> FO1 <--> host2.ethg++;
+        router1.ethg++ <--> FO1 <--> router2.ethg++;
         host2.ethg++ <--> FO1 <--> router2.ethg++;
         router2.ethg++ <--> FO1 <--> host3.ethg++;
 }

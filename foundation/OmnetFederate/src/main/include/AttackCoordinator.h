@@ -135,7 +135,7 @@ public:
         InterfaceIPAddressMap _interfaceIPAddressMap;
 
     public:
-        IPModuleProperties( void ) : _cModule( 0 ) { }
+        IPModuleProperties( void ) : _cModule( nullptr ) { }
         IPModuleProperties( omnetpp::cModule *cModule_var ) : _cModule( cModule_var ) { }
 
         omnetpp::cModule *getCModule( void ) {

@@ -29,6 +29,7 @@ private:
     omnetpp::cMessage *_keepAliveMsg;
     omnetpp::cMessage *_timingMsg;
 
+    bool _nodeAttackInProgress;
     const std::string _interactionMessageLabel;
     const std::string _appName;
     const std::string _host1Name;
@@ -43,14 +44,25 @@ public:
         _stateCounter(0),
         _keepAliveMsg(  new omnetpp::cMessage( "keepAlive" )  ),
         _timingMsg(  new omnetpp::cMessage( "timing" )  ),
+        _nodeAttackInProgress(false),
         _interactionMessageLabel(getInteractionMessageLabel()),
         _appName(getAppName()),
-        _host1Name("host1"),
-        _host2Name("host2"),
-        _host3Name("host3"),
-        _router1Name("router1"),
+        _host1Name("NodeAttackTestNetwork.host1"),
+        _host2Name("NodeAttackTestNetwork.host2"),
+        _host3Name("NodeAttackTestNetwork.host3"),
+        _router1Name("NodeAttackTestNetwork.router1"),
         _waitSeconds(2) { }
 
+    virtual ~NodeAttackTest() {
+        if (_keepAliveMsg != nullptr) {
+            cancelAndDelete(_keepAliveMsg);
+            _keepAliveMsg = nullptr;
+        }
+        if (_timingMsg != nullptr) {
+            cancelAndDelete(_timingMsg);
+            _timingMsg = nullptr;
+        }
+    }
     int sendPacket(const std::string &senderHostName, const std::string &receiverHostName);
     void checkPacket(omnetpp::cMessage *msg, const std::string &senderHostName, const std::string &receiverHostName, int messageNumber);
     void setNodeAttack(bool attackInProgress);

@@ -1,1 +1,1 @@
-opp_makemake -f --deep -O out -KINET4_PROJ=../../inet4 -DINET_IMPORT -Xhla -Imain/include -Imain/resources/messages -Imain/resources -Itest/include -I../../core/src/main/include -I'$(INET4_PROJ)/src' -L'$(INET4_PROJ)/src' -l'INET_dbg' -lboost_regex
+opp_makemake -f --deep -O out -M debug -KINET4_PROJ=../../inet4 -DINET_IMPORT -Xhla -Imain/include -Imain/resources/messages -Imain/resources -Itest/include -I../../core/src/main/include -I'$(INET4_PROJ)/src' -L'$(INET4_PROJ)/src' -l'INET_dbg' -lboost_regex

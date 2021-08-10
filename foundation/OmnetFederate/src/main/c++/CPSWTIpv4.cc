@@ -40,8 +40,7 @@ void CPSWTIpv4::initialize(int stage) {
     if (stage == inet::INITSTAGE_LOCAL) {
         _notificationBoard = inet::getContainingNode(this);
 
-        _hostFullName = getParentModule()->getFullPath();
-
+        _hostFullName = getParentModule()->getParentModule()->getFullPath();
         AttackCoordinator::getSingleton().registerIPModule(_hostFullName, this);
 
     } else if (stage == inet::INITSTAGE_LAST) {

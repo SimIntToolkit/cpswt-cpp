@@ -627,8 +627,10 @@ void C2WDHCPClient::sendRequest()
         sendToUDP(dhcpPacket, clientPort, inet::Ipv4Address::ALLONES_ADDRESS, serverPort);
     }
     else
+    {
         delete dhcpPacket;
-        throw omnetpp::cRuntimeError("Invalid state");
+    }
+    throw omnetpp::cRuntimeError("Invalid state");
 }
 
 void C2WDHCPClient::sendDiscover()
