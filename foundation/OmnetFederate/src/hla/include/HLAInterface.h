@@ -38,9 +38,6 @@ public:
 	}
 
 private:
-	std::string _federation_name;
-	std::string _name;
-
 	std::string _logLevel;
 
 	inet::cMessage *_keepAliveMsg;

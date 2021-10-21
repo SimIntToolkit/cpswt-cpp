@@ -66,70 +66,70 @@ void NetworkPacket::init( RTI::RTIambassador *rti ) {
 	}
 	
 	
-	getDatamemberNameHandleMap().insert(  std::make_pair( "NetworkPacket,packetType", get_packetType_handle() )  );
+	getDatamemberNameHandleMap().insert(  std::make_pair( "NetworkPacket.packetType", get_packetType_handle() )  );
 	
 	getDatamemberHandleNameMap().insert(  std::make_pair( get_packetType_handle(), "packetType" )  );
 	
 	getDatamemberTypeMap().insert( std::make_pair("packetType", "String") );
 	
 	
-	getDatamemberNameHandleMap().insert(  std::make_pair( "NetworkPacket,receiverHost", get_receiverHost_handle() )  );
+	getDatamemberNameHandleMap().insert(  std::make_pair( "NetworkPacket.receiverHost", get_receiverHost_handle() )  );
 	
 	getDatamemberHandleNameMap().insert(  std::make_pair( get_receiverHost_handle(), "receiverHost" )  );
 	
 	getDatamemberTypeMap().insert( std::make_pair("receiverHost", "String") );
 	
 	
-	getDatamemberNameHandleMap().insert(  std::make_pair( "NetworkPacket,data", get_data_handle() )  );
+	getDatamemberNameHandleMap().insert(  std::make_pair( "NetworkPacket.data", get_data_handle() )  );
 	
 	getDatamemberHandleNameMap().insert(  std::make_pair( get_data_handle(), "data" )  );
 	
 	getDatamemberTypeMap().insert( std::make_pair("data", "String") );
 	
 	
-	getDatamemberNameHandleMap().insert(  std::make_pair( "NetworkPacket,receiverAppIndex", get_receiverAppIndex_handle() )  );
+	getDatamemberNameHandleMap().insert(  std::make_pair( "NetworkPacket.receiverAppIndex", get_receiverAppIndex_handle() )  );
 	
 	getDatamemberHandleNameMap().insert(  std::make_pair( get_receiverAppIndex_handle(), "receiverAppIndex" )  );
 	
 	getDatamemberTypeMap().insert( std::make_pair("receiverAppIndex", "int") );
 	
 	
-	getDatamemberNameHandleMap().insert(  std::make_pair( "NetworkPacket,receiverHostApp", get_receiverHostApp_handle() )  );
+	getDatamemberNameHandleMap().insert(  std::make_pair( "NetworkPacket.receiverHostApp", get_receiverHostApp_handle() )  );
 	
 	getDatamemberHandleNameMap().insert(  std::make_pair( get_receiverHostApp_handle(), "receiverHostApp" )  );
 	
 	getDatamemberTypeMap().insert( std::make_pair("receiverHostApp", "String") );
 	
 	
-	getDatamemberNameHandleMap().insert(  std::make_pair( "NetworkPacket,senderHostApp", get_senderHostApp_handle() )  );
+	getDatamemberNameHandleMap().insert(  std::make_pair( "NetworkPacket.senderHostApp", get_senderHostApp_handle() )  );
 	
 	getDatamemberHandleNameMap().insert(  std::make_pair( get_senderHostApp_handle(), "senderHostApp" )  );
 	
 	getDatamemberTypeMap().insert( std::make_pair("senderHostApp", "String") );
 	
 	
-	getDatamemberNameHandleMap().insert(  std::make_pair( "NetworkPacket,numBytes", get_numBytes_handle() )  );
+	getDatamemberNameHandleMap().insert(  std::make_pair( "NetworkPacket.numBytes", get_numBytes_handle() )  );
 	
 	getDatamemberHandleNameMap().insert(  std::make_pair( get_numBytes_handle(), "numBytes" )  );
 	
 	getDatamemberTypeMap().insert( std::make_pair("numBytes", "int") );
 	
 	
-	getDatamemberNameHandleMap().insert(  std::make_pair( "NetworkPacket,senderHost", get_senderHost_handle() )  );
+	getDatamemberNameHandleMap().insert(  std::make_pair( "NetworkPacket.senderHost", get_senderHost_handle() )  );
 	
 	getDatamemberHandleNameMap().insert(  std::make_pair( get_senderHost_handle(), "senderHost" )  );
 	
 	getDatamemberTypeMap().insert( std::make_pair("senderHost", "String") );
 	
 	
-	getDatamemberNameHandleMap().insert(  std::make_pair( "NetworkPacket,receiverAppInterface", get_receiverAppInterface_handle() )  );
+	getDatamemberNameHandleMap().insert(  std::make_pair( "NetworkPacket.receiverAppInterface", get_receiverAppInterface_handle() )  );
 	
 	getDatamemberHandleNameMap().insert(  std::make_pair( get_receiverAppInterface_handle(), "receiverAppInterface" )  );
 	
 	getDatamemberTypeMap().insert( std::make_pair("receiverAppInterface", "String") );
 	
 	
-	getDatamemberNameHandleMap().insert(  std::make_pair( "NetworkPacket,senderAppIndex", get_senderAppIndex_handle() )  );
+	getDatamemberNameHandleMap().insert(  std::make_pair( "NetworkPacket.senderAppIndex", get_senderAppIndex_handle() )  );
 	
 	getDatamemberHandleNameMap().insert(  std::make_pair( get_senderAppIndex_handle(), "senderAppIndex" )  );
 	

@@ -1,1 +1,1 @@
-docker build -t omnetfederate:latest .
+docker build --squash -t omnetfederate:latest .

@@ -39,8 +39,8 @@ RUN cd /home/omnetpp/workspace && tar xf /tmp/inet-${INET_RELEASE}-src.tgz
 RUN cd /home/omnetpp/workspace/inet4 && make makefiles && make
 RUN rm /tmp/inet-${INET_RELEASE}-src.tgz
 
-RUN mkdir -p ${OMNETPP_WORKSPACE_DIR}/OmnetFederate/CPSWT/main ${OMNETPP_WORKSPACE_DIR}/OmnetFederate/CPSWT/hla
-RUN mkdir -p ${OMNETPP_WORKSPACE_DIR}/OmnetFederate/Project
+RUN mkdir -p ${OMNETPP_WORKSPACE_DIR}/OmnetFederate
+RUN mkdir -p ${OMNETPP_WORKSPACE_DIR}/Project
 
 
 ENV PORTICO_RELEASE 2.1.0
@@ -55,12 +55,16 @@ COPY git-ssh-key /root/.ssh/id_rsa
 RUN ssh-keyscan github.com >> ~/.ssh/known_hosts
 
 RUN cd /tmp && git clone --branch updates-for-inet4,-omnetpp5 --single-branch git@github.com:SimIntToolkit/cpswt-cpp.git
-RUN cd ${OMNETPP_WORKSPACE_DIR}/OmnetFederate/CPSWT && cp -r /tmp/cpswt-cpp/foundation/core .
-RUN cd ${OMNETPP_WORKSPACE_DIR}/OmnetFederate/CPSWT && cp -r /tmp/cpswt-cpp/foundation/SynchronizedFederate .
-RUN cd ${OMNETPP_WORKSPACE_DIR}/OmnetFederate/CPSWT && cp -r /tmp/cpswt-cpp/foundation/rti-base .
-RUN cd ${OMNETPP_WORKSPACE_DIR}/OmnetFederate/CPSWT && cp -r /tmp/cpswt-cpp/foundation/C2WConsoleLogger .
-RUN cd ${OMNETPP_WORKSPACE_DIR}/OmnetFederate/CPSWT && cp -r /tmp/cpswt-cpp/foundation/config .
+RUN cd ${OMNETPP_WORKSPACE_DIR}/OmnetFederate && cp -r /tmp/cpswt-cpp/foundation/core .
+RUN cd ${OMNETPP_WORKSPACE_DIR}/OmnetFederate && cp -r /tmp/cpswt-cpp/foundation/SynchronizedFederate .
+RUN cd ${OMNETPP_WORKSPACE_DIR}/OmnetFederate && cp -r /tmp/cpswt-cpp/foundation/rti-base .
+RUN cd ${OMNETPP_WORKSPACE_DIR}/OmnetFederate && cp -r /tmp/cpswt-cpp/foundation/C2WConsoleLogger .
+RUN cd ${OMNETPP_WORKSPACE_DIR}/OmnetFederate && cp -r /tmp/cpswt-cpp/foundation/config .
+RUN cd ${OMNETPP_WORKSPACE_DIR}/OmnetFederate && cp -r /tmp/cpswt-cpp/foundation/OmnetFederate/src/main .
+RUN cd ${OMNETPP_WORKSPACE_DIR}/OmnetFederate && cp -r /tmp/cpswt-cpp/foundation/OmnetFederate/src/hla .
 RUN rm -rf /tmp/cpswt-cpp
 
-COPY run-sim.sh ${OMNETPP_WORKSPACE_DIR}/OmnetFederate/CPSWT
-COPY var_mods.make ${OMNETPP_WORKSPACE_DIR}/OmnetFederate/CPSWT
+COPY build-sim.sh ${OMNETPP_WORKSPACE_DIR}/OmnetFederate
+COPY var_mods.make ${OMNETPP_WORKSPACE_DIR}/OmnetFederate
+
+RUN cd ${OMNETPP_WORKSPACE_DIR}/OmnetFederate && bash build-sim.sh

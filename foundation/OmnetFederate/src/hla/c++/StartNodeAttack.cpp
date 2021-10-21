@@ -19,8 +19,8 @@ void StartNodeAttack::init( RTI::RTIambassador *rti ) {
 	bool isNotInitialized = true;
 	while( isNotInitialized ) {
 		try {
-			getHandle() = rti->getInteractionClassHandle( "InteractionRoot.C2WInteractionRoot.ActionBase.OmnetCommand.StartNodeAttack" );
-			isNotInitialized = false;
+            getHandle() = rti->getInteractionClassHandle( "InteractionRoot.C2WInteractionRoot.ActionBase.OmnetCommand.StartNodeAttack" );
+            isNotInitialized = false;
 		} catch ( RTI::FederateNotExecutionMember & ) {
 			std::cerr << getInitErrorMessage() << "Federate Not Execution Member" << std::endl;
 			return;				
@@ -39,8 +39,6 @@ void StartNodeAttack::init( RTI::RTIambassador *rti ) {
 	isNotInitialized = true;
 	while( isNotInitialized ) {
 		try {		
-			
-			
 			get_nodeFullPath_handle_var() = rti->getParameterHandle( "nodeFullPath", get_handle() );
 			isNotInitialized = false;
 		} catch ( RTI::FederateNotExecutionMember & ) {

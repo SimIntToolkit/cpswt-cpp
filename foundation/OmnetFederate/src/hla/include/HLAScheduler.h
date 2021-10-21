@@ -27,6 +27,4 @@ public:
     }
 };
 
-Register_Class(HLAScheduler);
-
 #endif /* HLAScheduler_hpp */

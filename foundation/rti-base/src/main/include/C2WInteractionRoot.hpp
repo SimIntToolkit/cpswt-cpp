@@ -190,20 +190,6 @@ public:
 	virtual StringVector getParameterNames( void ) const { return get_parameter_names(); }
 	virtual StringVector getAllParameterNames( void ) const { return get_all_parameter_names(); }
 
-	virtual std::string getParameterName( int datamemberHandle ) const {
-		if (datamemberHandle == get_actualLogicalGenerationTime_handle()) {
-			return std::string("actualLogicalGenerationTime");
-		} else if (datamemberHandle == get_federateFilter_handle()) {
-			return std::string("federateFilter");
-		} else if (datamemberHandle == get_originFed_handle()) {
-			return std::string("originFed");
-		} else if (datamemberHandle == get_sourceFed_handle()) {
-			return std::string("sourceFed");
-		} else {
-			return InteractionRoot::getParameterName(datamemberHandle);
-		}
-	}
-
 	virtual void publishInteraction( RTI::RTIambassador *rti ) { publish( rti ); }
 	virtual void subscribeInteraction( RTI::RTIambassador *rti ) { subscribe( rti ); }
 

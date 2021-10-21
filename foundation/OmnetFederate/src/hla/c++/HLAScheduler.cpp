@@ -6,6 +6,7 @@
 #include <HLAScheduler.h>
 #include <HLAInterface.h>
 
+
 Register_Class(HLAScheduler);
 
 HLAScheduler::HLAScheduler() : cScheduler() {}
@@ -15,13 +16,15 @@ HLAScheduler::HLAScheduler() : cScheduler() {}
 omnetpp::cEvent* HLAScheduler::takeNextEvent()
 {
     // first try to see if an event is scheduled
+
+    HLAInterface *hlaInterfacePtr = HLAInterface::get_InstancePtr();
+
     omnetpp::cEvent *event = sim->getFES()->removeFirst();
     if (!event)
     {
         throw new inet::cTerminationException(omnetpp::E_ENDEDOK);
     }
 
-    HLAInterface *hlaInterfacePtr = HLAInterface::get_InstancePtr();
 
     // if no event is scheduled before the logical time,
     // request that the RTI advance the time

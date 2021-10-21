@@ -178,7 +178,7 @@ void SynchronizedFederate::joinFederation() {
 
 	intJoin->set_sourceFed( getFederateId() );
 	intJoin->set_originFed( getFederateId() );
-	intJoin->set_FederateType( getFederateType() );
+	intJoin->set_FederateType( getFederateId() );
 	intJoin->set_FederateId( getFederateId() );
     intJoin->set_IsLateJoiner(get_IsLateJoiner());
 
@@ -212,18 +212,14 @@ void SynchronizedFederate::enableTimeConstrained( void ) throw( RTI::FederateNot
 		}
 	}
 
-	try {
-		getRTI()->tick();
-	} catch( ... ) { }
+	tick();
 	while( _timeConstrainedNotEnabled ) {
 #ifdef _WIN32
 			Sleep( 500 );
 #else
 			usleep( 500000 );
 #endif
-		try {
-			getRTI()->tick();
-		} catch( ... ) { }
+		tick();
 	}
 }
 
@@ -256,14 +252,15 @@ void SynchronizedFederate::enableTimeRegulation( double time, double lookahead )
 		}
 	}
 
-	try { getRTI()->tick(); } catch( ... ) { }
+	//  INITIAL TICK
+	tick();
 	while( _timeRegulationNotEnabled ) {
 #ifdef _WIN32
 			Sleep( 500 );
 #else
 			usleep( 500000 );
 #endif
-		try { getRTI()->tick(); } catch( ... ) { }
+		tick();
 	}
 
 
@@ -306,14 +303,14 @@ throw( RTI::RTIinternalError, RTI::FederateNotExecutionMember ){
 			}
 		}
 
-		try { getRTI()->tick(); } catch( ... ) { }
+		tick();
 		while( !_timeRegulationNotEnabled ) {
 	#ifdef _WIN32
 				Sleep( 500 );
 	#else
 				usleep( 500000 );
 	#endif
-			try { getRTI()->tick(); } catch( ... ) { }
+			tick();
 		}
 
 	
@@ -458,6 +455,7 @@ void SynchronizedFederate::achieveSynchronizationPoint( const std::string &label
 	bool synchronizationPointNotAccepted = true;
 	while( synchronizationPointNotAccepted ) {
 		try {
+		    std::cout << "Synchronizing on label \"" << label << "\"" << std::endl;
 			getRTI()->synchronizationPointAchieved( label.c_str() );
 			while(  _achievedSynchronizationPoints.find( label ) == _achievedSynchronizationPoints.end()  ) {
 #ifdef _WIN32
@@ -465,7 +463,7 @@ void SynchronizedFederate::achieveSynchronizationPoint( const std::string &label
 #else
 				usleep( 500000 );
 #endif
-				getRTI()->tick();
+				tick();
 			}
 			synchronizationPointNotAccepted = false;
 		} catch ( RTI::FederateNotExecutionMember &f ) {
@@ -475,7 +473,7 @@ void SynchronizedFederate::achieveSynchronizationPoint( const std::string &label
 				synchronizationPointNotAccepted = false;
 			} else {
 				try {
-					getRTI()->tick();
+					tick();
 				} catch ( RTI::RTIinternalError &r ) {
 					throw r;
 				} catch ( ... ) {
@@ -498,6 +496,7 @@ void SynchronizedFederate::achieveSynchronizationPoint( const std::string &label
 
 void SynchronizedFederate::run( void ) {
 
+    std::cout << "run called." << std::endl;
 	_currentTime = getCurrentTime();
 	if ( _currentTime < 0 ) return;
 
@@ -554,7 +553,7 @@ void SynchronizedFederate::advanceTime( double time ) {
 	}
 
 	while( getTimeAdvanceNotGranted() ) {
-		try { getRTI()->tick(); } catch ( ... ) { }
+		tick();
 #ifdef _WIN32
 		Sleep( 10 );
 #else
