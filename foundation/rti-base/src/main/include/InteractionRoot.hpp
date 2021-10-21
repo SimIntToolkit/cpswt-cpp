@@ -266,7 +266,8 @@ public:
 	virtual StringVector getAllParameterNames( void ) const { return get_all_parameter_names(); }
 
 	virtual std::string getParameterName( int datamemberHandle ) const {
-		return std::string();
+	    IntegerStringMap::iterator ismItr = getDatamemberHandleNameMap().find(datamemberHandle);
+	    return ismItr == getDatamemberHandleNameMap().end() ? std::string("") : ismItr->second;
 	}
 
 	int getParameterHandle( const std::string &datamemberName ) const {
@@ -313,6 +314,7 @@ public:
 	}
 
 	static int get_parameter_handle( const std::string &className, const std::string &datamemberName ) {
+
 		StringIntegerMap::iterator simItr = getDatamemberNameHandleMap().find( className + "." + datamemberName );
 		if ( simItr == getDatamemberNameHandleMap().end() ) {
 			std::cerr << "Bad parameter \"" << datamemberName << "\" for class \"" << className << "\" on get_parameter_handle." << std::endl;
@@ -447,7 +449,7 @@ public:
 private:
 	void setParameter( RTI::Handle handle, const std::string &val ) {
 		if (  !setParameterAux( handle, val )  ) {
-			std::cerr << "set:  bad parameter handle in class \"" + getClassName() + "\"" << std::endl;
+			std::cerr << "set:  bad parameter handle (" << handle << ") in class \"" + getClassName() + "\"" << std::endl;
 		}
 	}
 
