@@ -1,0 +1,107 @@
+if [ -z "$JAVA_HOME" ]; then
+    echo "JAVA_HOME ENVIRONMENT VARIABLE IS NOT SET."
+    echo "PLEASE SET THE JAVA_HOME ENVIRONMENT VARIABLE TO THE ROOT DIRECTORY OF YOUR JAVA INSTALLATION."
+    exit 1
+fi
+
+FEDERATION_DIR="$(realpath "$(dirname "$0")")"
+cd "$FEDERATION_DIR"
+
+FEDERATION_CONFIG_DIR="$FEDERATION_DIR/FederationConfig"
+FEDERATION_CONFIG_TEMP_DIR="$FEDERATION_CONFIG_DIR/temp"
+mkdir -p "$FEDERATION_CONFIG_TEMP_DIR"
+
+export RTI_RID_FILE="$FEDERATION_CONFIG_DIR/RTI.rid"
+export LD_LIBRARY_PATH="$JAVA_HOME/jre/lib/amd64/server"
+
+FEDERATION_OUTPUT_DIR="$FEDERATION_DIR/output"
+mkdir -p "$FEDERATION_OUTPUT_DIR"
+
+FEDERATION_PID_DIR="$FEDERATION_DIR/pid"
+mkdir -p "$FEDERATION_PID_DIR"
+
+
+#
+# EXECUTE FEDERATION MANAGER
+#
+pushd ../../../../cpswt-core/cpswt-core/federation-manager
+
+FEDERATION_MANAGER_OUTPUT_FILE="$FEDERATION_OUTPUT_DIR/federation-manager.out"
+rm -f "$FEDERATION_MANAGER_OUTPUT_FILE"
+
+FEDERATION_MANAGER_PID_FILE="$FEDERATION_PID_DIR/federation-manager.pid"
+rm -f "$FEDERATION_MANAGER_OUTPUT_FILE"
+
+FEDERATION_MANAGER_CONFIG_FILE="$FEDERATION_CONFIG_TEMP_DIR/federationManagerConfig.json"
+cat <<TERMINUS > "$FEDERATION_MANAGER_CONFIG_FILE"
+{
+    "experimentConfig"  : "$FEDERATION_CONFIG_DIR/experimentConfig.json",
+    "federationId"      : "OmnetFederateTest",
+    "federationEndTime" : 0,
+    "fedFile"           : "$FEDERATION_CONFIG_DIR/OmnetFederateTest.fed",
+    "lookAhead"         : 0.01,
+    "stepSize"          : 0.1,
+    "realTimeMode"      : false
+}
+TERMINUS
+
+echo -n "EXECUTING FEDERATION MANAGER (output in \"$FEDERATION_MANAGER_OUTPUT_FILE\") ..."
+./gradlew run --args="--configFile $FEDERATION_MANAGER_CONFIG_FILE" --console=plain > "$FEDERATION_MANAGER_OUTPUT_FILE" 2>&1 &
+echo $! > "$FEDERATION_MANAGER_PID_FILE"
+echo " DONE."
+popd
+
+echo
+echo "WAITING 5 SECONDS FOR FEDERATION MANAGER TO REGISTER SYNCHRONIZATION POINTS ..."
+sleep 5
+echo " DONE."
+
+
+#
+# EXECUTE OMNETFEDERATE BASIC TEST
+#
+pushd ..
+OMNETFEDERATE_BASIC_TEST_OUTPUT_FILE="$FEDERATION_OUTPUT_DIR/omnet-federate-basic-test.out"
+rm -f "$OMNETFEDERATE_BASIC_TEST_OUTPUT_FILE"
+
+OMNETFEDERATE_BASIC_TEST_PID_FILE="$FEDERATION_PID_DIR/omnet-federate-basic-test.pid"
+rm -f "$OMNETFEDERATE_BASIC_TEST_PID_FILE"
+
+echo
+echo -n "EXECUTING OMNETFEDERATE BASIC TEST (output in \"$OMNETFEDERATE_BASIC_TEST_OUTPUT_FILE\") ..."
+./gradlew run --console=plain > "$OMNETFEDERATE_BASIC_TEST_OUTPUT_FILE" 2>&1 &
+echo $! > "$OMNETFEDERATE_BASIC_TEST_PID_FILE"
+echo " DONE."
+popd
+
+
+#
+# EXECUTE OMNET FEDERATE
+#
+pushd ../../../foundation/OmnetFederate
+OMNETFEDERATE_OUTPUT_FILE="$FEDERATION_OUTPUT_DIR/omnet-federate.out"
+rm -f "$OMNETFEDERATE_OUTPUT_FILE"
+
+OMNETFEDERATE_PID_FILE="$FEDERATION_PID_DIR/omnet-federate.pid"
+rm -f "$OMNETFEDERATE_PID_FILE"
+
+OMNET_CONFIG_DIR="$FEDERATION_DIR/OmnetConfig"
+OMNET_INI_FILE="$OMNET_CONFIG_DIR/omnetpp.ini"
+
+echo
+echo -n "EXECUTING OMNETFEDERATE (output in \"$OMNETFEDERATE_OUTPUT_FILE\") ..."
+./OmnetFederate -f "$OMNET_INI_FILE" -n src/main/resources:src/hla/resources:../inet4/src:"$OMNET_CONFIG_DIR" > "$OMNETFEDERATE_OUTPUT_FILE" 2>&1 &
+echo $! > "$OMNETFEDERATE_PID_FILE"
+echo " DONE."
+popd
+
+
+echo
+echo
+echo -n "PRESS ENTER TO END SIMULATION > "
+read input
+
+
+kill $(cat "$OMNETFEDERATE_PID_FILE")
+kill $(cat "$OMNETFEDERATE_BASIC_TEST_PID_FILE")
+kill $(cat "$FEDERATION_MANAGER_PID_FILE")

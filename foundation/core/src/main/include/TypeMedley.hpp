@@ -111,7 +111,7 @@ private:
 
 public:
 	TMTemplate( Type value ) : _value( value ) { }
-    virtual ~TMTemplate() { }
+	virtual ~TMTemplate() { }
 
 #define CONVERSION_OPERATOR( x ) \
 	virtual operator x( void ) const {\
@@ -156,7 +156,7 @@ private:
 public:
 	template< typename TYPE >
 	TypeMedley( const TYPE &value ) : _tmBaseSP(  new TMTemplate< TYPE >( value )  ) { }
-    virtual ~TypeMedley() { }
+	virtual ~TypeMedley() { }
 
 #define CONVERSION_OPERATOR( x ) \
 	virtual operator x( void ) const {\

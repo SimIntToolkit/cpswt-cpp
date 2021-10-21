@@ -46,7 +46,6 @@
 
 #include "FederateConfig.h"
 
-
 #ifndef C2W_FED_LOGGER_CLS
 #define C2W_FED_LOGGER_CLS C2WConsoleLogger
 #endif 
@@ -71,7 +70,7 @@ private:
 
 	std::string _federateId;
 	std::string _federationId;
-	std::string _lockFileName;
+//	std::string _lockFileName;
 
 	std::string _FederateId;
 	std::string _FederateType;
@@ -125,30 +124,29 @@ protected:
 
 	 SynchronizedFederate( void ) : _federateId( "" ), _federationId( "" ), _timeConstrainedNotEnabled( true ), _timeRegulationNotEnabled( true ), _simEndNotSubscribed( true ), _currentTime( 0 ), _lookahead( 0 ), _IsLateJoiner(false), _FederateType("")
 	 {
-	 	  setpgid( 0, 0 );
-	 	  _lockFileName = getenv( "EXEDIR" );
-	 	  if ( !_lockFileName.empty() ) {
-	 	      _lockFileName += "/";
-	 	  }
-	 	  _lockFileName += "__lock__";
+	 	 setpgid( 0, 0 );
+//	 	 _lockFileName = getenv( "EXEDIR" );
+//	 	 if ( !_lockFileName.empty() ) {
+//	 	     _lockFileName += "/";
+//	 	 }
+//	 	 _lockFileName += "__lock__";
 
-	 	  _timeAdvanceMode = SF_TIME_ADVANCE_REQUEST;
+	 	 _timeAdvanceMode = SF_TIME_ADVANCE_REQUEST;
 	 }
 
 
 
 	SynchronizedFederate( FederateConfig *fedconfig)
 	{
-		  
-		 this->_federationId = fedconfig->federationId;
-		  this->_timeConstrainedNotEnabled = true;
-		  this->_timeRegulationNotEnabled = true;
-		 this->_simEndNotSubscribed = true;
-		//   _currentTime = fedconfig->  
-		 setLookahead(fedconfig->lookAhead);
-		 this->_IsLateJoiner= fedconfig->isLateJoiner;
-		 this->_FederateType = fedconfig->federateType;
-		 setStepSize(fedconfig->stepSize);
+		this->_federationId = fedconfig->federationId;
+		this->_timeConstrainedNotEnabled = true;
+		this->_timeRegulationNotEnabled = true;
+		this->_simEndNotSubscribed = true;
+		//    = fedconfig->
+		setLookahead(fedconfig->lookAhead);
+		this->_IsLateJoiner= fedconfig->isLateJoiner;
+		this->_FederateType = fedconfig->federateType;
+		setStepSize(fedconfig->stepSize);
 
 
 
@@ -183,11 +181,34 @@ protected:
 	// void joinFederation( const std::string &federation_id, const std::string &federate_id, bool ignoreLockFile = true );
 	void joinFederation();
 	
-	std::string getFederateId( void ) const { return _federateId; }
-	std::string getFederationId( void ) const { return _federationId; }
+
+	void setFederateId(const std::string &federateId) {
+	    _federateId = federateId;
+	}
+	std::string getFederateId( void ) const {
+	    return _federateId;
+	}
+
+
+	void setFederationId(const std::string &federationId) {
+	    _federationId = federationId;
+	}
+	std::string getFederationId( void ) const {
+	    return _federationId;
+	}
+
+
 	std::string getFederationManagerName( void ) const { return SynchronizedFederate::FEDERATION_MANAGER_NAME; }
 
-	std::string getFederateType( void ) const { return _FederateType; }
+
+	void setFederateType( const std::string &federateType ) {
+        _FederateType = federateType;
+    }
+	std::string getFederateType( void ) const {
+	    return _FederateType;
+	}
+
+
 	bool get_IsLateJoiner( void ) const { return _IsLateJoiner; }
 
 
@@ -198,6 +219,14 @@ protected:
 	 throw( RTI::InvalidFederationTime, RTI::InvalidLookahead, RTI::FederateNotExecutionMember ) {
 		enableTimeRegulation( 0, lookahead );
 	}
+	void tick(void) {
+	    try {
+	        getRTI()->tick();
+        } catch ( RTI::RTIinternalError &r ) {
+            throw r;
+	    } catch( ... ) { }
+	}
+
 
 	void disableTimeRegulation()
 	 throw( RTI::RTIinternalError, RTI::FederateNotExecutionMember );
@@ -320,8 +349,11 @@ public:
 	 throw ( RTI::InvalidFederationTime, RTI::EnableTimeRegulationWasNotPending, RTI::FederateInternalError ) { _timeRegulationNotEnabled = false; }
 	virtual void timeAdvanceGrant( const RTI::FedTime &fedTime )
  	 throw( RTI::InvalidFederationTime, RTI::TimeAdvanceWasNotInProgress, RTI::FederateInternalError ) { _timeAdvanceNotGranted = false; }
-    virtual void federationSynchronized( const char *label )
-	 throw( RTI::FederateInternalError ) { _achievedSynchronizationPoints.insert( label ); }
+
+	virtual void federationSynchronized( const char *label ) throw( RTI::FederateInternalError ) {
+	    std::cout << "federationSynchronized on label \"" << label << "\"" << std::endl;
+        _achievedSynchronizationPoints.insert( label );
+    }
 
 private:
 	class InteractionRootSPComparator {
