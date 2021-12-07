@@ -24,3 +24,7 @@ dependencies {
 application {
     mainClass.set("OmnetFederateTest")
 }
+
+//tasks.getByName<JavaExec>("run") {
+//    args = listOf()
+//}
