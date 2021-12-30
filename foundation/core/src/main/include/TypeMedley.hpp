@@ -19,164 +19,171 @@
  * PROVIDE MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
  */
 
-#ifndef _TYPEMEDLEY
-#define _TYPEMEDLEY
-
-#include <typeinfo>
-#include <ctype.h>
+#ifndef _TYPEMEDLEY_HPP
+#define _TYPEMEDLEY_HPP
 
 #include <boost/lexical_cast.hpp>
-#include <boost/shared_ptr.hpp>
+#include <iostream>
+#include <regex>
+#include <utility>
 #include <boost/algorithm/string.hpp>
 
-class TMBase {
+class TypeMedley {
 public:
-	typedef boost::shared_ptr< TMBase > SP;
+    enum DataType { BOOLEAN, CHARACTER, SHORT, INTEGER, LONG, FLOAT, DOUBLE, STRING };
+
+private:
+    static std::regex &get_double_regex() {
+        static std::regex doubleRegex("^(?:\\.[0-9]+|[0-9]+(?:\\.[0-9]*)?)(?:e[+-][0-9]{1,3})?");
+        return doubleRegex;
+    }
+
+    static bool hasDoubleFormat(const std::string &value) {
+        return std::regex_match(value, get_double_regex());
+    }
+
+    static bool string_to_bool(const std::string &value);
+
+    template<typename T>
+    static std::string convert_to_string(const std::string &value) {
+        T tValue = hasDoubleFormat(value)
+                   ? static_cast<T>(boost::lexical_cast<double>(value))
+                   : static_cast<T>(value.empty());
+        return boost::lexical_cast<std::string>(tValue);
+    }
 
 protected:
-	template< typename TOTYPE, typename FROMTYPE, typename T = void >
-	class Converter {
-	public:
-		typedef TOTYPE ToType;
-		typedef FROMTYPE FromType;
-
-		static ToType get( const FromType &from ) {
-			return boost::lexical_cast< ToType >( from );
-		}
-	};
-
-	template< typename T >
-	class Converter< std::string, bool, T > {
-	public:
-		static std::string get( const bool &from ) {
-			return from ? "true" : "false";
-		}
-	};
-
-	template< typename T >
-	class Converter< bool, std::string, T > {
-	public:
-		static bool get( const std::string &from ) {
-			if ( from.empty() ) {
-				return false;
-			}
-
-			std::string modFrom(   ::boost::to_lower_copy(  ::boost::trim_copy( from )  )   );
-			if ( modFrom == "false" ) {
-				return false;
-			}
-
-			std::string::size_type pos = modFrom.find_first_not_of( "0" );
-			if ( pos == std::string::npos ) {
-				return true;
-			}
-			if ( modFrom[ pos ] != '.' ) {
-				return false;
-			}
-
-			pos = modFrom.find_first_not_of( "0", pos + 1 );
-			return pos == std::string::npos;
-		}
-	};
+    DataType _dataType;
+    std::string _value;
 
 public:
-	virtual ~TMBase() { }
+    explicit TypeMedley(bool value):
+      _dataType(BOOLEAN), _value(boost::lexical_cast<std::string>(value)) { }
 
-#define CONVERSION_OPERATOR( x ) \
-	virtual operator x( void ) const = 0;
+    explicit TypeMedley(char value):
+      _dataType(CHARACTER), _value(boost::lexical_cast<std::string>(static_cast<int>(value))) { }
 
-	CONVERSION_OPERATOR( bool )
-	CONVERSION_OPERATOR( char )
-	CONVERSION_OPERATOR( short )
-	CONVERSION_OPERATOR( int )
-	CONVERSION_OPERATOR( long )
-	CONVERSION_OPERATOR( float )
-	CONVERSION_OPERATOR( double )
-	CONVERSION_OPERATOR( std::string )
+    explicit TypeMedley(short value):
+      _dataType(SHORT), _value(boost::lexical_cast<std::string>(value)) { }
 
-#undef CONVERSION_OPERATOR
+    explicit TypeMedley(int value):
+      _dataType(INTEGER), _value(boost::lexical_cast<std::string>(value)) { }
 
-	virtual std::string getTypeName( void ) const = 0;
+    explicit TypeMedley(long value):
+      _dataType(LONG), _value(boost::lexical_cast<std::string>(value)) { }
 
+    explicit TypeMedley(float value):
+      _dataType(FLOAT), _value(boost::lexical_cast<std::string>(value)) { }
+
+    explicit TypeMedley(double value):
+      _dataType(DOUBLE), _value(boost::lexical_cast<std::string>(value)) { }
+
+    explicit TypeMedley(std::string value):
+      _dataType(STRING), _value(std::move(value)) { }
+
+public:
+    DataType getDataType() const {
+        return _dataType;
+    }
+
+    template<typename T>
+    bool setValue(T value) {
+        switch(_dataType) {
+            case BOOLEAN:
+                _value = boost::lexical_cast<std::string>(static_cast<bool>(value));
+                break;
+            case CHARACTER:
+                _value = boost::lexical_cast<std::string>(static_cast<char>(value));
+                break;
+            case SHORT:
+                _value = boost::lexical_cast<std::string>(static_cast<short>(value));
+                break;
+            case INTEGER:
+                _value = boost::lexical_cast<std::string>(static_cast<int>(value));
+                break;
+            case LONG:
+                _value = boost::lexical_cast<std::string>(static_cast<long>(value));
+                break;
+            case FLOAT:
+                _value = boost::lexical_cast<std::string>(static_cast<float>(value));
+                break;
+            case DOUBLE:
+                _value = boost::lexical_cast<std::string>(static_cast<double>(value));
+                break;
+            case STRING:
+                _value = boost::lexical_cast<std::string>(value);
+                break;
+        }
+        return true;
+    }
+
+    bool setValue(const std::string &value);
+
+    explicit operator bool() {
+        switch(_dataType) {
+            case CHARACTER:
+                return _value[0] != '0' && static_cast<char>(boost::lexical_cast<int>(_value)) != '0';
+            case STRING:
+                return string_to_bool(_value);
+            default:
+                return static_cast<bool>(boost::lexical_cast<double>(_value));
+        }
+    }
+
+    explicit operator char() {
+        if (_dataType == STRING) {
+            return _value.empty() ? '\0' : _value[0];
+        }
+        return static_cast<char>(boost::lexical_cast<double>(_value));
+    }
+
+    explicit operator short() {
+        if (_dataType == STRING && !hasDoubleFormat(_value)) {
+            return static_cast<short>(_value.empty());
+        }
+        return static_cast<short>(boost::lexical_cast<double>(_value));
+    }
+
+    explicit operator int() {
+        if (_dataType == STRING && !hasDoubleFormat(_value)) {
+            return static_cast<int>(_value.empty());
+        }
+        return static_cast<int>(boost::lexical_cast<double>(_value));
+    }
+
+    explicit operator long() {
+        if (_dataType == STRING && !hasDoubleFormat(_value)) {
+            return static_cast<long>(_value.empty());
+        }
+        return static_cast<long>(boost::lexical_cast<double>(_value));
+    }
+
+    explicit operator float() {
+        if (_dataType == STRING && !hasDoubleFormat(_value)) {
+            return static_cast<float>(_value.empty());
+        }
+        return static_cast<float>(boost::lexical_cast<double>(_value));
+    }
+
+    explicit operator double() {
+        if (_dataType == STRING && !hasDoubleFormat(_value)) {
+            return static_cast<double>(_value.empty());
+        }
+        return boost::lexical_cast<double>(_value);
+    }
+
+    explicit operator std::string() {
+        switch(_dataType) {
+            case BOOLEAN:
+                return boost::lexical_cast<int>(_value) ? "true" : "false";
+            case CHARACTER: {
+                char localChar = static_cast<char>(boost::lexical_cast<int>(_value));
+                return { &localChar, 1 };
+            }
+            default:
+                return _value;
+        }
+    }
 };
 
-template< typename TYPE >
-class TMTemplate : public TMBase {
-public:
-	typedef TYPE Type;
-	typedef TMBase Super;
-
-private:
-	const Type _value;
-
-public:
-	TMTemplate( Type value ) : _value( value ) { }
-	virtual ~TMTemplate() { }
-
-#define CONVERSION_OPERATOR( x ) \
-	virtual operator x( void ) const {\
-		return Super::Converter< x, Type >::get( _value );\
-	}
-
-	CONVERSION_OPERATOR( bool )
-	CONVERSION_OPERATOR( char )
-	CONVERSION_OPERATOR( short )
-	CONVERSION_OPERATOR( int )
-	CONVERSION_OPERATOR( long )
-	CONVERSION_OPERATOR( float )
-	CONVERSION_OPERATOR( double )
-	CONVERSION_OPERATOR( std::string )
-
-#undef CONVERSION_OPERATOR
-
-#define TYPE_NAME( x ) \
-	if (  typeid( x ) == typeid( Type )  ) {\
-		return #x;\
-	}
-
-	virtual std::string getTypeName( void ) const {
-		TYPE_NAME( bool )
-		TYPE_NAME( char )
-		TYPE_NAME( short )
-		TYPE_NAME( int )
-		TYPE_NAME( long )
-		TYPE_NAME( float )
-		TYPE_NAME( double )
-		TYPE_NAME( std::string )
-		return "unknown";
-	}
-
-#undef TYPE_NAME
-};
-
-class TypeMedley {
-private:
-	TMBase::SP _tmBaseSP;
-
-public:
-	template< typename TYPE >
-	TypeMedley( const TYPE &value ) : _tmBaseSP(  new TMTemplate< TYPE >( value )  ) { }
-	virtual ~TypeMedley() { }
-
-#define CONVERSION_OPERATOR( x ) \
-	virtual operator x( void ) const {\
-		return static_cast< x >( *_tmBaseSP );\
-	}
-
-	CONVERSION_OPERATOR( bool )
-	CONVERSION_OPERATOR( char )
-	CONVERSION_OPERATOR( short )
-	CONVERSION_OPERATOR( int )
-	CONVERSION_OPERATOR( long )
-	CONVERSION_OPERATOR( float )
-	CONVERSION_OPERATOR( double )
-	CONVERSION_OPERATOR( std::string )
-
-#undef CONVERSION_OPERATOR
-
-	std::string getTypeName( void ) {
-		return _tmBaseSP->getTypeName();
-	}
-};
-
-#endif
+#endif // _TYPEMEDLEY_HPP

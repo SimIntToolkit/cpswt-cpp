@@ -87,7 +87,7 @@ void C2WConsoleLogger::addLog(
 	std::cout << values;
 }
 
-void C2WConsoleLogger::addLog( const std::string &id, const InteractionIf &interactionRoot, double time, const std::string &level ) {
+void C2WConsoleLogger::addLog(const std::string &id, const InteractionRootInterface &interactionRoot, double time, const std::string &level ) {
 
 	std::string logIdString = boost::lexical_cast< std::string >( ++_logId );
 	std::string levelString = level.empty() ? "''" : "'" + level + "'";
@@ -122,7 +122,7 @@ void C2WConsoleLogger::addLog( const std::string &id, const InteractionIf &inter
 
 }
 
-void C2WConsoleLogger::addLog( const std::string &id, const ObjectIf &objectRoot, double time, const std::string &level ) {
+void C2WConsoleLogger::addLog(const std::string &id, const ObjectRootInterface &objectRoot, double time, const std::string &level ) {
 
 	std::string logIdString = boost::lexical_cast< std::string >( ++_logId );
 

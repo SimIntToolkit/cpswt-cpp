@@ -96,7 +96,7 @@
 
 #include "InteractionIf.hpp"
 
-class InteractionRoot : public InteractionIf{
+class InteractionRoot : public InteractionRootInterface{
 public:
 	typedef std::map< std::string, StringSet * > NameStringSetPtrMap;
 	typedef std::map< std::string, StringVector * > NameStringVectorPtrMap;
