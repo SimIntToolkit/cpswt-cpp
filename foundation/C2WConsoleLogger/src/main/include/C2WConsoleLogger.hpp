@@ -48,8 +48,8 @@ public:
  	void addLog(const std::string &object, const std::string &attribute, const std::string &fed, bool publish=true);
 	void addLog(const std::string &federate);
 	void addLog( const std::string &id, const std::string &parameter, const std::string &value, const std::string &ptype, double time = 0, const std::string &level = "" );
-	void addLog( const std::string &id, const InteractionIf &interactionRoot, double time = 0, const std::string &level = "" );
-	void addLog( const std::string &id, const ObjectIf &objectRoot, double time = 0, const std::string &level = "" );
+	void addLog(const std::string &id, const InteractionRootInterface &interactionRoot, double time = 0, const std::string &level = "" );
+	void addLog(const std::string &id, const ObjectRootInterface &objectRoot, double time = 0, const std::string &level = "" );
 	void addLog(const std::string &federate, const std::string &info, const std::string &level, double time);
 	int getLogLevel(const std::string &loglevel);
 };
