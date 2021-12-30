@@ -28,8 +28,8 @@
 
 #include "StringCollections.hpp"
 
-#include "InteractionIf.hpp"
-#include "ObjectIf.hpp"
+#include "InteractionRootInterface.hpp"
+#include "ObjectRootInterface.hpp"
 
 class C2WLogger {
 
@@ -39,8 +39,8 @@ public:
 	virtual void addLog(const std::string &object, const std::string &attribute, const std::string &fed, bool publish=true) = 0;
 	virtual void addLog(const std::string &federate) = 0;
 	virtual void addLog( const std::string &id, const std::string &parameter, const std::string &value, const std::string &ptype, double time = 0, const std::string &level = "" ) = 0;
-	virtual void addLog( const std::string &id, const InteractionIf &interactionRoot, double time = 0, const std::string &level = "" ) = 0;
-	virtual void addLog( const std::string &id, const ObjectIf &objectRoot, double time = 0, const std::string &level = "" ) = 0;
+	virtual void addLog(const std::string &id, const InteractionRootInterface &interactionRoot, double time = 0, const std::string &level = "" ) = 0;
+	virtual void addLog(const std::string &id, const ObjectRootInterface &objectRoot, double time = 0, const std::string &level = "" ) = 0;
 	virtual void addLog(const std::string &federate, const std::string &info, const std::string &level, double time) = 0;
 	virtual int getLogLevel(const std::string &loglevel) = 0;
 };

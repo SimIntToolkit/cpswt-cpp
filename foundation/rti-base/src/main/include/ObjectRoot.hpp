@@ -96,7 +96,7 @@
 
 #include "ObjectIf.hpp"
 
-class ObjectRoot : public ObjectIf{
+class ObjectRoot : public ObjectRootInterface{
 public:
 	typedef std::map< std::string, StringSet * > NameStringSetPtrMap;
 	typedef std::map< std::string, StringVector * > NameStringVectorPtrMap;
