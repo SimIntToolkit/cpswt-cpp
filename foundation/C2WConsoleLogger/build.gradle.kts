@@ -3,6 +3,8 @@ plugins {
     `maven-publish`
 }
 
+val rtiHome: String? = System.getenv("RTI_HOME")
+
 val archivaUser: String by project
 val archivaPassword: String by project
 val version: String by project
@@ -19,6 +21,16 @@ library {
 
 //tasks.register("wrapper") {}
 //tasks.register("prepareKotlinBuildScriptModel") {}
+
+tasks.withType(CppCompile::class.java).configureEach {
+    compilerArgs.addAll(toolChain.map { toolChain ->
+        when(toolChain) {
+            is Gcc, is Clang -> listOf("-I$rtiHome/include/hla13", "-Wno-deprecated")
+            is VisualCpp -> listOf("/I $rtiHome/include/hla13")
+            else -> listOf()
+        }
+    })
+}
 
 publishing {
     publications {

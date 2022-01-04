@@ -29,6 +29,7 @@
 
 #include "C2WLogger.hpp"
 
+
 class C2WConsoleLogger : public C2WLogger {
 
 private:

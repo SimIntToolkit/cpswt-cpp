@@ -31,6 +31,9 @@
 #include "InteractionRootInterface.hpp"
 #include "ObjectRootInterface.hpp"
 
+using ::org::cpswt::hla::InteractionRootInterface;
+using ::org::cpswt::hla::ObjectRootInterface;
+
 class C2WLogger {
 
 public:

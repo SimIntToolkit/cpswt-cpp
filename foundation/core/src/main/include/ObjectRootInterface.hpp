@@ -22,26 +22,93 @@
  * @author Harmon Nine
  */
 
+#ifndef _OBJECT_ROOT_INTERFACE
+#define _OBJECT_ROOT_INTERFACE
 
-#ifndef _OBJECT_IF
-#define _OBJECT_IF
+#ifndef _CRT_SECURE_NO_DEPRECATE
+#define _CRT_SECURE_NO_DEPRECATE
+#endif
+
+#ifndef RTI_USES_STD_FSTREAM
+#define RTI_USES_STD_FSTREAM
+#endif
 
 #include <string>
 #include <vector>
+#include <RTI.hh>
+
 #include <TypeMedley.hpp>
+#include <ClassAndPropertyName.hpp>
 
 #include <StringCollections.hpp>
 
-class ObjectRootInterface {
-public:
-	virtual int getClassHandle( void ) const = 0;
-	virtual std::string getClassName( void ) const = 0;
-	virtual StringVector getAttributeNames( void ) const = 0;
-	virtual StringVector getAllAttributeNames( void ) const = 0;
 
-	virtual TypeMedley getAttribute( const std::string &datamemberName ) const = 0;	
-	virtual TypeMedley getAttribute( int datamemberHandle ) const = 0;
-	
+namespace org {
+ namespace cpswt {
+  namespace hla {
+
+struct ObjectRootInterface {
+
+    virtual int getUniqueId() = 0;
+
+    virtual int getClassHandle() const = 0;
+
+    virtual const std::string &getCppClassName() const = 0;
+
+    virtual const std::string &getSimpleClassName() const = 0;
+
+    virtual const std::string &getHlaClassName() const = 0;
+
+    virtual const ClassAndPropertyNameList &getAttributeNames() const = 0;
+
+    virtual const ClassAndPropertyNameList &getAllAttributeNames() const = 0;
+
+    virtual void publishObject(RTI::RTIambassador *rtiAmbassador) = 0;
+
+    virtual void unpublishObject(RTI::RTIambassador *rtiAmbassador) = 0;
+
+    virtual void subscribeObject(RTI::RTIambassador *rtiAmbassador) = 0;
+
+    virtual void unsubscribeObject(RTI::RTIambassador *rtiAmbassador) = 0;
+
+    virtual double getTime() = 0;
+
+    virtual void setTime(double time) = 0;
+
+    virtual void setTime(const RTI::FedTime &rtiFedTime) = 0;
+
+    virtual const TypeMedley &getAttribute( const std::string &propertyName ) const = 0;
+
+    virtual const TypeMedley &getAttribute( int propertyHandle ) const = 0;
+
+    virtual void setAttributes(const RTI::AttributeHandleValuePairSet &propertyMap) = 0;
+
+    virtual void setAttribute(const std::string &propertyName, TypeMedley value ) = 0;
+
+//    virtual RTI::AttributeHandleSet getSubscribedAttributeHandleSet() = 0;
+
+    virtual void requestUpdate(RTI::RTIambassador *rtiAmbassador) = 0;
+
+    virtual int getObjectHandle() = 0;
+
+    virtual void registerObject(RTI::RTIambassador *rtiAmbassador) = 0;
+
+    virtual void registerObject(RTI::RTIambassador *rtiAmbassador, const std::string &name) = 0;
+
+    virtual void unregisterObject(RTI::RTIambassador *rtiAmbassador) = 0;
+
+    virtual void updateAttributeValues(RTI::RTIambassador *rtiAmbassador, double time, bool force) = 0;
+
+    virtual void updateAttributeValues(RTI::RTIambassador *rtiAmbassador, double time) = 0;
+
+    virtual void updateAttributeValues(RTI::RTIambassador *rtiAmbassador, bool force) = 0;
+
+    virtual void updateAttributeValues(RTI::RTIambassador *rtiAmbassador) = 0;
 };
 
-#endif // - _OBJECT_IF
+
+  } // NAMESPACE "hla"
+ } // NAMESPACE "cpswt"
+} // NAMESPACE "org"
+
+#endif // - _OBJECT_ROOT_INTERFACE

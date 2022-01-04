@@ -1,6 +1,7 @@
 plugins {
     `cpp-library`
     `maven-publish`
+    `cpp-unit-test`
 }
 
 val rtiHome: String? = System.getenv("RTI_HOME")
@@ -22,11 +23,27 @@ library {
     publicHeaders.from(file("src/main/include"))
 }
 
+unitTest {
+    targetMachines.set(listOf(machines.linux.x86_64))
+    source.from(file("src/test/c++"))
+    privateHeaders.from(file("src/test/include"))
+}
+
+
 tasks.withType(CppCompile::class.java).configureEach {
     compilerArgs.addAll(toolChain.map { toolChain ->
         when(toolChain) {
             is Gcc, is Clang -> listOf("-I$rtiHome/include/hla13")
             is VisualCpp -> listOf("/I $rtiHome/include/hla13")
+            else -> listOf()
+        }
+    })
+}
+
+tasks.withType(LinkExecutable::class.java).configureEach {
+    linkerArgs.addAll(toolChain.map { toolChain ->
+        when(toolChain) {
+            is Gcc, is Clang -> listOf("-lcppunit", "-ljsoncpp")
             else -> listOf()
         }
     })

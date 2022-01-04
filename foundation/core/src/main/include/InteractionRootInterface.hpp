@@ -22,24 +22,77 @@
  * @author Harmon Nine
  */
 
-#ifndef _INTERACTION_IF
-#define _INTERACTION_IF
+#ifndef _INTERACTION_ROOT_INTERFACE
+#define _INTERACTION_ROOT_INTERFACE
+
+#ifndef _CRT_SECURE_NO_DEPRECATE
+#define _CRT_SECURE_NO_DEPRECATE
+#endif
+
+#ifndef RTI_USES_STD_FSTREAM
+#define RTI_USES_STD_FSTREAM
+#endif
 
 #include <string>
 #include <vector>
+#include <RTI.hh>
 
 #include <TypeMedley.hpp>
+#include <ClassAndPropertyName.hpp>
 
 #include <StringCollections.hpp>
 
-class InteractionRootInterface {
-public:
-	virtual int getClassHandle( void ) const = 0;
-	virtual std::string getClassName( void ) const = 0;
-	virtual StringVector getParameterNames( void ) const = 0;
-	virtual StringVector getAllParameterNames( void ) const = 0;
 
-	virtual TypeMedley getParameter( const std::string &datamemberName ) const = 0;	
-	virtual TypeMedley getParameter( int datamemberHandle ) const = 0;
+namespace org {
+ namespace cpswt {
+  namespace hla {
+
+struct InteractionRootInterface {
+
+    virtual int getUniqueId() = 0;
+
+    virtual int getClassHandle() const = 0;
+
+    virtual const std::string &getCppClassName() const = 0;
+
+    virtual const std::string &getSimpleClassName() const = 0;
+
+    virtual const std::string &getHlaClassName() const = 0;
+
+    virtual const ClassAndPropertyNameList &getParameterNames() const = 0;
+
+    virtual const ClassAndPropertyNameList &getAllParameterNames() const = 0;
+
+    virtual void publishInteraction(RTI::RTIambassador *rtiAmbassador) = 0;
+
+    virtual void unpublishInteraction(RTI::RTIambassador *rtiAmbassador) = 0;
+
+    virtual void subscribeInteraction(RTI::RTIambassador *rtiAmbassador) = 0;
+
+    virtual void unsubscribeInteraction(RTI::RTIambassador *rtiAmbassador) = 0;
+
+    virtual double getTime() = 0;
+
+    virtual void setTime(double time) = 0;
+
+    virtual void setTime(const RTI::FedTime &rtiFedTime) = 0;
+
+    virtual const TypeMedley &getParameter( const std::string &propertyName ) const = 0;
+
+    virtual const TypeMedley &getParameter( int propertyHandle ) const = 0;
+
+    virtual void setParameters(const RTI::ParameterHandleValuePairSet &propertyMap) = 0;
+
+    virtual void setParameter(const std::string &propertyName, TypeMedley value ) = 0;
+
+    virtual void sendInteraction(RTI::RTIambassador *rtiAmbassador, double time) = 0;
+
+    virtual void sendInteraction(RTI::RTIambassador *rtiAmbassador) = 0;
 };
-#endif // - _INTERACTION_IF
+
+
+  } // NAMESPACE "hla"
+ } // NAMESPACE "cpswt"
+} // NAMESPACE "org"
+
+#endif // - _INTERACTION_ROOT_INTERFACE

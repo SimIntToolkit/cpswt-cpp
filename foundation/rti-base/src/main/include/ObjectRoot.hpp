@@ -1,3 +1,5 @@
+
+
 /*
  * Copyright (c) 2008, Institute for Software Integrated Systems, Vanderbilt University
  * All rights reserved.
@@ -18,50 +20,10 @@
  * ON AN "AS IS" BASIS, AND THE VANDERBILT UNIVERSITY HAS NO OBLIGATION TO
  * PROVIDE MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
  *
- * @author Himanshu Neema
- * @author Harmon Nine
  */
 
-/*
- * 	NOTE:  ALL "if" STATEMENTS IN THIS CODE THAT HAD THE FORM:
- *
- *  if (condition) statement;
- *
- *	OR
- *
- *  if (condition) statement1;
- *  else           statement2;
- *
- *  HAVE BEEN CONVERTED TO THE FORMS:
- *
- *  if (condition) {
- *		statement;
- *	}
- *
- *	AND
- *
- *  if (condition) {
- *		statement1;
- *	} else {
- *		statement2;
- *	}
- *
- *	RESPECTIVELY.  THIS IS BECAUSE THE OMNET DEBUGGER APPEARS TO HAVE A PROBLEM
- *  WITH THE NON-BRACED FORMS OF THE IF STATEMENT.  *PLEASE* DO NOT CHANGE IT BACK.
- *  -- H.S.N.
- *
- */
-
-#ifndef _OBJECT_ROOT
-#define _OBJECT_ROOT
-
-#ifndef _CRT_SECURE_NO_DEPRECATE
-#define _CRT_SECURE_NO_DEPRECATE
-#endif
-
-#ifndef RTI_USES_STD_FSTREAM
-#define RTI_USES_STD_FSTREAM
-#endif
+#ifndef _OBJECT_ROOT_CLASS
+#define _OBJECT_ROOT_CLASS
 
 #include <string>
 #include <vector>
@@ -71,12 +33,16 @@
 #include <set>
 #include <map>
 #include <list>
-#include <ctype.h>
-#include <stdlib.h>
+#include <cctype>
+#include <cstdlib>
 
 #include <boost/shared_ptr.hpp>
+#include <boost/algorithm/string.hpp>
+#include <boost/algorithm/string/join.hpp>
 
-#include <TypeMedley.hpp>
+#include <jsoncpp/json/json.h>
+#include <Attribute.hpp>
+
 #include <StringCollections.hpp>
 
 #include "RTI.hh"
@@ -94,627 +60,1375 @@
 #define C2W_RTI_LOGGER_CLS C2WConsoleLogger
 #endif
 
-#include "ObjectIf.hpp"
+#include "ObjectRootInterface.hpp"
 
-class ObjectRoot : public ObjectRootInterface{
+
+namespace org {
+ namespace cpswt {
+  namespace hla {
+
+class Object : public ObjectInterface {
+
 public:
-	typedef std::map< std::string, StringSet * > NameStringSetPtrMap;
-	typedef std::map< std::string, StringVector * > NameStringVectorPtrMap;
-	typedef std::map< std::string, int > StringIntegerMap;
-	typedef std::map< int, std::string > IntegerStringMap;
+    typedef boost::shared_ptr<Object> SP;
+    typedef boost::shared_ptr<RTI::AttributeHandleValuePairSet> PopertyHandleValuePairSetSP;
 
-	typedef boost::shared_ptr< ObjectRoot > SP;
-	typedef boost::shared_ptr< RTI::AttributeHandleValuePairSet > AttributeHandleValuePairSetSP;
+    typedef boost::shared_ptr<ClassAndPropertyNameSet> ClassAndPropertyNameSetSP;
 
-	typedef SP (*FactoryFunctionPtr)( void );
-	typedef std::map< std::string, FactoryFunctionPtr > ClassNameFactoryMap;
+    typedef std::map<std::string, ClassAndPropertyNameSetSP> StringClassAndPropertyNameSetSPMap;
+    typedef std::map< std::string, StringVector > NameStringVectorPtrMap;
+    typedef std::map< ClassAndPropertyName, int > ClassAndPropertyNameIntegerMap;
+    typedef std::map<int, ClassAndPropertyNameSP> IntegerClassAndPropertyNameSPMap;
+    typedef std::map<int, std:string> IntegerStringMap;
 
-	typedef void (*PubsubFunctionPtr)( RTI::RTIambassador * );
-	typedef std::map< std::string, PubsubFunctionPtr > ClassNamePubSubMap;
-	typedef std::map< std::string, std::string> DatamemberTypeMap;
+    typedef RTI::AttributeHandleSet AttributeHandleSet;
+    typedef boost::shared_ptr<AttributeHandleSet> AttributeHandleSetSP;
 
-	typedef std::map< std::string, RTI::AttributeHandleSet * > ClassNameAttributesPtrMap;
-	typedef std::map< int, SP > ObjectMap;
+    typesef std::map<std::string, SP> StringInstanceSPMap;
 
-	static DatamemberTypeMap &getDatamemberTypeMap( void ) {
-		static DatamemberTypeMap datamemberTypeMap;
-		return datamemberTypeMap;
-	}
+    typedef Attribute Value;
+    typedef RTI::AttributeHandleValuePairSet PropertyHandleValuePairSet;
+
+    typedef boost::shared_ptr<Value> ValueSP
+    typedef std::unordered_map<ClassAndPropertyName, ValueSP> ClassAndPropertyNameValueSPMap;
+    typedef boost::shared_ptr<PropertyHandleValuePairSet> PropertyHandleValuePairSetSP;
+
+    typedef void (*PubsubFunctionPtr)( RTI::RTIambassador * );
+    typedef std::map< std::string, PubsubFunctionPtr > ClassNamePubSubMap;
+    typedef std::map< std::string, std::string> DatamemberTypeMap;typedef std::map< std::string, AttributeHandleSetSP > StringAttributesHandleSetSPMap;
+    typedef std::unordered_map< int, SP > ObjectHandleInstanceMap;
+
+private:
+    static int generateUniqueID() {
+        static int globalUniqueID = 0;
+        return globalUniqueID++;
+    }
+
+    const int _uniqueID;
+
+public:
+    int getUniqueID() {
+        return _uniqueID;
+    }
+
+    //---------------
+    // CLASS-NAME SET
+    //---------------
+protected:
+    static StringSet &get_class_name_set( void ) {
+        static StringSet classNameSet;
+        return classNameSet;
+    }
+
+    //--------------------------------
+    // METHODS THAT USE CLASS-NAME-SET
+    //--------------------------------
+public:
+    static const StringSet &get_object_names( void ) {
+        return getClassNameSet();
+    }
+
+    //-------------------
+    // END CLASS-NAME-SET
+    //-------------------
+
+    //----------------------------
+    // CLASS-NAME CLASS-HANDLE MAP
+    //----------------------------
+protected:
+    static StringIntegerMap &get_class_name_handle_map( void ) {
+        static StringIntegerMap classNameHandleMap;
+        return classNameHandleMap;
+    }
+
+    //---------------------------------------------
+    // METHODS THAT USE CLASS-NAME CLASS-HANDLE MAP
+    //---------------------------------------------
+public:
+    static int get_class_handle(const std::string &className) {
+        StringIntegerMap::iterator simItr = get_class_name_handle_map().find(className);
+        return simItr == get_class_name_handle_map().end() ? -1 : simItr->second;
+    }
+
+    //--------------------------------
+    // END CLASS-NAME CLASS-HANDLE MAP
+    //--------------------------------
+
+    //-----------------------------------
+    // CLASS-NAME DATAMEMBER-NAME-SET MAP
+    //-----------------------------------
+protected:
+    static StringClassAndPropertyNameSetSPMap &get_class_name_property_name_set_sp_map() {
+        static StringClassAndPropertyNameSetSPMap classNamePropertyNameSetSPMap;
+        return classNamePropertyNameSetSPMap;
+    }
+
+    //----------------------------------------------------
+    // METHODS THAT USE CLASS-NAME DATAMEMBER-NAME-SET MAP
+    //----------------------------------------------------
+public:
+    static const ClassAndPropertyNameSetSP &get_attribute_names(const std::string &className) {
+       StringClassAndPropertyNameSetSPMap::iterator scmItr =
+         get_class_name_property_name_set_ptr_map().find(className);
+
+       return scmItr == get_class_name_property_name_set_ptr_map().end()
+         ? ClassAndPropertyNameSetSP(static_cast<ClassAndPropertyNameSet *>(0))
+         : scmItr->second;
+    }
+
+    //---------------------------------------
+    // END CLASS-NAME DATAMEMBER-NAME-SET MAP
+    //---------------------------------------
+
+    //---------------------------------------
+    // CLASS-NAME ALL-DATAMEMBER-NAME-SET MAP
+    //---------------------------------------
+protected:
+    static StringClassAndPropertyNameSetSPMap &get_class_name_all_property_name_set_sp_map() {
+        static StringClassAndPropertyNameSetSPMap classNameAllPropertyNameSetSPMap;
+        return classNameAllPropertyNameSetSPMap;
+    }
+
+    //--------------------------------------------------------
+    // METHODS THAT USE CLASS-NAME ALL-DATAMEMBER-NAME-SET MAP
+    //--------------------------------------------------------
+public:
+    static const ClassAndPropertyNameSetSP &get_all_attribute_names(const std::string &className) {
+       StringClassAndPropertyNameSetSPMap::iterator scmItr =
+         get_class_name_all_property_name_set_ptr_map().find(className);
+
+       return scmItr == get_class_name_all_property_name_set_ptr_map().end()
+         ? ClassAndPropertyNameSetSP(static_cast<ClassAndPropertyNameSet *>(0))
+         : scmItr->second;
+    }
+
+    //-------------------------------------------
+    // END CLASS-NAME All-DATAMEMBER-NAME-SET MAP
+    //-------------------------------------------
+
+    //--------------------------------------------
+    // CLASS-AND-PROPERTY-NAME PROPERTY-HANDLE MAP
+    //--------------------------------------------
+protected:
+    static ClassAndPropertyNameIntegerMap &get_class_and_property_name_handle_map() {
+        static ClassAndPropertyNameIntegerMap classAndPropertyNameIntegerMap;
+        return classAndPropertyNameIntegerMap;
+    }
+
+    //------------------------------------------------------------------
+    // METHODS THAT USE CLASS-NAME-DATAMEMBER-NAME DATAMEMBER-HANDLE MAP
+    //------------------------------------------------------------------
+private:
+    static std::string join(const std::list<std::string> &joinList, cons std:string &delimiter);
+
+public:
+    static ClassAndPropertyNameSP findProperty(const std:string &className, const std::string &propertyName);
+
+    static int get__handle(const std::string &className, const std::string &propertyName) {
+        ClassAndPropertyNameSP key = findProperty(className, propertyName);
+        if (!key) {
+            return -1
+        }
+
+        return get_class_and_property_name_handle_map()[key];
+    }
+    //-----------------------------------------------------
+    // END CLASS-NAME-DATAMEMBER-NAME DATAMEMBER-HANDLE MAP
+    //-----------------------------------------------------
+
+
+    //------------------------------------------------
+    // DATAMEMBER-HANDLE CLASS-AND-DATAMEMBER-NAME MAP
+    //------------------------------------------------
+protected:
+    static IntegerClassAndPropertyNameSPMap get_handle_class_and_property_name_sp_map() {
+        static IntegerClassAndPropertyNameSPMap handleClassAndPropertyNameSPMap;
+        return handleClassAndPropertyNameSPMap;
+    }
+
+    //-----------------------------------------------------------------
+    // METHODS THAT USE DATAMEMBER-HANDLE CLASS-AND-DATAMEMBER-NAME MAP
+    //-----------------------------------------------------------------
+public:
+    static ClassAndPropertyNameSP get_class_and_attribute_name(int propertyHandle) {
+        IntegerClassAndPropertyNameSPMap::iterator icmItr =
+          get_handle_class_and_property_name_sp_map().find(propertyHandle);
+        return icmItr == get_handle_class_and_property_name_sp_map().end()
+          ? ClassAndPropertyNameSP(static_cast<ClassAndPropertyName *>0) : icmItr->second;
+    }
+
+    ClassAndPropertyNameSP getClassAndAttributeName(int propertyHandle) {
+        return get_class_and_attribute_name(propertyHandle);
+    }
+
+    const std::string &getAttributeName(int propertyHandle) {
+        static std::string emptyString;
+        ClassAndPropertyNameSP classAndPropertyNameSP = get_class_and_attribute_name(propertyHandle);
+        return classAndPropertyNameSP ? classAndPropertyNameSP->getPropertyName() : emptyString;
+    }
+
+    //----------------------------------------------------
+    // END DATAMEMBER-HANDLE CLASS-AND-DATAMEMBER-NAME MAP
+    //----------------------------------------------------
+
+
+    //-----------------------------------
+    // CLASS-HANDLE CLASS-SIMPLE-NAME MAP
+    //-----------------------------------
+protected:
+    static IntegerStringMap &get_class_handle_simple_name_map() {
+        static IntegerStringMap integerStringMap;
+        return integerStringMap;
+    }
+
+    //----------------------------------------------------
+    // METHODS THAT USE CLASS-HANDLE CLASS-SIMPLE-NAME MAP
+    //----------------------------------------------------
+public:
+    static const std::string &get_simple_class_name(int classHandle) {
+        static std::string emptyString;
+        IntegerStringMap::iterator ismItr = get_class_handle_simple_name_map().find(classHandle);
+        return ismItr == get_class_handle_simple_name_map().end() ? emptyString : ismItr->second;
+    }
+
+    //---------------------------------------
+    // END CLASS-HANDLE CLASS-SIMPLE-NAME MAP
+    //---------------------------------------
+
+
+    //-----------------------
+    // CLASS-NAME ROOT-SP MAP
+    //-----------------------
+protected:
+    static StringInstanceSPMap &get_class_name_instance_sp_map() {
+        static StringInstanceSPMap classNameInstanceSPMap;
+        return classNameInstanceSPMap;
+    }
+
+    //-----------------------------------------
+    // METHODS THAT USER CLASS-NAME ROOT-SP MAP
+    //-----------------------------------------
+public:
+    static StringInstanceSPMap &get_class_name_instance_sp_map() {
+        static StringInstanceSPMap classNameInstanceMap;
+        return classNameInstanceMap;
+    }
+
+    static SP create_object(const std::string &className) {
+        StringInstanceSPMap::iterator cimItr = get_class_name_instance_sp_map().find(className);
+        return cimItr == get_class_name_instance_sp_map().end()
+          ? SP( ( *)0 )
+          : cimItr->second->createObject();
+    }
+
+    static SP create_object(const std::string &className, const RTIfedTime &rtiFedTime) {
+        StringInstanceSPMap::iterator cimItr = get_class_name_instance_sp_map().find( className );
+        return cimItr == get_class_name_instance_sp_map().end()
+          ? SP( ( *)0 )
+          : cimItr->second->createcreateObject(rtiFedTime);
+    }
+
+    static void publish_object(const std::string &className, RTI::RTIambassador *rtiAmbassador) {
+        StringInstanceSPMap::iterator cimItr = get_class_name_instance_sp_map().find(className);
+        if (cimItr != get_class_name_instance_sp_map().end()) {
+            cimItr->second->publishObject(rtiAmbassador);
+        }
+    }
+
+    static void unpublish_object(const std::string &className, RTI::RTIambassador *rtiAmbassador) {
+        StringInstanceSPMap::iterator cimItr = get_class_name_instance_sp_map().find(className);
+        if (cimItr != get_class_name_instance_sp_map().end()) {
+            cimItr->second->unpublishObject(rtiAmbassador);
+        }
+    }
+
+    static void subscribe_object(const std::string &className, RTI::RTIambassador *rtiAmbassador) {
+        StringInstanceSPMap::iterator cimItr = get_class_name_instance_sp_map().find(className);
+        if (cimItr != get_class_name_instance_sp_map().end()) {
+            cimItr->second->subscribeObject(rtiAmbassador);
+        }
+    }
+
+    static void unsubscribe_object(const std::string &className, RTI::RTIambassador *rtiAmbassador) {
+        StringInstanceSPMap::iterator cimItr = get_class_name_instance_sp_map().find(className);
+        if (cimItr != get_class_name_instance_sp_map().end()) {
+            cimItr->second->unsubscribeObject(rtiAmbassador);
+        }
+    }
+
+    //---------------------------
+    // END CLASS-NAME ROOT-SP MAP
+    //---------------------------
+
+
+    //----------------------------
+    // CLASS-HANDLE CLASS-NAME MAP
+    //----------------------------
+protected:
+    static IntegerStringMap &get_class_handle_name_map() {
+        static IntegerStringMap classHandleNameMap;
+        return classHandleNameMap;
+    }
+
+    //--------------------------------------------------
+    // METHODS THAT USE ONLY CLASS-HANDLE CLASS-NAME MAP
+    //--------------------------------------------------
+public:
+    static String get_hla_class_name(int classHandle) {
+        IntegerStringMap::iterator ismItr = get_class_handle_name_map().find(classHandle);
+        return ismItr == get_class_handle_name_map().end() ? "" : ismitr->second;
+    }
+
+    static SP create_object(int classHandle) {
+        IntegerStringMap::iterator ismItr = get_class_handle_name_map().find(classHandle);
+        return ismItr == get_class_handle_name_map().end()
+          ? SP( (Object *)0 )
+          : create_object(ismItr->second);
+    }
+
+    static SP create_object(int classHandle, const RTIfedTime &rtiFedTime) {
+        IntegerStringMap::iterator ismItr = get_class_handle_name_map().find(classHandle);
+        return ismItr == get_class_handle_name_map().end()
+          ? SP( ( *)0 )
+          : create_object(ismItr->second, rtiFedTime);
+    }
+
+    static SP create_object(int classHandle, const RTI::AttributeHandleValuePairSet &datamemberMap);
+    static SP create_object(int classHandle, const RTI::AttributeHandleValuePairSet &datamemberMap, const RTIfedTime &rtiFedTime);
+
+    //------------------------------------------------------
+    // END METHODS THAT USE ONLY CLASS-HANDLE CLASS-NAME MAP
+    //------------------------------------------------------
+
+
+    //--------------
+    // OBJECT HANDLE
+    //--------------
+private:
+    int _objectHandle;
+
+    //------------------------------------
+    // METHODS THAT USE ONLY OBJECT HANDLE
+    //------------------------------------
+public:
+    int getObjectHandle() {
+        return _objectHandle
+    }
+
+    //----------------------------------------
+    // END METHODS THAT USE ONLY OBJECT HANDLE
+    //----------------------------------------
+
+
+    //-----------
+    // OBJECT MAP
+    //-----------
+private:
+    static ObjectHandleInstanceMap &get_object_handle_instance_map() {
+        static ObjectHandleInstanceMap objectHandleInstanceMap = new ObjectHandleInstanceMap();
+    }
+
+    //---------------------------------
+    // METHODS THAT USE ONLY OBJECT MAP
+    //---------------------------------
+public:
+    static SP get_object( int object_handle ) {
+        ObjectHandleInstanceMap::iterator oimItr = get_object_handle_instance_map().find( object_handle );
+        return oimItr == get_object_handle_instance_map().end() ? SP(static_cast<ObjectRoot *>(0)) : oimItr->second;
+    }
+
+    static SP remove_object( int object_handle ) {
+        SP objectRootSP = get_object( object_handle );
+        get_object_handle_instance_map().erase( object_handle );
+        return SP;
+    }
+
+    static SP reflect( int object_handle, const RTI::AttributeHandleValuePairSet &datamemberMap ) {
+        SP objectRootSP = get_object( object_handle );
+        if ( !objectRootSP ) {
+            return objectRootSP;
+        }
+
+        objectRootSP->setTime( -1 );
+        objectRootSP->setAttributes( datamemberMap );
+        return objectRootSP;
+    }
+
+    static SP reflect(
+      int object_handle, const RTI::AttributeHandleValuePairSet &datamemberMap, const RTIfedTime &rtiFedTime
+    ) {
+        SP objectRootSP = get_object( object_handle );
+        if ( !objectRootSP ) {
+            return objectRootSP;
+        }
+
+        objectRootSP->setTime( rtiFedTime.getTime() );
+        objectRootSP->setAttributes( datamemberMap );
+        return objectRootSP;
+    }
+
+    static SP reflect( int object_handle, const RTI::AttributeHandleValuePairSet &datamemberMap, double theTime ) {
+        SP objectRootSP = get_object( object_handle );
+        if ( !objectRootSP ) {
+            return objectRootSP;
+        }
+
+        objectRootSP->setTime( theTime );
+        objectRootSP->setAttributes( datamemberMap );
+        return objectRootSP;
+    }
+
+    //-------------------------------------
+    // END METHODS THAT USE ONLY OBJECT MAP
+    //-------------------------------------
+
+
+    //---------------------------------------------------
+    // METHODS THAT USE BOTH OBJECT MAP AND OBJECT HANDLE
+    //---------------------------------------------------
+private:
+    void setObjectHandle( int object_handle ) {
+        remove_object( object_handle );
+        _objectHandle = object_handle;
+        get_object_handle_instance_map().insert(  std::make_pair( object_handle, SP(this) )  );
+    }
+
+    //-------------------------------------------------------
+    // END METHODS THAT USE BOTH OBJECT MAP AND OBJECT HANDLE
+    //-------------------------------------------------------
+
+
+    //--------------------------------------------------------------------------------------------------
+    // METHODS THAT USE OBJECT MAP, OBJECT HANDLE, CLASS-NAME CLASS MAP, AND CLASS-HANDLE CLASS-NAME MAP
+    //--------------------------------------------------------------------------------------------------
+public:
+    static SP discover( int class_handle, int object_handle ) {
+        SP objectRootSP = create_object( class_handle );
+        if (objectRootSP) {
+            get_object_handle_instance_map().insert( std::make_pair(object_handle, objectRootSP) );
+        }
+        return objectRootSP;
+    }
+
+    //------------------------------------------------------------------------------------------------------
+    // END METHODS THAT USE OBJECT MAP, OBJECT HANDLE, CLASS-NAME CLASS MAP, AND CLASS-HANDLE CLASS-NAME MAP
+    //------------------------------------------------------------------------------------------------------
+
+    //-------------------------
+    // END CLASS-NAME CLASS MAP
+    //-------------------------
+
+    //--------------------------------
+    // END CLASS-HANDLE CLASS-NAME MAP
+    //--------------------------------
+
+    //--------------
+    // IS REGISTERED
+    //--------------
+private:
+    bool _isRegistered = false;
+
+    //--------------------------------------------------------------
+    // METHODS THAT USE OBJECT MAP, OBJECT HANDLE, AND IS REGISTERED
+    //--------------------------------------------------------------
+public:
+    void registerObject( RTI::RTIambassador *rti );
+
+    void registerObject( RTI::RTIambassador *rti, std::string &name );
+
+    void unregisterObject( RTI::RTIambassador *rti );
+
+    //------------------------------------------------------------------
+    // END METHODS THAT USE OBJECT MAP, OBJECT HANDLE, AND IS REGISTERED
+    //------------------------------------------------------------------
+
+    //------------------
+    // END IS REGISTERED
+    //------------------
+
+    //---------------
+    // END OBJECT MAP
+    //---------------
+
+    //------------------
+    // END OBJECT HANDLE
+    //------------------
+
+    //----------------------------------------
+    // CLASS-NAME PUBLISHED-ATTRIBUTE-NAME SET
+    //----------------------------------------
+protected:
+    static StringClassAndPropertyNameSetSPMap &get_class_name_published_attribute_name_set_sp_map() {
+        static StringClassAndPropertyNameSetSPMap classNamePublishedAttributeNameSetSPMap;
+        return classNamePublishedAttributeNameSetSPMap;
+    }
+
+    //---------------------------------------------------------
+    // METHODS THAT USE CLASS-NAME PUBLISHED-ATTRIBUTE-NAME SET
+    //---------------------------------------------------------
+public:
+    static void publish_attribute( const std::string &className, const std::string &attributeName ) {
+        ClassAndPropertyNameSP key = findProperty(className, attributeName);
+        if (key) {
+            get_class_name_published_attribute_name_set_sp_map()[className].insert(*key);
+        }
+        // ERROR
+    }
+
+    static void unpublish_attribute( const std::string &className, const std::string &attributeName ) {
+        ClassAndPropertyNameSP key = findProperty(className, attributeName);
+        if (key) {
+            get_class_name_published_attribute_name_set_sp_map()[className].erase(*key);
+        }
+        // ERROR
+    }
+    //--------------------------------------------
+    // END CLASS-NAME PUBLISHED-ATTRIBUTE-NAME SET
+    //--------------------------------------------
+
+
+    //-----------------------------------------
+    // CLASS-NAME SUBSCRIBED-ATTRIBUTE-NAME SET
+    //-----------------------------------------
+protected:
+    static StringClassAndPropertyNameSetSPMap &get_class_name_subscribed_attribute_name_set_sp_map() {
+        static StringClassAndPropertyNameSetSPMap classNameSubscribedAttributeNameSetSPMap;
+        return classNameSubscribedAttributeNameSetSPMap;
+    }
+
+    //---------------------------------------------------------
+    // METHODS THAT USE CLASS-NAME SUBSCRIBED-ATTRIBUTE-NAME SET
+    //---------------------------------------------------------
+public:
+    static void subscribe_attribute( const std::string &className, const std::string &attributeName ) {
+        ClassAndPropertyNameSP key = findProperty(className, attributeName);
+        if (key) {
+            get_class_name_subscribed_attribute_name_set_sp_map()[className].insert(*key);
+        }
+        // ERROR
+    }
+
+    static void unsubscribe_attribute( const std::string &className, const std::string &attributeName ) {
+        ClassAndPropertyNameSP key = findProperty(className, attributeName);
+        if (key) {
+            get_class_name_subscribed_attribute_name_set_sp_map()[className].erase(*key);
+        }
+        // ERROR
+    }
+
+    //---------------------------------------------
+    // END CLASS-NAME SUBSCRIBED-ATTRIBUTE-NAME SET
+    //---------------------------------------------
+
+
+    //-------------------------------------------------------------------------------------------------
+    // CLASS-NAME PUBLISHED-ATTRIBUTE-HANDLE-SET MAP AND CLASS-NAME SUBSCRIBED-ATTRIBUTE-HANDLE-SET MAP
+    //-------------------------------------------------------------------------------------------------
+protected:
+    static StringAttributesHandleSetSPMap &get_class_name_published_attribute_handle_set_sp_map() {
+        static StringAttributesHandleSetSPMap classNamePublishedAttributesHandleSetSPMap;
+        return  classNamePublishedAttributesHandleSetSPMap;
+    }
+
+    static StringAttributesHandleSetSPMap &get_class_name_subscribed_attribute_handle_set_sp_map() {
+        static StringAttributesHandleSetSPMap classNameSubscribedAttributesHandleSetSPMap;
+        return  classNameSubscribedAttributesHandleSetSPMap;
+    }
+
+    //-----------------------------------------------------------------------------------------------------
+    // END CLASS-NAME PUBLISHED-ATTRIBUTE-HANDLE-SET MAP AND CLASS-NAME SUBSCRIBED-ATTRIBUTE-HANDLE-SET MAP
+    //-----------------------------------------------------------------------------------------------------
+
+    void requestUpdate( RTI::RTIambassador *rti );
+
+
+    //-------------------------------------------
+    // CLASS-AND-PROPERTY-NAME PROPERTY-VALUE MAP
+    //-------------------------------------------
+protected:
+    ClassAndPropertyNameValueSPMap _classAndPropertyNameValueSPMap;
+
+    //-----------------------------------------------------------------------------------------------------------
+    // PROPERTY-CLASS-NAME AND PROPERTY-VALUE DATA CLASS
+    // THIS CLASS IS USED ESPECIALLY FOR THE BENEFIT OF THE SET METHOD BELOW.  WHEN A VALUE IS RETRIEVED FROM THE
+    // classPropertyNameValueMap USING A GET METHOD, IT IS PAIRED WITH THE NAME OF THE CLASS IN WHICH THE
+    // PROPERTY IS DEFINED. IN THIS WAY, THE SET METHOD CAN PLACE THE NEW VALUE FOR THE PROPERTY USING THE
+    // CORRECT (CLASS-NAME, PROPERTY-NAME) KEY.
+    //-----------------------------------------------------------------------------------------------------------
+    class PropertyClassNameAndValue {
+    private:
+        const std::string className;
+        const ValueSP valueSP;
+
+    public:
+        PropertyClassNameAndValue(const std::string &className, ValueSP &localValueS{)
+         className(className), valueSP(localValueSP) {}
+
+        const std::string &getClassName() {
+            return className;
+        }
+
+        const ValueSP &getValueSP() {
+            return valueSP;
+        }
+    };
+
+    typedef boost:shared_ptr<PropertyClassNameAndValue> PropertyClassNameAndValueSP;
+
+    //------------------------------------------------------------
+    // METHODS THAT USE CLASS-AND-PROPERTY-NAME PROPERTY-VALUE MAP
+    //------------------------------------------------------------
+public:
+    template<typename T>
+    void setAttribute(const std::string &propertyName, const T &value) {
+
+        PropertyClassNameAndValueSP propertyClassNameAndValueSP =
+          getAttributeAux(getHlaClassName(), propertyName);
+
+        if (!propertyClassNameAndValueSP) {
+//            logger.error(
+//              "setattribute(\"{}\", {} value): could not find \"{}\" attribute of class \"{}\" or its " +
+//              "superclasses.", propertyName, value.getClass().getName(), propertyName, getHlaClassName()
+//            );
+            return;
+        }
+
+        Value currentValue = *propertyClassNameAndValueSP->getValueSP();
+
+        if (!currentValue.setValue(value)) {
+//            logger.error(
+//              "setattribute(\"{}\", {} value): \"value\" is incorrect type \"{}\" for \"{}\" parameter, " +
+//              "should be of type \"{}\".",
+//              propertyName,
+//              value.getClass().getName(),
+//              value.getClass().getName(),
+//              propertyName,
+//              currentValue.getClass().getName()
+//            );
+        }
+    }
+
+    void setAttribute(int propertyHandle, Object value) {
+        ClassAndPropertyNameSP classAndPropertyNameSP = _handleClassAndPropertyNameMap.get(propertyHandle);
+        if (!classAndPropertyNameSP) {
+//            logger.error(
+//              "setAttribute(int, Object value): propertyHandle {} does not exist.",
+//              propertyHandle
+//            );
+            return;
+        }
+
+        String propertyName = classAndPropertyNameSP->getPropertyName();
+        ValueSP valueSP = getAttribute(propertyName);
+        if (!valueSP) {
+//            logger.error(
+//                "setAttribute: propertyHandle {} corresponds to property of name \"{}\", which " +
+//                "does not exist in class \"{}\" (it's defined in class\"{}\")",
+//                propertyHandle, propertyName, getClass(), classAndPropertyName.getClassName()
+//            );
+        }
+
+        setAttribute(propertyName, value);
+    }
+
+    //
+    // getAttributeAux METHODS ARE DEFINED IN SUBCLASSES.
+    //
+
+    /**
+     * Returns the value of the attribute named "propertyName" for this
+     * object.
+     *
+     * @param propertyName name of attribute whose value to retrieve
+     * @return the value of the attribute whose name is "propertyName"
+     */
+    const Value &getAttribute(const std::string &propertyName) {
+        return *getAttributeAux(getHlaClassName(), propertyName)->getValue();
+    }
+
+    /**
+     * Returns the value of the attribute whose handle is "propertyHandle"
+     * (RTI assigned) for this object.
+     *
+     * @param propertyHandle handle (RTI assigned) of attribute whose
+     * value to retrieve
+     * @return the value of the attribute whose handle is "propertyHandle"
+     */
+    public const Value &getAttribute( int propertyHandle );
+
+    //---------------------------------------------------
+    // END CLASS-AND-PROPERTY-NAME PROPERTY-VALUE MAP
+    //---------------------------------------------------
+
+
+    //---------------------------
+    // START OF INCLUDED TEMPLATE
+    //---------------------------
+
+
+
+    // ----------------------------------------------------------------------------
+    // STATIC DATAMEMBERS AND CODE THAT DEAL WITH NAMES
+    // THIS CODE IS STATIC BECAUSE IT IS CLASS-DEPENDENT AND NOT INSTANCE-DEPENDENT
+    // ----------------------------------------------------------------------------
+
+public:
+    /**
+     * Returns the fully-qualified (dot-delimited) name of the org.cpswt.hla.ObjectRoot object class.
+     * Note: As this is a static method, it is NOT polymorphic, and so, if called on
+     * a reference will return the name of the class pertaining to the reference,
+     * rather than the name of the class for the instance referred to by the reference.
+     * For the polymorphic version of this method, use {@link #getJavaClassName()}.
+     *
+     * @return the fully-qualified Java class name for this object class
+     */
+    static const std::string &get_cpp_class_name() {
+        static const std::string cppClassName("::org::cpswt::hla::ObjectRoot");
+        return cppClassName;
+    }
+
+    /**
+     * Returns the fully-qualified (dot-delimited) name of this instance's object class.
+     * Polymorphic equivalent of get_java_class_name static method.
+     *
+     * @return the fully-qualified (dot-delimited) name of this instance's object class
+     */
+    virtual const std::string &getCppClassName() {
+        return get_cpp_class_name();
+    }
+
+    /**
+     * Returns the simple name (the last name in the dot-delimited fully-qualified
+     * class name) of the org.cpswt.hla.ObjectRoot object class.
+     *
+     * @return the name of this object class
+     */
+    static const std::string &get_simple_class_name() {
+        static const std::string simpleClassName("ObjectRoot");
+        return simpleClassName;
+    }
+
+    /**
+     * Returns the simple name (last name in its fully-qualified dot-delimited name)
+     * of this instance's object class.
+     * Polymorphic equivalent of the get_simple_class_name static method.
+     *
+     * @return the simple name of this instance's object class
+     */
+    virtual const std::string &getSimpleClassName() {
+        return get_simple_class_name();
+    }
+
+    /**
+     * Returns the fully-qualified (dot-delimited) hla class name of the
+     * ObjectRoot object class.
+     * Note: As this is a static method, it is NOT polymorphic, and so, if called on
+     * a reference will return the federation name of the class pertaining to the reference,
+     * rather than the name of the class for the instance referred to by the reference.
+     * For the polymorphic version of this method, use {@link #getHlaClassName()}.
+     *
+     * @return the fully-qualified federation (HLA) class name for this object class
+     */
+    static const std::string &get_hla_class_name() {
+        static const std::string hlaClassName("ObjectRoot");
+        return hlaClassName;
+    }
+
+    /**
+     * Returns the fully-qualified (dot-delimited) hla class name of this instance's object class.
+     * Polymorphic equivalent of get_hla_class_name static method.
+     *
+     * @return the fully-qualified (dot-delimited) name of this instance's object class
+     */
+    virtual const std::string &getHlaClassName() {
+        return get_hla_class_name();
+    }
+
+private:
+    static ClassAndPropertyNameSetSP &get_class_and_property_name_set_sp() {
+        static ClassAndPropertyNameSetSP classAndPropertyNameSetSP(new ClassAndPropertyNameSet());
+        return classAndPropertyNameSetSP;
+    }
+
+public:
+    /**
+     * Returns a sorted list containing the names of all of the non-hidden attributes in the
+     * org.cpswt.hla.ObjectRoot object class.
+     * The property names are paired with name of the hla class in which they are defined in a
+     * ClassAndPropertyName POJO.
+     * Note: As this is a static method, it is NOT polymorphic, and so, if called on
+     * a reference will return a set of class-and0parameter names pertaining to the reference,
+     * rather than the parameter names of the class for the instance referred to by
+     * the reference.  For the polymorphic version of this method, use
+     * {@link #getAttributeNames()}.
+     *
+     * @return a sorted list of the non-hidden attribute names for this object class
+     * paired with name of the hla class in which they are defined in a ClassAndPropertyName POJO.
+     */
+    static ClassAndPropertyNameList get_attribute_names() {
+        const ClassAndPropertyNameSet &classAndPropertyNameSet(*get_class_and_property_name_set_sp());
+        std::list<ClassAndPropertyName> classAndPropertyNameList(
+          classAndPropertyNameSet.begin(), classAndPropertyNameSet.end()
+        );
+        classAndPropertyNameList.sort();
+        return classAndPropertyNameList;
+    }
+
+    /**
+     * Returns a sorted list containing the names of all of the non-hiddenattributes of an
+     * object class instance.
+     * The property names are paired with name of the hla class in which they are defined in a
+     * ClassAndPropertyName POJO.
+     * Polymorphic equivalent to get_attribute_names static method.
+     *
+     * @return sorted list containing the names of all of the attributes of an
+     * object class instance paired with name of the hla class in which they are defined in a
+     * ClassAndPropertyName POJO.
+     */
+    virtual ClassAndPropertyNameList getAttributeNames() {
+        return get_attribute_names();
+    }
+
+private:
+    static ClassAndPropertyNameSetSP &get_all_class_and_property_name_set_sp() {
+        static ClassAndPropertyNameSetSP allClassAndPropertyNameSetSP(new ClassAndPropertyNameSet());
+        return allClassAndPropertyNameSetSP;
+    }
+
+public:
+    /**
+     * Returns a sorted list containing the names of all of the attributes in the
+     * org.cpswt.hla.ObjectRoot object class.
+     * The property names are paired with name of the hla class in which they are defined in a
+     * ClassAndPropertyName POJO.
+     * Note: As this is a static method, it is NOT polymorphic, and so, if called on
+     * a reference will return a set of parameter names pertaining to the reference,
+     * rather than the parameter names of the class for the instance referred to by
+     * the reference.  For the polymorphic version of this method, use
+     * {@link #getAttributeNames()}.
+     *
+     * @return a sorted list of the attribute names for this object class
+     * paired with name of the hla class in which they are defined in a ClassAndPropertyName POJO.
+     */
+    static ClassAndPropertyNameList get_all_attribute_names() {
+        const ClassAndPropertyNameSet &allClassAndPropertyNameSet(*get_all_class_and_property_name_set_sp());
+        ClassAndPropertyNameList allClassAndPropertyNameList(
+          allClassAndPropertyNameSet.begin(), allClassAndPropertyNameSet.end()
+        );
+        allClassAndPropertyNameList.sort();
+        return allClassAndPropertyNameList;
+    }
+
+    /**
+     * Returns a sorted list containing the names of all of the attributes of an
+     * object class instance.
+     * The property names are paired with name of the hla class in which they are defined in a
+     * ClassAndPropertyName POJO.
+     * Polymorphic equivalent of get_all_attribute_names() static method.
+     *
+     * @return sorted list containing the names of all of the attributes of an
+     * object class instance paired with name of the hla class in which they are defined in a
+     * ClassAndPropertyName POJO.
+     */
+    virtual ClassAndPropertyNameList getAllAttributeNames() {
+        return get_all_attribute_names();
+    }
 
 protected:
-	static StringSet &getClassNameSet( void ) {
-		static StringSet classNameSet;
-		return classNameSet;
-	}
+    static ClassAndPropertyNameSetSP &get_published_attribute_name_set_sp() {
+        static ClassAndPropertyNameSetSP publishedAttributeNameSetSP(new ClassAndPropertyNameSet());
+        return publishedAttributeNameSetSP;
+    }
 
-	static ClassNameFactoryMap &getClassNameFactoryMap( void ) {
-		static ClassNameFactoryMap classNameFactoryMap;
-		return classNameFactoryMap;
-	}
+    virtual const ClassAndPropertyNameSetSP &getPublishedAttributeNameSetSP() {
+        return get_published_attribute_name_set_sp();
+    }
 
-	static ClassNamePubSubMap &getClassNamePublishMap( void ) {
-		static ClassNamePubSubMap classNamePublishMap;
-		return classNamePublishMap;
-	}
+    static ClassAndPropertyNameSetSP &get_subscribed_attribute_name_set_sp() {
+        static ClassAndPropertyNameSetSP subscribedAttributeNameSetSP(new ClassAndPropertyNameSet());
+        return subscribedAttributeNameSetSP;
+    }
 
-	static ClassNamePubSubMap &getClassNameUnpublishMap( void ) {
-		static ClassNamePubSubMap classNameUnpublishMap;
-		return classNameUnpublishMap;
-	}
+    virtual const ClassAndPropertyNameSetSP &getSubscribedAttributeNameSetSP() {
+        return get_subscribed_attribute_name_set_sp();
+    }
 
-	static ClassNamePubSubMap &getClassNameSubscribeMap( void ) {
-		static ClassNamePubSubMap classNameSubscribeMap;
-		return classNameSubscribeMap;
-	}
-
-	static ClassNamePubSubMap &getClassNameUnsubscribeMap( void ) {
-		static ClassNamePubSubMap classNameUnsubscribeMap;
-		return classNameUnsubscribeMap;
-	}
-
-	static NameStringVectorPtrMap &getDatamemberClassNameVectorPtrMap( void ) {
-		static NameStringVectorPtrMap datamemberClassNameVectorPtrMap;
-		return datamemberClassNameVectorPtrMap;
-	}
-
-	static NameStringVectorPtrMap &getAllDatamemberClassNameVectorPtrMap( void ) {
-		static NameStringVectorPtrMap allDatamemberClassNameVectorPtrMap;
-		return allDatamemberClassNameVectorPtrMap;
-	}
-
-	static StringIntegerMap &getClassNameHandleMap( void ) {
-		static StringIntegerMap classNameHandleMap;
-		return classNameHandleMap;
-	}
-	static IntegerStringMap &getClassHandleNameMap( void ) {
-		static IntegerStringMap classHandleNameMap;
-		return classHandleNameMap;
-	}
-
-	static StringIntegerMap &getDatamemberNameHandleMap( void ) {
-		static StringIntegerMap datamemberNameHandleMap;
-		return datamemberNameHandleMap;
-	}
-	static IntegerStringMap &getDatamemberHandleNameMap( void ) {
-		static IntegerStringMap datamemberHandleNameMap;
-		return datamemberHandleNameMap;
-	}
-
-	static NameStringVectorPtrMap &getClassNamePublishAttributeNameVectorPtrMap( void ) {
-		static NameStringVectorPtrMap classNamePublishAttributeNameVectorPtrMap;
-		return classNamePublishAttributeNameVectorPtrMap;
-	}
-	static NameStringVectorPtrMap &getClassNameSubscribeAttributeNameVectorPtrMap( void ) {
-		static NameStringVectorPtrMap classNameSubscribeAttributeNameVectorPtrMap;
-		return classNameSubscribeAttributeNameVectorPtrMap;
-	}
-
-	static ClassNameAttributesPtrMap &getClassNamePublishedAttributesPtrMap( void ) {
-		static ClassNameAttributesPtrMap classNamePublishedAttributesPtrMap;
-		return classNamePublishedAttributesPtrMap;
-	}
-	static ClassNameAttributesPtrMap &getClassNameSubscribedAttributesPtrMap( void ) {
-		static ClassNameAttributesPtrMap classNameSubscribedAttributesPtrMap;
-		return classNameSubscribedAttributesPtrMap;
-	}
-
-	static ObjectMap &getObjectMap( void ) {
-		static ObjectMap objectMap;
-		return objectMap;
-	}
-
-	template< typename S, typename T >
-	class Attribute {
-	private:
-		T _value;
-		T _oldValue;
-		bool _oldValueInit;
-		double _time;
-
-	public:
-		Attribute( void ) : _value( 0 ), _oldValueInit( false ), _time( -1 ) { }
-
-		T getValue( void ) const { return _value; }
-		void setValue( T value ) { _value = value; }
-
-		double getTime( void ) { return _time; }
-		void setTime( double time ) { _time = time; }
-
-		void setHasBeenUpdated( void ) {
-			_oldValue = _value;
-			_oldValueInit = true;
-		}
-
-		bool shouldBeUpdated( bool force ) { return force || !_oldValueInit || _oldValue != _value; }
-	};
-
-	template< typename S >
-	class Attribute< S, std::string > {
-	private:
-		std::string _value;
-		std::string _oldValue;
-		bool _oldValueInit;
-		double _time;
-
-	public:
-		Attribute( void ) : _oldValueInit( false ), _time( -1 ) { }
-
-		const std::string &getValue( void ) const { return _value; }
-		void setValue( const std::string &value ) { _value = value; }
-
-		double getTime( void ) { return _time; }
-		void setTime( double time ) { _time = time; }
-
-		void setHasBeenUpdated( void ) {
-			_oldValue = _value;
-			_oldValueInit = true;
-		}
-
-		bool shouldBeUpdated( bool force ) { return force || !_oldValueInit || _oldValue != _value; }
-	};
-
-private:
-	static int &getHandle( void ) {
-		static int handle;
-		return handle;
-	}
 
 public:
-	static int get_handle( void ) { return getHandle(); }
-	static std::string get_class_name( void ) { return "ObjectRoot"; }
+    /*
+     * INITIALIZE STATIC DATAMEMBERS THAT DEAL WITH NAMES
+     */
+    static bool static_init();
 
-private:
-	static StringVector &getDatamemberNames( void ) {
-		static StringVector datamemberNames;
-		return datamemberNames;
-	}
+    // --------------------------------------------------------
+    // END OF STATIC DATAMEMBERS AND CODE THAT DEAL WITH NAMES.
+    // --------------------------------------------------------
 
-	static StringVector &getAllDatamemberNames( void ) {
-		static StringVector allDatamemberNames;
-		return allDatamemberNames;
-	}
 
-private:
-	static RTI::AttributeHandleSet &getPublishedAttributeHandleSet_var( void ) {
-		static RTI::AttributeHandleSet *publishedAttributeHandleSetPtr = RTI::AttributeHandleSetFactory::create( 0 );
-		return *publishedAttributeHandleSetPtr;
-	}
-	static StringVector &getPublishAttributeNameVector( void ) {
-		static StringVector publishAttributeNameVector;
-		return publishAttributeNameVector;
-	}
+public:
+    // ----------------------------------------------------------------------------
+    // STATIC DATAMEMBERS AND CODE THAT DEAL WITH HANDLES.
+    // THIS CODE IS STATIC BECAUSE IT IS CLASS-DEPENDENT AND NOT INSTANCE-DEPENDENT
+    // ----------------------------------------------------------------------------
+    /**
+     * Returns the handle (RTI assigned) of the org.cpswt.hla.ObjectRoot object class.
+     * Note: As this is a static method, it is NOT polymorphic, and so, if called on
+     * a reference will return the handle of the class pertaining to the reference,
+     * rather than the handle of the class for the instance referred to by the reference.
+     * For the polymorphic version of this method, use {@link #getClassHandle()}.
+     *
+     * @return the RTI assigned integer handle that represents this object class
+     */
+    static int &get_class_handle() {
+        static int _handle;
+        return _handle;
+    }
 
-	static RTI::AttributeHandleSet &getSubscribedAttributeHandleSet_var( void ) {
-		static RTI::AttributeHandleSet *subscribedAttributeHandleSet = RTI::AttributeHandleSetFactory::create( 0 );
-		return *subscribedAttributeHandleSet;
-	}
-	static StringVector &getSubscribeAttributeNameVector( void ) {
-		static StringVector subscribeAttributeNameVector;
-		return subscribeAttributeNameVector;
-	}
+    /**
+     * Returns the handle (RTI assigned) of this instance's object class.
+     * Polymorphic equivalent for get_class_handle static method.
+     *
+     * @return the handle (RTI assigned) if this instance's object class
+     */
+    virtual int getClassHandle() {
+        return get_class_handle();
+    }
 
-private:
-	static ObjectRoot::SP factory( void ) {
-		return ObjectRoot::SP( new ObjectRoot() );
-	}
-
-	static std::string &getInitErrorMessage( void ) {
-		static std::string initErrorMessage( "Error:  ObjectRoot:  could not initialize:  " );
-		return initErrorMessage;
-	}
 
 protected:
-	static void init( RTI::RTIambassador *rti );
+    /*
+     * THIS IS A PROTECTED METHOD THAT WILL (TRY TO) RETURN THE HANDLE OF A GIVEN DATAMEMBER, GIVEN THE DATAMEMBER'S NAME.
+     * FOR A GIVEN CLASS, IT WILL ATTEMPT TO FIND THE ENTRY IN THE _classAndPropertyNameHandleMap USING AS A KEY
+     * A ClassAndPropertyName POJO, ClassAndPropertyName(A, B), WHERE "A" IS THE FULL CLASS NAME OF THIS CLASS,
+     * AND "B" IS THE NAME OF THE DATAMEMBER. IF THERE IS NO SUCH ENTRY, THIS METHOD CALLS THE SAME METHOD IN ITS
+     * SUPER CLASS.  THIS METHOD CHAIN BOTTOMS OUT IN THE "InteractionRoot" CLASS, WHERE AN ERROR IS RAISED INDICATING
+     * THERE IS NO SUCH DATAMEMBER.
+     *
+     * THE "className" ARGUMENT IS THE FULL NAME OF THE CLASS FOR WHICH THIS METHOD WAS ORIGINALLY CALLED, I.E. THE NAME
+     * OF THE CLASS AT THE TOP OF THE CALL-CHAIN.  IT IS INCLUDED FOR ERROR REPORTING IN THE "InteractionRoot" CLASS.
+     *
+     * THIS METHOD IS INDIRECTLY CALLED VIA THE "get_attribute_handle(String)" METHOD BELOW, WHICH PROVIDES THE
+     * VALUE FOR THE "className" ARGUMENT.
+     */
+    static int get_attribute_handle_aux(const std::string &className, const std:string &propertyName);
+
+public:
+    /**
+     * Returns the handle of an attribute (RTI assigned) of
+     * this object class (i.e. "org.cpswt.hla.ObjectRoot") given the attribute's name.
+     *
+     * @param propertyName name of attribute
+     * @return the handle (RTI assigned) of the attribute "propertyName" of object class "className"
+     */
+    static int get_attribute_handle(const std::string &propertyName) {
+        return get_attribute_handle_aux(get_hla_class_name(), propertyName);
+    }
+
+    /**
+     * Returns the handle associated with the given attribute name for an object class instance
+     * Polymorphic equivalent of get_attribute_handle static method.
+     *
+     * @param propertyName the name of a attribute that belongs to this object class
+     * @return the RTI handle associated with the attribute name, or -1 if not found
+     */
+    virtual int getAttributeHandle(const std::string &propertyName) {
+        return get_attribute_handle(propertyName);
+    }
 
 private:
-	static bool &getIsPublished( void ) {
-		static bool isPublished = false;
-		return isPublished;
-	}
+    static AttributeHandleSetSP get_published_attribute_handle_set_sp() {
+        static AttributeHandleSetSP publishedAttributeHandleSetSP( RTI::AttributeHandleSetFactory::create( 0 );
+        return publishedAttributeHandleSetSP;
+    }
 
-	static std::string &getPublishErrorMessage( void ) {
-		static std::string publishErrorMessage = "Error:  ObjectRoot:  could not publish:  ";
-		return publishErrorMessage;
-	}
-
-public:
-	static void publish( RTI::RTIambassador *rti );
+    static AttributeHandleSetSP get_subscribed_attribute_handle_set_sp() {
+        static AttributeHandleSetSP subscribedAttributeHandleSetSP( RTI::AttributeHandleSetFactory::create( 0 );
+        return subscribedAttributeHandleSetSP;
+    }
 
 private:
-	static std::string &getUnpublishErrorMessage( void ) {
-		static std::string unpublishErrorMessage = "Error:	ObjectRoot:	 could not unpublish:  ";
-		return unpublishErrorMessage;
-	}
-
-public:
-	static void unpublish( RTI::RTIambassador *rti );
-
-private:
-	static bool &getIsSubscribed( void ) {
-		static bool isSubscribed = false;
-		return isSubscribed;
-	}
-	static std::string &getSubscribeErrorMessage( void ) {
-		static std::string subscribedErrorMessage = "Error:	 ObjectRoot:  could not subscribe:	";
-		return subscribedErrorMessage;
-	}
-
-public:
-	static void subscribe( RTI::RTIambassador *rti );
-
-private:
-	static std::string getUnsubscribeErrorMessage( void ) {
-		static std::string unsubscribeErrorMessage = "Error:  ObjectRoot:  could not unsubscribe:  ";
-		return unsubscribeErrorMessage;
-	}
-
-public:
-	static void unsubscribe( RTI::RTIambassador *rti );
-
-	static bool static_init( void );
-
-	static bool match( int handle ) { return handle == get_handle(); }
-
-	virtual int getClassHandle( void ) const { return get_handle(); }
-	virtual std::string getClassName( void ) const { return get_class_name(); }
-	virtual StringVector getAttributeNames( void ) const { return get_attribute_names(); }
-	virtual StringVector getAllAttributeNames( void ) const { return get_all_attribute_names(); }
-
-	virtual std::string getAttributeName( int datamemberHandle ) const {
-		return std::string();
-	}
-
-	int getAttributeHandle( const std::string &datamemberName ) {
-		return get_attribute_handle(getClassName(), datamemberName);
-	}
-
-	virtual void publishObject( RTI::RTIambassador *rti ) { publish( rti ); }
-	virtual void subscribeObject( RTI::RTIambassador *rti ) { subscribe( rti ); }
-
-	virtual ObjectRoot::SP clone( void ) {
-		return ObjectRoot::SP(	new ObjectRoot( *this )	 );
-	}
-
-	virtual const RTI::AttributeHandleSet &getSubscribedAttributeHandleSet( void ) { return getSubscribedAttributeHandleSet_var(); }
-
-public:
-	static StringSet get_object_names( void ) { return getClassNameSet(); }
-	static StringVector get_attribute_names( const std::string &className ) {
-		NameStringVectorPtrMap::iterator nssItr = getDatamemberClassNameVectorPtrMap().find( className );
-		return nssItr == getDatamemberClassNameVectorPtrMap().end() ? StringVector() : *nssItr->second;
-	}
-
-	static StringVector get_all_attribute_names( const std::string &className ) {
-		NameStringVectorPtrMap::iterator nssItr = getAllDatamemberClassNameVectorPtrMap().find( className );
-		return nssItr == getAllDatamemberClassNameVectorPtrMap().end() ? StringVector() : *nssItr->second;
-	}
-
-	static std::string get_class_name( int classHandle ) {
-		IntegerStringMap::iterator ismItr = getClassHandleNameMap().find( classHandle );
-		return ismItr == getClassHandleNameMap().end() ? std::string() : ismItr->second;
-	}
-
-	static int get_handle( const std::string &className ) {
-
-		StringIntegerMap::iterator simItr = getClassNameHandleMap().find( className );
-		if ( simItr == getClassNameHandleMap().end() ) {
-			std::cerr << "Bad class name \"" << className << "\" on get_handle." << std::endl;
-			return -1;
-		}
-
-		return simItr->second;
-	}
-
-	static std::string get_attribute_name( int datamemberHandle ) {
-		IntegerStringMap::iterator ismItr = getDatamemberHandleNameMap().find( datamemberHandle );
-		return ismItr == getDatamemberHandleNameMap().end() ? std::string() : ismItr->second;
-	}
-
-	static int get_attribute_handle( const std::string &className, const std::string &datamemberName ) {
-		StringIntegerMap::iterator simItr = getDatamemberNameHandleMap().find( className + "." + datamemberName );
-		if ( simItr == getDatamemberNameHandleMap().end() ) {
-			std::cerr << "Bad attribute \"" << datamemberName << "\" for class \"" << className << "\" on get_attribute_handle." << std::endl;
-			return -1;
-		}
-
-		return simItr->second;
-	}
-
-	static void publish( const std::string &className, RTI::RTIambassador *rti ) {
-		ClassNamePubSubMap::iterator cpmItr = getClassNamePublishMap().find( className );
-		if ( cpmItr == getClassNamePublishMap().end() ) {
-			std::cerr << "Bad class name \"" << className << "\" on publish." << std::endl;
-			return;
-		}
-
-		(*cpmItr->second)( rti );
-	}
-
-	static void unpublish( const std::string &className, RTI::RTIambassador *rti ) {
-		ClassNamePubSubMap::iterator cpmItr = getClassNameUnpublishMap().find( className );
-		if ( cpmItr == getClassNameUnpublishMap().end() ) {
-			std::cerr << "Bad class name \"" << className << "\" on unpublish." << std::endl;
-			return;
-		}
-
-		(*cpmItr->second)( rti );
-	}
-
-	static void subscribe( const std::string &className, RTI::RTIambassador *rti ) {
-		ClassNamePubSubMap::iterator cpmItr = getClassNameSubscribeMap().find( className );
-		if ( cpmItr == getClassNameSubscribeMap().end() ) {
-			std::cerr << "Bad class name \"" << className << "\" on subscribe." << std::endl;
-			return;
-		}
-
-		(*cpmItr->second)( rti );
-	}
-
-	static void unsubscribe( const std::string &className, RTI::RTIambassador *rti ) {
-		ClassNamePubSubMap::iterator cpmItr = getClassNameUnsubscribeMap().find( className );
-		if ( cpmItr == getClassNameSubscribeMap().end() ) {
-			std::cerr << "Bad class name \"" << className << "\" on unsubscribe." << std::endl;
-			return;
-		}
-
-		(*cpmItr->second)( rti );
-	}
-
-	static void publish( const std::string &className, const std::string &attributeName );
-
-	static void unpublish( const std::string &className, const std::string &attributeName ) {
-		NameStringVectorPtrMap::iterator camItr = getClassNamePublishAttributeNameVectorPtrMap().find( className );
-		if ( camItr == getClassNamePublishAttributeNameVectorPtrMap().end() ) {
-			std::cerr << "ERROR:  ObjectRoot.unpublish:	 could not unpublish class \"" << className << "\" \"" << attributeName << "\" attribute." << std::endl;
-			return;
-		}
-		camItr->second->erase( std::remove( camItr->second->begin(), camItr->second->end(), attributeName ), camItr->second->end() );
-	}
-	static void subscribe( const std::string &className, const std::string &attributeName );
-
-	static void unsubscribe( const std::string &className, const std::string &attributeName ) {
-		NameStringVectorPtrMap::iterator camItr = getClassNameSubscribeAttributeNameVectorPtrMap().find( className );
-		if ( camItr == getClassNameSubscribeAttributeNameVectorPtrMap().end() ) {
-			std::cerr << "ERROR:  ObjectRoot.unsubscribe:  could not unsubscribe class \"" << className << "\" \"" << attributeName << "\" attribute." << std::endl;
-			return;
-		}
-		camItr->second->erase( std::remove( camItr->second->begin(), camItr->second->end(), attributeName ), camItr->second->end() );
-	}
-
-public:
-	static SP create_object( const std::string &className ) {
-		ClassNameFactoryMap::iterator cfmItr = getClassNameFactoryMap().find( className );
-		return cfmItr == getClassNameFactoryMap().end() ? SP( (ObjectRoot *)0 ) : (*cfmItr->second)();
-	}
-
-	static SP create_object( const std::string &className, const RTIfedTime &dlc13FedTime ) {
-		ClassNameFactoryMap::iterator cfmItr = getClassNameFactoryMap().find( className );
-		if ( cfmItr == getClassNameFactoryMap().end() ) {
-			return SP( (ObjectRoot *)0 );
-		}
-
-		SP sp = (*cfmItr->second)();
-		sp->setTime( dlc13FedTime.getTime() );
-		return sp;
-	}
-
-	static SP create_object( int classHandle ) {
-		IntegerStringMap::iterator ismItr = getClassHandleNameMap().find( classHandle );
-		return ismItr == getClassHandleNameMap().end() ? SP( (ObjectRoot *)0 ) : create_object( ismItr->second );
-	}
-
-	static SP create_object( int classHandle, const RTIfedTime &dlc13FedTime ) {
-		IntegerStringMap::iterator ismItr = getClassHandleNameMap().find( classHandle );
-		return ismItr == getClassHandleNameMap().end() ? SP( (ObjectRoot *)0 ) : create_object( ismItr->second, dlc13FedTime );
-	}
-
-	static SP create_object( int classHandle, const RTI::AttributeHandleValuePairSet &datamemberMap );
-	static SP create_object( int classHandle, const RTI::AttributeHandleValuePairSet &datamemberMap, const RTIfedTime &dlc13FedTime );
-
-	static StringVector get_attribute_names() {
-		return StringVector();
-	}
-
-	static StringVector get_all_attribute_names() {
-		return StringVector();
-	}
-
-	static SP discover( int class_handle, int object_handle ) {
-
-		SP sp = create_object( class_handle );
-		if ( sp != 0 ) {
-			getObjectMap().insert(	std::make_pair( object_handle, sp )	 );
-		}
-		return sp;
-	}
-
-	static SP reflect( int object_handle, const RTI::AttributeHandleValuePairSet &datamemberMap ) {
-		ObjectMap::iterator obmItr = getObjectMap().find( object_handle );
-		if ( obmItr == getObjectMap().end() ) {
-			return SP( (ObjectRoot *)0 );
-		}
-
-		SP sp = obmItr->second;
-		sp->setTime( -1 );
-		sp->setAttributes( datamemberMap );
-		return sp;
-	}
-
-	static SP reflect(
-	 int object_handle,
-	 const RTI::AttributeHandleValuePairSet &datamemberMap,
-	 double theTime
-	) {
-		ObjectMap::iterator obmItr = getObjectMap().find( object_handle );
-		if ( obmItr == getObjectMap().end() ) {
-			return SP( (ObjectRoot *)0 );
-		}
-
-		SP sp = obmItr->second;
-		sp->setTime( theTime );
-		sp->setAttributes( datamemberMap );
-		return sp;
-	}
-
-	void requestUpdate( RTI::RTIambassador *rti );
-
-	static SP getObject( int object_handle ) {
-		ObjectMap::iterator obmItr = getObjectMap().find( object_handle );
-		return obmItr == getObjectMap().end() ? SP( (ObjectRoot *)0 ) : obmItr->second;
-	}
-
-	static SP removeObject( int object_handle ) {
-		ObjectMap::iterator obmItr = getObjectMap().find( object_handle );
-		if ( obmItr == getObjectMap().end() ) {
-			return SP( (ObjectRoot *)0 );
-		}
-
-		SP sp = obmItr->second;
-		getObjectMap().erase( obmItr );
-		return sp;
-	}
-
-private:
-	int _object_handle;
-
-	void setObjectHandle( int object_handle ) {
-		getObjectMap().erase( object_handle );
-		_object_handle = object_handle;
-		getObjectMap().insert(	std::make_pair( object_handle, this )  );
-	}
-
-public:
-	int getObjectHandle( void ) const { return _object_handle; }
-
-private:
-	double _time;
-	static C2WLogger* _logger;
-
-public:
-	double getTime( void ) { return _time; }
-
-	void setTime( double time ) { _time = time; }
-	void setTime( const RTIfedTime &dlc13FedTime ) {
-		setTime( dlc13FedTime.getTime() );
-	}
-
-	ObjectRoot( void ) : _time( -1 ), _isRegistered( false ) { }
-
-	ObjectRoot( const RTI::AttributeHandleValuePairSet &datamemberMap ) : _time( -1 ), _isRegistered( false ) {
-		setAttributes( datamemberMap );
-	}
-
-	ObjectRoot( const RTI::AttributeHandleValuePairSet &datamemberMap, const RTIfedTime &dlc13FedTime ) : _time( dlc13FedTime.getTime() ), _isRegistered( false ) {
-		setAttributes( datamemberMap );
-	}
-
-	static SP create( void ) { return SP( new ObjectRoot ); }
-	static SP create( const RTI::AttributeHandleValuePairSet &datamemberMap ) { return SP(	new ObjectRoot( datamemberMap )	 ); }
-	static SP create( const RTI::AttributeHandleValuePairSet &datamemberMap, const RTIfedTime &dlc13FedTime ) {
-		return SP(	new ObjectRoot( datamemberMap, dlc13FedTime )  );
-	}
-
-
-	virtual TypeMedley getAttribute( const std::string &datamemberName ) const {
-		throw std::invalid_argument( getClassName() + " class has no attribute named \"" + datamemberName + "\"" );
-	}
-
-	virtual TypeMedley getAttribute( int datamemberHandle ) const {
-		const std::string &datamemberName = getAttributeName(datamemberHandle);
-		if (datamemberName.empty()) {
-			throw std::invalid_argument(
-				getClassName() + " class has no attribute with handle (" + boost::lexical_cast< std::string >( datamemberHandle ) + ")"
-			);
-		}
-		return getAttribute(datamemberName);
-	}
-
-	void setAttributes( const RTI::AttributeHandleValuePairSet &datamemberMap );
-
-private:
-	void setAttribute( RTI::Handle handle, const std::string &val ) {
-		if (  !setAttributeAux( handle, val )  ) {
-			std::cerr << "set:	bad attribute handle in class \"" + getClassName() + "\"" << std::endl;
-		}
-	}
-
-public:
-	void setAttribute( const std::string &datamemberName, TypeMedley value ) {
-		if (  !setAttributeAux( datamemberName, value )	 ) {
-			std::cerr << "Error:  class \"" << getClassName() << "\":  invalid attribute \"" + datamemberName + "\"" << std::endl;
-		}
-	}
+    static bool &get_is_initialized() {
+        static bool isInitialized = false;
+        return isInitialized;
+    }
 
 protected:
-	virtual bool setAttributeAux( int datamemberHandle, const std::string &val ) {
-		const std::string &datamemberName = getAttributeName(datamemberHandle);
-		if (datamemberName.empty()) {
-			return false;
-		}
-		return setAttributeAux(datamemberName, val);
-	}
+    /*
+     * THIS FUNCTION INITIALIZES ALL OF THE HANDLES ASSOCIATED WITH THIS OBJECT CLASS
+     * IT NEEDS THE RTI TO DO SO.
+     */
+    static void init(RTIambassador rti);
 
-	virtual bool setAttributeAux( const std::string &datamemberName, const std::string &value ) {
-		return false;
-	}
+    // ----------------------------------------------------------
+    // END OF STATIC DATAMEMBERS AND CODE THAT DEAL WITH HANDLES.
+    // ----------------------------------------------------------
 
-	virtual bool setAttributeAux( const std::string &datamemberName, TypeMedley value ) {
-		return false;
-	}
 
-	virtual AttributeHandleValuePairSetSP createDatamemberHandleValuePairSet(RTI::ULong count, bool force ) {
-		return AttributeHandleValuePairSetSP(  RTI::AttributeSetFactory::create(count)  );
-	}
-
-	virtual AttributeHandleValuePairSetSP createDatamemberHandleValuePairSet( bool force ) {
-		return AttributeHandleValuePairSetSP(  RTI::AttributeSetFactory::create(0)  );
-	}
+    //-------------------------------------------------
+    // METHODS FOR PUBLISHING/SUBSCRIBING-TO THIS CLASS
+    //-------------------------------------------------
 
 private:
-	bool _isRegistered;
+    static bool &get_is_published() {
+        static bool isPublished = false;
+        return isPublished;
+    }
 
 public:
-	void registerObject( RTI::RTIambassador *rti );
-	void registerObject( RTI::RTIambassador *rti, const std::string &name ) throw ( RTI::ObjectAlreadyRegistered );
-	void unregisterObject( RTI::RTIambassador *rti );
+    /**
+     * Publishes the org.cpswt.hla.ObjectRoot object class for a federate.
+     *
+     * @param rti handle to the Local RTI Component
+     */
+    static void publish_object(RTI::RTIambassador *rti);
 
-	void updateAttributeValues( RTI::RTIambassador *rti, double time, bool force );
+    /**
+     * Publishes the object class of this instance of the class for a federate.
+     * Polymorphic equalivalent of publish_object static method.
+     *
+     * @param rti handle to the Local RTI Component
+     */
+    virtual void publishObject(RTI::RTIambassador *rti) {
+        publish_object(rti);
+    }
 
-	void updateAttributeValues( RTI::RTIambassador *rti, double time ) {
-		updateAttributeValues( rti, time, false );
-	}
 
-	void updateAttributeValues( RTI::RTIambassador *rti, bool force );
+    /**
+     * Unpublishes the org.cpswt.hla.ObjectRoot object class for a federate.
+     *
+     * @param rti handle to the Local RTI Component, usu. obtained through the
+     *            {@link SynchronizedFederate#getLRC()} call
+     */
+    static void unpublish_object(RTI::RTIambassador *rti);
 
-	void updateAttributeValues( RTI::RTIambassador *rti ) {
-		updateAttributeValues( rti, false );
-	}
+    /**
+     * Unpublishes the object class of this instance of this class for a federate.
+     * Polymorphic equivalent of unpublish_object static method.
+     *
+     * @param rti handle to the Local RTI Component
+     */
+    virtual void unpublishObject(RTI::RTIambassador *rti) {
+        unpublish_object(rti);
+    }
 
 private:
-	static std::string fedName;
+    static bool &get_is_subscribed() {
+        static bool isSubscribed = false;
+        return isSubscribed;
+    }
+
+/**
+ * Subscribes a federate to the org.cpswt.hla.ObjectRoot object class.
+ *
+ * @param rti handle to the Local RTI Component
+ */
+public:
+    static void subscribe_object(RTI::RTIambassador *rti);
+
+    /**
+     * Subscribes a federate to the object class of this instance of this class.
+     * Polymorphic equivalent of subscribe_object static method.
+     *
+     * @param rti handle to the Local RTI Component
+     */
+    virtual void subscribeObject(RTI::RTIambassador *rti) {
+        subscribe_object(rti);
+    }
+
+    /**
+     * Unsubscribes a federate from the org.cpswt.hla.ObjectRoot object class.
+     *
+     * @param rti handle to the Local RTI Component
+     */
+    static void unsubscribe_object(RTIambassador rti);
 
 public:
-	static void enablePublishLog(const std::string &object, const std::string &attribute, const std::string &fed, const std::string &thislevel, const std::string &globallevel);
-	static void enableSubscribeLog(const std::string &object, const std::string &attribute, const std::string &fed, const std::string &thislevel, const std::string &globallevel);
+    /**
+     * Unsubscribes a federate from the object class of this instance of this class.
+     *
+     * @param rti handle to the Local RTI Component
+     */
+    virtual void unsubscribeObject(RTI::RTIambassador *rti) {
+        unsubscribe_object(rti);
+    }
 
-	static std::map<std::string, std::string> &getPubAttributeLogMap( void) {
-		static std::map<std::string, std::string> pubAttributeLogMap;
-		return pubAttributeLogMap;
-	}
+    //-----------------------------------------------------
+    // END METHODS FOR PUBLISHING/SUBSCRIBING-TO THIS CLASS
+    //-----------------------------------------------------
 
-	static std::map<std::string, std::string> &getSubAttributeLogMap( void) {
-		static std::map<std::string, std::string> subAttributeLogMap;
-		return subAttributeLogMap;
-	}
+public:
+    /**
+     * Return true if "handle" is equal to the handle (RTI assigned) of this class
+     * (that is, the org.cpswt.hla.ObjectRoot object class).
+     *
+     * @param handle handle to compare to the value of the handle (RTI assigned) of
+     * this class (the org.cpswt.hla.ObjectRoot object class).
+     * @return "true" if "handle" matches the value of the handle of this class
+     * (that is, the org.cpswt.hla.ObjectRoot object class).
+     */
+    static bool match(int handle) {
+        return handle == get_class_handle();
+    }
 
-	void createLog( double time, bool isPub = true );
+
+    //--------------------------------
+    // DATAMEMBER MANIPULATION METHODS
+    //--------------------------------
+
+public:
+
+protected:
+    virtual PropertyClassNameAndValueSP getAttributeAux(
+      const std::string &className, const std::string &propertyName
+    );
+
+    //------------------------------------
+    // END DATAMEMBER MANIPULATION METHODS
+    //------------------------------------
+
+
+    //--------------------------
+    // INSTANCE CREATION METHODS
+    //--------------------------
+public:
+    static SP create_object() {
+        return SP(new Object());
+    }
+
+    virtual SP createObject() {
+        return create_object();
+    }
+
+    static SP create_object(const RTIfedTime &rtiFedTime) {
+        SP messagingRootSP(new Object());
+        messagingRootSP->setTime(rtiFedTime.getTime());
+        return messagingRootSP;
+    }
+
+    virtual SP createObject(const RTIfedTime &rtiFedTime) {
+        return create_object(rtiFedTime);
+    }
+
+    //------------------------------
+    // END INSTANCE CREATION METHODS
+    //------------------------------
+
+
+    //-------------------------
+    // END OF INCLUDED TEMPLATE
+    //-------------------------
+
+
+    //-------------
+    // TIME SET/GET
+    //-------------
+private:
+    double _time = -1;
+
+    /**
+     * Returns the timestamp for this object.  "receive order" objects
+     * should have a timestamp of -1.
+     *
+     * @return timestamp for this object
+     */
+public:
+    double getTime() {
+        return _time;
+    }
+
+    /**
+     * Sets the timestamp of this object to "time".
+     *
+     * @param time new timestamp for this object
+     */
+    void setTime( double time ) {
+        _time = time;
+    }
+
+    /**
+     * Sets the timestamp of this object to "logicalTime".
+     *
+     * @param logicalTime new timestamp for this object
+     */
+    void setTime( const RTIfedTime &rtiFedTime ) {
+        setTime( rtiFedTime.getTime() );
+    }
+
+    //-----------------
+    // END TIME SET/GET
+    //-----------------
+
+    //-------------
+    // CONSTRUCTORS
+    //-------------
+
+    /**
+     * Creates a new Object instance.
+     */
+private:
+    void defaultConstructorInit() {
+        _uniqueID = generateUniqueID();
+    }
+
+    void propertyMapInitFlagConstructorInit(RTI::AttributeHandleValuePairSet propertyMap, bool initFlag) {
+        defaultConstructorInit();
+        if ( initFlag ) setAttributes( propertyMap );
+    }
+
+    void propertyMapTimeInitFlagConstructorInit( RTI::AttributeHandleValuePairSet propertyMap, const RTIfedTime &rtiFedTime, boolean initFlag) {
+        propertyMapInitFlagConstructorInit(propertyMap, initFlag);
+        setTime( rtiFedTime );
+    }
+
+public:
+    Object() {
+        defaultConstructorInit();
+    }
+
+private:
+    void setAttribute(int propertyHandle, const std::string &value) {
+        ClassAndPropertyNameSP classAndPropertyNameSP = get_class_and_attribute_name(propertyHandle);
+        if (!classAndPropertyNameSP) {
+            // ERROR
+            return;
+        }
+        const ClassAndPropertyName &classAndPropertyName = *classAndPropertyNameSP;
+        _classAndPropertyNameValueSPMap[classAndPropertyName].setValue(value);
+    }
+
+public:
+    void setAttributes( const RTI::AttributeHandleValuePairSet &propertyMap );
+
+private:
+    void setAttribute(int handle, const std::string &value);
+
+protected:
+    Object( RTI::AttributeHandleValuePairSet propertyMap, bool initFlag ) {
+        propertyMapInitFlagConstructorInit(propertyMap, initFlag);
+    }
+
+    Object( RTI::AttributeHandleValuePairSet propertyMap, const RTIfedTime &rtiFedTime, boolean initFlag ) {
+        propertyMapTimeInitFlagConstructor(propertyMap, rtiFedTime, initFlag);
+    }
+
+
+    /**
+     * Creates a new object instance and initializes its attributes
+     * using the "propertyMap" -- this constructor is usually called as a
+     * super-class constructor to create and initialize an instance of an
+     * object further down in the inheritance hierarchy.  "propertyMap"
+     * is usually acquired as an argument to an RTI federate callback method, such
+     * as "receiveInteraction".
+     *
+     * @param propertyMap contains attribute values for the newly created
+     * object
+     */
+public:
+    public Object( RTI::AttributeHandleValuePairSet propertyMap ) {
+        propertyMapInitFlagConstructorInit( propertyMap, true );
+    }
+
+    /**
+     * Like {@link #Object( ReflectedAttributes propertyMap )},
+     * except the new instance has an initial timestamp of "logicalTime".
+     *
+     * @param propertyMap contains attribute values for the newly created
+     * object
+     * @param logicalTime initial timestamp for newly created object instance
+     */
+    public Object( ReflectedAttributes propertyMap, LogicalTime logicalTime ) {
+        propertyMapTimeInitFlagConstructorInit( propertyMap, logicalTime, true );
+    }
+
+    //-----------------
+    // END CONSTRUCTORS
+    //-----------------
+public:
+    PropertyHandleValuePairSetSP createPropertyHandleValuePairSet();
+
+    void updateAttributeValues( RTI::RTIambassador *rti, double time, bool force );
+
+    void updateAttributeValues( RTI::RTIambassador *rti, double time ) {
+        updateAttributeValues( rti, time, false );
+    }
+
+    void updateAttributeValues( RTI::RTIambassador *rti, bool force );
+
+    void updateAttributeValues( RTI::RTIambassador *rti ) {
+        updateAttributeValues( rti, false );
+    }
+
+    const std::string toJson();
+
+    static SP fromJson(const std::string &jsonString);
+
+
+public:
+    static std::string get__name( int datamemberHandle ) {
+        IntegerStringMap::iterator ismItr = getDatamemberHandleNameMap().find( datamemberHandle );
+        return ismItr == getDatamemberHandleNameMap().end() ? std::string() : ismItr->second;
+    }
+
+    static int get__handle( const std::string &className, const std::string &datamemberName ) {
+        StringIntegerMap::iterator simItr = getDatamemberNameHandleMap().find( className + "." + datamemberName );
+        if ( simItr == getDatamemberNameHandleMap().end() ) {
+            std::cerr << "Bad  \"" << datamemberName << "\" for class \"" << className << "\" on get__handle." << std::endl;
+            return -1;
+        }
+        return simItr->second;
+    }
+
+
+    static ClassAndPropertyNameSP get_class_pub_sub_class_and_property_name_sp(
+      const StringClassAndPropertyNameSetSPMap &stringClassAndPropertyNameSetSPMap,
+      const std::string &className,
+      const std::string &attributeName
+      bool publish;
+      bool insert;
+    ) {
+        StringClassAndPropertyNameSetSPMap::iterator samItr = stringClassAndPropertyNameSetSPMap.find( className );
+        if ( samItr == get_class_name_published_attribute_name_set_sp_map().end() ) {
+            // ERROR
+            return;
+        }
+
+        ClassAndPropertyNameSP classAndPropertyNameSP = findProperty(classNamd, attributeName);
+        if (!classAndPropertyNameSP) {
+            // ERROR
+            return;
+        }
+
+        if (insert) {
+            samItr->second->insert(*classAndPropertyNameSP);
+        } else {
+            samItr->second->erase(*classAndPropertyNameSP);
+        }
+    }
+
+    static void publish_attribute( const std::string &className, const std::string &attributeName ) {
+        get_class_name_published_attribute_name_set_sp_map(), className, attributeName, true, true);
+    }
+
+    static void unpublish_attribute( const std::string &className, const std::string &attributeName ) {
+        get_class_name_published_attribute_name_set_sp_map(), className, attributeName, true, false);
+    }
+
+    static void subscribe_attribute( const std::string &className, const std::string &attributeName ) {
+        get_class_name_published_attribute_name_set_sp_map(), className, attributeName, false, true);
+    }
+
+    static void subscribe_attribute( const std::string &className, const std::string &attributeName ) {
+        get_class_name_published_attribute_name_set_sp_map(), className, attributeName, false, false);
+    }
+
 };
+  } // NAMESPACE "hla"
+ } // NAMESPACE "cpswt"
+} // NAMESPACE "org"
 
-typedef ObjectRoot::SP ObjectRootSP;
+static bool static_init_1 = ::org::cpswt::hla::ObjectRoot::static_init();
 
-static bool call_ObjectRoot_static_init = ObjectRoot::static_init();
+std::ostream &operator<<( std::ostream &os, ::org::cpswt::hla::ObjectRoot::SP entitySP );
+std::ostream &operator<<( std::ostream &os, const ::org::cpswt::hla::ObjectRoot &entity );
 
-std::ostream &operator<<( std::ostream &os, ObjectRoot::SP entitySP );
-std::ostream &operator<<( std::ostream &os, const ObjectRoot &entity );
-
-#endif
+#endif // _OBJECT_ROOT

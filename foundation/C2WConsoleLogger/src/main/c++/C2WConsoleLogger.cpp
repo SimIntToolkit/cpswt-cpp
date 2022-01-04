@@ -26,13 +26,14 @@
 #include "TypeMedley.hpp"
 
 #include <iostream>
-#include <stdio.h>
+#include <cstdio>
 
 #if __cplusplus <= 199711L
 #define TIME_LOG_FORMAT "%.3f"
 #else
 #define TIME_LOG_FORMAT "%.3lf"
 #endif
+
 
 void C2WConsoleLogger::init( const ArgVector &argVector ){
 	//No initialization needed for the console
@@ -96,15 +97,19 @@ void C2WConsoleLogger::addLog(const std::string &id, const InteractionRootInterf
 	snprintf( timeCharArray, 60, TIME_LOG_FORMAT, time );
 	std::string timeString( timeCharArray );
 
-	StringVector stringVector = interactionRoot.getParameterNames();
-	if ( stringVector.empty() ) {
+	ClassAndPropertyNameList classAndPropertyNameList = interactionRoot.getParameterNames();
+	if ( classAndPropertyNameList.empty() ) {
 		std::string values = "'" + id + "', " + timeString + ", '', '', '', " + levelString +", '" + logIdString + "'";
 
 		std::cout << values;
 	}
-	for( StringVector::iterator issItr = stringVector.begin() ; issItr != stringVector.end() ; ++issItr ) {
+	for(
+            ClassAndPropertyNameList::iterator cplItr = classAndPropertyNameList.begin() ;
+            cplItr != classAndPropertyNameList.end() ;
+            ++cplItr
+    ) {
 
-		std::string parameterName( *issItr );
+		std::string parameterName( *cplItr );
 
 		TypeMedley parameterValue = interactionRoot.getParameter( parameterName );
 		std::string parameterValueString( parameterValue );
@@ -131,15 +136,19 @@ void C2WConsoleLogger::addLog(const std::string &id, const ObjectRootInterface &
 	std::string timeString( timeCharArray );
 	std::string levelString = level.empty() ? "''" : "'" + level + "'";
 
-	StringVector stringVector = objectRoot.getAttributeNames();
-	if ( stringVector.empty() ) {
+    ClassAndPropertyNameList classAndPropertyNameList = objectRoot.getAttributeNames();
+	if ( classAndPropertyNameList.empty() ) {
 		std::string values = "'" + id + "', " + timeString + ", '', '', '', " + levelString +", '" + logIdString + "'";
 
 		std::cout << values;
 	}
-	for( StringVector::iterator ossItr = stringVector.begin() ; ossItr != stringVector.end() ; ++ossItr ) {
+    for(
+            ClassAndPropertyNameList::iterator cplItr = classAndPropertyNameList.begin() ;
+            cplItr != classAndPropertyNameList.end() ;
+            ++cplItr
+    ) {
 
-		std::string attributeName( *ossItr );
+		std::string attributeName( *cplItr );
 
 		TypeMedley attributeValue = objectRoot.getAttribute( attributeName );
 		std::string attributeValueString( attributeValue );
