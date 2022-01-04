@@ -27,6 +27,7 @@
 #include <regex>
 #include <utility>
 #include <boost/algorithm/string.hpp>
+#include <map>
 
 class TypeMedley {
 public:
@@ -51,6 +52,28 @@ private:
                    : static_cast<T>(value.empty());
         return boost::lexical_cast<std::string>(tValue);
     }
+
+    static const std::map<DataType, std::string> &get_enum_to_string_type_map_aux() {
+        static std::map<DataType, std::string> enumToStringTypeMap;
+
+        enumToStringTypeMap[BOOLEAN] = "bool";
+        enumToStringTypeMap[CHARACTER] = "char";
+        enumToStringTypeMap[SHORT] = "short";
+        enumToStringTypeMap[INTEGER] = "int";
+        enumToStringTypeMap[LONG] = "long";
+        enumToStringTypeMap[FLOAT] = "float";
+        enumToStringTypeMap[DOUBLE] = "double";
+        enumToStringTypeMap[STRING] = "std::string";
+
+        return enumToStringTypeMap;
+    }
+
+    static const std::map<DataType, std::string> &get_enum_to_string_type_map() {
+        static const std::map<DataType, std::string> &enumToStringTypeMap = get_enum_to_string_type_map_aux();
+
+        return enumToStringTypeMap;
+    }
+
 
 protected:
     DataType _dataType;
@@ -84,6 +107,10 @@ public:
 public:
     DataType getDataType() const {
         return _dataType;
+    }
+
+    const std::string &getTypeName() const {
+        return get_enum_to_string_type_map().find(_dataType)->second;
     }
 
     template<typename T>

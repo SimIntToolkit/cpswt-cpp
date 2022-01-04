@@ -10,16 +10,17 @@
 
 #include <string>
 #include <typeinfo>
+#include <utility>
 
 class C2WException : public std::exception {
 private:
 	std::string _message;
 
 public:
-	C2WException( const std::string &message ) : _message( message ) { }
-	virtual ~C2WException( void ) throw() { }
+	explicit C2WException( std::string message ) : _message(std::move( message )) { }
+	~C2WException() noexcept override = default;
 
-	virtual const char *what() const throw() {
+	const char *what() const noexcept override {
 		return _message.c_str();
 	}
 };

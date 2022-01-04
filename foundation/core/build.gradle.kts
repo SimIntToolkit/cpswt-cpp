@@ -4,11 +4,15 @@ plugins {
     `cpp-unit-test`
 }
 
+val rtiHome: String? = System.getenv("RTI_HOME")
+print("RTI_HOME=\"$rtiHome\"\n")
+
 val archivaUser: String by project
 val archivaPassword: String by project
 val version: String by project
 val archivaHostId: String by project
 val archivaPort: String by project
+
 
 library {
     source.from(file("src/main/c++"))
@@ -19,6 +23,17 @@ unitTest {
     targetMachines.set(listOf(machines.linux.x86_64))
     source.from(file("src/test/c++"))
     privateHeaders.from(file("src/test/include"))
+}
+
+
+tasks.withType(CppCompile::class.java).configureEach {
+    compilerArgs.addAll(toolChain.map { toolChain ->
+        when(toolChain) {
+            is Gcc, is Clang -> listOf("-I$rtiHome/include/hla13")
+            is VisualCpp -> listOf("/I $rtiHome/include/hla13")
+            else -> listOf()
+        }
+    })
 }
 
 tasks.withType(LinkExecutable::class.java).configureEach {
@@ -38,7 +53,7 @@ publishing {
     }
     repositories {
         maven {
-            name = "corePublish"
+            name = "coreCppPublish"
             val internalRepoUrl = "http://$archivaHostId:$archivaPort/repository/internal"
             val snapshotsRepoUrl = "http://$archivaHostId:$archivaPort/repository/snapshots"
             url = uri(if (version.toString().endsWith("SNAPSHOT")) snapshotsRepoUrl else internalRepoUrl)
