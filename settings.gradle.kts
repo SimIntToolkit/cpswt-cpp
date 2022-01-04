@@ -3,6 +3,14 @@ rootProject.name = "cpswt-cpp"
 val archivaHostId: String by settings
 val archivaPort: String by settings
 
+pluginManagement {
+    repositories {
+        gradlePluginPortal()
+    }
+    plugins {
+    }
+}
+
 dependencyResolutionManagement {
     repositories {
         mavenLocal()

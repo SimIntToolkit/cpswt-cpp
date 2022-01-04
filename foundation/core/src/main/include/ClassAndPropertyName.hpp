@@ -3,7 +3,9 @@
 
 #include <string>
 #include <utility>
-
+#include <boost/shared_ptr.hpp>
+#include <unordered_set>
+#include <list>
 
 class ClassAndPropertyName {
 
@@ -80,5 +82,9 @@ struct std::hash<ClassAndPropertyName> {
         return classAndPropertyName.hashCode();
     }
 };
+
+typedef boost::shared_ptr<ClassAndPropertyName> ClassAndPropertyNameSP;
+typedef std::unordered_set<ClassAndPropertyName> ClassAndPropertyNameSet;
+typedef std::list<ClassAndPropertyName> ClassAndPropertyNameList;
 
 #endif // _CLASS_AND_PROPERTY_NAME_HPP

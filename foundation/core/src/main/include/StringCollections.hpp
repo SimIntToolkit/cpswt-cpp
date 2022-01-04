@@ -26,6 +26,7 @@
 
 #include <vector>
 #include <set>
+#include <string>
 
 typedef std::vector< std::string > ArgVector;
 typedef std::vector< std::string > StringVector;
