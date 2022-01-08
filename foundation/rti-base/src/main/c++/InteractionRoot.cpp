@@ -1,34 +1,36 @@
+#include <sstream>
 #include "InteractionRoot.hpp"
+
 
 
 namespace org {
  namespace cpswt {
   namespace hla {
 
-std::string InteractionRoot::join(const std::list<std::string> &joinList, cons std:string &delimiter) {
+std::string InteractionRoot::join(const std::list<std::string> &joinList, const std::string &delimiter) {
     std::string retval;
 
     if (joinList.empty()) {
         return retval;
     }
 
-    std::list<std::string>::iterator strItr = joinList.begin();
+    std::list<std::string>::const_iterator strItr = joinList.begin();
     retval += *strItr++;
     while(strItr != joinList.end()) {
-        retval += delimiter + *strItr++
+        retval += delimiter + *strItr++;
     }
 
     return retval;
 }
 
 
-ClassAndPropertyNameSP InteractionRoot::findProperty(const std:string &className, const std::string &propertyName) {
+ClassAndPropertyNameSP InteractionRoot::findProperty(const std::string &className, const std::string &propertyName) {
 
     std::list<std::string> classNameComponents;
-    boost::algorithm:split(classNameComponents, className, boost::is_any_of("."));
+    boost::algorithm::split(classNameComponents, className, boost::is_any_of("."));
 
     while(!classNameComponents.empty()) {
-        std::string localClassName = boost:algorithm::join(classNameComponents, ".");
+        std::string localClassName = boost::algorithm::join(classNameComponents, ".");
 
         ClassAndPropertyName key(localClassName, propertyName);
         if (get_class_and_property_name_handle_map().find(key) != get_class_and_property_name_handle_map().end()) {
@@ -38,16 +40,16 @@ ClassAndPropertyNameSP InteractionRoot::findProperty(const std:string &className
         classNameComponents.pop_back();
     }
 
-    return ClassAndPropertyNameSP(static_cast<ClassAndPropertyName *>(0));
+    return ClassAndPropertyNameSP();
 }InteractionRoot::SP InteractionRoot::create_interaction( int classHandle, const RTI::ParameterHandleValuePairSet &propertyMap ) {
-	IntegerStringMap::iterator ismItr = getClassHandleNameMap().find( classHandle );
-	if ( ismItr == getClassHandleNameMap().end() ) {
-		return SP( (InteractionRoot *)0 );
+	IntegerStringMap::iterator ismItr = get_class_handle_name_map().find( classHandle );
+	if ( ismItr == get_class_handle_name_map().end() ) {
+		return SP();
 	}
 
 	StringInstanceSPMap::iterator simItr = get_class_name_instance_sp_map().find( ismItr->second );
 	if ( simItr == get_class_name_instance_sp_map().end() ) {
-		return SP( (InteractionRoot *)0 );
+		return SP();
 	}
 
 	SP sp = simItr->second->createInteraction();
@@ -56,15 +58,15 @@ ClassAndPropertyNameSP InteractionRoot::findProperty(const std:string &className
 	return sp;
 }
 
-InteractionRoot::SP InteractionRoot::create_interaction( int classHandle, const RTI::{ property_type|title }}HandleValuePairSet &propertyMap, const RTIfedTime &rtiFedTime ) {
-	IntegerStringMap::iterator ismItr = getClassHandleNameMap().find( classHandle );
-	if ( ismItr == getClassHandleNameMap().end() ) {
-		return SP( (InteractionRoot *)0 );
+InteractionRoot::SP InteractionRoot::create_interaction( int classHandle, const RTI::ParameterHandleValuePairSet &propertyMap, const RTIfedTime &rtiFedTime ) {
+	IntegerStringMap::iterator ismItr = get_class_handle_name_map().find( classHandle );
+	if ( ismItr == get_class_handle_name_map().end() ) {
+		return SP();
 	}
 
 	StringInstanceSPMap::iterator simItr = get_class_name_instance_sp_map().find( ismItr->second );
 	if ( simItr == get_class_name_instance_sp_map().end() ) {
-		return SP( (InteractionRoot *)0 );
+		return SP();
 	}
 
 	SP sp = simItr->second->createInteraction(rtiFedTime);
@@ -74,23 +76,16 @@ InteractionRoot::SP InteractionRoot::create_interaction( int classHandle, const 
 	return sp;
 }
 
-const Value &InteractionRoot::getParameter( int propertyHandle ) {
-    const Value valueDefault(false);
-    ClassAndPropertyNameSP classAndPropertyNameSP = _handleClassAndPropertyNameMap.get(propertyHandle);
-    if (!classAndPropertyNameSP) {
+const InteractionRoot::Value &InteractionRoot::getParameter( int propertyHandle ) const {
+    static const Value valueDefault(false);
+    IntegerClassAndPropertyNameSPMap::const_iterator icmCit =
+      get_handle_class_and_property_name_sp_map().find(propertyHandle);
+    if (icmCit == get_handle_class_and_property_name_sp_map().end()) {
 //        logger.error("getParameter: propertyHandle {} does not exist.", propertyHandle);
         return valueDefault;
     }
-    const std::string &propertyName = classAndPropertyName.getPropertyName();
-    const ValueSP valueSP = getParameter(propertyName);
-    if (!valueSP) {
-//        logger.error(
-//            "getParameter: propertyHandle {} corresponds to property of name \"{}\", which " +
-//            "does not exist in class \"{}\" (it's defined in class\"{}\")",
-//            propertyHandle, propertyName, getClass(), classAndPropertyName.getClassName()
-//        );
-    }
 
+    const ValueSP valueSP = _classAndPropertyNameValueSPMap.find(*icmCit->second)->second;
     return *valueSP;
 }
 
@@ -103,8 +98,10 @@ void InteractionRoot::setParameters( const RTI::ParameterHandleValuePairSet &pro
         try {
             char *value = propertyMap.getValuePointer( ix, valueLength );
             ClassAndPropertyNameSP classAndPropertyNameSP =
-              get_handle_class_and_property_name_sp_map()[ propertyName.getHandle( ix ) ]
-            _classAndPropertyNameValueSPMap[*classAndPropertyNameSP]->setValue(  std::string( value, valueLength )  );
+              get_handle_class_and_property_name_sp_map()[ propertyMap.getHandle( ix ) ];
+            _classAndPropertyNameValueSPMap.find(*classAndPropertyNameSP)->second->setValue(
+              std::string( value, valueLength )
+            );
         } catch ( ... ) {
             std::cerr << "setParameters: Exception caught!" << std::endl;
         }
@@ -112,38 +109,27 @@ void InteractionRoot::setParameters( const RTI::ParameterHandleValuePairSet &pro
 }
 
 
-void InteractionRoot::setParameter(int handle, const std::string &value) {
-    IntegerClassAndPropertyNameSPMap::const_iterator icmCit =
-      get_handle_class_and_property_name_sp_map().find(handle);
-
-    if (icmCit == get_handle_class_and_property_name_sp_map().end()) {
-        //ERROR
-        return;
-    }
-
-    const ClassAndPropertyName &classAndPropertyName = *icmCit->second;
-    ValueSP valueSP = _classAndPropertyNameValueSPMap[classAndPropertyName];
-    valueSP->setValue(value);
-}
-
 bool InteractionRoot::static_init() {
     // ADD THIS CLASS TO THE _classNameSet DEFINED IN InteractionRoot
-    get_class_name_set().add(get_hla_class_name());
+    get_class_name_set().insert(get_hla_class_name());
 
     // ADD CLASS OBJECT OF THIS CLASS TO _classNameClassMap DEFINED IN InteractionRoot
     get_class_name_instance_sp_map()[get_hla_class_name()] = SP(new InteractionRoot());
 
     // ADD THIS CLASS'S _classAndPropertyNameSet TO _classNamePropertyNameSetMap DEFINED
     // IN InteractionRoot
-    get_class_name_property_name_set_sp_map()[get_hla_class_name()] = get_class_and_property_name_set_sp();
+    get_class_name_class_and_property_name_set_sp_map()[get_hla_class_name()] = get_class_and_property_name_set_sp();
 
     // ADD THIS CLASS'S _allClassAndPropertyNameSet TO _classNameAllPropertyNameSetMap DEFINED
     // IN InteractionRoot
-    get_class_name_all_property_name_set_sp_map()[get_hla_class_name()] = get_all_class_and_property_name_set_sp();
+    get_class_name_all_class_and_property_name_set_sp_map()[get_hla_class_name()] =
+      get_all_class_and_property_name_set_sp();
+
+    return true;
 }
 
 
-int InteractionRoot::get_parameter_handle_aux(const std::string &className, const std:string &propertyName) {
+int InteractionRoot::get_parameter_handle_aux(const std::string &className, const std::string &propertyName) {
     ClassAndPropertyName key(get_hla_class_name(), propertyName);
     ClassAndPropertyNameIntegerMap::const_iterator cimCit = get_class_and_property_name_handle_map().find(key);
     if (cimCit != get_class_and_property_name_handle_map().end()) {
@@ -157,24 +143,28 @@ int InteractionRoot::get_parameter_handle_aux(const std::string &className, cons
 }
 
 
-void InteractionRoot::init(RTIambassador rti) {
+void InteractionRoot::init(RTI::RTIambassador *rti) {
     if (get_is_initialized()) return;
     get_is_initialized() = true;
 
-    boolean isNotInitialized = true;
+    bool isNotInitialized = true;
     while(isNotInitialized) {
         try {
-            get_class_handle() = rti.getInteractionClassHandle(get_hla_class_name());
+            get_class_handle() = rti->getInteractionClassHandle(get_hla_class_name().c_str());
             isNotInitialized = false;
-        } catch (FederateNotExecutionMember e) {
-            logger.error("could not initialize: Federate Not Execution Member", e);
+        } catch (RTI::FederateNotExecutionMember e) {
+//            logger.error("could not initialize: Federate Not Execution Member", e);
             return;
-        } catch (NameNotFound e) {
-            logger.error("could not initialize: Name Not Found", e);
+        } catch (RTI::NameNotFound e) {
+//            logger.error("could not initialize: Name Not Found", e);
             return;
-        } catch (Exception e) {
-            logger.error(e);
-            CpswtUtils.sleepDefault();
+        } catch (...) {
+//            logger.error(e);
+#ifdef _WIN32
+            Sleep( 500 );
+#else
+            usleep( 500000 );
+#endif
         }
     }
 
@@ -192,7 +182,7 @@ void InteractionRoot::publish_interaction(RTI::RTIambassador *rti) {
 
     init(rti);
 
-    boolean isNotPublished = true;
+    bool isNotPublished = true;
     while(isNotPublished) {
         try {
             rti->publishInteractionClass(get_class_handle());
@@ -205,7 +195,11 @@ void InteractionRoot::publish_interaction(RTI::RTIambassador *rti) {
             return;
         } catch (...) {
 //            logger.error(e);
-            CpswtUtils.sleepDefault();
+#ifdef _WIN32
+            Sleep( 500 );
+#else
+            usleep( 500000 );
+#endif
         }
     }
 
@@ -219,7 +213,7 @@ void InteractionRoot::unpublish_interaction(RTI::RTIambassador *rti) {
 
     init(rti);
 
-    boolean isNotUnpublished = true;
+    bool isNotUnpublished = true;
     while(isNotUnpublished) {
         try {
             rti->unpublishInteractionClass(get_class_handle());
@@ -235,7 +229,11 @@ void InteractionRoot::unpublish_interaction(RTI::RTIambassador *rti) {
             return;
         } catch (...) {
 //            logger.error(e);
-            CpswtUtils.sleepDefault();
+#ifdef _WIN32
+            Sleep( 500 );
+#else
+            usleep( 500000 );
+#endif
         }
     }
 
@@ -251,7 +249,7 @@ void InteractionRoot::subscribe_interaction(RTI::RTIambassador *rti) {
 
     init(rti);
 
-    boolean isNotSubscribed = true;
+    bool isNotSubscribed = true;
     while(isNotSubscribed) {
         try {
             rti->subscribeInteractionClass(get_class_handle());
@@ -264,7 +262,11 @@ void InteractionRoot::subscribe_interaction(RTI::RTIambassador *rti) {
             return;
         } catch (...) {
 //            logger.error(e);
-            CpswtUtils.sleepDefault();
+#ifdef _WIN32
+            Sleep( 500 );
+#else
+            usleep( 500000 );
+#endif
         }
     }
 
@@ -272,13 +274,13 @@ void InteractionRoot::subscribe_interaction(RTI::RTIambassador *rti) {
 }
 
 
-void InteractionRoot::unsubscribe_interaction(RTIambassador rti) {
+void InteractionRoot::unsubscribe_interaction(RTI::RTIambassador *rti) {
     if (!get_is_subscribed()) return;
     get_is_subscribed() = false;
 
     init(rti);
 
-    boolean isNotUnsubscribed = true;
+    bool isNotUnsubscribed = true;
     while(isNotUnsubscribed) {
         try {
             rti->unsubscribeInteractionClass(get_class_handle());
@@ -292,9 +294,13 @@ void InteractionRoot::unsubscribe_interaction(RTIambassador rti) {
         } catch (RTI::InteractionClassNotSubscribed e) {
 //            logger.error("could not unsubscribe: Interaction Class Not Subscribed", e);
             return;
-        } catch (Exception e) {
+        } catch (...) {
 //            logger.error(e);
-            CpswtUtils.sleepDefault();
+#ifdef _WIN32
+            Sleep( 500 );
+#else
+            usleep( 500000 );
+#endif
         }
     }
 
@@ -302,26 +308,20 @@ void InteractionRoot::unsubscribe_interaction(RTIambassador rti) {
 }
 
 
-PropertyClassNameAndValueSP InteractionRoot::getParameterAux(
+InteractionRoot::PropertyClassNameAndValueSP InteractionRoot::getParameterAux(
   const std::string &className, const std::string &propertyName
-) {
-    ClassAndPropertyName key(get_hla_class_name(), "");
+) const {
 
-    ClassAndPropertyNameValueSPMap::const_iterator cvmCit = _classAndPropertyNameValueSPMap.find(key);
-    if (cvmCit != _classAndPropertyNameValueSPMap.end()) {
-        ValueSP valueSP = classAndPropertyNameValueMap[key];
-        return PropertyClassNameAndValueSP(new PropertyClassNameAndValue(get_hla_class_name(), valueSP));
-    }
-
-//    logger.error(
-//      "getparameter(\"{}\"): could not find value for \"{}\" parameter of class \"{}\" or " +
-//      "its superclasses.", propertyName, propertyName, className
-//    );
-
-    return PropertyClassMemberNameAndValueSP(static_cast<PropertyClassNameAndValue *>(0));
+    ClassAndPropertyNameSP classAndPropertyNameSP = findProperty(className, propertyName);
+    return classAndPropertyNameSP
+      ? PropertyClassNameAndValueSP( new PropertyClassNameAndValue(
+          classAndPropertyNameSP->getClassName(),
+          _classAndPropertyNameValueSPMap.find(*classAndPropertyNameSP)->second
+      ) )
+      : PropertyClassNameAndValueSP();
 }
 
-PropertyHandleValuePairSetSP InteractionRoot::createPropertyHandleValuePairSet() {
+InteractionRoot::PropertyHandleValuePairSetSP InteractionRoot::createPropertyHandleValuePairSetSP() {
 
     int count = _classAndPropertyNameValueSPMap.size();
     PropertyHandleValuePairSetSP propertyHandleValuePairSetSP(  RTI::ParameterSetFactory::create( count )  );
@@ -332,9 +332,9 @@ PropertyHandleValuePairSetSP InteractionRoot::createPropertyHandleValuePairSet()
       cvmItr != _classAndPropertyNameValueSPMap.end();
       ++cvmItr
     ) {
-        ClassAndPropertyName &classAndPropertyName(cvmItr->first);
+        const ClassAndPropertyName &classAndPropertyName(cvmItr->first);
         int handle = get_class_and_property_name_handle_map()[classAndPropertyName];
-        std::string value = cvmItr->second.getValue();
+        std::string value = static_cast<std::string>(*cvmItr->second);
         propertyHandleValuePairSet.add(handle, value.c_str(), value.size() + 1);
     }
 
@@ -345,30 +345,30 @@ void InteractionRoot::sendInteraction( RTI::RTIambassador *rti, double time ) {
     bool interactionNotSent = true;
     while ( interactionNotSent ) {
         try {
-            ParameterHandleValuePairSetSP datamembers = createDatamemberHandleValuePairSet( 0 );
+            PropertyHandleValuePairSetSP datamembers = createPropertyHandleValuePairSetSP();
             rti->sendInteraction(  getClassHandle(), *datamembers, RTIfedTime( time ), 0  );
-            createLog( time, true );
+//            createLog( time, true );
             interactionNotSent = false;
         } catch ( RTI::InteractionClassNotDefined & ) {
-            std::cerr << "ERROR:  " << getClassName() << ":  could not send interaction:  Interaction Class Not Defined" << std::endl;
+            std::cerr << "ERROR:  " << getCppClassName() << ":  could not send interaction:  Interaction Class Not Defined" << std::endl;
             return;
         } catch ( RTI::InteractionClassNotPublished & ) {
-            std::cerr << "ERROR:  " << getClassName() << ":  could not send interaction:  Interaction Class Not Published" << std::endl;
+            std::cerr << "ERROR:  " << getCppClassName() << ":  could not send interaction:  Interaction Class Not Published" << std::endl;
             return;
         } catch ( RTI::InteractionParameterNotDefined & ) {
-            std::cerr << "ERROR:  " << getClassName() << ":  could not send interaction:  Interaction Parameter Not Defined" << std::endl;
+            std::cerr << "ERROR:  " << getCppClassName() << ":  could not send interaction:  Interaction Parameter Not Defined" << std::endl;
             return;
         } catch ( RTI::InvalidFederationTime & ) {
-            std::cerr << "ERROR:  " << getClassName() << ":  could not send interaction:  Invalid Federation Time" << std::endl;
+            std::cerr << "ERROR:  " << getCppClassName() << ":  could not send interaction:  Invalid Federation Time" << std::endl;
             return;
         } catch ( RTI::FederateNotExecutionMember & ) {
-            std::cerr << "ERROR:  " << getClassName() << ":  could not send interaction:  Federate Not Execution Member" << std::endl;
+            std::cerr << "ERROR:  " << getCppClassName() << ":  could not send interaction:  Federate Not Execution Member" << std::endl;
             return;
         } catch ( RTI::ConcurrentAccessAttempted & ) {
-            std::cerr << "ERROR:  " << getClassName() << ":  could not send interaction:  ConcurrentAccessAttempted" << std::endl;
+            std::cerr << "ERROR:  " << getCppClassName() << ":  could not send interaction:  ConcurrentAccessAttempted" << std::endl;
             return;
         } catch ( ... ) {
-            std::cerr << "ERROR:  " << getClassName() << ":  could not send interaction:  Exception caught ... retry" << std::endl;
+            std::cerr << "ERROR:  " << getCppClassName() << ":  could not send interaction:  Exception caught ... retry" << std::endl;
 #ifdef _WIN32
             Sleep( 500 );
 #else
@@ -382,26 +382,26 @@ void InteractionRoot::sendInteraction( RTI::RTIambassador *rti ) {
     bool interactionNotSent = true;
     while ( interactionNotSent ) {
         try {
-            ParameterHandleValuePairSetSP datamembers = createDatamemberHandleValuePairSet( 0 );
+            PropertyHandleValuePairSetSP datamembers = createPropertyHandleValuePairSetSP();
             rti->sendInteraction(  getClassHandle(), *datamembers, 0  );
-            createLog( 0, true );
+//            createLog( 0, true );
         } catch ( RTI::InteractionClassNotDefined & ) {
-            std::cerr << "ERROR:  " << getClassName() << ":  could not send interaction:  Interaction Class Not Defined" << std::endl;
+            std::cerr << "ERROR:  " << getCppClassName() << ":  could not send interaction:  Interaction Class Not Defined" << std::endl;
             return;
         } catch ( RTI::InteractionClassNotPublished & ) {
-            std::cerr << "ERROR:  " << getClassName() << ":  could not send interaction:  Interaction Class Not Published" << std::endl;
+            std::cerr << "ERROR:  " << getCppClassName() << ":  could not send interaction:  Interaction Class Not Published" << std::endl;
             return;
         } catch ( RTI::InteractionParameterNotDefined & ) {
-            std::cerr << "ERROR:  " << getClassName() << ":  could not send interaction:  Interaction Parameter Not Defined" << std::endl;
+            std::cerr << "ERROR:  " << getCppClassName() << ":  could not send interaction:  Interaction Parameter Not Defined" << std::endl;
             return;
         } catch ( RTI::FederateNotExecutionMember & ) {
-            std::cerr << "ERROR:  " << getClassName() << ":  could not send interaction:  Federate Not Execution Member" << std::endl;
+            std::cerr << "ERROR:  " << getCppClassName() << ":  could not send interaction:  Federate Not Execution Member" << std::endl;
             return;
         } catch ( RTI::ConcurrentAccessAttempted & ) {
-            std::cerr << "ERROR:  " << getClassName() << ":  could not send interaction:  ConcurrentAccessAttempted" << std::endl;
+            std::cerr << "ERROR:  " << getCppClassName() << ":  could not send interaction:  ConcurrentAccessAttempted" << std::endl;
             return;
         } catch ( ... ) {
-            std::cerr << "ERROR:  " << getClassName() << ":  could not send interaction:  Exception caught ... retry" << std::endl;
+            std::cerr << "ERROR:  " << getCppClassName() << ":  could not send interaction:  Exception caught ... retry" << std::endl;
 #ifdef _WIN32
             Sleep( 500 );
 #else
@@ -411,19 +411,19 @@ void InteractionRoot::sendInteraction( RTI::RTIambassador *rti ) {
     }
 }
 
-const std::string InteractionRoot::toJson() {
+std::string InteractionRoot::toJson() {
     Json::Value topLevelJSONObject(Json::objectValue);
     topLevelJSONObject["messaging_type"] = "interaction";
     topLevelJSONObject["messaging_name"] = getHlaClassName();
 
     Json::Value propertyJSONObject(Json::objectValue);
-    topLevelJSONObject["properties"] = propertyJSONObject);
+    topLevelJSONObject["properties"] = propertyJSONObject;
     for(
       ClassAndPropertyNameValueSPMap::iterator cvmItr = _classAndPropertyNameValueSPMap.begin() ;
       cvmItr != _classAndPropertyNameValueSPMap.end() ;
       ++cvmItr
     ) {
-        const std::string &key(cvmItr->first);
+        const std::string key(cvmItr->first);
         Value &value = *cvmItr->second;
         switch(value.getDataType()) {
             case(TypeMedley::BOOLEAN):
@@ -439,7 +439,7 @@ const std::string InteractionRoot::toJson() {
                 propertyJSONObject[key] = static_cast<int>(value);
                 break;
             case(TypeMedley::LONG):
-                propertyJSONObject[key] = static_cast<long>(value);
+                propertyJSONObject[key] = static_cast<Json::Value::Int64>(static_cast<long>(value));
                 break;
             case(TypeMedley::STRING):
                 propertyJSONObject[key] = static_cast<std::string>(value);
@@ -455,21 +455,17 @@ const std::string InteractionRoot::toJson() {
     return stringOutputStream.str();
 }
 
-static SP InteractionRoot::fromJson(const std::string &jsonString) {
-    Json::CharReaderBuilder charReaderBbuilder;
-    std::unique_ptr<Json::CharReader> const charReaderUPtr(charReaderBbuilder.newCharReader());
+InteractionRoot::SP InteractionRoot::fromJson(const std::string &jsonString) {
+    std::istringstream jsonInputStream(jsonString);
 
-    const char[] jsonCString = strcpy(jsonString.c_str());
+    Json::Value topLevelJSONObject;
+    jsonInputStream >> topLevelJSONObject;
 
-    Json::Value topLevelJSONObject(Json::objectValue);
-    std::string errorString;
-    reader->parse(jsonCString, jsonCString + jsonString.size(), &topLevelJSONObject, &errorString);
-
-    const std::string className(topLevelJSONObject["messaging_name"].asString();
+    const std::string className(topLevelJSONObject["messaging_name"].asString());
     SP interactionRootSP = create_interaction(className);
     if (!interactionRootSP) {
-//        logger.error("InteractionRoot:  fromJson(String):  no such interaction class \"{}\"", className);
-        return SP(static_cast<InteractionRoot *>(0));
+//        logger.error("InteractionRoot:  fromJson(std::string):  no such interaction class \"{}\"", className);
+        return SP();
     }
 
     ClassAndPropertyNameValueSPMap &otherClassAndPropertyNameValueSPMap(
@@ -484,28 +480,34 @@ static SP InteractionRoot::fromJson(const std::string &jsonString) {
 
         switch(otherClassAndPropertyNameValueSPMap[classAndPropertyName]->getDataType()) {
             case TypeMedley::BOOLEAN:
-                classAndPropertyNameValueSPMap[classAndPropertyName] =
-                  ValueSP(new Value(propertyJSONObject[memberName].asBool()));
+                (*otherClassAndPropertyNameValueSPMap[classAndPropertyName]).setValue(
+                  propertyJSONObject[memberName].asBool()
+                );
                 break;
             case TypeMedley::CHARACTER:
-                classAndPropertyNameValueSPMap[classAndPropertyName] =
-                  ValueSP(new Value(static_cast<char>(propertyJSONObject[memberName].asInt())));
+                (*otherClassAndPropertyNameValueSPMap[classAndPropertyName]).setValue(
+                  static_cast<char>(propertyJSONObject[memberName].asInt())
+                );
                 break;
             case TypeMedley::SHORT:
-                classAndPropertyNameValueSPMap[classAndPropertyName] =
-                  ValueSP(new Value(static_cast<short>(propertyJSONObject[memberName].asInt())));
+                (*otherClassAndPropertyNameValueSPMap[classAndPropertyName]).setValue(
+                  static_cast<short>(propertyJSONObject[memberName].asInt())
+                );
                 break;
             case TypeMedley::INTEGER:
-                classAndPropertyNameValueSPMap[classAndPropertyName] =
-                  ValueSP(new Value(propertyJSONObject[memberName].asInt()));
+                (*otherClassAndPropertyNameValueSPMap[classAndPropertyName]).setValue(
+                  propertyJSONObject[memberName].asInt()
+                );
                 break;
             case TypeMedley::LONG:
-                propertyJSONObject[classAndPropertyName] =
-                  ValueSP(new Value(propertyJSONObject[memberName].asInt64()));
+                (*otherClassAndPropertyNameValueSPMap[classAndPropertyName]).setValue(
+                  static_cast<long>(propertyJSONObject[memberName].asInt64())
+                );
                 break;
             case TypeMedley::STRING:
-                propertyJSONObject[classAndPropertyName] =
-                  ValueSP(new Value(propertyJSONObject[memberName].asString()));
+                (*otherClassAndPropertyNameValueSPMap[classAndPropertyName]).setValue(
+                  propertyJSONObject[memberName].asString()
+                );
                 break;
         }
     }

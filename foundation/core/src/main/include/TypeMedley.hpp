@@ -146,7 +146,7 @@ public:
 
     bool setValue(const std::string &value);
 
-    explicit operator bool() {
+    operator bool() {
         switch(_dataType) {
             case CHARACTER:
                 return _value[0] != '0' && static_cast<char>(boost::lexical_cast<int>(_value)) != '0';
@@ -157,49 +157,49 @@ public:
         }
     }
 
-    explicit operator char() {
+    operator char() {
         if (_dataType == STRING) {
             return _value.empty() ? '\0' : _value[0];
         }
         return static_cast<char>(boost::lexical_cast<double>(_value));
     }
 
-    explicit operator short() {
+    operator short() {
         if (_dataType == STRING && !hasDoubleFormat(_value)) {
             return static_cast<short>(_value.empty());
         }
         return static_cast<short>(boost::lexical_cast<double>(_value));
     }
 
-    explicit operator int() {
+    operator int() {
         if (_dataType == STRING && !hasDoubleFormat(_value)) {
             return static_cast<int>(_value.empty());
         }
         return static_cast<int>(boost::lexical_cast<double>(_value));
     }
 
-    explicit operator long() {
+    operator long() {
         if (_dataType == STRING && !hasDoubleFormat(_value)) {
             return static_cast<long>(_value.empty());
         }
         return static_cast<long>(boost::lexical_cast<double>(_value));
     }
 
-    explicit operator float() {
+    operator float() {
         if (_dataType == STRING && !hasDoubleFormat(_value)) {
             return static_cast<float>(_value.empty());
         }
         return static_cast<float>(boost::lexical_cast<double>(_value));
     }
 
-    explicit operator double() {
+    operator double() {
         if (_dataType == STRING && !hasDoubleFormat(_value)) {
             return static_cast<double>(_value.empty());
         }
         return boost::lexical_cast<double>(_value);
     }
 
-    explicit operator std::string() {
+    operator std::string() {
         switch(_dataType) {
             case BOOLEAN:
                 return boost::lexical_cast<int>(_value) ? "true" : "false";
