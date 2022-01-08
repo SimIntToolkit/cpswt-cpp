@@ -33,7 +33,7 @@ unitTest {
 tasks.withType(CppCompile::class.java).configureEach {
     compilerArgs.addAll(toolChain.map { toolChain ->
         when(toolChain) {
-            is Gcc, is Clang -> listOf("-I$rtiHome/include/hla13")
+            is Gcc, is Clang -> listOf("-I$rtiHome/include/hla13", "-Wno-deprecated")
             is VisualCpp -> listOf("/I $rtiHome/include/hla13")
             else -> listOf()
         }

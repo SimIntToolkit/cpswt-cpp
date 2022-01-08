@@ -1,34 +1,36 @@
+#include <sstream>
 #include "ObjectRoot.hpp"
+
 
 
 namespace org {
  namespace cpswt {
   namespace hla {
 
-std::string ObjectRoot::join(const std::list<std::string> &joinList, cons std:string &delimiter) {
+std::string ObjectRoot::join(const std::list<std::string> &joinList, const std::string &delimiter) {
     std::string retval;
 
     if (joinList.empty()) {
         return retval;
     }
 
-    std::list<std::string>::iterator strItr = joinList.begin();
+    std::list<std::string>::const_iterator strItr = joinList.begin();
     retval += *strItr++;
     while(strItr != joinList.end()) {
-        retval += delimiter + *strItr++
+        retval += delimiter + *strItr++;
     }
 
     return retval;
 }
 
 
-ClassAndPropertyNameSP ObjectRoot::findProperty(const std:string &className, const std::string &propertyName) {
+ClassAndPropertyNameSP ObjectRoot::findProperty(const std::string &className, const std::string &propertyName) {
 
     std::list<std::string> classNameComponents;
-    boost::algorithm:split(classNameComponents, className, boost::is_any_of("."));
+    boost::algorithm::split(classNameComponents, className, boost::is_any_of("."));
 
     while(!classNameComponents.empty()) {
-        std::string localClassName = boost:algorithm::join(classNameComponents, ".");
+        std::string localClassName = boost::algorithm::join(classNameComponents, ".");
 
         ClassAndPropertyName key(localClassName, propertyName);
         if (get_class_and_property_name_handle_map().find(key) != get_class_and_property_name_handle_map().end()) {
@@ -38,37 +40,37 @@ ClassAndPropertyNameSP ObjectRoot::findProperty(const std:string &className, con
         classNameComponents.pop_back();
     }
 
-    return ClassAndPropertyNameSP(static_cast<ClassAndPropertyName *>(0));
+    return ClassAndPropertyNameSP();
 }ObjectRoot::SP ObjectRoot::create_object( int classHandle, const RTI::AttributeHandleValuePairSet &propertyMap ) {
-	IntegerStringMap::iterator ismItr = getClassHandleNameMap().find( classHandle );
-	if ( ismItr == getClassHandleNameMap().end() ) {
-		return SP( (InteractionRoot *)0 );
+	IntegerStringMap::iterator ismItr = get_class_handle_name_map().find( classHandle );
+	if ( ismItr == get_class_handle_name_map().end() ) {
+		return SP();
 	}
 
 	StringInstanceSPMap::iterator simItr = get_class_name_instance_sp_map().find( ismItr->second );
 	if ( simItr == get_class_name_instance_sp_map().end() ) {
-		return SP( (InteractionRoot *)0 );
+		return SP();
 	}
 
 	SP sp = simItr->second->createObject();
-	sp->setParameters( propertyMap );
+	sp->setAttributes( propertyMap );
 
 	return sp;
 }
 
-ObjectRoot::SP ObjectRoot::create_object( int classHandle, const RTI::{ property_type|title }}HandleValuePairSet &propertyMap, const RTIfedTime &rtiFedTime ) {
-	IntegerStringMap::iterator ismItr = getClassHandleNameMap().find( classHandle );
-	if ( ismItr == getClassHandleNameMap().end() ) {
-		return SP( (InteractionRoot *)0 );
+ObjectRoot::SP ObjectRoot::create_object( int classHandle, const RTI::AttributeHandleValuePairSet &propertyMap, const RTIfedTime &rtiFedTime ) {
+	IntegerStringMap::iterator ismItr = get_class_handle_name_map().find( classHandle );
+	if ( ismItr == get_class_handle_name_map().end() ) {
+		return SP();
 	}
 
 	StringInstanceSPMap::iterator simItr = get_class_name_instance_sp_map().find( ismItr->second );
 	if ( simItr == get_class_name_instance_sp_map().end() ) {
-		return SP( (InteractionRoot *)0 );
+		return SP();
 	}
 
 	SP sp = simItr->second->createObject(rtiFedTime);
-	sp->setParameters( propertyMap );
+	sp->setAttributes( propertyMap );
 	sp->setTime( rtiFedTime.getTime() );
 
 	return sp;
@@ -78,42 +80,42 @@ void ObjectRoot::registerObject( RTI::RTIambassador *rti ) {
 
     while( !_isRegistered ) {
         try {
-            _object_handle = rti->registerObjectInstance( getClassHandle() );
+            _objectHandle = rti->registerObjectInstance( getClassHandle() );
             _isRegistered = true;
         } catch ( RTI::ObjectClassNotDefined & ) {
-        	std::cerr << "ERROR:  InteractionRoot::registerObject:  Object Class Not Defined" << std::endl;
+            std::cerr << "ERROR:  ObjectRoot::registerObject:  Object Class Not Defined" << std::endl;
             return;
         } catch ( RTI::ObjectClassNotPublished & ) {
-        	std::cerr << "ERROR:  InteractionRoot::registerObject:  Object Class Not Published" << std::endl;
+            std::cerr << "ERROR:  ObjectRoot::registerObject:  Object Class Not Published" << std::endl;
             return;
         } catch ( RTI::FederateNotExecutionMember & ) {
-        	std::cerr << "ERROR:  InteractionRoot::registerObject:  Federate Not Execution Member" << std::endl;
+            std::cerr << "ERROR:  ObjectRoot::registerObject:  Federate Not Execution Member" << std::endl;
             return;
         } catch ( ... ) {
-        	std::cerr << "InteractionRoot::registerObject:  Exception caught ... retry" << std::endl;
+            std::cerr << "ObjectRoot::registerObject:  Exception caught ... retry" << std::endl;
         }
     }
 
 }
 
-void ObjectRoot::registerObject( RTI::RTIambassador *rti, const std::string &name ) throw ( RTI::ObjectAlreadyRegistered ) {
+void ObjectRoot::registerObject( RTI::RTIambassador *rti, const std::string &name ) {
     while( !_isRegistered ) {
         try {
-            _object_handle = rti->registerObjectInstance( getClassHandle(), name.c_str() );
+            _objectHandle = rti->registerObjectInstance( getClassHandle(), name.c_str() );
             _isRegistered = true;
         } catch ( RTI::ObjectClassNotDefined & ) {
-            std::cerr << "ERROR:  InteractionRoot::registerObject:  Object Class Not Defined" << std::endl;
+            std::cerr << "ERROR:  ObjectRoot::registerObject:  Object Class Not Defined" << std::endl;
             return;
         } catch ( RTI::ObjectClassNotPublished & ) {
-            std::cerr << "ERROR:  InteractionRoot::registerObject:  Object Class Not Published" << std::endl;
+            std::cerr << "ERROR:  ObjectRoot::registerObject:  Object Class Not Published" << std::endl;
             return;
         } catch ( RTI::FederateNotExecutionMember & ) {
-            std::cerr << "ERROR:  InteractionRoot::registerObject:  Federate Not Execution Member" << std::endl;
+            std::cerr << "ERROR:  ObjectRoot::registerObject:  Federate Not Execution Member" << std::endl;
             return;
         } catch ( RTI::ObjectAlreadyRegistered & ) {
             throw;
         } catch ( ... ) {
-            std::cerr << "InteractionRoot::registerObject:  Exception caught ... retry" << std::endl;
+            std::cerr << "ObjectRoot::registerObject:  Exception caught ... retry" << std::endl;
         }
     }
 }
@@ -125,16 +127,16 @@ void ObjectRoot::unregisterObject( RTI::RTIambassador *rti ) {
             rti->deleteObjectInstance( getObjectHandle(), 0 );
             _isRegistered = false;
         } catch ( RTI::ObjectNotKnown & ) {
-        	std::cerr << "ERROR:  InteractionRoot::unregisterObject:  Object Not Known" << std::endl;
+            std::cerr << "ERROR:  ObjectRoot::unregisterObject:  Object Not Known" << std::endl;
             return;
         } catch ( RTI::DeletePrivilegeNotHeld & ) {
-        	std::cerr << "ERROR:  InteractionRoot::unregisterObject:  Delete Privilege Not Held" << std::endl;
+            std::cerr << "ERROR:  ObjectRoot::unregisterObject:  Delete Privilege Not Held" << std::endl;
             return;
         } catch ( RTI::FederateNotExecutionMember & ) {
-        	std::cerr << "ERROR:  InteractionRoot::unregisterObject:  Federate Not Execution Member" << std::endl;
+            std::cerr << "ERROR:  ObjectRoot::unregisterObject:  Federate Not Execution Member" << std::endl;
             return;
         } catch ( ... ) {
-        	std::cerr << "InteractionRoot::unregisterObject:  Exception caught ... retry" << std::endl;
+            std::cerr << "ObjectRoot::unregisterObject:  Exception caught ... retry" << std::endl;
         }
     }
 }
@@ -142,40 +144,33 @@ void ObjectRoot::unregisterObject( RTI::RTIambassador *rti ) {
 void ObjectRoot::requestUpdate( RTI::RTIambassador *rti ) {
 	bool requestNotSubmitted = true;
 	while( requestNotSubmitted ) {
-		try {		
-			rti->requestObjectAttributeValueUpdate( getObjectHandle(), getSubscribedAttributeHandleSet_var() );
+		try {
+			rti->requestObjectAttributeValueUpdate( getObjectHandle(), *get_subscribed_attribute_handle_set_sp() );
 			requestNotSubmitted = false;
 		} catch ( RTI::FederateNotExecutionMember & ) {
-			std::cerr << "ERROR: " << getClassName() << "request for update failed:  Federate Not Execution Member" << std::endl;
-			return;				
+			std::cerr << "ERROR: " << getCppClassName() << "request for update failed:  Federate Not Execution Member" << std::endl;
+			return;
 		} catch ( RTI::ObjectNotKnown & ) {
-			std::cerr << "ERROR: " << getClassName() << "request for update failed:  Object Not Known" << std::endl;
-			return;				
+			std::cerr << "ERROR: " << getCppClassName() << "request for update failed:  Object Not Known" << std::endl;
+			return;
 		} catch ( RTI::AttributeNotDefined & ) {
-			std::cerr << "ERROR: " << getClassName() << "request for update failed:  Name Not Found" << std::endl;
-			return;				
+			std::cerr << "ERROR: " << getCppClassName() << "request for update failed:  Name Not Found" << std::endl;
+			return;
 		} catch ( ... ) {
-			std::cerr << "ERROR: " << getClassName() << "request for update failed:  Unknown Exception" << std::endl;			}
+			std::cerr << "ERROR: " << getCppClassName() << "request for update failed:  Unknown Exception" << std::endl;			}
 	}
 }
 
-const Value &ObjectRoot::getAttribute( int propertyHandle ) {
-    const Value valueDefault(false);
-    ClassAndPropertyNameSP classAndPropertyNameSP = _handleClassAndPropertyNameMap.get(propertyHandle);
-    if (!classAndPropertyNameSP) {
+const ObjectRoot::Value &ObjectRoot::getAttribute( int propertyHandle ) const {
+    static const Value valueDefault(false);
+    IntegerClassAndPropertyNameSPMap::const_iterator icmCit =
+      get_handle_class_and_property_name_sp_map().find(propertyHandle);
+    if (icmCit == get_handle_class_and_property_name_sp_map().end()) {
 //        logger.error("getAttribute: propertyHandle {} does not exist.", propertyHandle);
         return valueDefault;
     }
-    const std::string &propertyName = classAndPropertyName.getPropertyName();
-    const ValueSP valueSP = getAttribute(propertyName);
-    if (!valueSP) {
-//        logger.error(
-//            "getAttribute: propertyHandle {} corresponds to property of name \"{}\", which " +
-//            "does not exist in class \"{}\" (it's defined in class\"{}\")",
-//            propertyHandle, propertyName, getClass(), classAndPropertyName.getClassName()
-//        );
-    }
 
+    const ValueSP valueSP = _classAndPropertyNameValueSPMap.find(*icmCit->second)->second;
     return *valueSP;
 }
 
@@ -188,8 +183,10 @@ void ObjectRoot::setAttributes( const RTI::AttributeHandleValuePairSet &property
         try {
             char *value = propertyMap.getValuePointer( ix, valueLength );
             ClassAndPropertyNameSP classAndPropertyNameSP =
-              get_handle_class_and_property_name_sp_map()[ propertyName.getHandle( ix ) ]
-            _classAndPropertyNameValueSPMap[*classAndPropertyNameSP]->setValue(  std::string( value, valueLength )  );
+              get_handle_class_and_property_name_sp_map()[ propertyMap.getHandle( ix ) ];
+            _classAndPropertyNameValueSPMap.find(*classAndPropertyNameSP)->second->setValue(
+              std::string( value, valueLength )
+            );
         } catch ( ... ) {
             std::cerr << "setParameters: Exception caught!" << std::endl;
         }
@@ -197,49 +194,38 @@ void ObjectRoot::setAttributes( const RTI::AttributeHandleValuePairSet &property
 }
 
 
-void ObjectRoot::setAttribute(int handle, const std::string &value) {
-    IntegerClassAndPropertyNameSPMap::const_iterator icmCit =
-      get_handle_class_and_property_name_sp_map().find(handle);
-
-    if (icmCit == get_handle_class_and_property_name_sp_map().end()) {
-        //ERROR
-        return;
-    }
-
-    const ClassAndPropertyName &classAndPropertyName = *icmCit->second;
-    ValueSP valueSP = _classAndPropertyNameValueSPMap[classAndPropertyName];
-    valueSP->setValue(value);
-}
-
 bool ObjectRoot::static_init() {
     // ADD THIS CLASS TO THE _classNameSet DEFINED IN ObjectRoot
-    get_class_name_set().add(get_hla_class_name());
+    get_class_name_set().insert(get_hla_class_name());
 
     // ADD CLASS OBJECT OF THIS CLASS TO _classNameClassMap DEFINED IN ObjectRoot
     get_class_name_instance_sp_map()[get_hla_class_name()] = SP(new ObjectRoot());
 
     // ADD THIS CLASS'S _classAndPropertyNameSet TO _classNamePropertyNameSetMap DEFINED
     // IN ObjectRoot
-    get_class_name_property_name_set_sp_map()[get_hla_class_name()] = get_class_and_property_name_set_sp();
+    get_class_name_class_and_property_name_set_sp_map()[get_hla_class_name()] = get_class_and_property_name_set_sp();
 
     // ADD THIS CLASS'S _allClassAndPropertyNameSet TO _classNameAllPropertyNameSetMap DEFINED
     // IN ObjectRoot
-    get_class_name_all_property_name_set_sp_map()[get_hla_class_name()] = get_all_class_and_property_name_set_sp();
+    get_class_name_all_class_and_property_name_set_sp_map()[get_hla_class_name()] =
+      get_all_class_and_property_name_set_sp();
 
     get_class_name_published_attribute_name_set_sp_map()[get_hla_class_name()] =
-      get_published_attribute_name_set_sp());
+      get_published_class_and_property_name_set_sp();
     get_class_name_published_attribute_name_set_sp_map()[get_hla_class_name()] =
-      get_subscribed_attribute_name_set_sp());
+      get_subscribed_class_and_property_name_set_sp();
 
     get_class_name_published_attribute_handle_set_sp_map()[get_hla_class_name()] =
       get_published_attribute_handle_set_sp();
 
     get_class_name_subscribed_attribute_handle_set_sp_map()[get_hla_class_name()] =
       get_subscribed_attribute_handle_set_sp();
+
+    return true;
 }
 
 
-int ObjectRoot::get_attribute_handle_aux(const std::string &className, const std:string &propertyName) {
+int ObjectRoot::get_attribute_handle_aux(const std::string &className, const std::string &propertyName) {
     ClassAndPropertyName key(get_hla_class_name(), propertyName);
     ClassAndPropertyNameIntegerMap::const_iterator cimCit = get_class_and_property_name_handle_map().find(key);
     if (cimCit != get_class_and_property_name_handle_map().end()) {
@@ -253,24 +239,28 @@ int ObjectRoot::get_attribute_handle_aux(const std::string &className, const std
 }
 
 
-void ObjectRoot::init(RTIambassador rti) {
+void ObjectRoot::init(RTI::RTIambassador *rti) {
     if (get_is_initialized()) return;
     get_is_initialized() = true;
 
-    boolean isNotInitialized = true;
+    bool isNotInitialized = true;
     while(isNotInitialized) {
         try {
-            get_class_handle() = rti.getObjectClassHandle(get_hla_class_name());
+            get_class_handle() = rti->getObjectClassHandle(get_hla_class_name().c_str());
             isNotInitialized = false;
-        } catch (FederateNotExecutionMember e) {
-            logger.error("could not initialize: Federate Not Execution Member", e);
+        } catch (RTI::FederateNotExecutionMember e) {
+//            logger.error("could not initialize: Federate Not Execution Member", e);
             return;
-        } catch (NameNotFound e) {
-            logger.error("could not initialize: Name Not Found", e);
+        } catch (RTI::NameNotFound e) {
+//            logger.error("could not initialize: Name Not Found", e);
             return;
-        } catch (Exception e) {
-            logger.error(e);
-            CpswtUtils.sleepDefault();
+        } catch (...) {
+//            logger.error(e);
+#ifdef _WIN32
+            Sleep( 500 );
+#else
+            usleep( 500000 );
+#endif
         }
     }
 
@@ -290,19 +280,19 @@ void ObjectRoot::publish_object(RTI::RTIambassador *rti) {
 
     get_published_attribute_handle_set_sp()->empty();
     for(
-      ClassAndPropertyNameSet::const_iterator cnsCit = get_published_attribute_name_set_sp()->begin() ;
-      cnsCit != get_published_attribute_name_set_sp()->end() ;
+      ClassAndPropertyNameSet::const_iterator cnsCit = get_published_class_and_property_name_set_sp()->begin() ;
+      cnsCit != get_published_class_and_property_name_set_sp()->end() ;
       ++cnsCit
     ) {
         try {
             get_published_attribute_handle_set_sp()->add(get_class_and_property_name_handle_map()[*cnsCit]);
 //            logger.trace("publish {}:{}", get_hla_class_name(), key.toString());
-        } catch (Exception e) {
+        } catch (...) {
 //            logger.error("could not publish \"" + key.toString() + "\" attribute.", e);
         }
     }
 
-    boolean isNotPublished = true;
+    bool isNotPublished = true;
     while(isNotPublished) {
         try {
             rti->publishObjectClass(get_class_handle(), *get_published_attribute_handle_set_sp());
@@ -315,7 +305,11 @@ void ObjectRoot::publish_object(RTI::RTIambassador *rti) {
             return;
         } catch (...) {
 //            logger.error(e);
-            CpswtUtils.sleepDefault();
+#ifdef _WIN32
+            Sleep( 500 );
+#else
+            usleep( 500000 );
+#endif
         }
     }
 
@@ -329,7 +323,7 @@ void ObjectRoot::unpublish_object(RTI::RTIambassador *rti) {
 
     init(rti);
 
-    boolean isNotUnpublished = true;
+    bool isNotUnpublished = true;
     while(isNotUnpublished) {
         try {
             rti->unpublishObjectClass(get_class_handle());
@@ -345,7 +339,11 @@ void ObjectRoot::unpublish_object(RTI::RTIambassador *rti) {
             return;
         } catch (...) {
 //            logger.error(e);
-            CpswtUtils.sleepDefault();
+#ifdef _WIN32
+            Sleep( 500 );
+#else
+            usleep( 500000 );
+#endif
         }
     }
 
@@ -361,21 +359,21 @@ void ObjectRoot::subscribe_object(RTI::RTIambassador *rti) {
 
     init(rti);
 
-    get_subscribed_attribute_handle_set_sp().empty();
+    get_subscribed_attribute_handle_set_sp()->empty();
     for(
-      ClassAndPropertyNameSet::const_iterator cnsCit = get_subscribed_attribute_name_set_sp()->begin() ;
-      cnsCit != get_subscribed_attribute_name_set_sp()->end() ;
+      ClassAndPropertyNameSet::const_iterator cnsCit = get_subscribed_class_and_property_name_set_sp()->begin() ;
+      cnsCit != get_subscribed_class_and_property_name_set_sp()->end() ;
       ++cnsCit
     ) {
         try {
             get_subscribed_attribute_handle_set_sp()->add(get_class_and_property_name_handle_map()[*cnsCit]);
 //            logger.trace("subscribe {}:{}", get_hla_class_name(), key.toString());
-        } catch (Exception e) {
+        } catch (...) {
 //            logger.error("could not subscribe to \"" + key + "\" attribute.", e);
         }
     }
 
-    boolean isNotSubscribed = true;
+    bool isNotSubscribed = true;
     while(isNotSubscribed) {
         try {
             rti->subscribeObjectClassAttributes(get_class_handle(), *get_subscribed_attribute_handle_set_sp());
@@ -388,7 +386,11 @@ void ObjectRoot::subscribe_object(RTI::RTIambassador *rti) {
             return;
         } catch (...) {
 //            logger.error(e);
-            CpswtUtils.sleepDefault();
+#ifdef _WIN32
+            Sleep( 500 );
+#else
+            usleep( 500000 );
+#endif
         }
     }
 
@@ -396,13 +398,13 @@ void ObjectRoot::subscribe_object(RTI::RTIambassador *rti) {
 }
 
 
-void ObjectRoot::unsubscribe_object(RTIambassador rti) {
+void ObjectRoot::unsubscribe_object(RTI::RTIambassador *rti) {
     if (!get_is_subscribed()) return;
     get_is_subscribed() = false;
 
     init(rti);
 
-    boolean isNotUnsubscribed = true;
+    bool isNotUnsubscribed = true;
     while(isNotUnsubscribed) {
         try {
             rti->unsubscribeObjectClass(get_class_handle());
@@ -416,9 +418,13 @@ void ObjectRoot::unsubscribe_object(RTIambassador rti) {
         } catch (RTI::ObjectClassNotSubscribed e) {
 //            logger.error("could not unsubscribe: Object Class Not Subscribed", e);
             return;
-        } catch (Exception e) {
+        } catch (...) {
 //            logger.error(e);
-            CpswtUtils.sleepDefault();
+#ifdef _WIN32
+            Sleep( 500 );
+#else
+            usleep( 500000 );
+#endif
         }
     }
 
@@ -426,40 +432,47 @@ void ObjectRoot::unsubscribe_object(RTIambassador rti) {
 }
 
 
-PropertyClassNameAndValueSP ObjectRoot::getAttributeAux(
+ObjectRoot::PropertyClassNameAndValueSP ObjectRoot::getAttributeAux(
   const std::string &className, const std::string &propertyName
-) {
-    ClassAndPropertyName key(get_hla_class_name(), "");
+) const {
 
-    ClassAndPropertyNameValueSPMap::const_iterator cvmCit = _classAndPropertyNameValueSPMap.find(key);
-    if (cvmCit != _classAndPropertyNameValueSPMap.end()) {
-        ValueSP valueSP = classAndPropertyNameValueMap[key];
-        return PropertyClassNameAndValueSP(new PropertyClassNameAndValue(get_hla_class_name(), valueSP));
-    }
-
-//    logger.error(
-//      "getattribute(\"{}\"): could not find value for \"{}\" attribute of class \"{}\" or " +
-//      "its superclasses.", propertyName, propertyName, className
-//    );
-
-    return PropertyClassMemberNameAndValueSP(static_cast<PropertyClassNameAndValue *>(0));
+    ClassAndPropertyNameSP classAndPropertyNameSP = findProperty(className, propertyName);
+    return classAndPropertyNameSP
+      ? PropertyClassNameAndValueSP( new PropertyClassNameAndValue(
+          classAndPropertyNameSP->getClassName(),
+          _classAndPropertyNameValueSPMap.find(*classAndPropertyNameSP)->second
+      ) )
+      : PropertyClassNameAndValueSP();
 }
 
-PropertyHandleValuePairSetSP ObjectRoot::createPropertyHandleValuePairSet() {
+ObjectRoot::PropertyHandleValuePairSetSP ObjectRoot::createPropertyHandleValuePairSetSP( bool force ) {
 
-    int count = getPublishedAttributeSet().size();
+    int count;
+    if (force) {
+        count = _classAndPropertyNameValueSPMap.size();
+    } else {
+        count = 0;
+        for(
+          ClassAndPropertyNameValueSPMap::const_iterator cvmCit = _classAndPropertyNameValueSPMap.begin();
+          cvmCit != _classAndPropertyNameValueSPMap.end();
+          ++cvmCit
+        ) {
+            if (cvmCit->second->shouldBeUpdated(false)) {
+                ++count;
+            }
+        }
+    }
+
     PropertyHandleValuePairSetSP propertyHandleValuePairSetSP(  RTI::AttributeSetFactory::create( count )  );
-
-    ClassAndPropertyNameSet classAndPropertyNameSet = getPublishedClassAndPropertyNameSet();
     PropertyHandleValuePairSet &propertyHandleValuePairSet = *propertyHandleValuePairSetSP;
+
     for(
-      ClassAndPropertyNameSet::iterator cnsItr = classAndPropertyNameSet.begin();
-      cnsItr != classAndPropertyNameSet.end();
-      ++cvmItr
+      ClassAndPropertyNameValueSPMap::const_iterator cvmCit = _classAndPropertyNameValueSPMap.begin();
+      cvmCit != _classAndPropertyNameValueSPMap.end();
+      ++cvmCit
     ) {
-        const ClassAndPropertyName &classAndPropertyName(*cvmItr);
-        int handle = get_class_and_property_name_handle_map()[classAndPropertyName];
-        std::string value = _classAndPropertyNameValueSPMap[classAndPropertyName].getValue();
+        int handle = get_class_and_property_name_handle_map()[cvmCit->first];
+        std::string value = static_cast<std::string>(*cvmCit->second);
         propertyHandleValuePairSet.add(handle, value.c_str(), value.size() + 1);
     }
 
@@ -467,64 +480,64 @@ PropertyHandleValuePairSetSP ObjectRoot::createPropertyHandleValuePairSet() {
 }
 
 void ObjectRoot::updateAttributeValues( RTI::RTIambassador *rti, double time, bool force ) {
-    AttributeHandleValuePairSetSP suppliedAttributesSP = createDatamemberHandleValuePairSet( force );
-    if ( suppliedAttributesSP->size() == 0 ) {
+    PropertyHandleValuePairSetSP propertyHandleValuePairSetSP = createPropertyHandleValuePairSetSP( force );
+    if ( propertyHandleValuePairSetSP->size() == 0 ) {
         return;
     }
     try {
-        rti->updateAttributeValues(  getObjectHandle(), *suppliedAttributesSP, RTIfedTime( time ), 0  );
-        createLog( time, true );
+        rti->updateAttributeValues(  getObjectHandle(), *propertyHandleValuePairSetSP, RTIfedTime( time ), 0  );
+//        createLog( time, true );
     } catch ( RTI::ObjectNotKnown & ) {
-        std::cerr << "ERROR:  " << getClassName() << ":  could not update attributes:  Object Not Known" << std::endl;
+        std::cerr << "ERROR:  " << getCppClassName() << ":  could not update attributes:  Object Not Known" << std::endl;
         return;
     } catch ( RTI::FederateNotExecutionMember & ) {
-        std::cerr << "ERROR:  " << getClassName() << ":  could not update attributes:  Federate Not Execution Member" << std::endl;
+        std::cerr << "ERROR:  " << getCppClassName() << ":  could not update attributes:  Federate Not Execution Member" << std::endl;
         return;
     } catch ( RTI::AttributeNotDefined & ) {
-        std::cerr << "ERROR:  " << getClassName() << ":  could not update attributes:  Attribute Not Defined" << std::endl;
+        std::cerr << "ERROR:  " << getCppClassName() << ":  could not update attributes:  Attribute Not Defined" << std::endl;
         return;
     } catch ( RTI::AttributeNotOwned & ) {
-        std::cerr << "ERROR:  " << getClassName() << ":  could not update attributes:  Attribute Not Owned" << std::endl;
+        std::cerr << "ERROR:  " << getCppClassName() << ":  could not update attributes:  Attribute Not Owned" << std::endl;
         return;
     } catch ( RTI::ConcurrentAccessAttempted & ) {
-        std::cerr << "ERROR:  " << getClassName() << ":  could not update attributes:  Concurrent Access Attempted" << std::endl;
+        std::cerr << "ERROR:  " << getCppClassName() << ":  could not update attributes:  Concurrent Access Attempted" << std::endl;
         return;
     } catch ( RTI::InvalidFederationTime & ) {
-        std::cerr << "ERROR:  " << getClassName() << ":  could not update attributes:  Invalid Federation Time" << std::endl;
+        std::cerr << "ERROR:  " << getCppClassName() << ":  could not update attributes:  Invalid Federation Time" << std::endl;
         return;
     } catch ( ... ) {
-        std::cerr << "ERROR:  " << getClassName() << ":  could not update attributes:  exception caught" << std::endl;
+        std::cerr << "ERROR:  " << getCppClassName() << ":  could not update attributes:  exception caught" << std::endl;
     }
 }
 
 void ObjectRoot::updateAttributeValues( RTI::RTIambassador *rti, bool force ) {
-    AttributeHandleValuePairSetSP suppliedAttributesSP = createDatamemberHandleValuePairSet( force );
-    if ( suppliedAttributesSP->size() == 0 ) {
+    PropertyHandleValuePairSetSP propertyHandleValuePairSetSP = createPropertyHandleValuePairSetSP( force );
+    if ( propertyHandleValuePairSetSP->size() == 0 ) {
         return;
     }
     try {
-        rti->updateAttributeValues( getObjectHandle(), *suppliedAttributesSP, 0 );
-        createLog( 0, true );
+        rti->updateAttributeValues( getObjectHandle(), *propertyHandleValuePairSetSP, 0 );
+//        createLog( 0, true );
     } catch ( RTI::ObjectNotKnown & ) {
-        std::cerr << "ERROR:  " << getClassName() << ":  could not update attributes:  Object Not Known" << std::endl;
+        std::cerr << "ERROR:  " << getCppClassName() << ":  could not update attributes:  Object Not Known" << std::endl;
         return;
     } catch ( RTI::FederateNotExecutionMember & ) {
-        std::cerr << "ERROR:  " << getClassName() << ":  could not update attributes:  Federate Not Execution Member" << std::endl;
+        std::cerr << "ERROR:  " << getCppClassName() << ":  could not update attributes:  Federate Not Execution Member" << std::endl;
         return;
     } catch ( RTI::AttributeNotDefined & ) {
-        std::cerr << "ERROR:  " << getClassName() << ":  could not update attributes:  Attribute Not Defined" << std::endl;
+        std::cerr << "ERROR:  " << getCppClassName() << ":  could not update attributes:  Attribute Not Defined" << std::endl;
         return;
     } catch ( RTI::AttributeNotOwned & ) {
-        std::cerr << "ERROR:  " << getClassName() << ":  could not update attributes:  Attribute Not Owned" << std::endl;
+        std::cerr << "ERROR:  " << getCppClassName() << ":  could not update attributes:  Attribute Not Owned" << std::endl;
         return;
     } catch ( RTI::ConcurrentAccessAttempted & ) {
-        std::cerr << "ERROR:  " << getClassName() << ":  could not update attributes:  Concurrent Access Attempted" << std::endl;
+        std::cerr << "ERROR:  " << getCppClassName() << ":  could not update attributes:  Concurrent Access Attempted" << std::endl;
         return;
     } catch ( RTI::InvalidFederationTime & ) {
-        std::cerr << "ERROR:  " << getClassName() << ":  could not update attributes:  Invalid Federation Time" << std::endl;
+        std::cerr << "ERROR:  " << getCppClassName() << ":  could not update attributes:  Invalid Federation Time" << std::endl;
         return;
     } catch ( ... ) {
-        std::cerr << "ERROR:  " << getClassName() << ":  could not update attributes:  exception caught" << std::endl;
+        std::cerr << "ERROR:  " << getCppClassName() << ":  could not update attributes:  exception caught" << std::endl;
     }
 }
 
@@ -536,11 +549,11 @@ std::string ObjectRoot::toJson() {
     Json::Value propertyJSONObject(Json::objectValue);
     topLevelJSONObject["properties"] = propertyJSONObject;
     for(
-      ClassAndPropertyNameSet::const_iterator cnsCit = getPublishedAttributeNameSetSP()->begin() ;
-      cnsCit != getPublishedAttributeNameSetSP()->end() ;
-      ++cnsCit
+      ClassAndPropertyNameValueSPMap::iterator cvmItr = _classAndPropertyNameValueSPMap.begin() ;
+      cvmItr != _classAndPropertyNameValueSPMap.end() ;
+      ++cvmItr
     ) {
-        const std::string &key(cvmItr->first);
+        const std::string key(cvmItr->first);
         Attribute &value = *cvmItr->second;
         switch(value.getDataType()) {
             case(TypeMedley::BOOLEAN):
@@ -556,7 +569,7 @@ std::string ObjectRoot::toJson() {
                 propertyJSONObject[key] = static_cast<int>(value);
                 break;
             case(TypeMedley::LONG):
-                propertyJSONObject[key] = static_cast<long>(value);
+                propertyJSONObject[key] = static_cast<Json::Value::Int64>(static_cast<long>(value));
                 break;
             case(TypeMedley::STRING):
                 propertyJSONObject[key] = static_cast<std::string>(value);
@@ -573,19 +586,15 @@ std::string ObjectRoot::toJson() {
     return stringOutputStream.str();
 }
 
-static void ObjectRoot::fromJson(const std::string &jsonString) {
-    Json::CharReaderBuilder charReaderBbuilder;
-    std::unique_ptr<Json::CharReader> const charReaderUPtr(charReaderBbuilder.newCharReader());
+void ObjectRoot::fromJson(const std::string &jsonString) {
+    std::istringstream jsonInputStream(jsonString);
 
-    const char[] jsonCString = strcpy(jsonString.c_str());
-
-    Json::Value topLevelJSONObject(Json::objectValue);
-    std::string errorString;
-    reader->parse(jsonCString, jsonCString + jsonString.size(), &topLevelJSONObject, &errorString);
+    Json::Value topLevelJSONObject;
+    jsonInputStream >> topLevelJSONObject;
 
     int objectHandle = topLevelJSONObject["object_handle"].asInt();
-    SP objectRootSP = get_object_handle_instance_map().get(objectHandle, SP(static_cast<ObjectRoot>(0)));
-    if (!objectRootSP) {
+    ObjectHandleInstanceSPMap::iterator oimItr = get_object_handle_instance_sp_map().find(objectHandle);
+    if (oimItr != get_object_handle_instance_sp_map().end()) {
 //        logger.error(
 //                "ObjectRoot:  fromJson:  no registered object exists with recieved object-handle ({})",
 //                objectHandle
@@ -593,11 +602,12 @@ static void ObjectRoot::fromJson(const std::string &jsonString) {
         return;
     }
 
+    SP objectRootSP = oimItr->second;
     ClassAndPropertyNameValueSPMap &classAndPropertyNameValueSPMap(
-      interactionRootSP->_classAndPropertyNameValueSPMap
+      objectRootSP->_classAndPropertyNameValueSPMap
     );
     const Json::Value &propertyJSONObject(topLevelJSONObject["properties"]);
-    ClassAndPropertyNameSet &subscribedAttributeNameSet = *objectRootSP->getSubscribedAttributeNameSetSP();
+    ClassAndPropertyNameSet &subscribedAttributeNameSet = *objectRootSP->getSubscribedClassAndPropertyNameSetSP();
 
     Json::Value::Members members(propertyJSONObject.getMemberNames());
     for(Json::Value::Members::const_iterator mbrCit = members.begin() ; mbrCit != members.end() ; ++mbrCit) {
@@ -609,30 +619,36 @@ static void ObjectRoot::fromJson(const std::string &jsonString) {
             continue;
         }
 
-        switch(_classAndPropertyNameValueSPMap[classAndPropertyName].getDataType()) {
+        switch(classAndPropertyNameValueSPMap[classAndPropertyName]->getDataType()) {
             case TypeMedley::BOOLEAN:
-                classAndPropertyNameValueSPMap[classAndPropertyName] =
-                  ValueSP(new Value(propertyJSONObject[memberName].asBool()));
+                (*classAndPropertyNameValueSPMap[classAndPropertyName]).setValue(
+                  propertyJSONObject[memberName].asBool()
+                );
                 break;
             case TypeMedley::CHARACTER:
-                classAndPropertyNameValueSPMap[classAndPropertyName] =
-                  ValueSP(new Value(static_cast<char>(propertyJSONObject[memberName].asInt())));
+                (*classAndPropertyNameValueSPMap[classAndPropertyName]).setValue(
+                  static_cast<char>(propertyJSONObject[memberName].asInt())
+                );
                 break;
             case TypeMedley::SHORT:
-                classAndPropertyNameValueSPMap[classAndPropertyName] =
-                  ValueSP(new Value(static_cast<short>(propertyJSONObject[memberName].asInt())));
+                (*classAndPropertyNameValueSPMap[classAndPropertyName]).setValue(
+                  static_cast<short>(propertyJSONObject[memberName].asInt())
+                );
                 break;
             case TypeMedley::INTEGER:
-                classAndPropertyNameValueSPMap[classAndPropertyName] =
-                  ValueSP(new Value(propertyJSONObject[memberName].asInt()));
+                (*classAndPropertyNameValueSPMap[classAndPropertyName]).setValue(
+                  propertyJSONObject[memberName].asInt()
+                );
                 break;
             case TypeMedley::LONG:
-                propertyJSONObject[classAndPropertyName] =
-                  ValueSP(new Value(propertyJSONObject[memberName].asInt64()));
+                (*classAndPropertyNameValueSPMap[classAndPropertyName]).setValue(
+                  static_cast<long>(propertyJSONObject[memberName].asInt64())
+                );
                 break;
             case TypeMedley::STRING:
-                propertyJSONObject[classAndPropertyName] =
-                  ValueSP(new Value(propertyJSONObject[memberName].asString()));
+                (*classAndPropertyNameValueSPMap[classAndPropertyName]).setValue(
+                  propertyJSONObject[memberName].asString()
+                );
                 break;
         }
     }

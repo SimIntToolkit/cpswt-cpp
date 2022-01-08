@@ -78,7 +78,7 @@ public:
 
 template<>
 struct std::hash<ClassAndPropertyName> {
-    size_t operator()(const ClassAndPropertyName &classAndPropertyName) {
+    size_t operator()(const ClassAndPropertyName &classAndPropertyName) const noexcept {
         return classAndPropertyName.hashCode();
     }
 };
