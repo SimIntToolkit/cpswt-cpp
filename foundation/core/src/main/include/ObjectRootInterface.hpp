@@ -36,8 +36,10 @@
 #include <string>
 #include <vector>
 #include <RTI.hh>
+#include "fedtime.hh"
 
-#include <TypeMedley.hpp>
+#include <Attribute.hpp>
+
 #include <ClassAndPropertyName.hpp>
 
 #include <StringCollections.hpp>
@@ -49,6 +51,8 @@ namespace org {
 
 struct ObjectRootInterface {
 
+    typedef Attribute Value;
+
     virtual int getUniqueId() = 0;
 
     virtual int getClassHandle() const = 0;
@@ -59,9 +63,9 @@ struct ObjectRootInterface {
 
     virtual const std::string &getHlaClassName() const = 0;
 
-    virtual const ClassAndPropertyNameList &getAttributeNames() const = 0;
+    virtual const ClassAndPropertyNameList getAttributeNames() const = 0;
 
-    virtual const ClassAndPropertyNameList &getAllAttributeNames() const = 0;
+    virtual const ClassAndPropertyNameList getAllAttributeNames() const = 0;
 
     virtual void publishObject(RTI::RTIambassador *rtiAmbassador) = 0;
 
@@ -75,15 +79,15 @@ struct ObjectRootInterface {
 
     virtual void setTime(double time) = 0;
 
-    virtual void setTime(const RTI::FedTime &rtiFedTime) = 0;
+    virtual void setTime(const RTIfedTime &rtiFedTime) = 0;
 
-    virtual const TypeMedley &getAttribute( const std::string &propertyName ) const = 0;
+    virtual const Value &getAttribute( const std::string &propertyName ) const = 0;
 
-    virtual const TypeMedley &getAttribute( int propertyHandle ) const = 0;
+    virtual const Value &getAttribute( int propertyHandle ) const = 0;
 
     virtual void setAttributes(const RTI::AttributeHandleValuePairSet &propertyMap) = 0;
 
-    virtual void setAttribute(const std::string &propertyName, TypeMedley value ) = 0;
+//    virtual void setAttribute(const std::string &propertyName, TypeMedley value ) = 0;
 
 //    virtual RTI::AttributeHandleSet getSubscribedAttributeHandleSet() = 0;
 

@@ -36,8 +36,10 @@
 #include <string>
 #include <vector>
 #include <RTI.hh>
+#include "fedtime.hh"
 
 #include <TypeMedley.hpp>
+
 #include <ClassAndPropertyName.hpp>
 
 #include <StringCollections.hpp>
@@ -49,6 +51,8 @@ namespace org {
 
 struct InteractionRootInterface {
 
+    typedef TypeMedley Value;
+
     virtual int getUniqueId() = 0;
 
     virtual int getClassHandle() const = 0;
@@ -59,9 +63,9 @@ struct InteractionRootInterface {
 
     virtual const std::string &getHlaClassName() const = 0;
 
-    virtual const ClassAndPropertyNameList &getParameterNames() const = 0;
+    virtual const ClassAndPropertyNameList getParameterNames() const = 0;
 
-    virtual const ClassAndPropertyNameList &getAllParameterNames() const = 0;
+    virtual const ClassAndPropertyNameList getAllParameterNames() const = 0;
 
     virtual void publishInteraction(RTI::RTIambassador *rtiAmbassador) = 0;
 
@@ -75,15 +79,15 @@ struct InteractionRootInterface {
 
     virtual void setTime(double time) = 0;
 
-    virtual void setTime(const RTI::FedTime &rtiFedTime) = 0;
+    virtual void setTime(const RTIfedTime &rtiFedTime) = 0;
 
-    virtual const TypeMedley &getParameter( const std::string &propertyName ) const = 0;
+    virtual const Value &getParameter( const std::string &propertyName ) const = 0;
 
-    virtual const TypeMedley &getParameter( int propertyHandle ) const = 0;
+    virtual const Value &getParameter( int propertyHandle ) const = 0;
 
     virtual void setParameters(const RTI::ParameterHandleValuePairSet &propertyMap) = 0;
 
-    virtual void setParameter(const std::string &propertyName, TypeMedley value ) = 0;
+//    virtual void setParameter(const std::string &propertyName, TypeMedley value ) = 0;
 
     virtual void sendInteraction(RTI::RTIambassador *rtiAmbassador, double time) = 0;
 

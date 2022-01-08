@@ -16,6 +16,7 @@ private:
     bool _oldValueInit;
     double _time;
 
+public:
     explicit Attribute(bool value) : TypeMedley(value), _oldValueInit(false), _time(-1) { }
     explicit Attribute(char value) : TypeMedley(value), _oldValueInit(false), _time(-1) { }
     explicit Attribute(short value) : TypeMedley(value), _oldValueInit(false), _time(-1) { }
@@ -25,7 +26,6 @@ private:
     explicit Attribute(double value) : TypeMedley(value), _oldValueInit(false), _time(-1) { }
     explicit Attribute(const std::string &value) : TypeMedley(value), _oldValueInit(false), _time(-1) { }
 
-public:
     double getTime() const {
         return _time;
     }
