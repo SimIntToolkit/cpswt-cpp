@@ -37,10 +37,10 @@
 #include "fedtime.hh"
 #include "InteractionRoot.hpp"
 #include "ObjectRoot.hpp"
-#include "SimEnd.hpp"
+#include "InteractionRoot_p/C2WInteractionRoot_p/SimulationControl_p/SimEnd.hpp"
 
-#include "FederateResignInteraction.hpp"
-#include "FederateJoinInteraction.hpp"
+#include "InteractionRoot_p/C2WInteractionRoot_p/FederateResignInteraction.hpp"
+#include "InteractionRoot_p/C2WInteractionRoot_p/FederateJoinInteraction.hpp"
 
 #include "FederateLogger.hpp"
 
@@ -57,8 +57,13 @@
 #endif
 
 
-
 class SynchronizedFederate : public NullFederateAmbassador {
+
+using ObjectRoot = ::org::cpswt::hla::ObjectRoot;
+using C2WInteractionRoot = ::org::cpswt::hla::InteractionRoot_p::C2WInteractionRoot;
+using SimEnd = ::org::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::SimulationControl_p::SimEnd;
+using FederateJoinInteraction = ::org::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::FederateJoinInteraction;
+using FederateResignInteraction = ::org::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::FederateResignInteraction;
 
 public:
 	static const std::string FEDERATION_MANAGER_NAME;
@@ -249,7 +254,7 @@ protected:
 	void ensureSimEndSubscription( void ) {
 		if ( _simEndNotSubscribed ) {
 			// Auto-subscribing also ensures that there is no filter set for SimEnd
-			SimEnd::subscribe( getRTI() );
+			SimEnd::subscribe_interaction( getRTI() );
 			_simEndNotSubscribed = false;
 		}
 	}
@@ -428,7 +433,7 @@ public:
                 double ltime = rtitime.getTime();
                 handleIfSimEnd(interactionRootSP, ltime);
                 addInteraction( interactionRootSP );
-                interactionRootSP->createLog( ltime, false );
+//                 interactionRootSP->createLog( ltime, false );
 			}
 		}
 	}
@@ -456,7 +461,7 @@ public:
                 RTIfedTime rtitime( assumedTimestamp );
                 handleIfSimEnd(interactionRootSP, assumedTimestamp);
                 addInteraction( interactionRootSP );
-                interactionRootSP->createLog( assumedTimestamp, false );
+//                 interactionRootSP->createLog( assumedTimestamp, false );
             }
 		}
 	}
@@ -485,7 +490,7 @@ protected:
 		int classHandle = interactionRootSP->getClassHandle();
 		if(  SimEnd::match( classHandle )  ) {
 			std::cout << getFederateId() << ": SimEnd interaction received, exiting..." << std::endl;
-            interactionRootSP->createLog( timestamp, false );
+//             interactionRootSP->createLog( timestamp, false );
             finalizeAndTerminate();
 		}
 	}
@@ -497,10 +502,10 @@ public:
 		advanceTime( _currentTime + timeStep );
 	}
 
-	void createLog(
-		RTI::InteractionClassHandle theInteraction,
-		const RTI::ParameterHandleValuePairSet& theParameters,
-		double time=0);
+//	void createLog(
+//		RTI::InteractionClassHandle theInteraction,
+//		const RTI::ParameterHandleValuePairSet& theParameters,
+//		double time=0);
 
 	class ObjectReflector {
 	private:
@@ -550,7 +555,7 @@ public:
 			else  ObjectRoot::reflect( _objectHandle, *_theAttributes, _time );
         }
 
-		ObjectRoot::SP getObjectRootSP() const { return ObjectRoot::getObject( _objectHandle ); }
+		ObjectRoot::SP getObjectRootSP() const { return ObjectRoot::get_object( _objectHandle ); }
         double getTime() const { return _time; }
 
 		bool isNull( void ) const { return _theAttributes == 0; }
@@ -600,7 +605,7 @@ public:
 	virtual void reflectAttributeValues( RTI::ObjectHandle theObject, const RTI::AttributeHandleValuePairSet& theAttributes, const char *theTag )
 	 throw ( RTI::ObjectNotKnown, RTI::AttributeNotKnown, RTI::FederateOwnsAttributes, RTI::FederateInternalError ) {
 		addObjectReflector( theObject, theAttributes );
-		createLog(theObject, theAttributes);
+//		createLog(theObject, theAttributes);
 	}
 
 	virtual void reflectAttributeValues(
@@ -614,13 +619,13 @@ public:
 		addObjectReflector( theObject, theAttributes, theTime );
 		RTIfedTime rtitime(theTime);
 		double ltime = rtitime.getTime();
-		createLog(theObject, theAttributes, ltime);
+//		createLog(theObject, theAttributes, ltime);
 	}
 
-	void createLog(
-		RTI::ObjectHandle theObject,
-		const RTI::AttributeHandleValuePairSet& theAttributes,
-		double time=0);
+//	void createLog(
+//		RTI::ObjectHandle theObject,
+//		const RTI::AttributeHandleValuePairSet& theAttributes,
+//		double time=0);
 };
 
 #endif

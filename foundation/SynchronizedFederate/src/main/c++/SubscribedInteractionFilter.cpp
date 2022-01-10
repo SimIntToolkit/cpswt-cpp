@@ -1,6 +1,6 @@
 #include "SubscribedInteractionFilter.hpp"
 
-bool SubscribedInteractionFilter::filterC2WInteraction( const std::string &federateId, C2WInteractionRootSP c2wInteractionRootSP ) {
+bool SubscribedInteractionFilter::filterC2WInteraction( const std::string &federateId, C2WInteractionRoot::SP c2wInteractionRootSP ) {
 
     int handle = c2wInteractionRootSP->getClassHandle();
     HandleFilterMap::iterator hfmItr = _handleFilterMap.find( handle );

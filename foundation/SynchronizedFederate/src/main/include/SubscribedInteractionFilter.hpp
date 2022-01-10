@@ -3,9 +3,11 @@
 
 #include <boost/shared_ptr.hpp>
 #include <boost/algorithm/string.hpp>
-#include "C2WInteractionRoot.hpp"
+#include "InteractionRoot_p/C2WInteractionRoot.hpp"
 
 class SubscribedInteractionFilter {
+
+using C2WInteractionRoot = ::org::cpswt::hla::InteractionRoot_p::C2WInteractionRoot;
 
 public:
     enum OriginFedFilter { ORIGIN_FILTER_DISABLED, SELF, NON_SELF };
@@ -84,7 +86,7 @@ public:
         _filterInitSP = filterInitSP;
     }
 
-    bool filterC2WInteraction( const std::string &federateId, C2WInteractionRootSP c2wInteractionRootSP );
+    bool filterC2WInteraction( const std::string &federateId, C2WInteractionRoot::SP c2wInteractionRootSP );
 
     void initialize( void ) {
         _filterInitSP->execute( *this );
