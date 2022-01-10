@@ -609,12 +609,22 @@ protected:
     // INSTANCE CREATION METHODS
     //--------------------------
 public:
+    static SP create() {
+        return SP(new FederateObject());
+    }
+
     static ObjectRoot::SP create_object() {
         return SP(new FederateObject());
     }
 
     virtual ObjectRoot::SP createObject() {
         return create_object();
+    }
+
+    static SP create(
+      const RTI::AttributeHandleValuePairSet &propertyMap
+    ) {
+        return SP(new FederateObject(propertyMap));
     }
 
     static ObjectRoot::SP create_object(
@@ -629,12 +639,22 @@ public:
         return create_object(propertyMap);
     }
 
+    static SP create(const RTIfedTime &rtiFedTime) {
+        return SP(new FederateObject(rtiFedTime));
+    }
+
     static ObjectRoot::SP create_object(const RTIfedTime &rtiFedTime) {
         return SP(new FederateObject(rtiFedTime));
     }
 
     virtual ObjectRoot::SP createObject(const RTIfedTime &rtiFedTime) {
         return create_object(rtiFedTime);
+    }
+
+    static SP create(
+      const RTI::AttributeHandleValuePairSet &propertyMap, const RTIfedTime &rtiFedTime
+    ) {
+        return SP(new FederateObject(propertyMap, rtiFedTime));
     }
 
     static ObjectRoot::SP create_object(

@@ -165,8 +165,8 @@ void SynchronizedFederate::joinFederation() {
 	std::cout << "done." << std::endl;
 
 	// Federate state interaction pubsub
-	FederateJoinInteraction::publish( getRTI() );
-	FederateResignInteraction::publish( getRTI() );
+	FederateJoinInteraction::publish_interaction( getRTI() );
+	FederateResignInteraction::publish_interaction( getRTI() );
 
 
 	FederateJoinInteraction::SP intJoin = FederateJoinInteraction::create();
@@ -564,26 +564,26 @@ void SynchronizedFederate::advanceTime( double time ) {
 	_currentTime = time;
 }
 
-void SynchronizedFederate::createLog(
-		RTI::ObjectHandle theObject,
-		const RTI::AttributeHandleValuePairSet& theAttributes,
-		double time)
-{
-	if(ObjectRoot::getSubAttributeLogMap().empty()) return;
-	std::string objectName = ObjectRoot::getObject( theObject )->getClassName() ;
-	for(RTI::ULong i=0; i<theAttributes.size(); ++i)
-	{
-		std::string attribute = ObjectRoot::get_attribute_name(theAttributes.getHandle(i));
-		std::map<std::string, std::string>::iterator pos = ObjectRoot::getSubAttributeLogMap().find(attribute);
-		if(pos == ObjectRoot::getSubAttributeLogMap().end()) continue;
-		std::string loglevel = (*pos).second;
-		std::string id = objectName+"_"+attribute+"_sub_"+_federateId;
-		static RTI::ULong valueLength;
-		char* value = theAttributes.getValuePointer( i, valueLength);
-		std::string ptype="";
-		ObjectRoot::DatamemberTypeMap::iterator it = ObjectRoot::getDatamemberTypeMap().find( attribute );
-		if ( it != ObjectRoot::getDatamemberTypeMap().end() )
-			ptype = (*it).second;
-		_logger->addLog(id,attribute,std::string(value, valueLength),ptype,time,loglevel);
-	}
-}
+// void SynchronizedFederate::createLog(
+// 		RTI::ObjectHandle theObject,
+// 		const RTI::AttributeHandleValuePairSet& theAttributes,
+// 		double time)
+// {
+// 	if(ObjectRoot::getSubAttributeLogMap().empty()) return;
+// 	std::string objectName = ObjectRoot::getObject( theObject )->getClassName() ;
+// 	for(RTI::ULong i=0; i<theAttributes.size(); ++i)
+// 	{
+// 		std::string attribute = ObjectRoot::get_attribute_name(theAttributes.getHandle(i));
+// 		std::map<std::string, std::string>::iterator pos = ObjectRoot::getSubAttributeLogMap().find(attribute);
+// 		if(pos == ObjectRoot::getSubAttributeLogMap().end()) continue;
+// 		std::string loglevel = (*pos).second;
+// 		std::string id = objectName+"_"+attribute+"_sub_"+_federateId;
+// 		static RTI::ULong valueLength;
+// 		char* value = theAttributes.getValuePointer( i, valueLength);
+// 		std::string ptype="";
+// 		ObjectRoot::DatamemberTypeMap::iterator it = ObjectRoot::getDatamemberTypeMap().find( attribute );
+// 		if ( it != ObjectRoot::getDatamemberTypeMap().end() )
+// 			ptype = (*it).second;
+// 		_logger->addLog(id,attribute,std::string(value, valueLength),ptype,time,loglevel);
+// 	}
+// }

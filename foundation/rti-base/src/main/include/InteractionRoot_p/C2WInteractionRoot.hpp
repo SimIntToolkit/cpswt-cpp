@@ -569,12 +569,22 @@ protected:
     // INSTANCE CREATION METHODS
     //--------------------------
 public:
+    static SP create() {
+        return SP(new C2WInteractionRoot());
+    }
+
     static InteractionRoot::SP create_interaction() {
         return SP(new C2WInteractionRoot());
     }
 
     virtual InteractionRoot::SP createInteraction() {
         return create_interaction();
+    }
+
+    static SP create(
+      const RTI::ParameterHandleValuePairSet &propertyMap
+    ) {
+        return SP(new C2WInteractionRoot(propertyMap));
     }
 
     static InteractionRoot::SP create_interaction(
@@ -589,12 +599,22 @@ public:
         return create_interaction(propertyMap);
     }
 
+    static SP create(const RTIfedTime &rtiFedTime) {
+        return SP(new C2WInteractionRoot(rtiFedTime));
+    }
+
     static InteractionRoot::SP create_interaction(const RTIfedTime &rtiFedTime) {
         return SP(new C2WInteractionRoot(rtiFedTime));
     }
 
     virtual InteractionRoot::SP createInteraction(const RTIfedTime &rtiFedTime) {
         return create_interaction(rtiFedTime);
+    }
+
+    static SP create(
+      const RTI::ParameterHandleValuePairSet &propertyMap, const RTIfedTime &rtiFedTime
+    ) {
+        return SP(new C2WInteractionRoot(propertyMap, rtiFedTime));
     }
 
     static InteractionRoot::SP create_interaction(
