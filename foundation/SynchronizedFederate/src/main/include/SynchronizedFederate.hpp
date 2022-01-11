@@ -283,7 +283,7 @@ public:
 		typedef boost::shared_ptr< ATRCallback > SP;
     	virtual void execute( void ) = 0;
 		virtual SP clone( void ) = 0;
-        virtual ~ATRCallback();
+        virtual ~ATRCallback() {}
     };
 
 	//template< typename T >
