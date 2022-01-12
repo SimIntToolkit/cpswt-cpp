@@ -834,7 +834,7 @@ public:
  } // NAMESPACE "cpswt"
 } // NAMESPACE "org"
 
-static bool static_init_14 = ::org::cpswt::hla::ObjectRoot_p::FederateObject::static_init();
+static bool static_init_16 = ::org::cpswt::hla::ObjectRoot_p::FederateObject::static_init();
 
 std::ostream &operator<<( std::ostream &os, ::org::cpswt::hla::ObjectRoot_p::FederateObject::SP entitySP );
 std::ostream &operator<<( std::ostream &os, const ::org::cpswt::hla::ObjectRoot_p::FederateObject &entity );

@@ -527,7 +527,7 @@ public:
  } // NAMESPACE "cpswt"
 } // NAMESPACE "org"
 
-static bool static_init_7 = ::org::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::SimulationControl_p::SimResume::static_init();
+static bool static_init_8 = ::org::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::SimulationControl_p::SimResume::static_init();
 
 std::ostream &operator<<( std::ostream &os, ::org::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::SimulationControl_p::SimResume::SP entitySP );
 std::ostream &operator<<( std::ostream &os, const ::org::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::SimulationControl_p::SimResume &entity );

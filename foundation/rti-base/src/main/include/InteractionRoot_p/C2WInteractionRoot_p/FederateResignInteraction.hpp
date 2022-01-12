@@ -613,7 +613,7 @@ public:
  } // NAMESPACE "cpswt"
 } // NAMESPACE "org"
 
-static bool static_init_13 = ::org::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::FederateResignInteraction::static_init();
+static bool static_init_15 = ::org::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::FederateResignInteraction::static_init();
 
 std::ostream &operator<<( std::ostream &os, ::org::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::FederateResignInteraction::SP entitySP );
 std::ostream &operator<<( std::ostream &os, const ::org::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::FederateResignInteraction &entity );
