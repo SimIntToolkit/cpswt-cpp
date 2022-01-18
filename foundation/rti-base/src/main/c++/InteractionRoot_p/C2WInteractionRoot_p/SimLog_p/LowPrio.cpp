@@ -40,6 +40,8 @@ namespace org {
     namespace C2WInteractionRoot_p {
      namespace SimLog_p {
 
+bool LowPrio::static_init_var = LowPrio::static_init();
+
 bool LowPrio::static_init() {
     // ADD THIS CLASS TO THE _classNameSet DEFINED IN InteractionRoot
     get_class_name_set().insert(get_hla_class_name());

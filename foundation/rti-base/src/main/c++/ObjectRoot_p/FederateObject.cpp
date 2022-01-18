@@ -38,6 +38,8 @@ namespace org {
   namespace hla {
    namespace ObjectRoot_p {
 
+bool FederateObject::static_init_var = FederateObject::static_init();
+
 bool FederateObject::static_init() {
     // ADD THIS CLASS TO THE _classNameSet DEFINED IN ObjectRoot
     get_class_name_set().insert(get_hla_class_name());
