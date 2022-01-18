@@ -39,6 +39,8 @@ namespace org {
    namespace InteractionRoot_p {
     namespace C2WInteractionRoot_p {
 
+bool OutcomeBase::static_init_var = OutcomeBase::static_init();
+
 bool OutcomeBase::static_init() {
     // ADD THIS CLASS TO THE _classNameSet DEFINED IN InteractionRoot
     get_class_name_set().insert(get_hla_class_name());

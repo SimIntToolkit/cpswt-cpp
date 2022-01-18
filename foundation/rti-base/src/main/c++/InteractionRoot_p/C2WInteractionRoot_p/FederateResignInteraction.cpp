@@ -39,6 +39,8 @@ namespace org {
    namespace InteractionRoot_p {
     namespace C2WInteractionRoot_p {
 
+bool FederateResignInteraction::static_init_var = FederateResignInteraction::static_init();
+
 bool FederateResignInteraction::static_init() {
     // ADD THIS CLASS TO THE _classNameSet DEFINED IN InteractionRoot
     get_class_name_set().insert(get_hla_class_name());

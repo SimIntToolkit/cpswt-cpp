@@ -38,6 +38,8 @@ namespace org {
   namespace hla {
    namespace InteractionRoot_p {
 
+bool C2WInteractionRoot::static_init_var = C2WInteractionRoot::static_init();
+
 bool C2WInteractionRoot::static_init() {
     // ADD THIS CLASS TO THE _classNameSet DEFINED IN InteractionRoot
     get_class_name_set().insert(get_hla_class_name());

@@ -36,10 +36,11 @@
 #include "ObjectRoot.hpp"
 
 
-
 namespace org {
  namespace cpswt {
   namespace hla {
+
+bool ObjectRoot::static_init_var = ObjectRoot::static_init();
 
 std::string ObjectRoot::join(const std::list<std::string> &joinList, const std::string &delimiter) {
     std::string retval;

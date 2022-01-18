@@ -40,6 +40,8 @@ namespace org {
     namespace C2WInteractionRoot_p {
      namespace SimulationControl_p {
 
+bool SimPause::static_init_var = SimPause::static_init();
+
 bool SimPause::static_init() {
     // ADD THIS CLASS TO THE _classNameSet DEFINED IN InteractionRoot
     get_class_name_set().insert(get_hla_class_name());
