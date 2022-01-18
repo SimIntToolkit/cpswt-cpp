@@ -229,6 +229,7 @@ public:
      * INITIALIZE STATIC DATAMEMBERS THAT DEAL WITH NAMES
      */
     static bool static_init();
+    static bool static_init_var;
 
     // --------------------------------------------------------
     // END OF STATIC DATAMEMBERS AND CODE THAT DEAL WITH NAMES.
@@ -625,8 +626,6 @@ public:
   } // NAMESPACE "hla"
  } // NAMESPACE "cpswt"
 } // NAMESPACE "org"
-
-static bool static_init_15 = ::org::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::FederateJoinInteraction::static_init();
 
 std::ostream &operator<<( std::ostream &os, ::org::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::FederateJoinInteraction::SP entitySP );
 std::ostream &operator<<( std::ostream &os, const ::org::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::FederateJoinInteraction &entity );

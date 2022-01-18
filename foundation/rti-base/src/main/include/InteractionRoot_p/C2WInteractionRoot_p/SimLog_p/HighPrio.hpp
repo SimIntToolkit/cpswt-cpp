@@ -230,6 +230,7 @@ public:
      * INITIALIZE STATIC DATAMEMBERS THAT DEAL WITH NAMES
      */
     static bool static_init();
+    static bool static_init_var;
 
     // --------------------------------------------------------
     // END OF STATIC DATAMEMBERS AND CODE THAT DEAL WITH NAMES.
@@ -539,8 +540,6 @@ public:
   } // NAMESPACE "hla"
  } // NAMESPACE "cpswt"
 } // NAMESPACE "org"
-
-static bool static_init_11 = ::org::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::SimLog_p::HighPrio::static_init();
 
 std::ostream &operator<<( std::ostream &os, ::org::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::SimLog_p::HighPrio::SP entitySP );
 std::ostream &operator<<( std::ostream &os, const ::org::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::SimLog_p::HighPrio &entity );

@@ -36,10 +36,11 @@
 #include "InteractionRoot.hpp"
 
 
-
 namespace org {
  namespace cpswt {
   namespace hla {
+
+bool InteractionRoot::static_init_var = InteractionRoot::static_init();
 
 std::string InteractionRoot::join(const std::list<std::string> &joinList, const std::string &delimiter) {
     std::string retval;
