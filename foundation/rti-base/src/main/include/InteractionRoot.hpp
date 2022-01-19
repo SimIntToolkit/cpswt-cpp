@@ -997,6 +997,10 @@ public:
         return create_interaction(propertyMap, rtiFedTime);
     }
 
+    virtual SP cloneInteraction() {
+        return SP( new InteractionRoot( *this )  );
+    }
+
     //------------------------------
     // END INSTANCE CREATION METHODS
     //------------------------------

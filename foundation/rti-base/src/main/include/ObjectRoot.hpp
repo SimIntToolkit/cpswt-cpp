@@ -1295,6 +1295,10 @@ public:
         return create_object(propertyMap, rtiFedTime);
     }
 
+    virtual SP cloneObject() {
+        return SP( new ObjectRoot( *this )  );
+    }
+
     //------------------------------
     // END INSTANCE CREATION METHODS
     //------------------------------

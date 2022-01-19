@@ -616,6 +616,10 @@ public:
         return create_interaction(propertyMap, rtiFedTime);
     }
 
+    virtual InteractionRoot::SP cloneInteraction() {
+        return InteractionRoot::SP( new FederateJoinInteraction( *this )  );
+    }
+
     //------------------------------
     // END INSTANCE CREATION METHODS
     //------------------------------
