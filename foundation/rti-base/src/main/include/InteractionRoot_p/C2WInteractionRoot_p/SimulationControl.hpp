@@ -528,6 +528,10 @@ public:
         return create_interaction(propertyMap, rtiFedTime);
     }
 
+    virtual InteractionRoot::SP cloneInteraction() {
+        return InteractionRoot::SP( new SimulationControl( *this )  );
+    }
+
     //------------------------------
     // END INSTANCE CREATION METHODS
     //------------------------------

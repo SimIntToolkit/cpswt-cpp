@@ -682,6 +682,10 @@ public:
         return create_object(propertyMap, rtiFedTime);
     }
 
+    virtual ObjectRoot::SP cloneObject() {
+        return ObjectRoot::SP( new FederateObject( *this )  );
+    }
+
     //------------------------------
     // END INSTANCE CREATION METHODS
     //------------------------------
