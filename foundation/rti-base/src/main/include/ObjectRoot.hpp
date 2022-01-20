@@ -699,6 +699,10 @@ protected:
     // METHODS THAT USE CLASS-AND-PROPERTY-NAME PROPERTY-VALUE MAP
     //------------------------------------------------------------
 public:
+    const ClassAndPropertyNameValueSPMap &getClassAndPropertyNameValueMap() {
+        return _classAndPropertyNameValueSPMap;
+    }
+
     template<typename T>
     void setAttribute(const std::string &propertyName, const T &value) {
 
