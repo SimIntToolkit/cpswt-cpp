@@ -59,13 +59,13 @@
 
 class SynchronizedFederate : public NullFederateAmbassador {
 
-using ObjectRoot = ::org::cpswt::hla::ObjectRoot;
-using C2WInteractionRoot = ::org::cpswt::hla::InteractionRoot_p::C2WInteractionRoot;
-using SimEnd = ::org::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::SimulationControl_p::SimEnd;
-using FederateJoinInteraction = ::org::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::FederateJoinInteraction;
-using FederateResignInteraction = ::org::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::FederateResignInteraction;
-
 public:
+    using ObjectRoot = ::org::cpswt::hla::ObjectRoot;
+    using C2WInteractionRoot = ::org::cpswt::hla::InteractionRoot_p::C2WInteractionRoot;
+    using SimEnd = ::org::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::SimulationControl_p::SimEnd;
+    using FederateJoinInteraction = ::org::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::FederateJoinInteraction;
+    using FederateResignInteraction = ::org::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::FederateResignInteraction;
+
 	static const std::string FEDERATION_MANAGER_NAME;
 	enum TimeAdvanceMode { SF_TIME_ADVANCE_REQUEST, SF_NEXT_EVENT_REQUEST, SF_TIME_ADVANCE_REQUEST_AVAILABLE, SF_NEXT_EVENT_REQUEST_AVAILABLE };
 
