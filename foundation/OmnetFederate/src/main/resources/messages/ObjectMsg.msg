@@ -4,10 +4,12 @@
 
 cplusplus {{
 #include <ObjectRoot.hpp>
+
+using ObjectRoot = ::org::cpswt::hla::ObjectRoot;
 }};
 
-class noncobject ObjectRootSP;
+class noncobject ObjectRoot::SP;
 
 message ObjectMsg extends cPacket {
-    ObjectRootSP objectRootSP;
+    ObjectRoot::SP objectRootSP;
 }

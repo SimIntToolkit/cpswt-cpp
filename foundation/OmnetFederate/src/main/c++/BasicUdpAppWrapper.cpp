@@ -24,6 +24,9 @@
 Define_Module(BasicUdpAppWrapper);
 
 
+using NetworkPacket = ::org::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::NetworkPacket;
+
+
 void BasicUdpAppWrapper::recordInterfaceIPAddresses( void ) {
 
 	AttackCoordinator::InterfaceIPAddressMap &interfaceIPAddressMap =
@@ -111,7 +114,7 @@ void BasicUdpAppWrapper::sendToUDP( inet::Packet *packet, const inet::Ipv4Addres
 		return;
 	}
 
-    InteractionRootSP interactionRootSP = interactionMsg->getInteractionRootSP();
+    InteractionRoot::SP interactionRootSP = interactionMsg->getInteractionRootSP();
 
     // Integrity attack, if any
     if ( NetworkPacket::match( interactionRootSP->getClassHandle() ) && AttackCoordinator::getSingleton().isIntegrityAttackEnabled( getHostName() ) ) {
@@ -119,7 +122,7 @@ void BasicUdpAppWrapper::sendToUDP( inet::Packet *packet, const inet::Ipv4Addres
         // std::cout << "Got network packet, and integrity attack is enabled" << std::endl;
         // std::cout << "Got interaction is: " << interactionRootSP << std::endl;
 
-        NetworkPacketSP networkPacketSP = boost::static_pointer_cast< NetworkPacket >( interactionRootSP );
+        NetworkPacket::SP networkPacketSP = boost::static_pointer_cast< NetworkPacket >( interactionRootSP );
 
         // std::cout << "The corresponding NetworkPacketSP = ";
         // if ( networkPacketSP ) {
@@ -148,7 +151,7 @@ void BasicUdpAppWrapper::sendToUDP( inet::Packet *packet, const inet::Ipv4Addres
         // std::cout << "BasicUdpAppWrapper: \"" << getHostName() << "\" sending cPacket to HLA" << std::endl;
 
 		if (  NetworkPacket::match( interactionRootSP->getClassHandle() ) && AttackCoordinator::getSingleton().modifyToHLAPackets( getHostName() )  ) {
-		    NetworkPacketSP networkPacketSP = boost::static_pointer_cast< NetworkPacket >( interactionRootSP );
+		    NetworkPacket::SP networkPacketSP = boost::static_pointer_cast< NetworkPacket >( interactionRootSP );
 		    networkPacketSP = modifyOutgoing( networkPacketSP );
 		    interactionMsg->setInteractionRootSP(  boost::static_pointer_cast< InteractionRoot >( networkPacketSP )  );
 		}
@@ -164,7 +167,7 @@ void BasicUdpAppWrapper::sendToUDP( inet::Packet *packet, const inet::Ipv4Addres
 		return;
 	}
 
-	NetworkPacketSP networkPacketSP = boost::static_pointer_cast< NetworkPacket >( interactionRootSP );
+	NetworkPacket::SP networkPacketSP = boost::static_pointer_cast< NetworkPacket >( interactionRootSP );
 	if (  AttackCoordinator::getSingleton().modifyFromHLAPackets( getHostName() )  ) {
         networkPacketSP = modifyIncoming( networkPacketSP );
         interactionRootSP = boost::static_pointer_cast< InteractionRoot >( networkPacketSP );
@@ -201,7 +204,7 @@ void BasicUdpAppWrapper::sendToUDP( inet::Packet *packet, const inet::Ipv4Addres
 	Super::sendToUDP( packet, destinationIPAddress, destinationPort );
 }
 
-NetworkPacketSP BasicUdpAppWrapper::modifyIncoming( NetworkPacketSP networkPacketSP ) {
+NetworkPacket::SP BasicUdpAppWrapper::modifyIncoming( NetworkPacket::SP networkPacketSP ) {
     std::string data = networkPacketSP->get_data();
     int dataLen = data.length();
     if(dataLen == 0) {
@@ -215,7 +218,7 @@ NetworkPacketSP BasicUdpAppWrapper::modifyIncoming( NetworkPacketSP networkPacke
     return networkPacketSP;
 }
 
-NetworkPacketSP BasicUdpAppWrapper::modifyOutgoing( NetworkPacketSP networkPacketSP ) {
+NetworkPacket::SP BasicUdpAppWrapper::modifyOutgoing( NetworkPacket::SP networkPacketSP ) {
     std::string data = networkPacketSP->get_data();
     int dataLen = data.length();
     if(dataLen == 0) {
@@ -229,116 +232,62 @@ NetworkPacketSP BasicUdpAppWrapper::modifyOutgoing( NetworkPacketSP networkPacke
     return networkPacketSP;
 }
 
-NetworkPacketSP BasicUdpAppWrapper::tweakIncoming( NetworkPacketSP networkPacketSP, int intMultiplier, int intAdder, long longMultiplier, long longAdder, double doubleMultiplier, double doubleAdder, bool booleanEnableFlip, const std::string &stringReplacement ) {
-    // std::cout << "BasicUdpAppWrapper::tweakIncoming() called..." << std::endl;
+NetworkPacket::SP BasicUdpAppWrapper::tweakIncoming( NetworkPacket::SP networkPacketSP, int intMultiplier, int intAdder, long longMultiplier, long longAdder, double doubleMultiplier, double doubleAdder, bool booleanEnableFlip, const std::string &stringReplacement ) {
 
-    // Create a dummy interaction of the packetType to extract its data types
-    std::string packetType = networkPacketSP->get_packetType();
 
-    // std::cout << "PacketType = " << packetType << std::endl;
-    InteractionRoot::SP interactionRootSP = InteractionRoot::create_interaction( packetType );
-    StringVector intrParamNamesList = interactionRootSP->getParameterNames();
-    StringVector intrDataTypesList;
+    std::string interactionJson = networkPacketSP->get_data();
 
-    // std::cout << "interaction created = " << interactionRootSP << std::endl;
-    // std::cout << "params size = " << intrParamNamesList.size() << std::endl;
+    InteractionRoot::SP wrappedInteractionSP = InteractionRoot::fromJson(interactionJson);
 
-    for (StringVector::const_iterator it = intrParamNamesList.begin(); it!=intrParamNamesList.end(); ++it) {
-        std::string paramName = *it;
+    const InteractionRoot::ClassAndPropertyNameValueSPMap &classAndPropertyValueSPMap = wrappedInteractionSP->getClassAndPropertyNameValueSPMap();
 
-        // std::cout << "Param name: " << paramName << std::endl;
-        std::string paramType = interactionRootSP->getParameter(paramName).getTypeName();
+    for(
+      InteractionRoot::ClassAndPropertyNameValueSPMap::const_iterator cvmCit = classAndPropertyValueSPMap.begin() ;
+      cvmCit != classAndPropertyValueSPMap.end() ;
+      ++cvmCit
+    ) {
+        TypeMedley &value = *cvmCit->second;
 
-        // std::cout << "Param type: " << paramType << std::endl;
-        intrDataTypesList.push_back( paramType );
-    }
+        TypeMedley::DataType dataType = value.getDataType();
 
-    // Parse all data tokens in the payload of the network packet interaction
-    std::string data = networkPacketSP->get_data();
-    std::vector< std::string > dataTokens;
-    std::string tokenSeparatorString = "*@*";
-    size_t  pos = data.find(tokenSeparatorString);
+        switch(dataType) {
 
-    // std::cout << "Parsing data tokens now..." << std::endl;
-    while (pos != std::string::npos)
-    {
-        std::string newTok = data.substr(0, pos); // find new token
-        // std::cout << "Found token: " << newTok << std::endl;
-
-        dataTokens.push_back(newTok); // add new token to the list
-        data.erase(0, pos + 3); // remove last token and tokenSeparatorString from original string
-        pos = data.find(tokenSeparatorString); // find more tokens
-    }
-    // std::cout << "Found token: " << data << std::endl;
-    dataTokens.push_back(data); // last token
-
-    // If there are no parameters, nothing to tweak
-    if(intrDataTypesList.size() == 0) {
-        return networkPacketSP;
-    }
-
-    // Make sure the quantity of data type names and payload data tokens is the same
-    if(intrDataTypesList.size() != dataTokens.size()) {
-        std::cerr << "ERROR:  BasicUdpAppWrapper:  \"" << getHostName() << "\" No. of data type tokens in the interaction of type '" << packetType << "' is not equal to no. of data tokens in the payload:\n\t" << data << std::endl;
-    }
-
-    // Replace the data value according to integrity attack
-    std::stringstream updatedDataSS;
-    std::vector<std::string>::const_iterator dtIt = intrDataTypesList.begin();
-    std::string nextDataType = *dtIt;
-    for(std::vector<std::string>::const_iterator tokIt = dataTokens.begin() ; tokIt != dataTokens.end() ; tokIt++) {
-        std::string dataToken = *tokIt;
-        if(nextDataType == "int" ) {
-            int curVal = boost::lexical_cast< int >( dataToken );
-            int newVal = (curVal * intMultiplier) + intAdder;
-            updatedDataSS << newVal;
-        } else if(nextDataType == "long" ) {
-            long curVal = boost::lexical_cast< long >( dataToken );
-            long newVal = (curVal * longMultiplier) + longAdder;
-            updatedDataSS << newVal;
-        } else if(nextDataType == "double" ) {
-            double curVal = boost::lexical_cast< double >( dataToken );
-            double newVal = (curVal * doubleMultiplier) + doubleAdder;
-            updatedDataSS << newVal;
-        } else if(nextDataType == "bool" ) {
-            std::stringstream ssTemp;
-            ssTemp << dataToken;
-            bool curVal = false;
-            ssTemp >> curVal;
-            if(booleanEnableFlip) {
-                if(curVal) {
-                    updatedDataSS << "false";
-                } else {
-                    updatedDataSS << "true";
-                }
-            } else {
-                if(curVal) {
-                    updatedDataSS << "true";
-                } else {
-                    updatedDataSS << "false";
-                }
+            case TypeMedley::INTEGER: {
+                int currentValue = static_cast<int>(value);
+                int newValue = (currentValue * intMultiplier) + intAdder;
+                value.setValue(newValue);
+                break;
             }
-        } else if(nextDataType == "std::string" ) {
-            if(stringReplacement == "") {
-                updatedDataSS << dataToken;
-            } else {
-                updatedDataSS << stringReplacement;
+
+            case TypeMedley::LONG: {
+                long currentValue = static_cast<long>(value);
+                long newValue = (currentValue * longMultiplier) + longAdder;
+                value.setValue(newValue);
+                break;
             }
-        } else {
-            // Not int, long, double, boolean, or std::string, so simply use the same data token
-            updatedDataSS << dataToken;
-        }
 
-        dtIt++;
+            case TypeMedley::DOUBLE: {
+                double currentValue = static_cast<double>(value);
+                double newValue = (currentValue * doubleMultiplier) + doubleAdder;
+                value.setValue(newValue);
+                break;
+            }
 
-        // If there are more tokens, add the separator
-        if(dtIt != intrDataTypesList.end()) {
-            updatedDataSS << tokenSeparatorString;
-            nextDataType = *dtIt;
+            case TypeMedley::BOOLEAN: {
+                bool currentValue = static_cast<bool>(value);
+                bool newValue = booleanEnableFlip ? !currentValue : currentValue;
+                value.setValue(newValue);
+                break;
+            }
+
+            case TypeMedley::STRING: {
+                std::string currentValue = static_cast<std::string>(value);
+                std::string newValue = stringReplacement.empty() ? currentValue : stringReplacement;
+                value.setValue(newValue);
+                break;
+            }
         }
     }
-
-    // std::cout << "The tweaked data due to integrity attack is: " << updatedDataSS.str() << std::endl;
-    networkPacketSP->set_data(updatedDataSS.str());
+    networkPacketSP->set_data(wrappedInteractionSP->toJson());
     return networkPacketSP;
 }

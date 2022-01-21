@@ -202,7 +202,7 @@ tasks.withType(LinkExecutable::class.java).configureEach {
     )
 
     val linkLibraryList = listOf(
-        "oppmain", "oppcmdenv", "oppenvir", "oppqtenv", "opplayout", "oppsim", "dl", "stdc++", "jvm"
+        "oppmain", "oppcmdenv", "oppenvir", "oppqtenv", "opplayout", "oppsim", "dl", "stdc++", "jvm", "jsoncpp"
     )
 
     val linkCompleteLibraryList = linkWholeLibraryList + linkLibraryList

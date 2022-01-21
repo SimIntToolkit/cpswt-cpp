@@ -23,6 +23,66 @@
 Define_Module(HLAInterface);
 
 
+using AddRouteToRoutingTable = ::org::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::OmnetCommand_p::AddRouteToRoutingTable;
+using DropRouteFromRoutingTable = ::org::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::OmnetCommand_p::DropRouteFromRoutingTable;
+
+using CommandExecutionStatus = ::org::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::CommandExecutionStatus;
+
+using C2WInteractionRoot = ::org::cpswt::hla::InteractionRoot_p::C2WInteractionRoot;
+
+using NetworkPacket = ::org::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::NetworkPacket;
+
+using OmnetCommand = ::org::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::OmnetCommand;
+
+using RecordPacketsForReplayAttack = ::org::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::OmnetCommand_p::RecordPacketsForReplayAttack;
+using CeaseReplayAttack = ::org::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::OmnetCommand_p::CeaseReplayAttack;
+
+using StartDataInjectionAttack = ::org::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::OmnetCommand_p::AttacksNotYetImplemented_p::StartDataInjectionAttack;
+using StopDataInjectionAttack = ::org::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::OmnetCommand_p::AttacksNotYetImplemented_p::StopDataInjectionAttack;
+
+using StartDelayNodeAttack = ::org::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::OmnetCommand_p::StartDelayNodeAttack;
+using StopDelayNodeAttack = ::org::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::OmnetCommand_p::StopDelayNodeAttack;
+
+using StartDisableNetworkAttack = ::org::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::OmnetCommand_p::StartDisableNetworkAttack;
+using StopDisableNetworkAttack = ::org::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::OmnetCommand_p::StopDisableNetworkAttack;
+
+using StartDNSPoisoningAttack = ::org::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::OmnetCommand_p::AttacksNotYetImplemented_p::StartDNSPoisoningAttack;
+using StopDNSPoisoningAttack = ::org::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::OmnetCommand_p::AttacksNotYetImplemented_p::StopDNSPoisoningAttack;
+
+using StartIntegrityAttack = ::org::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::OmnetCommand_p::StartIntegrityAttack;
+using StopIntegrityAttack = ::org::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::OmnetCommand_p::StopIntegrityAttack;
+
+using StartLinkAttack = ::org::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::OmnetCommand_p::AttacksNotYetImplemented_p::StartLinkAttack;
+using StopLinkAttack = ::org::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::OmnetCommand_p::AttacksNotYetImplemented_p::StopLinkAttack;
+
+using StartMasqueradingAttack = ::org::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::OmnetCommand_p::AttacksNotYetImplemented_p::StartMasqueradingAttack;
+using StopMasqueradingAttack = ::org::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::OmnetCommand_p::AttacksNotYetImplemented_p::StopMasqueradingAttack;
+
+using StartModifyFromHLAPacketsAttack = ::org::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::OmnetCommand_p::StartModifyFromHLAPacketsAttack;
+using StopModifyFromHLAPacketsAttack = ::org::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::OmnetCommand_p::StopModifyFromHLAPacketsAttack;
+
+using StartModifyToHLAPacketsAttack = ::org::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::OmnetCommand_p::StartModifyToHLAPacketsAttack;
+using StopModifyToHLAPacketsAttack = ::org::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::OmnetCommand_p::StopModifyToHLAPacketsAttack;
+
+using StartNetworkFilterAttack = ::org::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::OmnetCommand_p::StartNetworkFilterAttack;
+using StopNetworkFilterAttack = ::org::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::OmnetCommand_p::StopNetworkFilterAttack;
+
+using StartNetworkIPFirewall = ::org::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::OmnetCommand_p::StartNetworkIPFirewall;
+using StopNetworkIPFirewall = ::org::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::OmnetCommand_p::StopNetworkIPFirewall;
+
+using StartNodeAttack = ::org::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::OmnetCommand_p::StartNodeAttack;
+using StopNodeAttack = ::org::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::OmnetCommand_p::StopNodeAttack;
+
+using StartOutOfOrderPacketsAttack = ::org::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::OmnetCommand_p::StartOutOfOrderPacketsAttack;
+using StopOutOfOrderPacketsAttack = ::org::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::OmnetCommand_p::StopOutOfOrderPacketsAttack;
+
+using StartReplayAttack = ::org::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::OmnetCommand_p::StartReplayAttack;
+using TerminateReplayAttack = ::org::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::OmnetCommand_p::TerminateReplayAttack;
+
+using StartSnifferAttack = ::org::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::OmnetCommand_p::StartSnifferAttack;
+using StopSnifferAttack = ::org::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::OmnetCommand_p::StopSnifferAttack;
+
+
 void HLAInterface::processInteractions( void ) {
 
     InteractionRoot::SP interactionRootSP;
@@ -33,7 +93,7 @@ void HLAInterface::processInteractions( void ) {
         int classHandle = interactionRootSP->getClassHandle();
 
         if (  NetworkPacket::match( classHandle )  ) {
-            NetworkPacketSP networkPacketSP = boost::static_pointer_cast< NetworkPacket >( interactionRootSP );
+            NetworkPacket::SP networkPacketSP = boost::static_pointer_cast< NetworkPacket >( interactionRootSP );
             InteractionMsg *interactionMsgPtr = new InteractionMsg( getInteractionMessageLabel().c_str() );
             interactionMsgPtr->setToHLA( true );
             interactionMsgPtr->setMessageNo( AttackCoordinator::getUniqueNo() );
@@ -63,45 +123,45 @@ void HLAInterface::processInteractions( void ) {
 
 
         if (  StartNodeAttack::match( classHandle )  ) {
-            StartNodeAttackSP startNodeAttackSP = boost::static_pointer_cast< StartNodeAttack >( interactionRootSP );
+            StartNodeAttack::SP startNodeAttackSP = boost::static_pointer_cast< StartNodeAttack >( interactionRootSP );
 
-            std::string nodeFullPath = startNodeAttackSP->get_nodeFullPath();
+            std::string recordingNodeFullPath = startNodeAttackSP->get_recordingNodeFullPath();
 
             NodeAttackMsg *nodeAttackMsg = new NodeAttackMsg;
             nodeAttackMsg->setAttackInProgress( true );
 
-            cModule *cModulePtr = AttackCoordinator::getSingleton().getIPModule( nodeFullPath );
+            cModule *cModulePtr = AttackCoordinator::getSingleton().getIPModule( recordingNodeFullPath );
             if ( cModulePtr != 0 ) {
                 sendDirect(  nodeAttackMsg, cModulePtr, "hlaIn"  );
             } else {
-                std::cout << "WARNING:  StartNodeAttack:  NO MODULE FOR NODE \"" << nodeFullPath << "\"" << std::endl;
+                std::cout << "WARNING:  StartNodeAttack:  NO MODULE FOR NODE \"" << recordingNodeFullPath << "\"" << std::endl;
             }
             continue;
         }
 
 
         if (  StopNodeAttack::match( classHandle )  ) {
-            StopNodeAttackSP stopNodeAttackSP = boost::static_pointer_cast< StopNodeAttack >( interactionRootSP );
+            StopNodeAttack::SP stopNodeAttackSP = boost::static_pointer_cast< StopNodeAttack >( interactionRootSP );
 
-            std::string nodeFullPath = stopNodeAttackSP->get_nodeFullPath();
+            std::string recordingNodeFullPath = stopNodeAttackSP->get_recordingNodeFullPath();
 
             NodeAttackMsg *nodeAttackMsg = new NodeAttackMsg;
             nodeAttackMsg->setAttackInProgress( false );
 
 
 
-            cModule *cModulePtr = AttackCoordinator::getSingleton().getIPModule( nodeFullPath );
+            cModule *cModulePtr = AttackCoordinator::getSingleton().getIPModule( recordingNodeFullPath );
             if ( cModulePtr != 0 ) {
                 sendDirect(  nodeAttackMsg, cModulePtr, "hlaIn"  );
             } else {
-                std::cout << "WARNING:  StopNodeAttack:  NO MODULE FOR NODE \"" << nodeFullPath << "\"" << std::endl;
+                std::cout << "WARNING:  StopNodeAttack:  NO MODULE FOR NODE \"" << recordingNodeFullPath << "\"" << std::endl;
             }
             continue;
         }
 
 
         if (  StartDelayNodeAttack::match( classHandle )  ) {
-            StartDelayNodeAttackSP startDelayNodeAttackSP = boost::static_pointer_cast< StartDelayNodeAttack >( interactionRootSP );
+            StartDelayNodeAttack::SP startDelayNodeAttackSP = boost::static_pointer_cast< StartDelayNodeAttack >( interactionRootSP );
 
             std::string nodeFullPath = startDelayNodeAttackSP->get_nodeFullPath();
 
@@ -121,7 +181,7 @@ void HLAInterface::processInteractions( void ) {
 
 
         if (  StopDelayNodeAttack::match( classHandle )  ) {
-            StopDelayNodeAttackSP stopDelayNodeAttackSP = boost::static_pointer_cast< StopDelayNodeAttack >( interactionRootSP );
+            StopDelayNodeAttack::SP stopDelayNodeAttackSP = boost::static_pointer_cast< StopDelayNodeAttack >( interactionRootSP );
 
             std::string nodeFullPath = stopDelayNodeAttackSP->get_nodeFullPath();
 
@@ -139,7 +199,7 @@ void HLAInterface::processInteractions( void ) {
 
 
         if (  StartSnifferAttack::match( classHandle )  ) {
-            StartSnifferAttackSP startSnifferAttackSP = boost::static_pointer_cast< StartSnifferAttack >( interactionRootSP );
+            StartSnifferAttack::SP startSnifferAttackSP = boost::static_pointer_cast< StartSnifferAttack >( interactionRootSP );
 
             std::string nodeFullPath = startSnifferAttackSP->get_nodeFullPath();
 
@@ -160,7 +220,7 @@ void HLAInterface::processInteractions( void ) {
         }
 
         if (  StopSnifferAttack::match( classHandle )  ) {
-            StopSnifferAttackSP stopSnifferAttackSP = boost::static_pointer_cast< StopSnifferAttack >( interactionRootSP );
+            StopSnifferAttack::SP stopSnifferAttackSP = boost::static_pointer_cast< StopSnifferAttack >( interactionRootSP );
 
             std::string nodeFullPath = stopSnifferAttackSP->get_nodeFullPath();
 
@@ -181,45 +241,45 @@ void HLAInterface::processInteractions( void ) {
         }
 
         if (  StartNetworkFilterAttack::match( classHandle )  ) {
-            StartNetworkFilterAttackSP startNetworkFilterAttackSP = boost::static_pointer_cast< StartNetworkFilterAttack >( interactionRootSP );
+            StartNetworkFilterAttack::SP startNetworkFilterAttackSP = boost::static_pointer_cast< StartNetworkFilterAttack >( interactionRootSP );
 
-            std::string nodeFullPath = startNetworkFilterAttackSP->get_nodeFullPath();
+            std::string recordingNodeFullPath = startNetworkFilterAttackSP->get_recordingNodeFullPath();
 
             FilterAttackMsg *filterAttackMsg = new FilterAttackMsg;
             filterAttackMsg->setSourceNetworkAddress( startNetworkFilterAttackSP->get_srcNetworkAddress().c_str() );
             filterAttackMsg->setDestinationNetworkAddress( startNetworkFilterAttackSP->get_dstNetworkAddress().c_str() );
             filterAttackMsg->setEnable( true );
 
-            cModule *cModulePtr = AttackCoordinator::getSingleton().getIPModule( nodeFullPath );
+            cModule *cModulePtr = AttackCoordinator::getSingleton().getIPModule( recordingNodeFullPath );
             if ( cModulePtr != 0 ) {
                 sendDirect(  filterAttackMsg, cModulePtr, "hlaIn"  );
             } else {
-                std::cout << "WARNING:  StartNetworkFilterAttack:  NO MODULE FOR NODE \"" << nodeFullPath << "\"" << std::endl;
+                std::cout << "WARNING:  StartNetworkFilterAttack:  NO MODULE FOR NODE \"" << recordingNodeFullPath << "\"" << std::endl;
             }
             continue;
         }
 
         if (  StopNetworkFilterAttack::match( classHandle )  ) {
-            StopNetworkFilterAttackSP stopNetworkFilterAttackSP = boost::static_pointer_cast< StopNetworkFilterAttack >( interactionRootSP );
+            StopNetworkFilterAttack::SP stopNetworkFilterAttackSP = boost::static_pointer_cast< StopNetworkFilterAttack >( interactionRootSP );
 
-            std::string nodeFullPath = stopNetworkFilterAttackSP->get_nodeFullPath();
+            std::string recordingNodeFullPath = stopNetworkFilterAttackSP->get_recordingNodeFullPath();
 
             FilterAttackMsg *filterAttackMsg = new FilterAttackMsg;
             filterAttackMsg->setSourceNetworkAddress( stopNetworkFilterAttackSP->get_srcNetworkAddress().c_str() );
             filterAttackMsg->setDestinationNetworkAddress( stopNetworkFilterAttackSP->get_dstNetworkAddress().c_str() );
             filterAttackMsg->setEnable( false );
 
-            cModule *cModulePtr = AttackCoordinator::getSingleton().getIPModule( nodeFullPath );
+            cModule *cModulePtr = AttackCoordinator::getSingleton().getIPModule( recordingNodeFullPath );
             if ( cModulePtr != 0 ) {
                 sendDirect(  filterAttackMsg, cModulePtr, "hlaIn"  );
             } else {
-                std::cout << "WARNING:  StopNetworkFilterAttack:  NO MODULE FOR NODE \"" << nodeFullPath << "\"" << std::endl;
+                std::cout << "WARNING:  StopNetworkFilterAttack:  NO MODULE FOR NODE \"" << recordingNodeFullPath << "\"" << std::endl;
             }
             continue;
         }
 
         if (  StartNetworkIPFirewall::match( classHandle )  ) {
-            StartNetworkIPFirewallSP startNetworkIPFirewallSP = boost::static_pointer_cast< StartNetworkIPFirewall >( interactionRootSP );
+            StartNetworkIPFirewall::SP startNetworkIPFirewallSP = boost::static_pointer_cast< StartNetworkIPFirewall >( interactionRootSP );
 
             std::string nodeFullPath = startNetworkIPFirewallSP->get_nodeFullPath();
 
@@ -238,7 +298,7 @@ void HLAInterface::processInteractions( void ) {
         }
 
         if (  StopNetworkIPFirewall::match( classHandle )  ) {
-            StopNetworkIPFirewallSP stopNetworkIPFirewallSP = boost::static_pointer_cast< StopNetworkIPFirewall >( interactionRootSP );
+            StopNetworkIPFirewall::SP stopNetworkIPFirewallSP = boost::static_pointer_cast< StopNetworkIPFirewall >( interactionRootSP );
 
             std::string nodeFullPath = stopNetworkIPFirewallSP->get_nodeFullPath();
 
@@ -258,7 +318,7 @@ void HLAInterface::processInteractions( void ) {
 
         if (  StartDisableNetworkAttack::match( classHandle )  ) {
 
-            StartDisableNetworkAttackSP startDisableNetworkAttackSP = boost::static_pointer_cast< StartDisableNetworkAttack >( interactionRootSP );
+            StartDisableNetworkAttack::SP startDisableNetworkAttackSP = boost::static_pointer_cast< StartDisableNetworkAttack >( interactionRootSP );
 
             std::string networkAddressStr = startDisableNetworkAttackSP->get_networkAddress();
 
@@ -277,7 +337,7 @@ void HLAInterface::processInteractions( void ) {
         }
 
         if (  StopDisableNetworkAttack::match( classHandle )  ) {
-            StopDisableNetworkAttackSP stopDisableNetworkAttackSP = boost::static_pointer_cast< StopDisableNetworkAttack >( interactionRootSP );
+            StopDisableNetworkAttack::SP stopDisableNetworkAttackSP = boost::static_pointer_cast< StopDisableNetworkAttack >( interactionRootSP );
 
             std::string networkAddressStr = stopDisableNetworkAttackSP->get_networkAddress();
 
@@ -296,7 +356,7 @@ void HLAInterface::processInteractions( void ) {
         }
 
         if (  RecordPacketsForReplayAttack::match( classHandle )  ) {
-            RecordPacketsForReplayAttackSP recordPacketsForReplayAttackSP = boost::static_pointer_cast< RecordPacketsForReplayAttack >( interactionRootSP );
+            RecordPacketsForReplayAttack::SP recordPacketsForReplayAttackSP = boost::static_pointer_cast< RecordPacketsForReplayAttack >( interactionRootSP );
 
             std::string nodeFullPath = recordPacketsForReplayAttackSP->get_recordingNodeFullPath();
 
@@ -316,7 +376,7 @@ void HLAInterface::processInteractions( void ) {
         }
 
         if (  TerminateReplayAttack::match( classHandle )  ) {
-            TerminateReplayAttackSP terminateReplayAttackSP = boost::static_pointer_cast< TerminateReplayAttack >( interactionRootSP );
+            TerminateReplayAttack::SP terminateReplayAttackSP = boost::static_pointer_cast< TerminateReplayAttack >( interactionRootSP );
 
             std::string nodeFullPath = terminateReplayAttackSP->get_recordingNodeFullPath();
 
@@ -336,7 +396,7 @@ void HLAInterface::processInteractions( void ) {
         }
 
         if (  StartReplayAttack::match( classHandle )  ) {
-            StartReplayAttackSP startReplayAttackSP = boost::static_pointer_cast< StartReplayAttack >( interactionRootSP );
+            StartReplayAttack::SP startReplayAttackSP = boost::static_pointer_cast< StartReplayAttack >( interactionRootSP );
 
             std::string nodeFullPath = startReplayAttackSP->get_recordingNodeFullPath();
 
@@ -355,7 +415,7 @@ void HLAInterface::processInteractions( void ) {
         }
 
         if (  CeaseReplayAttack::match( classHandle )  ) {
-            CeaseReplayAttackSP ceaseReplayAttackSP = boost::static_pointer_cast< CeaseReplayAttack >( interactionRootSP );
+            CeaseReplayAttack::SP ceaseReplayAttackSP = boost::static_pointer_cast< CeaseReplayAttack >( interactionRootSP );
 
             std::string nodeFullPath = ceaseReplayAttackSP->get_recordingNodeFullPath();
 
@@ -374,7 +434,7 @@ void HLAInterface::processInteractions( void ) {
         }
 
         if (  StartOutOfOrderPacketsAttack::match( classHandle )  ) {
-            StartOutOfOrderPacketsAttackSP startOutOfOrderPacketsAttackSP = boost::static_pointer_cast< StartOutOfOrderPacketsAttack >( interactionRootSP );
+            StartOutOfOrderPacketsAttack::SP startOutOfOrderPacketsAttackSP = boost::static_pointer_cast< StartOutOfOrderPacketsAttack >( interactionRootSP );
 
             std::string nodeFullPath = startOutOfOrderPacketsAttackSP->get_recordingNodeFullPath();
 
@@ -394,7 +454,7 @@ void HLAInterface::processInteractions( void ) {
         }
 
         if (  StopOutOfOrderPacketsAttack::match( classHandle )  ) {
-            StopOutOfOrderPacketsAttackSP stopOutOfOrderPacketsAttackSP = boost::static_pointer_cast< StopOutOfOrderPacketsAttack >( interactionRootSP );
+            StopOutOfOrderPacketsAttack::SP stopOutOfOrderPacketsAttackSP = boost::static_pointer_cast< StopOutOfOrderPacketsAttack >( interactionRootSP );
 
             std::string nodeFullPath = stopOutOfOrderPacketsAttackSP->get_recordingNodeFullPath();
 
@@ -414,7 +474,7 @@ void HLAInterface::processInteractions( void ) {
         }
 
         if ( AddRouteToRoutingTable::match( classHandle ) ) {
-            AddRouteToRoutingTableSP addRouteToRoutingTableSP =
+            AddRouteToRoutingTable::SP addRouteToRoutingTableSP =
              boost::static_pointer_cast< AddRouteToRoutingTable >( interactionRootSP );
 
             std::string nodeFullPath = addRouteToRoutingTableSP->get_nodeFullPath();
@@ -437,7 +497,7 @@ void HLAInterface::processInteractions( void ) {
         }
 
         if ( DropRouteFromRoutingTable::match( classHandle ) ) {
-            DropRouteFromRoutingTableSP dropRouteFromRoutingTableSP =
+            DropRouteFromRoutingTable::SP dropRouteFromRoutingTableSP =
              boost::static_pointer_cast< DropRouteFromRoutingTable >( interactionRootSP );
 
             std::string nodeFullPath = dropRouteFromRoutingTableSP->get_nodeFullPath();
@@ -460,7 +520,7 @@ void HLAInterface::processInteractions( void ) {
         }
 
         if ( StartModifyToHLAPacketsAttack::match( classHandle ) ) {
-            StartModifyToHLAPacketsAttackSP startModifyToHLAPacketsAttackSP =
+            StartModifyToHLAPacketsAttack::SP startModifyToHLAPacketsAttackSP =
              boost::static_pointer_cast< StartModifyToHLAPacketsAttack >( interactionRootSP );
 
             std::string nodeFullPath = startModifyToHLAPacketsAttackSP->get_nodeFullPath();
@@ -470,7 +530,7 @@ void HLAInterface::processInteractions( void ) {
         }
 
         if ( StopModifyToHLAPacketsAttack::match( classHandle ) ) {
-            StopModifyToHLAPacketsAttackSP stopModifyToHLAPacketsAttackSP =
+            StopModifyToHLAPacketsAttack::SP stopModifyToHLAPacketsAttackSP =
              boost::static_pointer_cast< StopModifyToHLAPacketsAttack >( interactionRootSP );
 
             std::string nodeFullPath = stopModifyToHLAPacketsAttackSP->get_nodeFullPath();
@@ -480,7 +540,7 @@ void HLAInterface::processInteractions( void ) {
         }
 
         if ( StartModifyFromHLAPacketsAttack::match( classHandle ) ) {
-            StartModifyFromHLAPacketsAttackSP startModifyFromHLAPacketsAttackSP =
+            StartModifyFromHLAPacketsAttack::SP startModifyFromHLAPacketsAttackSP =
              boost::static_pointer_cast< StartModifyFromHLAPacketsAttack >( interactionRootSP );
 
             std::string nodeFullPath = startModifyFromHLAPacketsAttackSP->get_nodeFullPath();
@@ -490,7 +550,7 @@ void HLAInterface::processInteractions( void ) {
         }
 
         if ( StopModifyFromHLAPacketsAttack::match( classHandle ) ) {
-            StopModifyFromHLAPacketsAttackSP stopModifyFromHLAPacketsAttackSP =
+            StopModifyFromHLAPacketsAttack::SP stopModifyFromHLAPacketsAttackSP =
              boost::static_pointer_cast< StopModifyFromHLAPacketsAttack >( interactionRootSP );
 
             std::string nodeFullPath = stopModifyFromHLAPacketsAttackSP->get_nodeFullPath();
@@ -500,7 +560,7 @@ void HLAInterface::processInteractions( void ) {
         }
 
         if ( StartIntegrityAttack::match( classHandle ) ) {
-            StartIntegrityAttackSP startIntegrityAttackSP =
+            StartIntegrityAttack::SP startIntegrityAttackSP =
              boost::static_pointer_cast< StartIntegrityAttack >( interactionRootSP );
 
             std::string nodeFullPath = startIntegrityAttackSP->get_nodeFullPath();
@@ -520,7 +580,7 @@ void HLAInterface::processInteractions( void ) {
         }
 
         if ( StopIntegrityAttack::match( classHandle ) ) {
-            StopIntegrityAttackSP stopIntegrityAttackSP =
+            StopIntegrityAttack::SP stopIntegrityAttackSP =
              boost::static_pointer_cast< StopIntegrityAttack >( interactionRootSP );
 
             std::string nodeFullPath = stopIntegrityAttackSP->get_nodeFullPath();
@@ -563,7 +623,7 @@ void HLAInterface::receiveInteraction(
     }
 
     InteractionRoot::SP interactionRootSP = InteractionRoot::create_interaction( theInteraction, theParameters, theTime );
-    C2WInteractionRootSP c2wInteractionRootSP = boost::dynamic_pointer_cast< C2WInteractionRoot >( interactionRootSP );
+    C2WInteractionRoot::SP c2wInteractionRootSP = boost::dynamic_pointer_cast< C2WInteractionRoot >( interactionRootSP );
 
     // Filter interaction if src/origin fed requirements (if any) are met
     if (  c2wInteractionRootSP != 0 && SubscribedInteractionFilter::get_singleton().filterC2WInteraction( getFederateId(), c2wInteractionRootSP )  ) {
@@ -586,7 +646,7 @@ void HLAInterface::receiveInteraction(
  throw ( RTI::InteractionClassNotKnown, RTI::InteractionParameterNotKnown, RTI::FederateInternalError ) {
 
     InteractionRoot::SP interactionRootSP = InteractionRoot::create_interaction( theInteraction, theParameters );
-    C2WInteractionRootSP c2wInteractionRootSP = boost::dynamic_pointer_cast< C2WInteractionRoot >( interactionRootSP );
+    C2WInteractionRoot::SP c2wInteractionRootSP = boost::dynamic_pointer_cast< C2WInteractionRoot >( interactionRootSP );
     if (  c2wInteractionRootSP != 0 && SubscribedInteractionFilter::get_singleton().filterC2WInteraction( getFederateId(), c2wInteractionRootSP )  ) {
         return;
     }
@@ -679,47 +739,47 @@ void HLAInterface::setup() {
     enableAsynchronousDelivery();
 
     // publish interactions
-    NetworkPacket::publish( getRTI() );
-    CommandExecutionStatus::publish( getRTI() );
+    NetworkPacket::publish_interaction( getRTI() );
+    CommandExecutionStatus::publish_interaction( getRTI() );
 
     // subscribe interactions
-    StartNodeAttack::subscribe( getRTI() );
-    StartLinkAttack::subscribe( getRTI() );
-    NetworkPacket::subscribe( getRTI() );
-    StartDisableNetworkAttack::subscribe( getRTI() );
-    StopDisableNetworkAttack::subscribe( getRTI() );
-    StopNodeAttack::subscribe( getRTI() );
-    StopLinkAttack::subscribe( getRTI() );
-    StartDataInjectionAttack::subscribe( getRTI() );
-    StopDataInjectionAttack::subscribe( getRTI() );
-    StartSnifferAttack::subscribe( getRTI() );
-    StopSnifferAttack::subscribe( getRTI() );
-    StartMasqueradingAttack::subscribe( getRTI() );
-    StopMasqueradingAttack::subscribe( getRTI() );
-    CeaseReplayAttack::subscribe( getRTI() );
-    RecordPacketsForReplayAttack::subscribe( getRTI() );
-    StopDNSPoisoningAttack::subscribe( getRTI() );
-    StartDNSPoisoningAttack::subscribe( getRTI() );
-    OmnetCommand::subscribe( getRTI() );
-    StartReplayAttack::subscribe( getRTI() );
-    TerminateReplayAttack::subscribe( getRTI() );
-    StopOutOfOrderPacketsAttack::subscribe( getRTI() );
-    StartOutOfOrderPacketsAttack::subscribe( getRTI() );
-    DropRouteFromRoutingTable::subscribe( getRTI() );
-    AddRouteToRoutingTable::subscribe( getRTI() );
-    StartNetworkFilterAttack::subscribe( getRTI() );
-    StopNetworkFilterAttack::subscribe( getRTI() );
-    StopDelayNodeAttack::subscribe( getRTI() );
-    StartDelayNodeAttack::subscribe( getRTI() );
-    StartModifyFromHLAPacketsAttack::subscribe( getRTI() );
-    StopModifyFromHLAPacketsAttack::subscribe( getRTI() );
-    StartModifyToHLAPacketsAttack::subscribe( getRTI() );
-    StopModifyToHLAPacketsAttack::subscribe( getRTI() );
-    StartIntegrityAttack::subscribe( getRTI() );
-    StopIntegrityAttack::subscribe( getRTI() );
+    StartNodeAttack::subscribe_interaction( getRTI() );
+    StartLinkAttack::subscribe_interaction( getRTI() );
+    NetworkPacket::subscribe_interaction( getRTI() );
+    StartDisableNetworkAttack::subscribe_interaction( getRTI() );
+    StopDisableNetworkAttack::subscribe_interaction( getRTI() );
+    StopNodeAttack::subscribe_interaction( getRTI() );
+    StopLinkAttack::subscribe_interaction( getRTI() );
+    StartDataInjectionAttack::subscribe_interaction( getRTI() );
+    StopDataInjectionAttack::subscribe_interaction( getRTI() );
+    StartSnifferAttack::subscribe_interaction( getRTI() );
+    StopSnifferAttack::subscribe_interaction( getRTI() );
+    StartMasqueradingAttack::subscribe_interaction( getRTI() );
+    StopMasqueradingAttack::subscribe_interaction( getRTI() );
+    CeaseReplayAttack::subscribe_interaction( getRTI() );
+    RecordPacketsForReplayAttack::subscribe_interaction( getRTI() );
+    StopDNSPoisoningAttack::subscribe_interaction( getRTI() );
+    StartDNSPoisoningAttack::subscribe_interaction( getRTI() );
+    OmnetCommand::subscribe_interaction( getRTI() );
+    StartReplayAttack::subscribe_interaction( getRTI() );
+    TerminateReplayAttack::subscribe_interaction( getRTI() );
+    StopOutOfOrderPacketsAttack::subscribe_interaction( getRTI() );
+    StartOutOfOrderPacketsAttack::subscribe_interaction( getRTI() );
+    DropRouteFromRoutingTable::subscribe_interaction( getRTI() );
+    AddRouteToRoutingTable::subscribe_interaction( getRTI() );
+    StartNetworkFilterAttack::subscribe_interaction( getRTI() );
+    StopNetworkFilterAttack::subscribe_interaction( getRTI() );
+    StopDelayNodeAttack::subscribe_interaction( getRTI() );
+    StartDelayNodeAttack::subscribe_interaction( getRTI() );
+    StartModifyFromHLAPacketsAttack::subscribe_interaction( getRTI() );
+    StopModifyFromHLAPacketsAttack::subscribe_interaction( getRTI() );
+    StartModifyToHLAPacketsAttack::subscribe_interaction( getRTI() );
+    StopModifyToHLAPacketsAttack::subscribe_interaction( getRTI() );
+    StartIntegrityAttack::subscribe_interaction( getRTI() );
+    StopIntegrityAttack::subscribe_interaction( getRTI() );
 
-    StartNetworkIPFirewall::subscribe( getRTI() );
-    StopNetworkIPFirewall::subscribe( getRTI() );
+    StartNetworkIPFirewall::subscribe_interaction( getRTI() );
+    StopNetworkIPFirewall::subscribe_interaction( getRTI() );
 
 
     SubscribedInteractionFilter::get_singleton().initialize();
@@ -728,44 +788,44 @@ void HLAInterface::setup() {
 
     //subscribe objects
 
-    if ( !dbname.empty() ) {
-        NetworkPacket::enablePublishLog("NetworkPacket", "OmnetFederate", "NORMAL", _logLevel);
-        CommandExecutionStatus::enablePublishLog("CommandExecutionStatus", "OmnetFederate", "NORMAL", _logLevel);
-
-        StartNodeAttack::enableSubscribeLog("StartNodeAttack", "OmnetFederate", "NORMAL", _logLevel);
-        StartLinkAttack::enableSubscribeLog("StartLinkAttack", "OmnetFederate", "NORMAL", _logLevel);
-        NetworkPacket::enableSubscribeLog("NetworkPacket", "OmnetFederate", "NORMAL", _logLevel);
-        StartDisableNetworkAttack::enableSubscribeLog("StartDisableNetworkAttack", "OmnetFederate", "NORMAL", _logLevel);
-        StopDisableNetworkAttack::enableSubscribeLog("StopDisableNetworkAttack", "OmnetFederate", "NORMAL", _logLevel);
-        StopNodeAttack::enableSubscribeLog("StopNodeAttack", "OmnetFederate", "NORMAL", _logLevel);
-        StopLinkAttack::enableSubscribeLog("StopLinkAttack", "OmnetFederate", "NORMAL", _logLevel);
-        StartDataInjectionAttack::enableSubscribeLog("StartDataInjectionAttack", "OmnetFederate", "NORMAL", _logLevel);
-        StopDataInjectionAttack::enableSubscribeLog("StopDataInjectionAttack", "OmnetFederate", "NORMAL", _logLevel);
-        StartSnifferAttack::enableSubscribeLog("StartSnifferAttack", "OmnetFederate", "NORMAL", _logLevel);
-        StopSnifferAttack::enableSubscribeLog("StopSnifferAttack", "OmnetFederate", "NORMAL", _logLevel);
-        StartMasqueradingAttack::enableSubscribeLog("StartMasqueradingAttack", "OmnetFederate", "NORMAL", _logLevel);
-        StopMasqueradingAttack::enableSubscribeLog("StopMasqueradingAttack", "OmnetFederate", "NORMAL", _logLevel);
-        CeaseReplayAttack::enableSubscribeLog("CeaseReplayAttack", "OmnetFederate", "NORMAL", _logLevel);
-        RecordPacketsForReplayAttack::enableSubscribeLog("RecordPacketsForReplayAttack", "OmnetFederate", "NORMAL", _logLevel);
-        StopDNSPoisoningAttack::enableSubscribeLog("StopDNSPoisoningAttack", "OmnetFederate", "NORMAL", _logLevel);
-        StartDNSPoisoningAttack::enableSubscribeLog("StartDNSPoisoningAttack", "OmnetFederate", "NORMAL", _logLevel);
-        OmnetCommand::enableSubscribeLog("OmnetCommand", "OmnetFederate", "NORMAL", _logLevel);
-        StartReplayAttack::enableSubscribeLog("StartReplayAttack", "OmnetFederate", "NORMAL", _logLevel);
-        TerminateReplayAttack::enableSubscribeLog("TerminateReplayAttack", "OmnetFederate", "NORMAL", _logLevel);
-        StopOutOfOrderPacketsAttack::enableSubscribeLog("StopOutOfOrderPacketsAttack", "OmnetFederate", "NORMAL", _logLevel);
-        StartOutOfOrderPacketsAttack::enableSubscribeLog("StartOutOfOrderPacketsAttack", "OmnetFederate", "NORMAL", _logLevel);
-        DropRouteFromRoutingTable::enableSubscribeLog("DropRouteFromRoutingTable", "OmnetFederate", "NORMAL", _logLevel);
-        AddRouteToRoutingTable::enableSubscribeLog("AddRouteToRoutingTable", "OmnetFederate", "NORMAL", _logLevel);
-        StartNetworkFilterAttack::enableSubscribeLog("StartNetworkFilterAttack", "OmnetFederate", "NORMAL", _logLevel);
-        StopNetworkFilterAttack::enableSubscribeLog("StopNetworkFilterAttack", "OmnetFederate", "NORMAL", _logLevel);
-        StopDelayNodeAttack::enableSubscribeLog("StopDelayNodeAttack", "OmnetFederate", "NORMAL", _logLevel);
-        StartDelayNodeAttack::enableSubscribeLog("StartDelayNodeAttack", "OmnetFederate", "NORMAL", _logLevel);
-        StartIntegrityAttack::enableSubscribeLog("StartIntegrityAttack", "OmnetFederate", "NORMAL", _logLevel);
-        StopIntegrityAttack::enableSubscribeLog("StopIntegrityAttack", "OmnetFederate", "NORMAL", _logLevel);
-
-        StartNetworkIPFirewall::enableSubscribeLog("StartNetworkIPFirewall", "OmnetFederate", "NORMAL", _logLevel);
-        StopNetworkIPFirewall::enableSubscribeLog("StopNetworkIPFirewall", "OmnetFederate", "NORMAL", _logLevel);
-    }
+//    if ( !dbname.empty() ) {
+//        NetworkPacket::enablePublishLog("NetworkPacket", "OmnetFederate", "NORMAL", _logLevel);
+//        CommandExecutionStatus::enablePublishLog("CommandExecutionStatus", "OmnetFederate", "NORMAL", _logLevel);
+//
+//        StartNodeAttack::enableSubscribeLog("StartNodeAttack", "OmnetFederate", "NORMAL", _logLevel);
+//        StartLinkAttack::enableSubscribeLog("StartLinkAttack", "OmnetFederate", "NORMAL", _logLevel);
+//        NetworkPacket::enableSubscribeLog("NetworkPacket", "OmnetFederate", "NORMAL", _logLevel);
+//        StartDisableNetworkAttack::enableSubscribeLog("StartDisableNetworkAttack", "OmnetFederate", "NORMAL", _logLevel);
+//        StopDisableNetworkAttack::enableSubscribeLog("StopDisableNetworkAttack", "OmnetFederate", "NORMAL", _logLevel);
+//        StopNodeAttack::enableSubscribeLog("StopNodeAttack", "OmnetFederate", "NORMAL", _logLevel);
+//        StopLinkAttack::enableSubscribeLog("StopLinkAttack", "OmnetFederate", "NORMAL", _logLevel);
+//        StartDataInjectionAttack::enableSubscribeLog("StartDataInjectionAttack", "OmnetFederate", "NORMAL", _logLevel);
+//        StopDataInjectionAttack::enableSubscribeLog("StopDataInjectionAttack", "OmnetFederate", "NORMAL", _logLevel);
+//        StartSnifferAttack::enableSubscribeLog("StartSnifferAttack", "OmnetFederate", "NORMAL", _logLevel);
+//        StopSnifferAttack::enableSubscribeLog("StopSnifferAttack", "OmnetFederate", "NORMAL", _logLevel);
+//        StartMasqueradingAttack::enableSubscribeLog("StartMasqueradingAttack", "OmnetFederate", "NORMAL", _logLevel);
+//        StopMasqueradingAttack::enableSubscribeLog("StopMasqueradingAttack", "OmnetFederate", "NORMAL", _logLevel);
+//        CeaseReplayAttack::enableSubscribeLog("CeaseReplayAttack", "OmnetFederate", "NORMAL", _logLevel);
+//        RecordPacketsForReplayAttack::enableSubscribeLog("RecordPacketsForReplayAttack", "OmnetFederate", "NORMAL", _logLevel);
+//        StopDNSPoisoningAttack::enableSubscribeLog("StopDNSPoisoningAttack", "OmnetFederate", "NORMAL", _logLevel);
+//        StartDNSPoisoningAttack::enableSubscribeLog("StartDNSPoisoningAttack", "OmnetFederate", "NORMAL", _logLevel);
+//        OmnetCommand::enableSubscribeLog("OmnetCommand", "OmnetFederate", "NORMAL", _logLevel);
+//        StartReplayAttack::enableSubscribeLog("StartReplayAttack", "OmnetFederate", "NORMAL", _logLevel);
+//        TerminateReplayAttack::enableSubscribeLog("TerminateReplayAttack", "OmnetFederate", "NORMAL", _logLevel);
+//        StopOutOfOrderPacketsAttack::enableSubscribeLog("StopOutOfOrderPacketsAttack", "OmnetFederate", "NORMAL", _logLevel);
+//        StartOutOfOrderPacketsAttack::enableSubscribeLog("StartOutOfOrderPacketsAttack", "OmnetFederate", "NORMAL", _logLevel);
+//        DropRouteFromRoutingTable::enableSubscribeLog("DropRouteFromRoutingTable", "OmnetFederate", "NORMAL", _logLevel);
+//        AddRouteToRoutingTable::enableSubscribeLog("AddRouteToRoutingTable", "OmnetFederate", "NORMAL", _logLevel);
+//        StartNetworkFilterAttack::enableSubscribeLog("StartNetworkFilterAttack", "OmnetFederate", "NORMAL", _logLevel);
+//        StopNetworkFilterAttack::enableSubscribeLog("StopNetworkFilterAttack", "OmnetFederate", "NORMAL", _logLevel);
+//        StopDelayNodeAttack::enableSubscribeLog("StopDelayNodeAttack", "OmnetFederate", "NORMAL", _logLevel);
+//        StartDelayNodeAttack::enableSubscribeLog("StartDelayNodeAttack", "OmnetFederate", "NORMAL", _logLevel);
+//        StartIntegrityAttack::enableSubscribeLog("StartIntegrityAttack", "OmnetFederate", "NORMAL", _logLevel);
+//        StopIntegrityAttack::enableSubscribeLog("StopIntegrityAttack", "OmnetFederate", "NORMAL", _logLevel);
+//
+//        StartNetworkIPFirewall::enableSubscribeLog("StartNetworkIPFirewall", "OmnetFederate", "NORMAL", _logLevel);
+//        StopNetworkIPFirewall::enableSubscribeLog("StopNetworkIPFirewall", "OmnetFederate", "NORMAL", _logLevel);
+//    }
 
     // set up dataflows
     std::cout << "sending \"ready to populate\"" << std::endl;
@@ -824,7 +884,7 @@ void HLAInterface::handleMessage( omnetpp::cMessage* msg ) {
 
         InteractionMsg *interactionMsg = dynamic_cast< InteractionMsg * >( c_packetPtr );
 
-        NetworkPacketSP networkPacketSP = boost::static_pointer_cast< NetworkPacket >( interactionMsg->getInteractionRootSP() );
+        NetworkPacket::SP networkPacketSP = boost::static_pointer_cast< NetworkPacket >( interactionMsg->getInteractionRootSP() );
         networkPacketSP->set_sourceFed( getFederateId() );
         networkPacketSP->sendInteraction( getRTI(), timestamp );
         // std::cerr << "Sending interaction with timestamp " << boost::lexical_cast< std::string >( timestamp ) << std::endl;

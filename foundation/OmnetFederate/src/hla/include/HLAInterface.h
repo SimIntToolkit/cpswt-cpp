@@ -22,6 +22,8 @@
 
 class HLAInterface : public omnetpp::cSimpleModule, public SynchronizedFederate {
 
+using ObjectRoot = ::org::cpswt::hla::ObjectRoot;
+
 public:
 	typedef SynchronizedFederate Super;
 	enum MessageType { INTERACTION, OBJECT };
@@ -121,7 +123,7 @@ public:
 	    SynchronizedFederate::finalizeAndTerminate();
 	}
 
-	ObjectMsg *wrapObject( ObjectRootSP objectRootSP, const std::string &name, inet::simtime_t timestamp ) {
+	ObjectMsg *wrapObject( ObjectRoot::SP objectRootSP, const std::string &name, inet::simtime_t timestamp ) {
 	
 		Enter_Method( "wrapObject" );
 
@@ -133,16 +135,16 @@ public:
 		return objectMsgPtr;
 	}
 	
-	ObjectMsg *wrapObject( ObjectRootSP objectRootSP, const std::string &name ) {
+	ObjectMsg *wrapObject( ObjectRoot::SP objectRootSP, const std::string &name ) {
 		return wrapObject( objectRootSP, name, inet::simTime() );
 	}
 	
 	ObjectMsg *wrapObject( ObjectRoot &objectRoot, const std::string &name, inet::simtime_t timestamp ) {
-		return wrapObject( objectRoot.clone(), name, timestamp );
+		return wrapObject( objectRoot.cloneObject(), name, timestamp );
 	}
 
 	ObjectMsg *wrapObject( ObjectRoot &objectRoot, const std::string &name ) {
-		return wrapObject( objectRoot.clone(), name );
+		return wrapObject( objectRoot.cloneObject(), name );
 	}
 
 	void updateObject( ObjectMsg *objectMsgPtr ) {
@@ -151,21 +153,21 @@ public:
 		scheduleAt( inet::simTime(), objectMsgPtr );
 	}
 	
-	void updateObject( ObjectRootSP objectRootSP, const std::string &name, inet::simtime_t timestamp ) {		
+	void updateObject( ObjectRoot::SP objectRootSP, const std::string &name, inet::simtime_t timestamp ) {		
 		ObjectMsg *objectMsgPtr = wrapObject( objectRootSP, name, timestamp );
 		updateObject( objectMsgPtr );
 	}
 	
-	void updateObject( ObjectRootSP objectRootSP, const std::string &name, double timestamp ) {
+	void updateObject( ObjectRoot::SP objectRootSP, const std::string &name, double timestamp ) {
 		updateObject(  objectRootSP, name, inet::SimTime( timestamp )  );
 	}
 
-	void updateObject( ObjectRootSP objectRootSP, const std::string &name ) {
+	void updateObject( ObjectRoot::SP objectRootSP, const std::string &name ) {
 		updateObject( objectRootSP, name, inet::simTime() );
 	}
 
 	void updateObject( ObjectRoot &objectRoot, const std::string &name, inet::simtime_t timestamp ) {
-		updateObject( objectRoot.clone(), name, timestamp );
+		updateObject( objectRoot.cloneObject(), name, timestamp );
 	}
 	
 	void updateObject( ObjectRoot &objectRoot, const std::string &name, double timestamp ) {
@@ -176,8 +178,8 @@ public:
 		updateObject( objectRoot, name, inet::simTime() );
 	}
 
-	static ObjectRootSP unwrapObject( inet::cMessage *msg ) {
-		if ( msg->getKind() != OBJECT ) return ObjectRootSP(  static_cast< ObjectRoot * >( 0 )  );
+	static ObjectRoot::SP unwrapObject( inet::cMessage *msg ) {
+		if ( msg->getKind() != OBJECT ) return ObjectRoot::SP(  static_cast< ObjectRoot * >( 0 )  );
 		return static_cast< ObjectMsg * >( msg )->getObjectRootSP();
 	}	
 

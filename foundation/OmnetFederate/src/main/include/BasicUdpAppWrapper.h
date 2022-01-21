@@ -19,13 +19,15 @@
 #include <omnetpp.h>
 #include "BasicUdpApp.h"
 #include "AttackCoordinator.h"
-#include <NetworkPacket.hpp>
+#include <InteractionRoot_p/C2WInteractionRoot_p/ActionBase_p/NetworkPacket.hpp>
 
 /**
  * TODO - Generated class
  */
 class BasicUdpAppWrapper : public BasicUdpApp {
 public:
+    using NetworkPacket = ::org::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::NetworkPacket;
+
 	typedef BasicUdpApp Super;
 
 private:
@@ -70,10 +72,10 @@ protected:
 	virtual void initialize( int stage ) override;
 	virtual void handleMessage(omnetpp::cMessage *msg) override;
 	virtual void sendToUDP( inet::Packet *msg, const inet::Ipv4Address& destAddr, int destPort ) override;
-	virtual NetworkPacketSP modifyIncoming( NetworkPacketSP networkPacketSP );
-	virtual NetworkPacketSP modifyOutgoing( NetworkPacketSP networkPacketSP );
-	virtual NetworkPacketSP tweakIncoming(
-	        NetworkPacketSP networkPacketSP,
+	virtual NetworkPacket::SP modifyIncoming( NetworkPacket::SP networkPacketSP );
+	virtual NetworkPacket::SP modifyOutgoing( NetworkPacket::SP networkPacketSP );
+	virtual NetworkPacket::SP tweakIncoming(
+	        NetworkPacket::SP networkPacketSP,
 	        int intMultuplier = 1,
 	        int intAdder = 0,
 	        long longMultiplier = 1,
