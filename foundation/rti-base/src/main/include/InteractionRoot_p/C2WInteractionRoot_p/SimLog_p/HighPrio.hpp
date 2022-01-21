@@ -545,7 +545,8 @@ public:
  } // NAMESPACE "cpswt"
 } // NAMESPACE "org"
 
-std::ostream &operator<<( std::ostream &os, ::org::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::SimLog_p::HighPrio::SP entitySP );
-std::ostream &operator<<( std::ostream &os, const ::org::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::SimLog_p::HighPrio &entity );
+inline std::ostream &operator<<( std::ostream &os, ::org::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::SimLog_p::HighPrio::SP messagingSP ) {
+    return os << *messagingSP;
+}
 
 #endif // _org_cpswt_hla_InteractionRoot_p_C2WInteractionRoot_p_SimLog_p_HighPrio_CLASS

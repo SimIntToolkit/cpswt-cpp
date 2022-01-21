@@ -554,3 +554,34 @@ InteractionRoot::SP InteractionRoot::fromJson(const std::string &jsonString) {
   } // NAMESPACE "hla"
  } // NAMESPACE "cpswt"
 } // NAMESPACE "org"
+
+std::ostream &operator<<( std::ostream &os, const ::org::cpswt::hla::InteractionRoot &messaging ) {
+
+    typedef ::org::cpswt::hla::InteractionRoot::ClassAndPropertyNameValueSPMap::const_iterator const_iterator;
+    const ::org::cpswt::hla::InteractionRoot::ClassAndPropertyNameValueSPMap &classAndPropertyNameValueSPMap =
+      messaging.getClassAndPropertyNameValueSPMap();
+    os << messaging.getCppClassName() << "(";
+    bool first = true;
+    for(
+      const_iterator cvmCit = classAndPropertyNameValueSPMap.begin() ;
+      cvmCit != classAndPropertyNameValueSPMap.end() ;
+      ++cvmCit
+    ) {
+        if (first) first = false;
+        else os << ", " ;
+
+        os << static_cast<std::string>(cvmCit->first) << ": ";
+        TypeMedley &value = *cvmCit->second;
+        switch(value.getDataType()) {
+            case TypeMedley::BOOLEAN: os << static_cast<bool>(value);
+            case TypeMedley::CHARACTER: os << static_cast<char>(value);
+            case TypeMedley::SHORT: os << static_cast<short>(value);
+            case TypeMedley::INTEGER: os << static_cast<int>(value);
+            case TypeMedley::LONG: os << static_cast<long>(value);
+            case TypeMedley::FLOAT: os << static_cast<float>(value);
+            case TypeMedley::DOUBLE: os << static_cast<double>(value);
+            case TypeMedley::STRING: os << "\"" << static_cast<std::string>(value) << "\"";
+        }
+    }
+    return os << ")";
+}

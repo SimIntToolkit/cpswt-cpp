@@ -631,7 +631,8 @@ public:
  } // NAMESPACE "cpswt"
 } // NAMESPACE "org"
 
-std::ostream &operator<<( std::ostream &os, ::org::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::FederateResignInteraction::SP entitySP );
-std::ostream &operator<<( std::ostream &os, const ::org::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::FederateResignInteraction &entity );
+inline std::ostream &operator<<( std::ostream &os, ::org::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::FederateResignInteraction::SP messagingSP ) {
+    return os << *messagingSP;
+}
 
 #endif // _org_cpswt_hla_InteractionRoot_p_C2WInteractionRoot_p_FederateResignInteraction_CLASS

@@ -435,7 +435,7 @@ protected:
     // METHODS THAT USE CLASS-AND-PROPERTY-NAME PROPERTY-VALUE MAP
     //------------------------------------------------------------
 public:
-    const ClassAndPropertyNameValueSPMap &getClassAndPropertyNameValueMap() {
+    const ClassAndPropertyNameValueSPMap &getClassAndPropertyNameValueSPMap() const {
         return _classAndPropertyNameValueSPMap;
     }
 
@@ -1127,7 +1127,9 @@ public:
  } // NAMESPACE "cpswt"
 } // NAMESPACE "org"
 
-std::ostream &operator<<( std::ostream &os, ::org::cpswt::hla::InteractionRoot::SP entitySP );
-std::ostream &operator<<( std::ostream &os, const ::org::cpswt::hla::InteractionRoot &entity );
+std::ostream &operator<<( std::ostream &os, const ::org::cpswt::hla::InteractionRoot &messaging );
+inline std::ostream &operator<<( std::ostream &os, ::org::cpswt::hla::InteractionRoot::SP messagingSP ) {
+    return os << *messagingSP;
+}
 
 #endif // _INTERACTION_ROOT
