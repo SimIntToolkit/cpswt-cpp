@@ -146,7 +146,7 @@ void InteractionRoot::setParameters( const RTI::ParameterHandleValuePairSet &pro
 
 bool InteractionRoot::static_init() {
     // ADD THIS CLASS TO THE _classNameSet DEFINED IN InteractionRoot
-    get_class_name_set().insert(get_hla_class_name());
+    get_hla_class_name_set().insert(get_hla_class_name());
 
     // ADD CLASS OBJECT OF THIS CLASS TO _classNameClassMap DEFINED IN InteractionRoot
     get_class_name_instance_sp_map()[get_hla_class_name()] = SP(new InteractionRoot());
