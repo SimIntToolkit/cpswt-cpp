@@ -43,7 +43,7 @@ bool FederateJoinInteraction::static_init_var = FederateJoinInteraction::static_
 
 bool FederateJoinInteraction::static_init() {
     // ADD THIS CLASS TO THE _classNameSet DEFINED IN InteractionRoot
-    get_class_name_set().insert(get_hla_class_name());
+    get_hla_class_name_set().insert(get_hla_class_name());
 
     // ADD CLASS OBJECT OF THIS CLASS TO _classNameClassMap DEFINED IN InteractionRoot
     get_class_name_instance_sp_map()[get_hla_class_name()] = SP(new FederateJoinInteraction());
@@ -66,31 +66,31 @@ bool FederateJoinInteraction::static_init() {
         "InteractionRoot.C2WInteractionRoot.FederateJoinInteraction", "IsLateJoiner"
     );
 
-    get_class_and_property_name_set_sp()->emplace(
+    get_all_class_and_property_name_set_sp()->emplace(
         "InteractionRoot.C2WInteractionRoot.FederateJoinInteraction", "FederateId"
     );
 
-    get_class_and_property_name_set_sp()->emplace(
+    get_all_class_and_property_name_set_sp()->emplace(
         "InteractionRoot.C2WInteractionRoot.FederateJoinInteraction", "FederateType"
     );
 
-    get_class_and_property_name_set_sp()->emplace(
+    get_all_class_and_property_name_set_sp()->emplace(
         "InteractionRoot.C2WInteractionRoot.FederateJoinInteraction", "IsLateJoiner"
     );
 
-    get_class_and_property_name_set_sp()->emplace(
+    get_all_class_and_property_name_set_sp()->emplace(
         "InteractionRoot.C2WInteractionRoot", "actualLogicalGenerationTime"
     );
 
-    get_class_and_property_name_set_sp()->emplace(
+    get_all_class_and_property_name_set_sp()->emplace(
         "InteractionRoot.C2WInteractionRoot", "federateFilter"
     );
 
-    get_class_and_property_name_set_sp()->emplace(
+    get_all_class_and_property_name_set_sp()->emplace(
         "InteractionRoot.C2WInteractionRoot", "originFed"
     );
 
-    get_class_and_property_name_set_sp()->emplace(
+    get_all_class_and_property_name_set_sp()->emplace(
         "InteractionRoot.C2WInteractionRoot", "sourceFed"
     );
 
