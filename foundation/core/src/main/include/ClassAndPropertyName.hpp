@@ -6,6 +6,7 @@
 #include <boost/shared_ptr.hpp>
 #include <unordered_set>
 #include <list>
+#include <iostream>
 
 class ClassAndPropertyName {
 
@@ -86,5 +87,10 @@ struct std::hash<ClassAndPropertyName> {
 typedef boost::shared_ptr<ClassAndPropertyName> ClassAndPropertyNameSP;
 typedef std::unordered_set<ClassAndPropertyName> ClassAndPropertyNameSet;
 typedef std::list<ClassAndPropertyName> ClassAndPropertyNameList;
+
+inline std::ostream &operator<<(std::ostream &os, const ClassAndPropertyName &classAndPropertyName) {
+    os << static_cast<std::string>(classAndPropertyName);
+    return os;
+}
 
 #endif // _CLASS_AND_PROPERTY_NAME_HPP

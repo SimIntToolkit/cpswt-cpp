@@ -42,7 +42,7 @@ bool FederateObject::static_init_var = FederateObject::static_init();
 
 bool FederateObject::static_init() {
     // ADD THIS CLASS TO THE _classNameSet DEFINED IN ObjectRoot
-    get_class_name_set().insert(get_hla_class_name());
+    get_hla_class_name_set().insert(get_hla_class_name());
 
     // ADD CLASS OBJECT OF THIS CLASS TO _classNameClassMap DEFINED IN ObjectRoot
     get_class_name_instance_sp_map()[get_hla_class_name()] = SP(new FederateObject());
@@ -65,15 +65,15 @@ bool FederateObject::static_init() {
         "ObjectRoot.FederateObject", "FederateType"
     );
 
-    get_class_and_property_name_set_sp()->emplace(
+    get_all_class_and_property_name_set_sp()->emplace(
         "ObjectRoot.FederateObject", "FederateHandle"
     );
 
-    get_class_and_property_name_set_sp()->emplace(
+    get_all_class_and_property_name_set_sp()->emplace(
         "ObjectRoot.FederateObject", "FederateHost"
     );
 
-    get_class_and_property_name_set_sp()->emplace(
+    get_all_class_and_property_name_set_sp()->emplace(
         "ObjectRoot.FederateObject", "FederateType"
     );
 

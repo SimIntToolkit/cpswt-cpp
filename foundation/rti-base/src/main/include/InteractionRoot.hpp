@@ -121,17 +121,17 @@ public:
     // CLASS-NAME SET
     //---------------
 protected:
-    static StringSet &get_class_name_set( void ) {
-        static StringSet classNameSet;
-        return classNameSet;
+    static StringSet &get_hla_class_name_set( void ) {
+        static StringSet hlaClassNameSet;
+        return hlaClassNameSet;
     }
 
     //--------------------------------
     // METHODS THAT USE CLASS-NAME-SET
     //--------------------------------
 public:
-    static const StringSet &get_interaction_name_set( void ) {
-        return get_class_name_set();
+    static const StringSet &get_interaction_hla_class_name_set( void ) {
+        return get_hla_class_name_set();
     }
 
     //-------------------
@@ -155,6 +155,9 @@ public:
         StringIntegerMap::iterator simItr = get_class_name_handle_map().find(className);
         return simItr == get_class_name_handle_map().end() ? -1 : simItr->second;
     }
+    static int get_class_handle(const char *className) {
+        return get_class_handle(std::string(className));
+    }
 
     //--------------------------------
     // END CLASS-NAME CLASS-HANDLE MAP
@@ -173,12 +176,20 @@ protected:
     // METHODS THAT USE CLASS-NAME DATAMEMBER-NAME-SET MAP
     //----------------------------------------------------
 public:
-    static const ClassAndPropertyNameSetSP get_parameter_names(const std::string &className) {
+    static ClassAndPropertyNameList get_parameter_names(const std::string &className) {
        StringClassAndPropertyNameSetSPMap::iterator scmItr =
          get_class_name_class_and_property_name_set_sp_map().find(className);
 
-       return scmItr == get_class_name_class_and_property_name_set_sp_map().end()
-         ? ClassAndPropertyNameSetSP() : scmItr->second;
+       const ClassAndPropertyNameSet &classAndPropertyNameSet =
+         scmItr == get_class_name_class_and_property_name_set_sp_map().end() ?
+           *ClassAndPropertyNameSetSP(new ClassAndPropertyNameSet()) : *scmItr->second;
+
+       ClassAndPropertyNameList classAndPropertyNameList(
+         classAndPropertyNameSet.begin(), classAndPropertyNameSet.end()
+       );
+
+       classAndPropertyNameList.sort();
+       return classAndPropertyNameList;
     }
 
     //---------------------------------------
@@ -198,13 +209,20 @@ protected:
     // METHODS THAT USE CLASS-NAME ALL-DATAMEMBER-NAME-SET MAP
     //--------------------------------------------------------
 public:
-    static const ClassAndPropertyNameSetSP get_all_parameter_names(const std::string &className) {
+    static const ClassAndPropertyNameList get_all_parameter_names(const std::string &className) {
        StringClassAndPropertyNameSetSPMap::iterator scmItr =
          get_class_name_all_class_and_property_name_set_sp_map().find(className);
 
-       return scmItr == get_class_name_all_class_and_property_name_set_sp_map().end()
-         ? ClassAndPropertyNameSetSP()
-         : scmItr->second;
+       const ClassAndPropertyNameSet &classAndPropertyNameSet =
+         scmItr == get_class_name_all_class_and_property_name_set_sp_map().end() ?
+           *ClassAndPropertyNameSetSP(new ClassAndPropertyNameSet()) : *scmItr->second;
+
+       ClassAndPropertyNameList classAndPropertyNameList(
+         classAndPropertyNameSet.begin(), classAndPropertyNameSet.end()
+       );
+
+       classAndPropertyNameList.sort();
+       return classAndPropertyNameList;
     }
 
     //-------------------------------------------

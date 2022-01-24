@@ -41,14 +41,21 @@
 #define _CRT_SECURE_NO_DEPRECATE
 #endif
 
+
+#ifndef CPSWT_TEST
+
 #ifndef RTI_USES_STD_FSTREAM
 #define RTI_USES_STD_FSTREAM
 #endif
 
-#include <string>
-#include <vector>
 #include <RTI.hh>
 #include "fedtime.hh"
+
+#endif // CPSWT_TEST
+
+
+#include <string>
+#include <vector>
 
 #include <Attribute.hpp>
 

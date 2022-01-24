@@ -231,7 +231,7 @@ void ObjectRoot::setAttributes( const RTI::AttributeHandleValuePairSet &property
 
 bool ObjectRoot::static_init() {
     // ADD THIS CLASS TO THE _classNameSet DEFINED IN ObjectRoot
-    get_class_name_set().insert(get_hla_class_name());
+    get_hla_class_name_set().insert(get_hla_class_name());
 
     // ADD CLASS OBJECT OF THIS CLASS TO _classNameClassMap DEFINED IN ObjectRoot
     get_class_name_instance_sp_map()[get_hla_class_name()] = SP(new ObjectRoot());

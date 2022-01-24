@@ -31,6 +31,9 @@
  * @author Harmon Nine
  */
 
+import java.nio.file.Files
+import java.util.regex.Pattern
+
 plugins {
     `cpp-library`
     `maven-publish`
@@ -80,6 +83,25 @@ tasks.withType(LinkExecutable::class.java).configureEach {
             else -> listOf()
         }
     })
+}
+
+tasks.withType(InstallExecutable::class.java).configureEach {
+    doLast {
+        val libraryDirectory = File(installDirectory.asFile.get(), "lib")
+        val sharedObjectFileList = libraryDirectory.listFiles { file -> file.name.endsWith(".so") }!!.toList()
+
+        val pattern = Pattern.compile("(.*)_(?:debug|release)")
+
+        for(file in sharedObjectFileList) {
+            val fileName = file.name
+            val matcher = pattern.matcher(fileName)
+            if (matcher.find()) {
+                val libName = matcher.group(1);
+                val libraryFile = File(libraryDirectory, "lib${libName}.so")
+                Files.createSymbolicLink(libraryFile.toPath(), File(fileName).toPath())
+            }
+        }
+    }
 }
 
 publishing {
