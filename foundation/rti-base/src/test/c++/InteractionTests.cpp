@@ -1,5 +1,5 @@
 #include "InteractionTests.hpp"
-#include "RTITest.hh"
+#include "RTIAmbassadorTest1.hh"
 
 #include "InteractionRoot.hpp"
 #include "InteractionRoot_p/C2WInteractionRoot.hpp"
@@ -79,72 +79,85 @@ void InteractionTests::messagingNamesTest() {
 }
 
 void InteractionTests::classHandleTest() {
-    RTI::RTIambassador rtiambassador;
+    RTIAmbassadorTest1 rtiAmbassadorTest1;
+    RTI::RTIambassador rtiAmbassador(&rtiAmbassadorTest1);
 
-    InteractionRoot::publish_interaction(&rtiambassador);
-    C2WInteractionRoot::publish_interaction(&rtiambassador);
-    SimLog::publish_interaction(&rtiambassador);
-    HighPrio::publish_interaction(&rtiambassador);
-    SimulationControl::publish_interaction(&rtiambassador);
-    SimEnd::publish_interaction(&rtiambassador);
+    InteractionRoot::publish_interaction(&rtiAmbassador);
+    C2WInteractionRoot::publish_interaction(&rtiAmbassador);
+    SimLog::publish_interaction(&rtiAmbassador);
+    HighPrio::publish_interaction(&rtiAmbassador);
+    SimulationControl::publish_interaction(&rtiAmbassador);
+    SimEnd::publish_interaction(&rtiAmbassador);
 
     CPPUNIT_ASSERT_EQUAL(
-            get_class_name_handle_map().find("InteractionRoot")->second,
+            RTIAmbassadorTest1::get_class_name_handle_map().find("InteractionRoot")->second,
             static_cast<RTI::InteractionClassHandle>(InteractionRoot::get_class_handle())
     );
     CPPUNIT_ASSERT_EQUAL(
-            get_class_name_handle_map().find("InteractionRoot.C2WInteractionRoot")->second,
+            RTIAmbassadorTest1::get_class_name_handle_map().find("InteractionRoot.C2WInteractionRoot")->second,
             static_cast<RTI::InteractionClassHandle>(C2WInteractionRoot::get_class_handle())
     );
     CPPUNIT_ASSERT_EQUAL(
-            get_class_name_handle_map().find("InteractionRoot.C2WInteractionRoot.SimLog")->second,
+            RTIAmbassadorTest1::get_class_name_handle_map().find("InteractionRoot.C2WInteractionRoot.SimLog")->second,
             static_cast<RTI::InteractionClassHandle>(SimLog::get_class_handle())
     );
     CPPUNIT_ASSERT_EQUAL(
-            get_class_name_handle_map().find("InteractionRoot.C2WInteractionRoot.SimLog.HighPrio")->second,
+            RTIAmbassadorTest1::get_class_name_handle_map().find(
+              "InteractionRoot.C2WInteractionRoot.SimLog.HighPrio"
+            )->second,
             static_cast<RTI::InteractionClassHandle>(HighPrio::get_class_handle())
     );
     CPPUNIT_ASSERT_EQUAL(
-            get_class_name_handle_map().find("InteractionRoot.C2WInteractionRoot.SimulationControl")->second,
+            RTIAmbassadorTest1::get_class_name_handle_map().find(
+              "InteractionRoot.C2WInteractionRoot.SimulationControl"
+            )->second,
             static_cast<RTI::InteractionClassHandle>(SimulationControl::get_class_handle())
     );
     CPPUNIT_ASSERT_EQUAL(
-            get_class_name_handle_map().find("InteractionRoot.C2WInteractionRoot.SimulationControl.SimEnd")->second,
+            RTIAmbassadorTest1::get_class_name_handle_map().find(
+              "InteractionRoot.C2WInteractionRoot.SimulationControl.SimEnd"
+            )->second,
             static_cast<RTI::InteractionClassHandle>(SimEnd::get_class_handle())
     );
 
     CPPUNIT_ASSERT_EQUAL(
-            get_class_name_handle_map().find("InteractionRoot")->second,
+            RTIAmbassadorTest1::get_class_name_handle_map().find("InteractionRoot")->second,
             static_cast<RTI::InteractionClassHandle>(
               InteractionRoot::get_class_handle("InteractionRoot")
             )
     );
     CPPUNIT_ASSERT_EQUAL(
-            get_class_name_handle_map().find("InteractionRoot.C2WInteractionRoot")->second,
+            RTIAmbassadorTest1::get_class_name_handle_map().find("InteractionRoot.C2WInteractionRoot")->second,
             static_cast<RTI::InteractionClassHandle>(
               InteractionRoot::get_class_handle("InteractionRoot.C2WInteractionRoot")
             )
     );
     CPPUNIT_ASSERT_EQUAL(
-            get_class_name_handle_map().find("InteractionRoot.C2WInteractionRoot.SimLog")->second,
+            RTIAmbassadorTest1::get_class_name_handle_map().find("InteractionRoot.C2WInteractionRoot.SimLog")->second,
             static_cast<RTI::InteractionClassHandle>(
               InteractionRoot::get_class_handle("InteractionRoot.C2WInteractionRoot.SimLog")
             )
     );
     CPPUNIT_ASSERT_EQUAL(
-            get_class_name_handle_map().find("InteractionRoot.C2WInteractionRoot.SimLog.HighPrio")->second,
+            RTIAmbassadorTest1::get_class_name_handle_map().find(
+              "InteractionRoot.C2WInteractionRoot.SimLog.HighPrio"
+            )->second,
             static_cast<RTI::InteractionClassHandle>(
               InteractionRoot::get_class_handle("InteractionRoot.C2WInteractionRoot.SimLog.HighPrio")
             )
     );
     CPPUNIT_ASSERT_EQUAL(
-            get_class_name_handle_map().find("InteractionRoot.C2WInteractionRoot.SimulationControl")->second,
+            RTIAmbassadorTest1::get_class_name_handle_map().find(
+              "InteractionRoot.C2WInteractionRoot.SimulationControl"
+            )->second,
             static_cast<RTI::InteractionClassHandle>(
               InteractionRoot::get_class_handle("InteractionRoot.C2WInteractionRoot.SimulationControl")
             )
     );
     CPPUNIT_ASSERT_EQUAL(
-            get_class_name_handle_map().find("InteractionRoot.C2WInteractionRoot.SimulationControl.SimEnd")->second,
+            RTIAmbassadorTest1::get_class_name_handle_map().find(
+              "InteractionRoot.C2WInteractionRoot.SimulationControl.SimEnd"
+            )->second,
             static_cast<RTI::InteractionClassHandle>(
               InteractionRoot::get_class_handle("InteractionRoot.C2WInteractionRoot.SimulationControl.SimEnd")
             )
