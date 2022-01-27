@@ -1,64 +1,38 @@
 #include "RTITest.hh"
-#include "AttributeHandleSetTest.hh"
-
-#include <limits>
-
-//File RTIambServices.hh
-//Included in RTI.hh
-
-
-//                RTI Parameter Passing Memory Conventions
-//
-// C1  In parameter by value.
-// C2  Out parameter by pointer value.
-// C3  Function return by value.
-// C4  In parameter by const pointer value.  Caller provides memory.
-//     Caller may free memory or overwrite it upon completion of
-//     the call.  Callee must copy during the call anything it
-//     wishes to save beyond completion of the call.  Parameter
-//     type must define const accessor methods.
-// C5  Out parameter by pointer value.  Caller provides reference to object.
-//     Callee constructs an instance on the heap (new) and returns.
-//     The caller destroys the instance (delete) at its leisure.
-// C6  Function return by pointer value.  Callee constructs an instance on
-//     the heap (new) and returns a reference.  The caller destroys the
-//     instance (delete) at its leisure.
-//
-
-class FederateAmbassador;
-typedef FederateAmbassador *FederateAmbassadorPtr;
-
-////////////////////////////////////
-// Federation Management Services //
-////////////////////////////////////
+#include "RTIAmbassadorProxy.hh"
 
 // 4.2
 void RTI::RTIambassador::createFederationExecution (
   const char *executionName, // supplied C4
-  const char *FED)           // supplied C4
-throw (
+  const char *FED            // supplied C4
+) throw (
   FederationExecutionAlreadyExists,
   CouldNotOpenFED,
   ErrorReadingFED,
   ConcurrentAccessAttempted,
-  RTIinternalError) { }
+  RTIinternalError
+) {
+    rtiAmbassadorProxy->createFederationExecution(executionName, FED);
+}
 
 // 4.3
 void RTI::RTIambassador::destroyFederationExecution (
-  const char *executionName) // supplied C4
-throw (
+  const char *executionName // supplied C4
+) throw (
   FederatesCurrentlyJoined,
   FederationExecutionDoesNotExist,
   ConcurrentAccessAttempted,
-  RTIinternalError) { }
+  RTIinternalError
+) {
+    rtiAmbassadorProxy->destroyFederationExecution(executionName);
+}
 
 // 4.4
-RTI::FederateHandle                                               // returned C3
-RTI::RTIambassador::joinFederationExecution (
-  const char                   *yourName,                    // supplied C4
-  const char                   *executionName,               // supplied C4
-        FederateAmbassadorPtr   federateAmbassadorReference) // supplied C1
-throw (
+RTI::FederateHandle RTI::RTIambassador::joinFederationExecution (        // returned C3
+  const char              *yourName,                    // supplied C4
+  const char              *executionName,               // supplied C4
+  FederateAmbassadorPtr   federateAmbassadorReference   // supplied C1
+) throw (
   FederateAlreadyExecutionMember,
   FederationExecutionDoesNotExist,
   CouldNotOpenFED,
@@ -66,127 +40,157 @@ throw (
   ConcurrentAccessAttempted,
   SaveInProgress,
   RestoreInProgress,
-  RTIinternalError) {
-    return static_cast<FederateHandle>(0);
+  RTIinternalError
+) {
+    return rtiAmbassadorProxy->joinFederationExecution(yourName, executionName, federateAmbassadorReference);
 }
 
 // 4.5
 void RTI::RTIambassador::resignFederationExecution (
-  ResignAction theAction) // supplied C1
-throw (
+  ResignAction theAction // supplied C1
+) throw (
   FederateOwnsAttributes,
   FederateNotExecutionMember,
   InvalidResignAction,
   ConcurrentAccessAttempted,
-  RTIinternalError) { }
+  RTIinternalError
+) {
+    rtiAmbassadorProxy->resignFederationExecution(theAction);
+}
 
 // 4.6
 void RTI::RTIambassador::registerFederationSynchronizationPoint (
   const char *label,  // supplied C4
-  const char *theTag) // supplied C4
-throw (
+  const char *theTag  // supplied C4
+) throw (
   FederateNotExecutionMember,
   ConcurrentAccessAttempted,
   SaveInProgress,
   RestoreInProgress,
-  RTIinternalError) { }
+  RTIinternalError
+) {
+    rtiAmbassadorProxy->registerFederationSynchronizationPoint(label, theTag);
+}
 
 void RTI::RTIambassador::registerFederationSynchronizationPoint (
   const char                *label,    // supplied C4
   const char                *theTag,   // supplied C4
-  const FederateHandleSet&   syncSet)  // supplied C4
-throw (
+  const FederateHandleSet&   syncSet   // supplied C4
+) throw (
   FederateNotExecutionMember,
   ConcurrentAccessAttempted,
   SaveInProgress,
   RestoreInProgress,
-  RTIinternalError) { }
+  RTIinternalError
+) {
+    rtiAmbassadorProxy->registerFederationSynchronizationPoint(label, theTag, syncSet);
+}
 
 // 4.9
 void RTI::RTIambassador::synchronizationPointAchieved (
-  const char *label) // supplied C4
-throw (
+  const char *label  // supplied C4
+) throw (
   SynchronizationPointLabelWasNotAnnounced,
   FederateNotExecutionMember,
   ConcurrentAccessAttempted,
   SaveInProgress,
   RestoreInProgress,
-  RTIinternalError) { }
+  RTIinternalError
+) {
+    rtiAmbassadorProxy->synchronizationPointAchieved(label);
+}
 
 // 4.11
 void RTI::RTIambassador::requestFederationSave (
   const char     *label,   // supplied C4
-  const FedTime&  theTime) // supplied C4
-throw (
+  const FedTime&  theTime  // supplied C4
+) throw (
   FederationTimeAlreadyPassed,
   InvalidFederationTime,
   FederateNotExecutionMember,
   ConcurrentAccessAttempted,
   SaveInProgress,
   RestoreInProgress,
-  RTIinternalError) { }
+  RTIinternalError
+) {
+    rtiAmbassadorProxy->requestFederationSave(label, theTime);
+}
 
 void RTI::RTIambassador::requestFederationSave (
-  const char *label)     // supplied C4
-  throw (
-    FederateNotExecutionMember,
-    ConcurrentAccessAttempted,
-    SaveInProgress,
-    RestoreInProgress,
-    RTIinternalError) { }
-
-// 4.13
-void RTI::RTIambassador::federateSaveBegun ()
-throw (
-  SaveNotInitiated,
-  FederateNotExecutionMember,
-  ConcurrentAccessAttempted,
-  RestoreInProgress,
-  RTIinternalError) { }
-
-// 4.14
-void RTI::RTIambassador::federateSaveComplete ()
-throw (
-  SaveNotInitiated,
-  FederateNotExecutionMember,
-  ConcurrentAccessAttempted,
-  RestoreInProgress,
-  RTIinternalError) { }
-
-void RTI::RTIambassador::federateSaveNotComplete ()
-throw (
-  SaveNotInitiated,
-  FederateNotExecutionMember,
-  ConcurrentAccessAttempted,
-  RestoreInProgress,
-  RTIinternalError) { }
-
-// 4.16
-void RTI::RTIambassador::requestFederationRestore (
-  const char *label) // supplied C4
-throw (
+  const char *label     // supplied C4
+) throw (
   FederateNotExecutionMember,
   ConcurrentAccessAttempted,
   SaveInProgress,
   RestoreInProgress,
-  RTIinternalError) { }
+  RTIinternalError
+) {
+    rtiAmbassadorProxy->requestFederationSave(label);
+}
+
+// 4.13
+void RTI::RTIambassador::federateSaveBegun () throw (
+  SaveNotInitiated,
+  FederateNotExecutionMember,
+  ConcurrentAccessAttempted,
+  RestoreInProgress,
+  RTIinternalError
+) {
+    rtiAmbassadorProxy->federateSaveBegun();
+}
+
+// 4.14
+void RTI::RTIambassador::federateSaveComplete () throw (
+  SaveNotInitiated,
+  FederateNotExecutionMember,
+  ConcurrentAccessAttempted,
+  RestoreInProgress,
+  RTIinternalError
+) {
+    rtiAmbassadorProxy->federateSaveComplete();
+}
+
+void RTI::RTIambassador::federateSaveNotComplete () throw (
+  SaveNotInitiated,
+  FederateNotExecutionMember,
+  ConcurrentAccessAttempted,
+  RestoreInProgress,
+  RTIinternalError
+) {
+    rtiAmbassadorProxy->federateSaveNotComplete();
+}
+
+// 4.16
+void RTI::RTIambassador::requestFederationRestore (
+  const char *label // supplied C4
+) throw (
+  FederateNotExecutionMember,
+  ConcurrentAccessAttempted,
+  SaveInProgress,
+  RestoreInProgress,
+  RTIinternalError
+) {
+    rtiAmbassadorProxy->requestFederationRestore(label);
+}
 
 // 4.20
-void RTI::RTIambassador::federateRestoreComplete ()
-  throw (
-    RestoreNotRequested,
-    FederateNotExecutionMember,
-    ConcurrentAccessAttempted,
-    SaveInProgress,
-    RTIinternalError) { }
-
-void RTI::RTIambassador::federateRestoreNotComplete ()
-throw (
+void RTI::RTIambassador::federateRestoreComplete () throw (
   RestoreNotRequested,
   FederateNotExecutionMember,
   ConcurrentAccessAttempted,
   SaveInProgress,
-  RTIinternalError) { }
+  RTIinternalError
+) {
+    rtiAmbassadorProxy->federateRestoreComplete();
+}
+
+void RTI::RTIambassador::federateRestoreNotComplete () throw (
+  RestoreNotRequested,
+  FederateNotExecutionMember,
+  ConcurrentAccessAttempted,
+  SaveInProgress,
+  RTIinternalError
+) { }
 
 /////////////////////////////////////
 // Declaration Management Services //
@@ -195,8 +199,8 @@ throw (
 // 5.2
 void RTI::RTIambassador::publishObjectClass (
         ObjectClassHandle   theClass,      // supplied C1
-  const AttributeHandleSet& attributeList) // supplied C4
-throw (
+  const AttributeHandleSet& attributeList  // supplied C4
+) throw (
   ObjectClassNotDefined,
   AttributeNotDefined,
   OwnershipAcquisitionPending,
@@ -204,12 +208,15 @@ throw (
   ConcurrentAccessAttempted,
   SaveInProgress,
   RestoreInProgress,
-  RTIinternalError) { }
+  RTIinternalError
+) {
+    rtiAmbassadorProxy->publishObjectClass(theClass, attributeList);
+}
 
 // 5.3
 void RTI::RTIambassador::unpublishObjectClass (
-  ObjectClassHandle theClass) // supplied C1
-throw (
+  ObjectClassHandle theClass  // supplied C1
+) throw (
   ObjectClassNotDefined,
   ObjectClassNotPublished,
   OwnershipAcquisitionPending,
@@ -217,92 +224,112 @@ throw (
   ConcurrentAccessAttempted,
   SaveInProgress,
   RestoreInProgress,
-  RTIinternalError) { }
+  RTIinternalError
+) {
+    rtiAmbassadorProxy->unpublishObjectClass(theClass);
+}
 
 // 5.4
 void RTI::RTIambassador::publishInteractionClass (
-  InteractionClassHandle theInteraction) // supplied C1
-throw (
+  InteractionClassHandle theInteraction  // supplied C1
+) throw (
   InteractionClassNotDefined,
   FederateNotExecutionMember,
   ConcurrentAccessAttempted,
   SaveInProgress,
   RestoreInProgress,
-  RTIinternalError) { }
+  RTIinternalError
+) {
+    rtiAmbassadorProxy->publishInteractionClass(theInteraction);
+}
 
 // 5.5
 void RTI::RTIambassador::unpublishInteractionClass (
-  InteractionClassHandle theInteraction) // supplied C1
-throw (
+  InteractionClassHandle theInteraction  // supplied C1
+) throw (
   InteractionClassNotDefined,
   InteractionClassNotPublished,
   FederateNotExecutionMember,
   ConcurrentAccessAttempted,
   SaveInProgress,
   RestoreInProgress,
-  RTIinternalError) { }
+  RTIinternalError
+) {
+    rtiAmbassadorProxy->unpublishInteractionClass(theInteraction);
+}
 
 // 5.6
 void RTI::RTIambassador::subscribeObjectClassAttributes (
-        ObjectClassHandle   theClass,      // supplied C1
-  const AttributeHandleSet& attributeList, // supplied C4
-        Boolean        active)
-throw (
+  ObjectClassHandle theClass,                           // supplied C1
+  const             AttributeHandleSet& attributeList, // supplied C4
+  Boolean           active
+) throw (
   ObjectClassNotDefined,
   AttributeNotDefined,
   FederateNotExecutionMember,
   ConcurrentAccessAttempted,
   SaveInProgress,
   RestoreInProgress,
-  RTIinternalError) { }
+  RTIinternalError
+ ) {
+     rtiAmbassadorProxy->subscribeObjectClassAttributes(theClass, attributeList, active);
+ }
 
 // 5.7
 void RTI::RTIambassador::unsubscribeObjectClass (
-  ObjectClassHandle theClass) // supplied C1
-throw (
+  ObjectClassHandle theClass  // supplied C1
+) throw (
   ObjectClassNotDefined,
   ObjectClassNotSubscribed,
   FederateNotExecutionMember,
   ConcurrentAccessAttempted,
   SaveInProgress,
   RestoreInProgress,
-  RTIinternalError) { }
+  RTIinternalError
+) {
+    rtiAmbassadorProxy->unsubscribeObjectClass(theClass);
+}
 
 // 5.8
 void RTI::RTIambassador::subscribeInteractionClass (
   InteractionClassHandle theClass, // supplied C1
-  Boolean           active)
-throw (
+  Boolean                active
+) throw (
   InteractionClassNotDefined,
   FederateNotExecutionMember,
   ConcurrentAccessAttempted,
   FederateLoggingServiceCalls,
   SaveInProgress,
   RestoreInProgress,
-  RTIinternalError) { }
+  RTIinternalError
+) {
+    rtiAmbassadorProxy->subscribeInteractionClass(theClass, active);
+}
 
 // 5.9
 void RTI::RTIambassador::unsubscribeInteractionClass (
-  InteractionClassHandle theClass) // supplied C1
-throw (
+  InteractionClassHandle theClass  // supplied C1
+) throw (
   InteractionClassNotDefined,
   InteractionClassNotSubscribed,
   FederateNotExecutionMember,
   ConcurrentAccessAttempted,
   SaveInProgress,
   RestoreInProgress,
-  RTIinternalError) { }
+  RTIinternalError
+) {
+    rtiAmbassadorProxy->unsubscribeInteractionClass(theClass);
+}
 
 ////////////////////////////////
 // Object Management Services //
 ////////////////////////////////
 
 // 6.2
-RTI::ObjectHandle                          // returned C3
-RTI::RTIambassador::registerObjectInstance (
-        ObjectClassHandle  theClass,  // supplied C1
-  const char              *theObject) // supplied C4
-throw (
+RTI::ObjectHandle RTI::RTIambassador::registerObjectInstance (  // returned C3
+  ObjectClassHandle   theClass,        // supplied C1
+  const char         *theObject        // supplied C4
+) throw (
   ObjectClassNotDefined,
   ObjectClassNotPublished,
   ObjectAlreadyRegistered,
@@ -310,32 +337,32 @@ throw (
   ConcurrentAccessAttempted,
   SaveInProgress,
   RestoreInProgress,
-  RTIinternalError) {
-    return static_cast<ObjectHandle>(0);
+  RTIinternalError
+) {
+    return rtiAmbassadorProxy->registerObjectInstance(theClass, theObject);
 }
 
-RTI::ObjectHandle                         // returned C3
-RTI::RTIambassador::registerObjectInstance (
-        ObjectClassHandle theClass)  // supplied C1
-throw (
+RTI::ObjectHandle RTI::RTIambassador::registerObjectInstance (  // returned C3
+  ObjectClassHandle theClass           // supplied C1
+) throw (
   ObjectClassNotDefined,
   ObjectClassNotPublished,
   FederateNotExecutionMember,
   ConcurrentAccessAttempted,
   SaveInProgress,
   RestoreInProgress,
-  RTIinternalError) {
-    return static_cast<ObjectHandle>(0);
+  RTIinternalError
+) {
+    return rtiAmbassadorProxy->registerObjectInstance(theClass);
 }
 
 // 6.4
-RTI::EventRetractionHandle                               // returned C3
-RTI::RTIambassador::updateAttributeValues (
-        ObjectHandle                 theObject,     // supplied C1
+RTI::EventRetractionHandle RTI::RTIambassador::updateAttributeValues (       // returned C3
+  ObjectHandle                       theObject,     // supplied C1
   const AttributeHandleValuePairSet& theAttributes, // supplied C4
   const FedTime&                     theTime,       // supplied C4
-  const char                        *theTag)        // supplied C4
-throw (
+  const char                        *theTag         // supplied C4
+) throw (
   ObjectNotKnown,
   AttributeNotDefined,
   AttributeNotOwned,
@@ -344,19 +371,16 @@ throw (
   ConcurrentAccessAttempted,
   SaveInProgress,
   RestoreInProgress,
-  RTIinternalError) {
-
-    EventRetractionHandle eventRetractionHandle;
-    eventRetractionHandle.theSerialNumber = 0;
-    eventRetractionHandle.sendingFederate = 0;
-    return eventRetractionHandle;
+  RTIinternalError
+) {
+    return rtiAmbassadorProxy->updateAttributeValues(theObject, theAttributes, theTime, theTag);
 }
 
 void RTI::RTIambassador::updateAttributeValues (
-        ObjectHandle                 theObject,     // supplied C1
+  ObjectHandle                       theObject,     // supplied C1
   const AttributeHandleValuePairSet& theAttributes, // supplied C4
-  const char                        *theTag)        // supplied C4
-throw (
+  const char                        *theTag         // supplied C4
+) throw (
   ObjectNotKnown,
   AttributeNotDefined,
   AttributeNotOwned,
@@ -364,12 +388,14 @@ throw (
   ConcurrentAccessAttempted,
   SaveInProgress,
   RestoreInProgress,
-  RTIinternalError) { }
+  RTIinternalError
+) {
+    rtiAmbassadorProxy->updateAttributeValues(theObject, theAttributes, theTag);
+}
 
 // 6.6
-RTI::EventRetractionHandle                                // returned C3
-RTI::RTIambassador::sendInteraction (
-        InteractionClassHandle       theInteraction, // supplied C1
+RTI::EventRetractionHandle RTI::RTIambassador::sendInteraction (              // returned C3
+  InteractionClassHandle             theInteraction, // supplied C1
   const ParameterHandleValuePairSet& theParameters,  // supplied C4
   const FedTime&                     theTime,        // supplied C4
   const char                        *theTag)         // supplied C4
@@ -382,19 +408,16 @@ throw (
   ConcurrentAccessAttempted,
   SaveInProgress,
   RestoreInProgress,
-  RTIinternalError) {
-
-    EventRetractionHandle eventRetractionHandle;
-    eventRetractionHandle.theSerialNumber = 0;
-    eventRetractionHandle.sendingFederate = 0;
-    return eventRetractionHandle;
+  RTIinternalError
+) {
+    return rtiAmbassadorProxy->sendInteraction(theInteraction, theParameters, theTime, theTag);
 }
 
 void RTI::RTIambassador::sendInteraction (
         InteractionClassHandle       theInteraction, // supplied C1
   const ParameterHandleValuePairSet& theParameters,  // supplied C4
-  const char                        *theTag)         // supplied C4
-throw (
+  const char                        *theTag          // supplied C4
+) throw (
   InteractionClassNotDefined,
   InteractionClassNotPublished,
   InteractionParameterNotDefined,
@@ -402,15 +425,17 @@ throw (
   ConcurrentAccessAttempted,
   SaveInProgress,
   RestoreInProgress,
-  RTIinternalError) { }
+  RTIinternalError
+) {
+    rtiAmbassadorProxy->sendInteraction(theInteraction, theParameters, theTag);
+}
 
 // 6.8
-RTI::EventRetractionHandle                 // returned C3
-RTI::RTIambassador::deleteObjectInstance (
-        ObjectHandle    theObject,    // supplied C1
-  const FedTime&        theTime,      // supplied C4
-  const char           *theTag)       // supplied C4
-throw (
+RTI::EventRetractionHandle RTI::RTIambassador::deleteObjectInstance ( // returned C3
+  ObjectHandle    theObject,                         // supplied C1
+  const FedTime&  theTime,                           // supplied C4
+  const char      *theTag                            // supplied C4
+) throw (
   ObjectNotKnown,
   DeletePrivilegeNotHeld,
   InvalidFederationTime,
@@ -418,44 +443,47 @@ throw (
   ConcurrentAccessAttempted,
   SaveInProgress,
   RestoreInProgress,
-  RTIinternalError) {
-
-    EventRetractionHandle eventRetractionHandle;
-    eventRetractionHandle.theSerialNumber = 0;
-    eventRetractionHandle.sendingFederate = 0;
-    return eventRetractionHandle;
+  RTIinternalError
+) {
+    return rtiAmbassadorProxy->deleteObjectInstance(theObject, theTime, theTag);
 }
 
 void RTI::RTIambassador::deleteObjectInstance (
         ObjectHandle    theObject,    // supplied C1
-  const char           *theTag)       // supplied C4
-throw (
+  const char           *theTag        // supplied C4
+) throw (
   ObjectNotKnown,
   DeletePrivilegeNotHeld,
   FederateNotExecutionMember,
   ConcurrentAccessAttempted,
   SaveInProgress,
   RestoreInProgress,
-  RTIinternalError) { }
+  RTIinternalError
+) {
+    rtiAmbassadorProxy->deleteObjectInstance(theObject, theTag);
+}
 
 // 6.10
 void RTI::RTIambassador::localDeleteObjectInstance (
-  ObjectHandle    theObject)       // supplied C1
-throw (
+  ObjectHandle    theObject       // supplied C1
+) throw (
   ObjectNotKnown,
   FederateOwnsAttributes,
   FederateNotExecutionMember,
   ConcurrentAccessAttempted,
   SaveInProgress,
   RestoreInProgress,
-  RTIinternalError) { }
+  RTIinternalError
+) {
+    rtiAmbassadorProxy->localDeleteObjectInstance(theObject);
+}
 
 // 6.11
 void RTI::RTIambassador::changeAttributeTransportationType (
         ObjectHandle             theObject,     // supplied C1
   const AttributeHandleSet&      theAttributes, // supplied C4
-        TransportationHandle     theType)       // supplied C1
-throw (
+        TransportationHandle     theType        // supplied C1
+) throw (
   ObjectNotKnown,
   AttributeNotDefined,
   AttributeNotOwned,
@@ -464,13 +492,16 @@ throw (
   ConcurrentAccessAttempted,
   SaveInProgress,
   RestoreInProgress,
-  RTIinternalError) { }
+  RTIinternalError
+) {
+    rtiAmbassadorProxy->changeAttributeTransportationType(theObject, theAttributes, theType);
+}
 
 // 6.12
 void RTI::RTIambassador::changeInteractionTransportationType (
   InteractionClassHandle theClass, // supplied C1
-  TransportationHandle   theType)  // supplied C1
-throw (
+  TransportationHandle   theType   // supplied C1
+) throw (
   InteractionClassNotDefined,
   InteractionClassNotPublished,
   InvalidTransportationHandle,
@@ -478,32 +509,41 @@ throw (
   ConcurrentAccessAttempted,
   SaveInProgress,
   RestoreInProgress,
-  RTIinternalError) { }
+  RTIinternalError
+) {
+    rtiAmbassadorProxy->changeInteractionTransportationType(theClass, theType);
+}
 
 // 6.15
 void RTI::RTIambassador::requestObjectAttributeValueUpdate (
         ObjectHandle        theObject,     // supplied C1
-  const AttributeHandleSet& theAttributes) // supplied C4
-throw (
+  const AttributeHandleSet& theAttributes  // supplied C4
+) throw (
   ObjectNotKnown,
   AttributeNotDefined,
   FederateNotExecutionMember,
   ConcurrentAccessAttempted,
   SaveInProgress,
   RestoreInProgress,
-  RTIinternalError) { }
+  RTIinternalError
+) {
+    rtiAmbassadorProxy->requestObjectAttributeValueUpdate(theObject, theAttributes);
+}
 
 void RTI::RTIambassador::requestClassAttributeValueUpdate (
         ObjectClassHandle   theClass,      // supplied C1
-  const AttributeHandleSet& theAttributes) // supplied C4
-throw (
+  const AttributeHandleSet& theAttributes  // supplied C4
+) throw (
   ObjectClassNotDefined,
   AttributeNotDefined,
   FederateNotExecutionMember,
   ConcurrentAccessAttempted,
   SaveInProgress,
   RestoreInProgress,
-  RTIinternalError) { }
+  RTIinternalError
+) {
+    rtiAmbassadorProxy->requestClassAttributeValueUpdate(theClass, theAttributes);
+}
 
 ///////////////////////////////////
 // Ownership Management Services //
@@ -512,8 +552,8 @@ throw (
 // 7.2
 void RTI::RTIambassador::unconditionalAttributeOwnershipDivestiture (
         ObjectHandle                  theObject,     // supplied C1
-  const AttributeHandleSet&           theAttributes) // supplied C4
-throw (
+  const AttributeHandleSet&           theAttributes  // supplied C4
+) throw (
   ObjectNotKnown,
   AttributeNotDefined,
   AttributeNotOwned,
@@ -521,14 +561,17 @@ throw (
   ConcurrentAccessAttempted,
   SaveInProgress,
   RestoreInProgress,
-  RTIinternalError) { }
+  RTIinternalError
+) {
+    rtiAmbassadorProxy->unconditionalAttributeOwnershipDivestiture(theObject, theAttributes);
+}
 
 // 7.3
 void RTI::RTIambassador::negotiatedAttributeOwnershipDivestiture (
         ObjectHandle                  theObject,     // supplied C1
   const AttributeHandleSet&           theAttributes, // supplied C4
-  const char                         *theTag)        // supplied C4
-throw (
+  const char                         *theTag         // supplied C4
+) throw (
   ObjectNotKnown,
   AttributeNotDefined,
   AttributeNotOwned,
@@ -537,14 +580,17 @@ throw (
   ConcurrentAccessAttempted,
   SaveInProgress,
   RestoreInProgress,
-  RTIinternalError) { }
+  RTIinternalError
+) {
+    rtiAmbassadorProxy->negotiatedAttributeOwnershipDivestiture(theObject, theAttributes, theTag);
+}
 
 // 7.7
 void RTI::RTIambassador::attributeOwnershipAcquisition (
         ObjectHandle        theObject,         // supplied C1
   const AttributeHandleSet& desiredAttributes, // supplied C4
-  const char               *theTag)            // supplied C4
-throw (
+  const char               *theTag             // supplied C4
+) throw (
   ObjectNotKnown,
   ObjectClassNotPublished,
   AttributeNotDefined,
@@ -554,13 +600,16 @@ throw (
   ConcurrentAccessAttempted,
   SaveInProgress,
   RestoreInProgress,
-  RTIinternalError) { }
+  RTIinternalError
+) {
+    rtiAmbassadorProxy->attributeOwnershipAcquisition(theObject, desiredAttributes, theTag);
+}
 
 // 7.8
 void RTI::RTIambassador::attributeOwnershipAcquisitionIfAvailable (
         ObjectHandle        theObject,         // supplied C1
-  const AttributeHandleSet& desiredAttributes) // supplied C4
-throw (
+  const AttributeHandleSet& desiredAttributes  // supplied C4
+) throw (
   ObjectNotKnown,
   ObjectClassNotPublished,
   AttributeNotDefined,
@@ -571,14 +620,16 @@ throw (
   ConcurrentAccessAttempted,
   SaveInProgress,
   RestoreInProgress,
-  RTIinternalError) { }
+  RTIinternalError
+) {
+    rtiAmbassadorProxy->attributeOwnershipAcquisitionIfAvailable(theObject, desiredAttributes);
+}
 
 // 7.11
-RTI::AttributeHandleSet*                        // returned C6
-RTI::RTIambassador::attributeOwnershipReleaseResponse (
-        ObjectHandle        theObject,     // supplied C1
-  const AttributeHandleSet& theAttributes) // supplied C4
-throw (
+RTI::AttributeHandleSet* RTI::RTIambassador::attributeOwnershipReleaseResponse ( // returned C6
+        ObjectHandle        theObject,                          // supplied C1
+  const AttributeHandleSet& theAttributes                       // supplied C4
+) throw (
   ObjectNotKnown,
   AttributeNotDefined,
   AttributeNotOwned,
@@ -587,16 +638,16 @@ throw (
   ConcurrentAccessAttempted,
   SaveInProgress,
   RestoreInProgress,
-  RTIinternalError) {
-
-    return new AttributeHandleSetTest();
+  RTIinternalError
+) {
+    return rtiAmbassadorProxy->attributeOwnershipReleaseResponse(theObject, theAttributes);
 }
 
 // 7.12
 void RTI::RTIambassador::cancelNegotiatedAttributeOwnershipDivestiture (
         ObjectHandle        theObject,     // supplied C1
-  const AttributeHandleSet& theAttributes) // supplied C4
-throw (
+  const AttributeHandleSet& theAttributes  // supplied C4
+) throw (
   ObjectNotKnown,
   AttributeNotDefined,
   AttributeNotOwned,
@@ -605,13 +656,16 @@ throw (
   ConcurrentAccessAttempted,
   SaveInProgress,
   RestoreInProgress,
-  RTIinternalError) { }
+  RTIinternalError
+) {
+    rtiAmbassadorProxy->cancelNegotiatedAttributeOwnershipDivestiture(theObject, theAttributes);
+}
 
 // 7.13
 void RTI::RTIambassador::cancelAttributeOwnershipAcquisition (
         ObjectHandle        theObject,     // supplied C1
-  const AttributeHandleSet& theAttributes) // supplied C4
-throw (
+  const AttributeHandleSet& theAttributes  // supplied C4
+) throw (
   ObjectNotKnown,
   AttributeNotDefined,
   AttributeAlreadyOwned,
@@ -620,36 +674,41 @@ throw (
   ConcurrentAccessAttempted,
   SaveInProgress,
   RestoreInProgress,
-  RTIinternalError) { }
+  RTIinternalError
+) {
+    rtiAmbassadorProxy->cancelAttributeOwnershipAcquisition(theObject, theAttributes);
+}
 
 // 7.15
 void RTI::RTIambassador::queryAttributeOwnership (
   ObjectHandle    theObject,    // supplied C1
-  AttributeHandle theAttribute) // supplied C1
-throw (
+  AttributeHandle theAttribute  // supplied C1
+) throw (
   ObjectNotKnown,
   AttributeNotDefined,
   FederateNotExecutionMember,
   ConcurrentAccessAttempted,
   SaveInProgress,
   RestoreInProgress,
-  RTIinternalError) { }
+  RTIinternalError
+) {
+    rtiAmbassadorProxy->queryAttributeOwnership(theObject, theAttribute);
+}
 
 // 7.17
-RTI::Boolean                          // returned C3
-RTI::RTIambassador::isAttributeOwnedByFederate (
-  ObjectHandle    theObject,     // supplied C1
-  AttributeHandle theAttribute)  // supplied C1
-throw (
+RTI::Boolean RTI::RTIambassador::isAttributeOwnedByFederate ( // returned C3
+  ObjectHandle    theObject,                 // supplied C1
+  AttributeHandle theAttribute               // supplied C1
+) throw (
   ObjectNotKnown,
   AttributeNotDefined,
   FederateNotExecutionMember,
   ConcurrentAccessAttempted,
   SaveInProgress,
   RestoreInProgress,
-  RTIinternalError) {
-
-    return RTI_FALSE;
+  RTIinternalError
+) {
+    return rtiAmbassadorProxy->isAttributeOwnedByFederate(theObject, theAttribute);
 }
 
 //////////////////////////////
@@ -659,8 +718,8 @@ throw (
 // 8.2
 void RTI::RTIambassador::enableTimeRegulation (
   const FedTime& theFederateTime,  // supplied C4
-  const FedTime& theLookahead)     // supplied C4
-throw (
+  const FedTime& theLookahead      // supplied C4
+) throw (
   TimeRegulationAlreadyEnabled,
   EnableTimeRegulationPending,
   TimeAdvanceAlreadyInProgress,
@@ -670,21 +729,25 @@ throw (
   FederateNotExecutionMember,
   SaveInProgress,
   RestoreInProgress,
-  RTIinternalError) { }
+  RTIinternalError
+) {
+    rtiAmbassadorProxy->enableTimeRegulation(theFederateTime, theLookahead);
+}
 
 // 8.4
-void RTI::RTIambassador::disableTimeRegulation ()
-throw (
+void RTI::RTIambassador::disableTimeRegulation () throw (
   TimeRegulationWasNotEnabled,
   ConcurrentAccessAttempted,
   FederateNotExecutionMember,
   SaveInProgress,
   RestoreInProgress,
-  RTIinternalError) { }
+  RTIinternalError
+) {
+    rtiAmbassadorProxy->disableTimeRegulation();
+}
 
 // 8.5
-void RTI::RTIambassador::enableTimeConstrained ()
-throw (
+void RTI::RTIambassador::enableTimeConstrained () throw (
   TimeConstrainedAlreadyEnabled,
   EnableTimeConstrainedPending,
   TimeAdvanceAlreadyInProgress,
@@ -692,22 +755,27 @@ throw (
   ConcurrentAccessAttempted,
   SaveInProgress,
   RestoreInProgress,
-  RTIinternalError) { }
+  RTIinternalError
+) {
+    rtiAmbassadorProxy->enableTimeConstrained();
+}
 
 // 8.7
-void RTI::RTIambassador::disableTimeConstrained ()
-throw (
+void RTI::RTIambassador::disableTimeConstrained () throw (
   TimeConstrainedWasNotEnabled,
   FederateNotExecutionMember,
   ConcurrentAccessAttempted,
   SaveInProgress,
   RestoreInProgress,
-  RTIinternalError) { }
+  RTIinternalError
+) {
+    rtiAmbassadorProxy->disableTimeConstrained();
+}
 
 // 8.8
 void RTI::RTIambassador::timeAdvanceRequest (
- const  FedTime& theTime) // supplied C4
-throw (
+ const  FedTime& theTime  // supplied C4
+) throw (
   InvalidFederationTime,
   FederationTimeAlreadyPassed,
   TimeAdvanceAlreadyInProgress,
@@ -717,27 +785,33 @@ throw (
   ConcurrentAccessAttempted,
   SaveInProgress,
   RestoreInProgress,
-  RTIinternalError) { }
+  RTIinternalError
+) {
+    rtiAmbassadorProxy->timeAdvanceRequest(theTime);
+}
 
 // 8.9
 void RTI::RTIambassador::timeAdvanceRequestAvailable (
-const FedTime& theTime) // supplied C4
-  throw (
-    InvalidFederationTime,
-    FederationTimeAlreadyPassed,
-    TimeAdvanceAlreadyInProgress,
-    EnableTimeRegulationPending,
-    EnableTimeConstrainedPending,
-    FederateNotExecutionMember,
-    ConcurrentAccessAttempted,
-    SaveInProgress,
-    RestoreInProgress,
-    RTIinternalError) { }
+  const FedTime& theTime  // supplied C4
+) throw (
+  InvalidFederationTime,
+  FederationTimeAlreadyPassed,
+  TimeAdvanceAlreadyInProgress,
+  EnableTimeRegulationPending,
+  EnableTimeConstrainedPending,
+  FederateNotExecutionMember,
+  ConcurrentAccessAttempted,
+  SaveInProgress,
+  RestoreInProgress,
+  RTIinternalError
+) {
+    rtiAmbassadorProxy->timeAdvanceRequestAvailable(theTime);
+}
 
 // 8.10
 void RTI::RTIambassador::nextEventRequest (
-  const FedTime& theTime) // supplied C4
-throw (
+  const FedTime& theTime  // supplied C4
+) throw (
   InvalidFederationTime,
   FederationTimeAlreadyPassed,
   TimeAdvanceAlreadyInProgress,
@@ -747,12 +821,15 @@ throw (
   ConcurrentAccessAttempted,
   SaveInProgress,
   RestoreInProgress,
-  RTIinternalError) { }
+  RTIinternalError
+) {
+    rtiAmbassadorProxy->nextEventRequest(theTime);
+}
 
 // 8.11
 void RTI::RTIambassador::nextEventRequestAvailable (
-  const FedTime& theTime) // supplied C4
-throw (
+  const FedTime& theTime  // supplied C4
+) throw (
   InvalidFederationTime,
   FederationTimeAlreadyPassed,
   TimeAdvanceAlreadyInProgress,
@@ -762,12 +839,15 @@ throw (
   ConcurrentAccessAttempted,
   SaveInProgress,
   RestoreInProgress,
-  RTIinternalError) { }
+  RTIinternalError
+) {
+    rtiAmbassadorProxy->nextEventRequestAvailable(theTime);
+}
 
 // 8.12
 void RTI::RTIambassador::flushQueueRequest (
-  const FedTime& theTime) // supplied C4
-throw (
+  const FedTime& theTime  // supplied C4
+) throw (
   InvalidFederationTime,
   FederationTimeAlreadyPassed,
   TimeAdvanceAlreadyInProgress,
@@ -777,96 +857,121 @@ throw (
   ConcurrentAccessAttempted,
   SaveInProgress,
   RestoreInProgress,
-  RTIinternalError) { }
+  RTIinternalError
+) {
+    rtiAmbassadorProxy->flushQueueRequest(theTime);
+}
 
 // 8.14
-void RTI::RTIambassador::enableAsynchronousDelivery()
-  throw (
-    AsynchronousDeliveryAlreadyEnabled,
-    FederateNotExecutionMember,
-    ConcurrentAccessAttempted,
-    SaveInProgress,
-    RestoreInProgress,
-    RTIinternalError) { }
+void RTI::RTIambassador::enableAsynchronousDelivery() throw (
+  AsynchronousDeliveryAlreadyEnabled,
+  FederateNotExecutionMember,
+  ConcurrentAccessAttempted,
+  SaveInProgress,
+  RestoreInProgress,
+  RTIinternalError
+) {
+    rtiAmbassadorProxy->enableAsynchronousDelivery();
+}
 
 // 8.15
-void RTI::RTIambassador::disableAsynchronousDelivery()
-  throw (
-    AsynchronousDeliveryAlreadyDisabled,
-    FederateNotExecutionMember,
-    ConcurrentAccessAttempted,
-    SaveInProgress,
-    RestoreInProgress,
-    RTIinternalError) { }
+void RTI::RTIambassador::disableAsynchronousDelivery() throw (
+  AsynchronousDeliveryAlreadyDisabled,
+  FederateNotExecutionMember,
+  ConcurrentAccessAttempted,
+  SaveInProgress,
+  RestoreInProgress,
+  RTIinternalError
+) {
+    rtiAmbassadorProxy->disableAsynchronousDelivery();
+}
 
 // 8.16
 void RTI::RTIambassador::queryLBTS (
-  FedTime& theTime) // returned C5
-throw (
+  FedTime& theTime  // returned C5
+) throw (
   FederateNotExecutionMember,
   ConcurrentAccessAttempted,
   SaveInProgress,
   RestoreInProgress,
-  RTIinternalError) { }
+  RTIinternalError
+) {
+    rtiAmbassadorProxy->queryLBTS(theTime);
+}
 
 // 8.17
 void RTI::RTIambassador::queryFederateTime (
-  FedTime& theTime) // returned C5
-throw (
+  FedTime& theTime  // returned C5
+) throw (
   FederateNotExecutionMember,
   ConcurrentAccessAttempted,
   SaveInProgress,
   RestoreInProgress,
-  RTIinternalError) { }
+  RTIinternalError
+) {
+    rtiAmbassadorProxy->queryFederateTime(theTime);
+}
 
 // 8.18
 void RTI::RTIambassador::queryMinNextEventTime (
-  FedTime& theTime) // returned C5
-throw (
+  FedTime& theTime  // returned C5
+) throw (
   FederateNotExecutionMember,
   ConcurrentAccessAttempted,
   SaveInProgress,
   RestoreInProgress,
-  RTIinternalError) { }
+  RTIinternalError
+) {
+    rtiAmbassadorProxy->queryMinNextEventTime(theTime);
+}
 
 // 8.19
 void RTI::RTIambassador::modifyLookahead (
-  const FedTime& theLookahead) // supplied C4
-throw (
+  const FedTime& theLookahead  // supplied C4
+) throw (
   InvalidLookahead,
   FederateNotExecutionMember,
   ConcurrentAccessAttempted,
   SaveInProgress,
   RestoreInProgress,
-  RTIinternalError) { }
+  RTIinternalError
+) {
+    rtiAmbassadorProxy->modifyLookahead(theLookahead);
+}
 
 // 8.20
 void RTI::RTIambassador::queryLookahead (
-   FedTime& theTime) // returned C5
-throw (
+   FedTime& theTime  // returned C5
+) throw (
   FederateNotExecutionMember,
   ConcurrentAccessAttempted,
   SaveInProgress,
   RestoreInProgress,
-  RTIinternalError) { }
+  RTIinternalError
+) {
+    rtiAmbassadorProxy->queryLookahead(theTime);
+}
 
 // 8.21
 void RTI::RTIambassador::retract (
-  EventRetractionHandle theHandle) // supplied C1
-throw (
+  EventRetractionHandle theHandle  // supplied C1
+) throw (
   InvalidRetractionHandle,
   FederateNotExecutionMember,
   ConcurrentAccessAttempted,
   SaveInProgress,
   RestoreInProgress,
-  RTIinternalError) { }
+  RTIinternalError
+) {
+    rtiAmbassadorProxy->retract(theHandle);
+}
 
 // 8.23
 void RTI::RTIambassador::changeAttributeOrderType (
         ObjectHandle        theObject,     // supplied C1
   const AttributeHandleSet& theAttributes, // supplied C4
-        OrderingHandle      theType)       // supplied C1
-throw (
+        OrderingHandle      theType        // supplied C1
+) throw (
   ObjectNotKnown,
   AttributeNotDefined,
   AttributeNotOwned,
@@ -875,13 +980,16 @@ throw (
   ConcurrentAccessAttempted,
   SaveInProgress,
   RestoreInProgress,
-  RTIinternalError) { }
+  RTIinternalError
+) {
+    rtiAmbassadorProxy->changeAttributeOrderType(theObject, theAttributes, theType);
+}
 
 // 8.24
 void RTI::RTIambassador::changeInteractionOrderType (
   InteractionClassHandle theClass, // supplied C1
-  OrderingHandle         theType)  // supplied C1
-throw (
+  OrderingHandle         theType   // supplied C1
+) throw (
   InteractionClassNotDefined,
   InteractionClassNotPublished,
   InvalidOrderingHandle,
@@ -889,63 +997,70 @@ throw (
   ConcurrentAccessAttempted,
   SaveInProgress,
   RestoreInProgress,
-  RTIinternalError) { }
+  RTIinternalError
+) {
+    rtiAmbassadorProxy->changeInteractionOrderType(theClass, theType);
+}
 
 //////////////////////////////////
 // Data Distribution Management //
 //////////////////////////////////
 
 // 9.2
-RTI::Region*                           // returned C6
-RTI::RTIambassador::createRegion (
+RTI::Region *RTI::RTIambassador::createRegion (    // returned C6
   SpaceHandle theSpace,           // supplied C1
-  ULong       numberOfExtents)    // supplied C1
-throw (
+  ULong       numberOfExtents     // supplied C1
+) throw (
   SpaceNotDefined,
   InvalidExtents,
   FederateNotExecutionMember,
   ConcurrentAccessAttempted,
   SaveInProgress,
   RestoreInProgress,
-  RTIinternalError) {
-
-    return nullptr;
+  RTIinternalError
+) {
+    return rtiAmbassadorProxy->createRegion(theSpace, numberOfExtents);
 }
 
 
 // 9.3
 void RTI::RTIambassador::notifyAboutRegionModification (
-  Region &theRegion)  // supplied C4
-throw (
+  Region &theRegion   // supplied C4
+) throw (
   RegionNotKnown,
   InvalidExtents,
   FederateNotExecutionMember,
   ConcurrentAccessAttempted,
   SaveInProgress,
   RestoreInProgress,
-  RTIinternalError) { }
+  RTIinternalError
+) {
+    rtiAmbassadorProxy->notifyAboutRegionModification(theRegion);
+}
 
 // 9.4
 void RTI::RTIambassador::deleteRegion (
-  Region *theRegion) // supplied C1
-throw (
+  Region *theRegion  // supplied C1
+) throw (
   RegionNotKnown,
   RegionInUse,
   FederateNotExecutionMember,
   ConcurrentAccessAttempted,
   SaveInProgress,
   RestoreInProgress,
-  RTIinternalError) { }
+  RTIinternalError
+) {
+    rtiAmbassadorProxy->deleteRegion(theRegion);
+}
 
 // 9.5
-RTI::ObjectHandle                                  // returned C3
-RTI::RTIambassador::registerObjectInstanceWithRegion (
+RTI::ObjectHandle RTI::RTIambassador::registerObjectInstanceWithRegion (  // returned C3
         ObjectClassHandle theClass,           // supplied C1
   const char             *theObject,          // supplied C4
         AttributeHandle   theAttributes[],    // supplied C4
         Region           *theRegions[],       // supplied C4
-        ULong             theNumberOfHandles) // supplied C1
-throw (
+        ULong             theNumberOfHandles  // supplied C1
+) throw (
   ObjectClassNotDefined,
   ObjectClassNotPublished,
   AttributeNotDefined,
@@ -957,17 +1072,19 @@ throw (
   ConcurrentAccessAttempted,
   SaveInProgress,
   RestoreInProgress,
-  RTIinternalError) {
-    return static_cast<ObjectHandle>(0);
+  RTIinternalError
+) {
+    return rtiAmbassadorProxy->registerObjectInstanceWithRegion(
+      theClass, theObject, theAttributes, theRegions, theNumberOfHandles
+    );
 }
 
-RTI::ObjectHandle                              // returned C3
-RTI::RTIambassador::registerObjectInstanceWithRegion (
+RTI::ObjectHandle RTI::RTIambassador::registerObjectInstanceWithRegion (  // returned C3
   ObjectClassHandle theClass,             // supplied C1
   AttributeHandle   theAttributes[],      // supplied C4
   Region           *theRegions[],         // supplied C4
-  ULong             theNumberOfHandles)   // supplied C1
-throw (
+  ULong             theNumberOfHandles    // supplied C1
+) throw (
   ObjectClassNotDefined,
   ObjectClassNotPublished,
   AttributeNotDefined,
@@ -978,16 +1095,17 @@ throw (
   ConcurrentAccessAttempted,
   SaveInProgress,
   RestoreInProgress,
-  RTIinternalError) {
-    return static_cast<ObjectHandle>(0);
+  RTIinternalError
+) {
+    return rtiAmbassadorProxy->registerObjectInstanceWithRegion(theClass, theAttributes, theRegions, theNumberOfHandles);
 }
 
 // 9.6
 void RTI::RTIambassador::associateRegionForUpdates (
         Region             &theRegion,     // supplied C4
         ObjectHandle        theObject,     // supplied C1
-  const AttributeHandleSet &theAttributes) // supplied C4
-throw (
+  const AttributeHandleSet &theAttributes  // supplied C4
+) throw (
   ObjectNotKnown,
   AttributeNotDefined,
   InvalidRegionContext,
@@ -996,13 +1114,16 @@ throw (
   ConcurrentAccessAttempted,
   SaveInProgress,
   RestoreInProgress,
-  RTIinternalError) { }
+  RTIinternalError
+) {
+    rtiAmbassadorProxy->associateRegionForUpdates(theRegion, theObject, theAttributes);
+}
 
 // 9.7
 void RTI::RTIambassador::unassociateRegionForUpdates (
   Region       &theRegion,     // supplied C4
-  ObjectHandle  theObject)     // supplied C1
-throw (
+  ObjectHandle  theObject      // supplied C1
+) throw (
   ObjectNotKnown,
   InvalidRegionContext,
   RegionNotKnown,
@@ -1010,15 +1131,18 @@ throw (
   ConcurrentAccessAttempted,
   SaveInProgress,
   RestoreInProgress,
-  RTIinternalError) { }
+  RTIinternalError
+) {
+    rtiAmbassadorProxy->unassociateRegionForUpdates(theRegion, theObject);
+}
 
 // 9.8
 void RTI::RTIambassador::subscribeObjectClassAttributesWithRegion (
         ObjectClassHandle   theClass,      // supplied C1
         Region             &theRegion,     // supplied C4
   const AttributeHandleSet &attributeList, // supplied C4
-        Boolean        active)
-throw (
+        Boolean        active
+) throw (
   ObjectClassNotDefined,
   AttributeNotDefined,
   RegionNotKnown,
@@ -1027,13 +1151,16 @@ throw (
   ConcurrentAccessAttempted,
   SaveInProgress,
   RestoreInProgress,
-  RTIinternalError) { }
+  RTIinternalError
+) {
+    rtiAmbassadorProxy->subscribeObjectClassAttributesWithRegion(theClass, theRegion, attributeList, active);
+}
 
 // 9.9
 void RTI::RTIambassador::unsubscribeObjectClassWithRegion (
   ObjectClassHandle theClass,          // supplied C1
-  Region           &theRegion)         // supplied C4
-throw (
+  Region           &theRegion          // supplied C4
+) throw (
   ObjectClassNotDefined,
   RegionNotKnown,
   ObjectClassNotSubscribed,
@@ -1041,14 +1168,17 @@ throw (
   ConcurrentAccessAttempted,
   SaveInProgress,
   RestoreInProgress,
-  RTIinternalError) { }
+  RTIinternalError
+) {
+    rtiAmbassadorProxy->unsubscribeObjectClassWithRegion(theClass, theRegion);
+}
 
 // 9.10
 void RTI::RTIambassador::subscribeInteractionClassWithRegion (
   InteractionClassHandle theClass,        // supplied C1
   Region                &theRegion,       // supplied C4
-  Boolean           active)
-throw (
+  Boolean           active
+) throw (
   InteractionClassNotDefined,
   RegionNotKnown,
   InvalidRegionContext,
@@ -1057,13 +1187,16 @@ throw (
   ConcurrentAccessAttempted,
   SaveInProgress,
   RestoreInProgress,
-  RTIinternalError) { }
+  RTIinternalError
+) {
+    rtiAmbassadorProxy->subscribeInteractionClassWithRegion(theClass, theRegion, active);
+}
 
 // 9.11
 void RTI::RTIambassador::unsubscribeInteractionClassWithRegion (
   InteractionClassHandle theClass,  // supplied C1
-  Region                &theRegion) // supplied C4
-throw (
+  Region                &theRegion  // supplied C4
+) throw (
   InteractionClassNotDefined,
   InteractionClassNotSubscribed,
   RegionNotKnown,
@@ -1071,17 +1204,19 @@ throw (
   ConcurrentAccessAttempted,
   SaveInProgress,
   RestoreInProgress,
-  RTIinternalError) { }
+  RTIinternalError
+) {
+    rtiAmbassadorProxy->unsubscribeInteractionClassWithRegion(theClass, theRegion);
+}
 
 // 9.12
-RTI::EventRetractionHandle                                // returned C3
-RTI::RTIambassador::sendInteractionWithRegion (
+RTI::EventRetractionHandle RTI::RTIambassador::sendInteractionWithRegion (  // returned C3
         InteractionClassHandle       theInteraction, // supplied C1
   const ParameterHandleValuePairSet &theParameters,  // supplied C4
   const FedTime&                     theTime,        // supplied C4
   const char                        *theTag,         // supplied C4
-  const Region                      &theRegion)      // supplied C4
-throw (
+  const Region                      &theRegion       // supplied C4
+) throw (
   InteractionClassNotDefined,
   InteractionClassNotPublished,
   InteractionParameterNotDefined,
@@ -1092,20 +1227,17 @@ throw (
   ConcurrentAccessAttempted,
   SaveInProgress,
   RestoreInProgress,
-  RTIinternalError) {
-
-      EventRetractionHandle eventRetractionHandle;
-      eventRetractionHandle.theSerialNumber = 0;
-      eventRetractionHandle.sendingFederate = 0;
-      return eventRetractionHandle;
+  RTIinternalError
+) {
+    return rtiAmbassadorProxy->sendInteractionWithRegion(theInteraction, theParameters, theTime, theTag, theRegion);
 }
 
 void RTI::RTIambassador::sendInteractionWithRegion (
   InteractionClassHandle       theInteraction, // supplied C1
   const ParameterHandleValuePairSet &theParameters,  // supplied C4
   const char                        *theTag,         // supplied C4
-  const Region                      &theRegion)      // supplied C4
-throw (
+  const Region                      &theRegion       // supplied C4
+) throw (
   InteractionClassNotDefined,
   InteractionClassNotPublished,
   InteractionParameterNotDefined,
@@ -1115,14 +1247,17 @@ throw (
   ConcurrentAccessAttempted,
   SaveInProgress,
   RestoreInProgress,
-  RTIinternalError) { }
+  RTIinternalError
+) {
+    rtiAmbassadorProxy->sendInteractionWithRegion(theInteraction, theParameters, theTag, theRegion);
+}
 
 // 9.13
 void RTI::RTIambassador::requestClassAttributeValueUpdateWithRegion (
         ObjectClassHandle   theClass,      // supplied C1
   const AttributeHandleSet &theAttributes, // supplied C4
-  const Region             &theRegion)     // supplied C4
-throw (
+  const Region             &theRegion      // supplied C4
+) throw (
   ObjectClassNotDefined,
   AttributeNotDefined,
   RegionNotKnown,
@@ -1130,488 +1265,428 @@ throw (
   ConcurrentAccessAttempted,
   SaveInProgress,
   RestoreInProgress,
-  RTIinternalError) { }
+  RTIinternalError
+) {
+    rtiAmbassadorProxy->requestClassAttributeValueUpdateWithRegion(theClass, theAttributes, theRegion);
+}
 
 //////////////////////////
 // RTI Support Services //
 //////////////////////////
 
 // 10.2
-RTI::ObjectClassHandle      // returned C3
-RTI::RTIambassador::getObjectClassHandle (
-  const char *theName) // supplied C4
-throw (
+RTI::ObjectClassHandle RTI::RTIambassador::getObjectClassHandle (  // returned C3
+  const char *theName  // supplied C4
+) throw (
   NameNotFound,
   FederateNotExecutionMember,
   ConcurrentAccessAttempted,
-  RTIinternalError) {
-
-    return static_cast<ObjectClassHandle>(0);
+  RTIinternalError
+) {
+    return rtiAmbassadorProxy->getObjectClassHandle(theName);
 }
 
 // 10.3
-char *                         // returned C6
-RTI::RTIambassador::getObjectClassName (
-  ObjectClassHandle theHandle) // supplied C1
-throw (
+char *RTI::RTIambassador::getObjectClassName (     // returned C6
+  ObjectClassHandle theHandle  // supplied C1
+) throw (
   ObjectClassNotDefined,
   FederateNotExecutionMember,
   ConcurrentAccessAttempted,
-  RTIinternalError) {
-
-    return nullptr;
+  RTIinternalError
+) {
+    return rtiAmbassadorProxy->getObjectClassName(theHandle);
 }
 
 // 10.4
-RTI::AttributeHandle                       // returned C3
-RTI::RTIambassador::getAttributeHandle (
+RTI::AttributeHandle RTI::RTIambassador::getAttributeHandle (  // returned C3
   const char             *theName,    // supplied C4
-        ObjectClassHandle whichClass) // supplied C1
-throw (
+        ObjectClassHandle whichClass  // supplied C1
+) throw (
   ObjectClassNotDefined,
   NameNotFound,
   FederateNotExecutionMember,
   ConcurrentAccessAttempted,
-  RTIinternalError) {
-
-    return static_cast<AttributeHandle>(0);
+  RTIinternalError
+) {
+    return rtiAmbassadorProxy->getAttributeHandle(theName, whichClass);
 }
 
 // 10.5
-char *                          // returned C6
-RTI::RTIambassador::getAttributeName (
+char *RTI::RTIambassador::getAttributeName (  // returned C6
   AttributeHandle   theHandle,  // supplied C1
-  ObjectClassHandle whichClass) // supplied C1
-throw (
+  ObjectClassHandle whichClass  // supplied C1
+) throw (
   ObjectClassNotDefined,
   AttributeNotDefined,
   FederateNotExecutionMember,
   ConcurrentAccessAttempted,
-  RTIinternalError) {
-
-    return nullptr;
+  RTIinternalError
+) {
+    return rtiAmbassadorProxy->getAttributeName(theHandle, whichClass);
 }
-
-const ClassNameToHandleMap &get_class_name_handle_map_aux() {
-    static ClassNameToHandleMap classNameToHandleMap;
-
-    int handleValue = 0;
-
-    classNameToHandleMap["InteractionRoot"] =
-      static_cast<RTI::InteractionClassHandle>(handleValue++);
-
-    classNameToHandleMap["InteractionRoot.C2WInteractionRoot"] =
-      static_cast<RTI::InteractionClassHandle>(handleValue++);
-
-    classNameToHandleMap["InteractionRoot.C2WInteractionRoot.ActionBase"] =
-      static_cast<RTI::InteractionClassHandle>(handleValue++);
-
-    classNameToHandleMap["InteractionRoot.C2WInteractionRoot.FederateJoinInteraction"] =
-      static_cast<RTI::InteractionClassHandle>(handleValue++);
-
-    classNameToHandleMap["InteractionRoot.C2WInteractionRoot.FederateResignInteraction"] =
-      static_cast<RTI::InteractionClassHandle>(handleValue++);
-
-    classNameToHandleMap["InteractionRoot.C2WInteractionRoot.OutcomeBase"] =
-      static_cast<RTI::InteractionClassHandle>(handleValue++);
-
-    classNameToHandleMap["InteractionRoot.C2WInteractionRoot.SimLog"] =
-      static_cast<RTI::InteractionClassHandle>(handleValue++);
-
-    classNameToHandleMap["InteractionRoot.C2WInteractionRoot.SimLog.HighPrio"] =
-      static_cast<RTI::InteractionClassHandle>(handleValue++);
-
-    classNameToHandleMap["InteractionRoot.C2WInteractionRoot.SimLog.HighPrio"] =
-      static_cast<RTI::InteractionClassHandle>(handleValue++);
-
-    classNameToHandleMap["InteractionRoot.C2WInteractionRoot.SimLog.LowPrio"] =
-      static_cast<RTI::InteractionClassHandle>(handleValue++);
-
-    classNameToHandleMap["InteractionRoot.C2WInteractionRoot.SimLog.MediumPrio"] =
-      static_cast<RTI::InteractionClassHandle>(handleValue++);
-
-    classNameToHandleMap["InteractionRoot.C2WInteractionRoot.SimLog.VeryLowPrio"] =
-      static_cast<RTI::InteractionClassHandle>(handleValue++);
-
-    classNameToHandleMap["InteractionRoot.C2WInteractionRoot.SimulationControl"] =
-      static_cast<RTI::InteractionClassHandle>(handleValue++);
-
-    classNameToHandleMap["InteractionRoot.C2WInteractionRoot.SimulationControl.SimEnd"] =
-      static_cast<RTI::InteractionClassHandle>(handleValue++);
-
-    classNameToHandleMap["InteractionRoot.C2WInteractionRoot.SimulationControl.SimPause"] =
-      static_cast<RTI::InteractionClassHandle>(handleValue++);
-
-    classNameToHandleMap["InteractionRoot.C2WInteractionRoot.SimulationControl.SimResume"] =
-      static_cast<RTI::InteractionClassHandle>(handleValue++);
-
-    return classNameToHandleMap;
-}
-
-const ClassNameToHandleMap &get_class_name_handle_map() {
-    static const ClassNameToHandleMap &classNameToHandleMap = get_class_name_handle_map_aux();
-    return classNameToHandleMap;
-}
-
 
 // 10.6
-RTI::InteractionClassHandle      // returned C3
-RTI::RTIambassador::getInteractionClassHandle (const char *theName)
-  throw (NameNotFound, FederateNotExecutionMember, ConcurrentAccessAttempted, RTIinternalError) {
-
-    ClassNameToHandleMap::const_iterator chmCit = get_class_name_handle_map().find(theName);
-    return chmCit == get_class_name_handle_map().end() ?
-      std::numeric_limits<RTI::InteractionClassHandle>::max() : chmCit->second;
+RTI::InteractionClassHandle RTI::RTIambassador::getInteractionClassHandle ( // returned C3
+  const char *theName      // supplied C4
+) throw (
+  NameNotFound,
+  FederateNotExecutionMember,
+  ConcurrentAccessAttempted,
+  RTIinternalError
+) {
+    return rtiAmbassadorProxy->getInteractionClassHandle(theName);
 }
 
 // 10.7
-char *                              // returned C6
-RTI::RTIambassador::getInteractionClassName (
-  InteractionClassHandle theHandle) // supplied C1
-throw (
+char * RTI::RTIambassador::getInteractionClassName (  // returned C6
+  InteractionClassHandle theHandle        // supplied C1
+) throw (
   InteractionClassNotDefined,
   FederateNotExecutionMember,
   ConcurrentAccessAttempted,
-  RTIinternalError) {
-
-    return nullptr;
+  RTIinternalError
+) {
+    return rtiAmbassadorProxy->getInteractionClassName(theHandle);
 }
 
 // 10.8
-RTI::ParameterHandle                            // returned C3
-RTI::RTIambassador::getParameterHandle (
+RTI::ParameterHandle RTI::RTIambassador::getParameterHandle (  // returned C3
   const char *theName,                     // supplied C4
-        InteractionClassHandle whichClass) // supplied C1
-throw (
+        InteractionClassHandle whichClass  // supplied C1
+) throw (
   InteractionClassNotDefined,
   NameNotFound,
   FederateNotExecutionMember,
   ConcurrentAccessAttempted,
-  RTIinternalError) {
-
-    return static_cast<ParameterHandle>(0);
+  RTIinternalError
+) {
+    return rtiAmbassadorProxy->getParameterHandle(theName, whichClass);
 }
 
 // 10.9
-char *                               // returned C6
-RTI::RTIambassador::getParameterName (
+char *RTI::RTIambassador::getParameterName (     // returned C6
   ParameterHandle        theHandle,  // supplied C1
-  InteractionClassHandle whichClass) // supplied C1
-throw (
+  InteractionClassHandle whichClass  // supplied C1
+) throw (
   InteractionClassNotDefined,
   InteractionParameterNotDefined,
   FederateNotExecutionMember,
   ConcurrentAccessAttempted,
-  RTIinternalError) {
-
-    return nullptr;
+  RTIinternalError
+) {
+    return rtiAmbassadorProxy->getParameterName(theHandle, whichClass);
 }
 
 // 10.10
-RTI::ObjectHandle                 // returned C3
-RTI::RTIambassador::getObjectInstanceHandle (
-  const char *theName)       // supplied C4
-throw (
+RTI::ObjectHandle RTI::RTIambassador::getObjectInstanceHandle (  // returned C3
+  const char *theName        // supplied C4
+) throw (
   ObjectNotKnown,
   FederateNotExecutionMember,
   ConcurrentAccessAttempted,
-  RTIinternalError) {
-
-    return static_cast<ObjectHandle>(0);
+  RTIinternalError
+) {
+    return rtiAmbassadorProxy->getObjectInstanceHandle(theName);
 }
 
 // 10.11
-char *                     // returned C6
-RTI::RTIambassador::getObjectInstanceName (
-  ObjectHandle theHandle)  // supplied C1
-throw (
+char *RTI::RTIambassador::getObjectInstanceName (  // returned C6
+  ObjectHandle theHandle   // supplied C1
+) throw (
   ObjectNotKnown,
   FederateNotExecutionMember,
   ConcurrentAccessAttempted,
-  RTIinternalError) {
-
-    return nullptr;
+  RTIinternalError
+) {
+    return rtiAmbassadorProxy->getObjectInstanceName(theHandle);
 }
 
 // 10.12
-RTI::SpaceHandle                // returned C3
-RTI::RTIambassador::getRoutingSpaceHandle (
-  const char *theName)     // supplied C4
-throw (
+RTI::SpaceHandle RTI::RTIambassador::getRoutingSpaceHandle (  // returned C3
+  const char *theName      // supplied C4
+) throw (
   NameNotFound,
   FederateNotExecutionMember,
   ConcurrentAccessAttempted,
-  RTIinternalError) {
-
-    return static_cast<SpaceHandle>(0);
+  RTIinternalError
+) {
+    return rtiAmbassadorProxy->getRoutingSpaceHandle(theName);
 }
 
 // 10.13
-char *                         // returned C6
-RTI::RTIambassador::getRoutingSpaceName (
+char *RTI::RTIambassador::getRoutingSpaceName (  // returned C6
    //
    // This const was removed for the RTI 1.3 NG to work around a limitation of
    // the Sun 4.2 C++ compiler regarding template instantiation.  The const
    // is unnecessary.
    //
-   /* const */ SpaceHandle theHandle) // supplied C4
-throw (
+   /* const */ SpaceHandle theHandle  // supplied C4
+) throw (
   SpaceNotDefined,
   FederateNotExecutionMember,
   ConcurrentAccessAttempted,
-  RTIinternalError) {
-
-    return nullptr;
+  RTIinternalError
+) {
+    return rtiAmbassadorProxy->getRoutingSpaceName(theHandle);
 }
 
 // 10.14
-RTI::DimensionHandle                   // returned C3
-RTI::RTIambassador::getDimensionHandle (
+RTI::DimensionHandle RTI::RTIambassador::getDimensionHandle (  // returned C3
   const char         *theName,    // supplied C4
-        SpaceHandle   whichSpace) // supplied C1
-throw (
+        SpaceHandle   whichSpace  // supplied C1
+) throw (
   SpaceNotDefined,
   NameNotFound,
   FederateNotExecutionMember,
   ConcurrentAccessAttempted,
-  RTIinternalError) {
-
-    return static_cast<DimensionHandle>(0);
+  RTIinternalError
+) {
+    return rtiAmbassadorProxy->getDimensionHandle(theName, whichSpace);
 }
 
 // 10.15
-char *                        // returned C6
-RTI::RTIambassador::getDimensionName (
+char *RTI::RTIambassador::getDimensionName (  // returned C6
   DimensionHandle theHandle,  // supplied C1
-  SpaceHandle     whichSpace) // supplied C1
-throw (
+  SpaceHandle     whichSpace  // supplied C1
+) throw (
   SpaceNotDefined,
   DimensionNotDefined,
   FederateNotExecutionMember,
   ConcurrentAccessAttempted,
-  RTIinternalError) {
-
-    return nullptr;
+  RTIinternalError
+) {
+    return rtiAmbassadorProxy->getDimensionName(theHandle, whichSpace);
 }
 
 // 10.16
-RTI::SpaceHandle                      // returned C3
-RTI::RTIambassador::getAttributeRoutingSpaceHandle (
+RTI::SpaceHandle RTI::RTIambassador::getAttributeRoutingSpaceHandle (  // returned C3
   AttributeHandle   theHandle,   // supplied C1
-  ObjectClassHandle whichClass)  // supplied C1
-throw (
+  ObjectClassHandle whichClass   // supplied C1
+) throw (
   ObjectClassNotDefined,
   AttributeNotDefined,
   FederateNotExecutionMember,
   ConcurrentAccessAttempted,
-  RTIinternalError) {
-
-    return static_cast<SpaceHandle>(0);
+  RTIinternalError
+) {
+    return rtiAmbassadorProxy->getAttributeRoutingSpaceHandle(theHandle, whichClass);
 }
 
 // 10.17
-RTI::ObjectClassHandle            // returned C3
-RTI::RTIambassador::getObjectClass (
-  ObjectHandle theObject)    // supplied C1
-throw (
+RTI::ObjectClassHandle RTI::RTIambassador::getObjectClass (  // returned C3
+  ObjectHandle theObject     // supplied C1
+) throw (
   ObjectNotKnown,
   FederateNotExecutionMember,
   ConcurrentAccessAttempted,
-  RTIinternalError) {
-
-    return static_cast<ObjectClassHandle>(0);
+  RTIinternalError
+) {
+    return rtiAmbassadorProxy->getObjectClass(theObject);
 }
 
 // 10.18
-RTI::SpaceHandle                             // returned C3
-RTI::RTIambassador::getInteractionRoutingSpaceHandle (
-  InteractionClassHandle   theHandle)   // supplied C1
-throw (
+RTI::SpaceHandle RTI::RTIambassador::getInteractionRoutingSpaceHandle (  // returned C3
+  InteractionClassHandle   theHandle    // supplied C1
+) throw (
   InteractionClassNotDefined,
   FederateNotExecutionMember,
   ConcurrentAccessAttempted,
-  RTIinternalError) {
-
-    return static_cast<SpaceHandle>(0);
+  RTIinternalError
+) {
+    return rtiAmbassadorProxy->getInteractionRoutingSpaceHandle(theHandle);
 }
 
 // 10.19
-RTI::TransportationHandle      // returned C3
-RTI::RTIambassador::getTransportationHandle (
-  const char *theName)    // supplied C4
-throw (
+RTI::TransportationHandle RTI::RTIambassador::getTransportationHandle (  // returned C3
+  const char *theName     // supplied C4
+) throw (
   NameNotFound,
   FederateNotExecutionMember,
   ConcurrentAccessAttempted,
-  RTIinternalError) {
-
-    return static_cast<TransportationHandle>(0);
-
+  RTIinternalError
+) {
+    return rtiAmbassadorProxy->getTransportationHandle(theName);
 }
 
 // 10.20
-char *                            // returned C6
-RTI::RTIambassador::getTransportationName (
-  TransportationHandle theHandle) // supplied C1
-throw (
+char *RTI::RTIambassador::getTransportationName (  // returned C6
+  TransportationHandle theHandle  // supplied C1
+) throw (
   InvalidTransportationHandle,
   FederateNotExecutionMember,
   ConcurrentAccessAttempted,
-  RTIinternalError) {
-
-    return nullptr;
+  RTIinternalError
+) {
+    return rtiAmbassadorProxy->getTransportationName(theHandle);
 }
 
 // 10.21
-RTI::OrderingHandle         // returned C3
-RTI::RTIambassador::getOrderingHandle (
-  const char *theName) // supplied C4
-throw (
+RTI::OrderingHandle RTI::RTIambassador::getOrderingHandle (  // returned C3
+  const char *theName  // supplied C4
+) throw (
   NameNotFound,
   FederateNotExecutionMember,
   ConcurrentAccessAttempted,
-  RTIinternalError) {
-
-    return static_cast<OrderingHandle>(0);
+  RTIinternalError
+) {
+    return rtiAmbassadorProxy->getOrderingHandle(theName);
 }
 
 // 10.22
-char *                      // returned C6
-RTI::RTIambassador::getOrderingName (
-  OrderingHandle theHandle) // supplied C1
-throw (
+char *RTI::RTIambassador::getOrderingName (  // returned C6
+  OrderingHandle theHandle  // supplied C1
+) throw (
   InvalidOrderingHandle,
   FederateNotExecutionMember,
   ConcurrentAccessAttempted,
-  RTIinternalError) {
-
-    return nullptr;
+  RTIinternalError
+) {
+    return rtiAmbassadorProxy->getOrderingName(theHandle);
 }
 
 // 10.23
-void RTI::RTIambassador::enableClassRelevanceAdvisorySwitch()
-throw(
+void RTI::RTIambassador::enableClassRelevanceAdvisorySwitch() throw(
   FederateNotExecutionMember,
   ConcurrentAccessAttempted,
   SaveInProgress,
   RestoreInProgress,
-  RTIinternalError) { }
+  RTIinternalError
+) {
+    rtiAmbassadorProxy->enableClassRelevanceAdvisorySwitch();
+}
 
 // 10.24
-void RTI::RTIambassador::disableClassRelevanceAdvisorySwitch()
-throw(
+void RTI::RTIambassador::disableClassRelevanceAdvisorySwitch() throw(
   FederateNotExecutionMember,
   ConcurrentAccessAttempted,
   SaveInProgress,
   RestoreInProgress,
-  RTIinternalError) { }
+  RTIinternalError
+) {
+    rtiAmbassadorProxy->disableClassRelevanceAdvisorySwitch();
+}
 
 // 10.25
-void RTI::RTIambassador::enableAttributeRelevanceAdvisorySwitch()
-throw(
+void RTI::RTIambassador::enableAttributeRelevanceAdvisorySwitch() throw(
   FederateNotExecutionMember,
   ConcurrentAccessAttempted,
   SaveInProgress,
   RestoreInProgress,
-  RTIinternalError) { }
+  RTIinternalError
+) {
+    rtiAmbassadorProxy->enableAttributeRelevanceAdvisorySwitch();
+}
 
 // 10.26
-void RTI::RTIambassador::disableAttributeRelevanceAdvisorySwitch()
-throw(
+void RTI::RTIambassador::disableAttributeRelevanceAdvisorySwitch() throw(
   FederateNotExecutionMember,
   ConcurrentAccessAttempted,
   SaveInProgress,
   RestoreInProgress,
-  RTIinternalError) { }
+  RTIinternalError
+) {
+    rtiAmbassadorProxy->disableAttributeRelevanceAdvisorySwitch();
+}
 
 // 10.27
-void RTI::RTIambassador::enableAttributeScopeAdvisorySwitch()
-throw(
+void RTI::RTIambassador::enableAttributeScopeAdvisorySwitch() throw(
   FederateNotExecutionMember,
   ConcurrentAccessAttempted,
   SaveInProgress,
   RestoreInProgress,
-  RTIinternalError) { }
+  RTIinternalError
+) {
+    rtiAmbassadorProxy->enableAttributeScopeAdvisorySwitch();
+}
 
 // 10.28
-void RTI::RTIambassador::disableAttributeScopeAdvisorySwitch()
-throw(
+void RTI::RTIambassador::disableAttributeScopeAdvisorySwitch() throw(
   FederateNotExecutionMember,
   ConcurrentAccessAttempted,
   SaveInProgress,
   RestoreInProgress,
-  RTIinternalError) { }
+  RTIinternalError
+) {
+    rtiAmbassadorProxy->disableAttributeScopeAdvisorySwitch();
+}
 
 // 10.29
-void RTI::RTIambassador::enableInteractionRelevanceAdvisorySwitch()
-throw(
+void RTI::RTIambassador::enableInteractionRelevanceAdvisorySwitch() throw(
   FederateNotExecutionMember,
   ConcurrentAccessAttempted,
   SaveInProgress,
   RestoreInProgress,
-  RTIinternalError) { }
+  RTIinternalError
+) {
+    rtiAmbassadorProxy->enableInteractionRelevanceAdvisorySwitch();
+}
 
 // 10.30
-void RTI::RTIambassador::disableInteractionRelevanceAdvisorySwitch()
-throw(
+void RTI::RTIambassador::disableInteractionRelevanceAdvisorySwitch() throw(
   FederateNotExecutionMember,
   ConcurrentAccessAttempted,
   SaveInProgress,
   RestoreInProgress,
-  RTIinternalError) { }
+  RTIinternalError
+) {
+    rtiAmbassadorProxy->disableInteractionRelevanceAdvisorySwitch();
+}
 
 //
-RTI::Boolean // returned C3
-RTI::RTIambassador::tick ()
-throw (
+RTI::Boolean RTI::RTIambassador::tick () throw (  // returned C3
   SpecifiedSaveLabelDoesNotExist,
   ConcurrentAccessAttempted,
-  RTIinternalError) {
-
-    return RTI_FALSE;
+  RTIinternalError
+) {
+    return rtiAmbassadorProxy->tick();
 }
 
-RTI::Boolean             // returned C3
-RTI::RTIambassador::tick (
+RTI::Boolean RTI::RTIambassador::tick (  // returned C3
   TickTime minimum, // supplied C1
-  TickTime maximum) // supplied C1
-throw (
+  TickTime maximum  // supplied C1
+) throw (
   SpecifiedSaveLabelDoesNotExist,
   ConcurrentAccessAttempted,
-  RTIinternalError) {
-
-    return RTI_FALSE;
+  RTIinternalError
+) {
+    return rtiAmbassadorProxy->tick(minimum, maximum);
 }
 
-RTI::RTIambassador::RTIambassador()
-throw (
+RTI::RTIambassador::RTIambassador() throw (
   MemoryExhausted,
-  RTIinternalError) { }
+  RTIinternalError
+) : rtiAmbassadorProxy(nullptr) { }
 
-RTI::RTIambassador::~RTIambassador()
-throw (RTIinternalError) { }
+RTI::RTIambassador::RTIambassador(RTIProxy::RTIAmbassadorProxy &inputRTIAmbassadorProxy) :
+  rtiAmbassadorProxy(&inputRTIAmbassadorProxy) { }
 
-RTI::RegionToken
-RTI::RTIambassador::getRegionToken(
-  Region *)
-throw(
+RTI::RTIambassador::RTIambassador(RTIProxy::RTIAmbassadorProxy *inputRTIAmbassadorProxy) :
+  rtiAmbassadorProxy(inputRTIAmbassadorProxy) { }
+
+RTI::RTIambassador::~RTIambassador() throw (
+  RTIinternalError
+) { }
+
+RTI::RegionToken RTI::RTIambassador::getRegionToken(
+  Region *returnPtr
+) throw(
   FederateNotExecutionMember,
   ConcurrentAccessAttempted,
   RegionNotKnown,
-  RTIinternalError) {
-
-    return static_cast<RegionToken>(0);
+  RTIinternalError
+) {
+    return rtiAmbassadorProxy->getRegionToken(returnPtr);
 }
 
-RTI::Region *
-RTI::RTIambassador::getRegion(
-  RegionToken)
-throw(
+RTI::Region *RTI::RTIambassador::getRegion(
+  RegionToken regionToken
+) throw(
   FederateNotExecutionMember,
   ConcurrentAccessAttempted,
   RegionNotKnown,
-  RTIinternalError) {
-
-    return nullptr;
+  RTIinternalError
+) {
+    return rtiAmbassadorProxy->getRegion(regionToken);
 }
 
