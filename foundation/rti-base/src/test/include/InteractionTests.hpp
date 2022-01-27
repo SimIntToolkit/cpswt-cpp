@@ -9,6 +9,7 @@ class InteractionTests: public CppUnit::TestCase {
     CPPUNIT_TEST(messagingNamesTest);
     CPPUNIT_TEST(classHandleTest);
     CPPUNIT_TEST(parameterNamesTest);
+    CPPUNIT_TEST(propertyHandleTest);
     CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -17,6 +18,7 @@ public:
     void messagingNamesTest();
     void classHandleTest();
     void parameterNamesTest();
+    void propertyHandleTest();
 };
 
 #endif // _INTERACTION_TESTS
