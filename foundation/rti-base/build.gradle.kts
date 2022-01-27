@@ -54,6 +54,7 @@ library {
     dependencies {
         implementation(group="org.cpswt", name="core-cpp", version="0.7.0-SNAPSHOT")
         implementation(group="org.cpswt", name="C2WConsoleLogger", version="0.7.0-SNAPSHOT")
+        testImplementation(project(":foundation:CppTestHarness"))
     }
     source.from(file("src/main/c++"))
     publicHeaders.from(file("src/main/include"))

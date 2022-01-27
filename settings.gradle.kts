@@ -27,6 +27,8 @@ dependencyResolutionManagement {
 
 include("foundation")
 
+include("foundation:CppTestHarness")
+project(":foundation:CppTestHarness").name = "CppTestHarness"
 
 include("foundation:core")
 project(":foundation:core").name = "core-cpp"
