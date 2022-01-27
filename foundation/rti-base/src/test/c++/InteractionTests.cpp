@@ -18,6 +18,7 @@ using SimLog = ::org::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::SimLo
 using HighPrio = ::org::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::SimLog_p::HighPrio;
 using SimulationControl = ::org::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::SimulationControl;
 using SimEnd = ::org::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::SimulationControl_p::SimEnd;
+using FederateObject = ::org::cpswt::hla::ObjectRoot_p::FederateObject;
 
 typedef std::set<std::string> StringSet;
 
@@ -284,6 +285,44 @@ void InteractionTests::parameterNamesTest() {
             expectedHighPrioAllParameterList,
             InteractionRoot::get_all_parameter_names("InteractionRoot.C2WInteractionRoot.SimLog.HighPrio")
     );
+}
+
+void InteractionTests::propertyHandleTest() {
+
+    RTIAmbassadorTest1 rtiAmbassadorTest1;
+    RTI::RTIambassador rtiAmbassador(&rtiAmbassadorTest1);
+
+    HighPrio::publish_interaction(&rtiAmbassador);
+
+    int expectedValue = RTIAmbassadorTest1::get_class_and_property_name_parameter_handle_map().find(
+            ClassAndPropertyName("InteractionRoot.C2WInteractionRoot", "originFed")
+    )->second;
+
+    CPPUNIT_ASSERT_EQUAL(expectedValue, HighPrio::get_parameter_handle("originFed"));
+    CPPUNIT_ASSERT_EQUAL(expectedValue, SimLog::get_parameter_handle("originFed"));
+    CPPUNIT_ASSERT_EQUAL(expectedValue, C2WInteractionRoot::get_parameter_handle("originFed"));
+
+    expectedValue = RTIAmbassadorTest1::get_class_and_property_name_parameter_handle_map().find(
+            ClassAndPropertyName("InteractionRoot.C2WInteractionRoot.SimLog", "FedName")
+    )->second;
+
+    CPPUNIT_ASSERT_EQUAL(expectedValue, HighPrio::get_parameter_handle("FedName"));
+    CPPUNIT_ASSERT_EQUAL(expectedValue, SimLog::get_parameter_handle("FedName"));
+
+    expectedValue = RTIAmbassadorTest1::get_class_and_property_name_parameter_handle_map().find(
+            ClassAndPropertyName("InteractionRoot.C2WInteractionRoot.SimLog", "FedName")
+    )->second;
+
+    CPPUNIT_ASSERT_EQUAL(expectedValue, HighPrio::get_parameter_handle("FedName"));
+    CPPUNIT_ASSERT_EQUAL(expectedValue, SimLog::get_parameter_handle("FedName"));
+
+    FederateObject::publish_object(&rtiAmbassador);
+
+    expectedValue = RTIAmbassadorTest1::get_class_and_property_name_attribute_handle_map().find(
+            ClassAndPropertyName("ObjectRoot.FederateObject", "FederateHost")
+    )->second;
+
+    CPPUNIT_ASSERT_EQUAL(expectedValue, FederateObject::get_attribute_handle("FederateHost"));
 }
 
 CPPUNIT_TEST_SUITE_REGISTRATION( InteractionTests );
