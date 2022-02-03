@@ -118,16 +118,20 @@ void ObjectRoot::registerObject( RTI::RTIambassador *rti ) {
             _objectHandle = rti->registerObjectInstance( getClassHandle() );
             _isRegistered = true;
         } catch ( RTI::ObjectClassNotDefined & ) {
-            std::cerr << "ERROR:  ObjectRoot::registerObject:  Object Class Not Defined" << std::endl;
+            BOOST_LOG_SEV(get_logger(), error) << getCppClassName()
+              << ": could not register object:  object class not defined";
             return;
         } catch ( RTI::ObjectClassNotPublished & ) {
-            std::cerr << "ERROR:  ObjectRoot::registerObject:  Object Class Not Published" << std::endl;
+            BOOST_LOG_SEV(get_logger(), error) << getCppClassName()
+              << ": could not register object:  object class not published";
             return;
         } catch ( RTI::FederateNotExecutionMember & ) {
-            std::cerr << "ERROR:  ObjectRoot::registerObject:  Federate Not Execution Member" << std::endl;
+            BOOST_LOG_SEV(get_logger(), error) << getCppClassName()
+              << ": could not register object:  federate not execution member";
             return;
         } catch ( ... ) {
-            std::cerr << "ObjectRoot::registerObject:  Exception caught ... retry" << std::endl;
+            BOOST_LOG_SEV(get_logger(), error) << getCppClassName()
+              << ": could not register object:  unspecified exception caught ... retry";
         }
     }
 
@@ -139,18 +143,24 @@ void ObjectRoot::registerObject( RTI::RTIambassador *rti, const std::string &nam
             _objectHandle = rti->registerObjectInstance( getClassHandle(), name.c_str() );
             _isRegistered = true;
         } catch ( RTI::ObjectClassNotDefined & ) {
-            std::cerr << "ERROR:  ObjectRoot::registerObject:  Object Class Not Defined" << std::endl;
+            BOOST_LOG_SEV(get_logger(), error) << getCppClassName()
+              << ": could not register object:  object class not defined";
             return;
         } catch ( RTI::ObjectClassNotPublished & ) {
-            std::cerr << "ERROR:  ObjectRoot::registerObject:  Object Class Not Published" << std::endl;
+            BOOST_LOG_SEV(get_logger(), error) << getCppClassName()
+              << ": could not register object:  object class not published";
             return;
         } catch ( RTI::FederateNotExecutionMember & ) {
-            std::cerr << "ERROR:  ObjectRoot::registerObject:  Federate Not Execution Member" << std::endl;
+            BOOST_LOG_SEV(get_logger(), error) << getCppClassName()
+              << ": could not register object:  federate not execution member";
             return;
         } catch ( RTI::ObjectAlreadyRegistered & ) {
-            throw;
+            BOOST_LOG_SEV(get_logger(), warning) << getCppClassName()
+              << ": could not register object:  object with name \"" << name << "\" already registered";
+            return;
         } catch ( ... ) {
-            std::cerr << "ObjectRoot::registerObject:  Exception caught ... retry" << std::endl;
+            BOOST_LOG_SEV(get_logger(), error) << getCppClassName()
+              << ": could not register object:  unspecified exception caught ... retry";
         }
     }
 }
@@ -162,17 +172,63 @@ void ObjectRoot::unregisterObject( RTI::RTIambassador *rti ) {
             rti->deleteObjectInstance( getObjectHandle(), 0 );
             _isRegistered = false;
         } catch ( RTI::ObjectNotKnown & ) {
-            std::cerr << "ERROR:  ObjectRoot::unregisterObject:  Object Not Known" << std::endl;
+            BOOST_LOG_SEV(get_logger(), error) << getCppClassName()
+              << ": could not unregister object:  object not known";
             return;
         } catch ( RTI::DeletePrivilegeNotHeld & ) {
-            std::cerr << "ERROR:  ObjectRoot::unregisterObject:  Delete Privilege Not Held" << std::endl;
+            BOOST_LOG_SEV(get_logger(), error) << getCppClassName()
+              << ": could not unregister object:  delete privilege not held";
             return;
         } catch ( RTI::FederateNotExecutionMember & ) {
-            std::cerr << "ERROR:  ObjectRoot::unregisterObject:  Federate Not Execution Member" << std::endl;
+            BOOST_LOG_SEV(get_logger(), error) << getCppClassName()
+              << ": could not unregister object:  federate not execution member";
             return;
         } catch ( ... ) {
-            std::cerr << "ObjectRoot::unregisterObject:  Exception caught ... retry" << std::endl;
+            BOOST_LOG_SEV(get_logger(), error) << getCppClassName()
+              << ": could not unregister object:  unspecified exception caught ... retry";
         }
+    }
+}
+
+void ObjectRoot::get_class_pub_sub_class_and_property_name_sp(
+  const StringClassAndPropertyNameSetSPMap &stringClassAndPropertyNameSetSPMap,
+  const std::string &className,
+  const std::string &attributeName,
+  bool publish,
+  bool insert
+) {
+    StringClassAndPropertyNameSetSPMap::const_iterator samItr =
+      stringClassAndPropertyNameSetSPMap.find( className );
+    if ( samItr == stringClassAndPropertyNameSetSPMap.end() ) {
+
+        std::string prefix = insert ? "" : "un";
+        std::string pubsub = publish ? "publish" : "subscribe";
+
+        BOOST_LOG_SEV(get_logger(), error) << "Could not " << prefix << pubsub
+          << " \"" << attributeName << "\" attribute of object class \"" << className
+          << "\": class does not exist";
+
+        return;
+    }
+
+    ClassAndPropertyNameSP classAndPropertyNameSP = findProperty(className, attributeName);
+    if (!classAndPropertyNameSP) {
+
+        std::string prefix = insert ? "" : "un";
+        std::string pubsub = publish ? "publish" : "subscribe";
+
+        BOOST_LOG_SEV(get_logger(), error) << "Could not " << prefix << pubsub
+          << " \"" << attributeName << "\" attribute of object class \"" << className
+          << "\": \"" << attributeName << "\" attribute does not exist in the \""
+          << className << "\" class or any of its base classes";
+
+        return;
+    }
+
+    if (insert) {
+        samItr->second->insert(*classAndPropertyNameSP);
+    } else {
+        samItr->second->erase(*classAndPropertyNameSP);
     }
 }
 
@@ -183,16 +239,21 @@ void ObjectRoot::requestUpdate( RTI::RTIambassador *rti ) {
 			rti->requestObjectAttributeValueUpdate( getObjectHandle(), *get_subscribed_attribute_handle_set_sp() );
 			requestNotSubmitted = false;
 		} catch ( RTI::FederateNotExecutionMember & ) {
-			std::cerr << "ERROR: " << getCppClassName() << "request for update failed:  Federate Not Execution Member" << std::endl;
+            BOOST_LOG_SEV(get_logger(), error) << getCppClassName()
+              << ": request for update failed:  federate not execution member";
 			return;
 		} catch ( RTI::ObjectNotKnown & ) {
-			std::cerr << "ERROR: " << getCppClassName() << "request for update failed:  Object Not Known" << std::endl;
+            BOOST_LOG_SEV(get_logger(), error) <<  getCppClassName()
+              << ": request for update failed:  object not known";
 			return;
 		} catch ( RTI::AttributeNotDefined & ) {
-			std::cerr << "ERROR: " << getCppClassName() << "request for update failed:  Name Not Found" << std::endl;
+            BOOST_LOG_SEV(get_logger(), error) <<  getCppClassName()
+			  << ": request for update failed:  undefined attribute";
 			return;
 		} catch ( ... ) {
-			std::cerr << "ERROR: " << getCppClassName() << "request for update failed:  Unknown Exception" << std::endl;			}
+            BOOST_LOG_SEV(get_logger(), error) <<  getCppClassName()
+			  << ": request for update failed:  unspecified exception";
+		}
 	}
 }
 
@@ -201,7 +262,8 @@ const ObjectRoot::Value &ObjectRoot::getAttribute( int propertyHandle ) const {
     IntegerClassAndPropertyNameSPMap::const_iterator icmCit =
       get_handle_class_and_property_name_sp_map().find(propertyHandle);
     if (icmCit == get_handle_class_and_property_name_sp_map().end()) {
-//        logger.error("getAttribute: propertyHandle {} does not exist.", propertyHandle);
+        BOOST_LOG_SEV(get_logger(), error) << "getAttribute: propertyHandle (" << propertyHandle
+          <<") does not exist";
         return valueDefault;
     }
 
@@ -223,7 +285,7 @@ void ObjectRoot::setAttributes( const RTI::AttributeHandleValuePairSet &property
               std::string( value, valueLength )
             );
         } catch ( ... ) {
-            std::cerr << "setParameters: Exception caught!" << std::endl;
+            BOOST_LOG_SEV(get_logger(), error) << "setParameters: Exception caught!";
         }
     }
 }
@@ -284,13 +346,13 @@ void ObjectRoot::init(RTI::RTIambassador *rti) {
             get_class_handle() = rti->getObjectClassHandle(get_hla_class_name().c_str());
             isNotInitialized = false;
         } catch (RTI::FederateNotExecutionMember e) {
-//            logger.error("could not initialize: Federate Not Execution Member", e);
+            BOOST_LOG_SEV(get_logger(), error) << "could not initialize class handle: federate not execution member";
             return;
         } catch (RTI::NameNotFound e) {
-//            logger.error("could not initialize: Name Not Found", e);
+            BOOST_LOG_SEV(get_logger(), error) << "could not initialize class handle: name not found";
             return;
         } catch (...) {
-//            logger.error(e);
+            BOOST_LOG_SEV(get_logger(), error) << "could not initialize class handle: unspecified exception ... retry";
 #ifdef _WIN32
             Sleep( 500 );
 #else
@@ -321,9 +383,11 @@ void ObjectRoot::publish_object(RTI::RTIambassador *rti) {
     ) {
         try {
             get_published_attribute_handle_set_sp()->add(get_class_and_property_name_handle_map()[*cnsCit]);
-//            logger.trace("publish {}:{}", get_hla_class_name(), key.toString());
+            BOOST_LOG_SEV(get_logger(), trace) << "publish_object: adding \"" << cnsCit->getPropertyName()
+              << "\" attribute to attribute set";
         } catch (...) {
-//            logger.error("could not publish \"" + key.toString() + "\" attribute.", e);
+            BOOST_LOG_SEV(get_logger(), error) << "could not publish \"" << cnsCit->getPropertyName()
+              << "\" attribute";
         }
     }
 
@@ -333,13 +397,13 @@ void ObjectRoot::publish_object(RTI::RTIambassador *rti) {
             rti->publishObjectClass(get_class_handle(), *get_published_attribute_handle_set_sp());
             isNotPublished = false;
         } catch (RTI::FederateNotExecutionMember e) {
-//            logger.error("could not publish: Federate Not Execution Member", e);
+            BOOST_LOG_SEV(get_logger(), error) << "could not publish: federate not execution member";
             return;
         } catch (RTI::ObjectClassNotDefined e) {
-//            logger.error("could not publish: Object Class Not Defined", e);
+            BOOST_LOG_SEV(get_logger(), error) << "could not publish: object class not defined";
             return;
         } catch (...) {
-//            logger.error(e);
+            BOOST_LOG_SEV(get_logger(), error) << "could not publish: unspecified exception ... retry";
 #ifdef _WIN32
             Sleep( 500 );
 #else
@@ -348,7 +412,7 @@ void ObjectRoot::publish_object(RTI::RTIambassador *rti) {
         }
     }
 
-//    logger.debug("publish: {}", get_hla_class_name());
+    BOOST_LOG_SEV(get_logger(), debug) << "publish_object: object published";
 }
 
 
@@ -364,16 +428,16 @@ void ObjectRoot::unpublish_object(RTI::RTIambassador *rti) {
             rti->unpublishObjectClass(get_class_handle());
             isNotUnpublished = false;
         } catch (RTI::FederateNotExecutionMember e) {
-//            logger.error("could not unpublish: Federate Not Execution Member", e);
+            BOOST_LOG_SEV(get_logger(), error) << "could not unpublish: federate not execution member";
             return;
         } catch (RTI::ObjectClassNotDefined e) {
-//            logger.error("could not unpublish: Object Class Not Defined", e);
+            BOOST_LOG_SEV(get_logger(), error) << "could not unpublish: object class not defined";
             return;
         } catch (RTI::ObjectClassNotPublished e) {
-//            logger.error("could not unpublish: Object Class Not Published", e);
+            BOOST_LOG_SEV(get_logger(), error) << "could not unpublish: object class not published";
             return;
         } catch (...) {
-//            logger.error(e);
+            BOOST_LOG_SEV(get_logger(), error) << "could not unpublish: unspecified exception ... retry";
 #ifdef _WIN32
             Sleep( 500 );
 #else
@@ -382,7 +446,7 @@ void ObjectRoot::unpublish_object(RTI::RTIambassador *rti) {
         }
     }
 
-//    logger.debug("unpublish: {}", get_hla_class_name());
+    BOOST_LOG_SEV(get_logger(), debug) << "unpublish_object: object unpublished";
 }
 
 
@@ -402,9 +466,11 @@ void ObjectRoot::subscribe_object(RTI::RTIambassador *rti) {
     ) {
         try {
             get_subscribed_attribute_handle_set_sp()->add(get_class_and_property_name_handle_map()[*cnsCit]);
-//            logger.trace("subscribe {}:{}", get_hla_class_name(), key.toString());
+            BOOST_LOG_SEV(get_logger(), trace) << "subscribe_object: adding \"" << cnsCit->getPropertyName()
+              << "\" attribute to attribute set";
         } catch (...) {
-//            logger.error("could not subscribe to \"" + key + "\" attribute.", e);
+            BOOST_LOG_SEV(get_logger(), error) << "could not subscribe to \"" << cnsCit->getPropertyName()
+              << "\" attribute";
         }
     }
 
@@ -414,13 +480,13 @@ void ObjectRoot::subscribe_object(RTI::RTIambassador *rti) {
             rti->subscribeObjectClassAttributes(get_class_handle(), *get_subscribed_attribute_handle_set_sp());
             isNotSubscribed = false;
         } catch (RTI::FederateNotExecutionMember e) {
-//            logger.error("could not subscribe: Federate Not Execution Member", e);
+            BOOST_LOG_SEV(get_logger(), error) << "could not subscribe: federate not execution member";
             return;
         } catch (RTI::ObjectClassNotDefined e) {
-//            logger.error("could not subscribe: Object Class Not Defined", e);
+            BOOST_LOG_SEV(get_logger(), error) << "could not subscribe: class not defined";
             return;
         } catch (...) {
-//            logger.error(e);
+            BOOST_LOG_SEV(get_logger(), error) << "could not subscribe: unspecified exception ... retry";
 #ifdef _WIN32
             Sleep( 500 );
 #else
@@ -429,7 +495,7 @@ void ObjectRoot::subscribe_object(RTI::RTIambassador *rti) {
         }
     }
 
-//    logger.debug("subscribe: {}", get_hla_class_name());
+    BOOST_LOG_SEV(get_logger(), debug) << "subscribe_object: object subscribed";
 }
 
 
@@ -445,16 +511,16 @@ void ObjectRoot::unsubscribe_object(RTI::RTIambassador *rti) {
             rti->unsubscribeObjectClass(get_class_handle());
             isNotUnsubscribed = false;
         } catch (RTI::FederateNotExecutionMember e) {
-//            logger.error("could not unsubscribe: Federate Not Execution Member", e);
+            BOOST_LOG_SEV(get_logger(), error) << "could not unsubscribe: federate not execution member";
             return;
         } catch (RTI::ObjectClassNotDefined e) {
-//            logger.error("could not unsubscribe: Object Class Not Defined", e);
+            BOOST_LOG_SEV(get_logger(), error) << "could not unsubscribe: class not defined";
             return;
         } catch (RTI::ObjectClassNotSubscribed e) {
-//            logger.error("could not unsubscribe: Object Class Not Subscribed", e);
+            BOOST_LOG_SEV(get_logger(), error) << "could not unsubscribe: class not subscribed";
             return;
         } catch (...) {
-//            logger.error(e);
+            BOOST_LOG_SEV(get_logger(), error) << "could not unsubscribe: unspecified exception ... retry";
 #ifdef _WIN32
             Sleep( 500 );
 #else
@@ -463,7 +529,7 @@ void ObjectRoot::unsubscribe_object(RTI::RTIambassador *rti) {
         }
     }
 
-//    logger.debug("unsubscribe: {}", get_hla_class_name());
+    BOOST_LOG_SEV(get_logger(), debug) << "unsubscribe_object: object unsubscribed";
 }
 
 
@@ -523,25 +589,25 @@ void ObjectRoot::updateAttributeValues( RTI::RTIambassador *rti, double time, bo
         rti->updateAttributeValues(  getObjectHandle(), *propertyHandleValuePairSetSP, RTIfedTime( time ), 0  );
 //        createLog( time, true );
     } catch ( RTI::ObjectNotKnown & ) {
-        std::cerr << "ERROR:  " << getCppClassName() << ":  could not update attributes:  Object Not Known" << std::endl;
+        BOOST_LOG_SEV(get_logger(), error) << "could not update attributes:  object not known";
         return;
     } catch ( RTI::FederateNotExecutionMember & ) {
-        std::cerr << "ERROR:  " << getCppClassName() << ":  could not update attributes:  Federate Not Execution Member" << std::endl;
+        BOOST_LOG_SEV(get_logger(), error) << "could not update attributes:  federate not execution member";
         return;
     } catch ( RTI::AttributeNotDefined & ) {
-        std::cerr << "ERROR:  " << getCppClassName() << ":  could not update attributes:  Attribute Not Defined" << std::endl;
+        BOOST_LOG_SEV(get_logger(), error) << "could not update attributes:  attribute not defined";
         return;
     } catch ( RTI::AttributeNotOwned & ) {
-        std::cerr << "ERROR:  " << getCppClassName() << ":  could not update attributes:  Attribute Not Owned" << std::endl;
+        BOOST_LOG_SEV(get_logger(), error) << "could not update attributes:  attribute not owned";
         return;
     } catch ( RTI::ConcurrentAccessAttempted & ) {
-        std::cerr << "ERROR:  " << getCppClassName() << ":  could not update attributes:  Concurrent Access Attempted" << std::endl;
+        BOOST_LOG_SEV(get_logger(), error) << "could not update attributes:  concurrent access attempted";
         return;
     } catch ( RTI::InvalidFederationTime & ) {
-        std::cerr << "ERROR:  " << getCppClassName() << ":  could not update attributes:  Invalid Federation Time" << std::endl;
+        BOOST_LOG_SEV(get_logger(), error) << "could not update attributes:  invalid federation time";
         return;
     } catch ( ... ) {
-        std::cerr << "ERROR:  " << getCppClassName() << ":  could not update attributes:  exception caught" << std::endl;
+        BOOST_LOG_SEV(get_logger(), error) << "could not update attributes:  unspecified exception caught";
     }
 }
 
@@ -554,25 +620,22 @@ void ObjectRoot::updateAttributeValues( RTI::RTIambassador *rti, bool force ) {
         rti->updateAttributeValues( getObjectHandle(), *propertyHandleValuePairSetSP, 0 );
 //        createLog( 0, true );
     } catch ( RTI::ObjectNotKnown & ) {
-        std::cerr << "ERROR:  " << getCppClassName() << ":  could not update attributes:  Object Not Known" << std::endl;
+        BOOST_LOG_SEV(get_logger(), error) << "could not update attributes:  object not known";
         return;
     } catch ( RTI::FederateNotExecutionMember & ) {
-        std::cerr << "ERROR:  " << getCppClassName() << ":  could not update attributes:  Federate Not Execution Member" << std::endl;
+        BOOST_LOG_SEV(get_logger(), error) << "could not update attributes:  federate not execution member";
         return;
     } catch ( RTI::AttributeNotDefined & ) {
-        std::cerr << "ERROR:  " << getCppClassName() << ":  could not update attributes:  Attribute Not Defined" << std::endl;
+        BOOST_LOG_SEV(get_logger(), error) << "could not update attributes:  attribute not defined";
         return;
     } catch ( RTI::AttributeNotOwned & ) {
-        std::cerr << "ERROR:  " << getCppClassName() << ":  could not update attributes:  Attribute Not Owned" << std::endl;
+        BOOST_LOG_SEV(get_logger(), error) << "could not update attributes:  attribute not owned";
         return;
     } catch ( RTI::ConcurrentAccessAttempted & ) {
-        std::cerr << "ERROR:  " << getCppClassName() << ":  could not update attributes:  Concurrent Access Attempted" << std::endl;
-        return;
-    } catch ( RTI::InvalidFederationTime & ) {
-        std::cerr << "ERROR:  " << getCppClassName() << ":  could not update attributes:  Invalid Federation Time" << std::endl;
+        BOOST_LOG_SEV(get_logger(), error) << "could not update attributes:  concurrent access attempted";
         return;
     } catch ( ... ) {
-        std::cerr << "ERROR:  " << getCppClassName() << ":  could not update attributes:  exception caught" << std::endl;
+        BOOST_LOG_SEV(get_logger(), error) << "could not update attributes:  unspecified exception caught";
     }
 }
 
@@ -630,10 +693,8 @@ void ObjectRoot::fromJson(const std::string &jsonString) {
     int objectHandle = topLevelJSONObject["object_handle"].asInt();
     ObjectHandleInstanceSPMap::iterator oimItr = get_object_handle_instance_sp_map().find(objectHandle);
     if (oimItr != get_object_handle_instance_sp_map().end()) {
-//        logger.error(
-//                "ObjectRoot:  fromJson:  no registered object exists with recieved object-handle ({})",
-//                objectHandle
-//        );
+        BOOST_LOG_SEV(get_logger(), error) << "fromJson:  no registered object exists with received object-handle ("
+          << objectHandle << ")";
         return;
     }
 
