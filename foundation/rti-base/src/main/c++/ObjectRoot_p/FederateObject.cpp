@@ -113,13 +113,13 @@ void FederateObject::init(RTI::RTIambassador *rti) {
             get_class_handle() = rti->getObjectClassHandle(get_hla_class_name().c_str());
             isNotInitialized = false;
         } catch (RTI::FederateNotExecutionMember e) {
-//            logger.error("could not initialize: Federate Not Execution Member", e);
+            BOOST_LOG_SEV(get_logger(), error) << "could not initialize class handle: federate not execution member";
             return;
         } catch (RTI::NameNotFound e) {
-//            logger.error("could not initialize: Name Not Found", e);
+            BOOST_LOG_SEV(get_logger(), error) << "could not initialize class handle: name not found";
             return;
         } catch (...) {
-//            logger.error(e);
+            BOOST_LOG_SEV(get_logger(), error) << "could not initialize class handle: unspecified exception ... retry";
 #ifdef _WIN32
             Sleep( 500 );
 #else
@@ -162,16 +162,19 @@ void FederateObject::init(RTI::RTIambassador *rti) {
 
             isNotInitialized = false;
         } catch (RTI::FederateNotExecutionMember e) {
-//            logger.error("could not initialize: Federate Not Execution Member", e);
+            BOOST_LOG_SEV(get_logger(), error)
+              << "could not initialize attribute handle: federate not execution member";
             return;
         } catch (RTI::ObjectClassNotDefined e) {
-//            logger.error("could not initialize: Object Class Not Defined", e);
+            BOOST_LOG_SEV(get_logger(), error)
+              << "could not initialize attribute handle: object class not defined";
             return;
         } catch (RTI::NameNotFound e) {
-//            logger.error("could not initialize: Name Not Found", e);
+            BOOST_LOG_SEV(get_logger(), error) << "could not initialize attribute handle: name not found";
             return;
         } catch (...) {
-//            logger.error(e);
+            BOOST_LOG_SEV(get_logger(), error)
+              << "could not initialize attribute handle: unspecified exception ... retry";
 #ifdef _WIN32
             Sleep( 500 );
 #else
@@ -198,9 +201,11 @@ void FederateObject::publish_object(RTI::RTIambassador *rti) {
     ) {
         try {
             get_published_attribute_handle_set_sp()->add(get_class_and_property_name_handle_map()[*cnsCit]);
-//            logger.trace("publish {}:{}", get_hla_class_name(), key.toString());
+            BOOST_LOG_SEV(get_logger(), trace) << "publish_object: adding \"" << cnsCit->getPropertyName()
+              << "\" attribute to attribute set";
         } catch (...) {
-//            logger.error("could not publish \"" + key.toString() + "\" attribute.", e);
+            BOOST_LOG_SEV(get_logger(), error) << "could not publish \"" << cnsCit->getPropertyName()
+              << "\" attribute";
         }
     }
 
@@ -210,13 +215,13 @@ void FederateObject::publish_object(RTI::RTIambassador *rti) {
             rti->publishObjectClass(get_class_handle(), *get_published_attribute_handle_set_sp());
             isNotPublished = false;
         } catch (RTI::FederateNotExecutionMember e) {
-//            logger.error("could not publish: Federate Not Execution Member", e);
+            BOOST_LOG_SEV(get_logger(), error) << "could not publish: federate not execution member";
             return;
         } catch (RTI::ObjectClassNotDefined e) {
-//            logger.error("could not publish: Object Class Not Defined", e);
+            BOOST_LOG_SEV(get_logger(), error) << "could not publish: object class not defined";
             return;
         } catch (...) {
-//            logger.error(e);
+            BOOST_LOG_SEV(get_logger(), error) << "could not publish: unspecified exception ... retry";
 #ifdef _WIN32
             Sleep( 500 );
 #else
@@ -225,7 +230,7 @@ void FederateObject::publish_object(RTI::RTIambassador *rti) {
         }
     }
 
-//    logger.debug("publish: {}", get_hla_class_name());
+    BOOST_LOG_SEV(get_logger(), debug) << "publish_object: object published";
 }
 
 
@@ -241,16 +246,16 @@ void FederateObject::unpublish_object(RTI::RTIambassador *rti) {
             rti->unpublishObjectClass(get_class_handle());
             isNotUnpublished = false;
         } catch (RTI::FederateNotExecutionMember e) {
-//            logger.error("could not unpublish: Federate Not Execution Member", e);
+            BOOST_LOG_SEV(get_logger(), error) << "could not unpublish: federate not execution member";
             return;
         } catch (RTI::ObjectClassNotDefined e) {
-//            logger.error("could not unpublish: Object Class Not Defined", e);
+            BOOST_LOG_SEV(get_logger(), error) << "could not unpublish: object class not defined";
             return;
         } catch (RTI::ObjectClassNotPublished e) {
-//            logger.error("could not unpublish: Object Class Not Published", e);
+            BOOST_LOG_SEV(get_logger(), error) << "could not unpublish: object class not published";
             return;
         } catch (...) {
-//            logger.error(e);
+            BOOST_LOG_SEV(get_logger(), error) << "could not unpublish: unspecified exception ... retry";
 #ifdef _WIN32
             Sleep( 500 );
 #else
@@ -259,7 +264,7 @@ void FederateObject::unpublish_object(RTI::RTIambassador *rti) {
         }
     }
 
-//    logger.debug("unpublish: {}", get_hla_class_name());
+    BOOST_LOG_SEV(get_logger(), debug) << "unpublish_object: object unpublished";
 }
 
 
@@ -279,9 +284,11 @@ void FederateObject::subscribe_object(RTI::RTIambassador *rti) {
     ) {
         try {
             get_subscribed_attribute_handle_set_sp()->add(get_class_and_property_name_handle_map()[*cnsCit]);
-//            logger.trace("subscribe {}:{}", get_hla_class_name(), key.toString());
+            BOOST_LOG_SEV(get_logger(), trace) << "subscribe_object: adding \"" << cnsCit->getPropertyName()
+              << "\" attribute to attribute set";
         } catch (...) {
-//            logger.error("could not subscribe to \"" + key + "\" attribute.", e);
+            BOOST_LOG_SEV(get_logger(), error) << "could not subscribe to \"" << cnsCit->getPropertyName()
+              << "\" attribute";
         }
     }
 
@@ -291,13 +298,13 @@ void FederateObject::subscribe_object(RTI::RTIambassador *rti) {
             rti->subscribeObjectClassAttributes(get_class_handle(), *get_subscribed_attribute_handle_set_sp());
             isNotSubscribed = false;
         } catch (RTI::FederateNotExecutionMember e) {
-//            logger.error("could not subscribe: Federate Not Execution Member", e);
+            BOOST_LOG_SEV(get_logger(), error) << "could not subscribe: federate not execution member";
             return;
         } catch (RTI::ObjectClassNotDefined e) {
-//            logger.error("could not subscribe: Object Class Not Defined", e);
+            BOOST_LOG_SEV(get_logger(), error) << "could not subscribe: class not defined";
             return;
         } catch (...) {
-//            logger.error(e);
+            BOOST_LOG_SEV(get_logger(), error) << "could not subscribe: unspecified exception ... retry";
 #ifdef _WIN32
             Sleep( 500 );
 #else
@@ -306,7 +313,7 @@ void FederateObject::subscribe_object(RTI::RTIambassador *rti) {
         }
     }
 
-//    logger.debug("subscribe: {}", get_hla_class_name());
+    BOOST_LOG_SEV(get_logger(), debug) << "subscribe_object: object subscribed";
 }
 
 
@@ -322,16 +329,16 @@ void FederateObject::unsubscribe_object(RTI::RTIambassador *rti) {
             rti->unsubscribeObjectClass(get_class_handle());
             isNotUnsubscribed = false;
         } catch (RTI::FederateNotExecutionMember e) {
-//            logger.error("could not unsubscribe: Federate Not Execution Member", e);
+            BOOST_LOG_SEV(get_logger(), error) << "could not unsubscribe: federate not execution member";
             return;
         } catch (RTI::ObjectClassNotDefined e) {
-//            logger.error("could not unsubscribe: Object Class Not Defined", e);
+            BOOST_LOG_SEV(get_logger(), error) << "could not unsubscribe: class not defined";
             return;
         } catch (RTI::ObjectClassNotSubscribed e) {
-//            logger.error("could not unsubscribe: Object Class Not Subscribed", e);
+            BOOST_LOG_SEV(get_logger(), error) << "could not unsubscribe: class not subscribed";
             return;
         } catch (...) {
-//            logger.error(e);
+            BOOST_LOG_SEV(get_logger(), error) << "could not unsubscribe: unspecified exception ... retry";
 #ifdef _WIN32
             Sleep( 500 );
 #else
@@ -340,7 +347,7 @@ void FederateObject::unsubscribe_object(RTI::RTIambassador *rti) {
         }
     }
 
-//    logger.debug("unsubscribe: {}", get_hla_class_name());
+    BOOST_LOG_SEV(get_logger(), debug) << "unsubscribe_object: object unsubscribed";
 }
 
 
