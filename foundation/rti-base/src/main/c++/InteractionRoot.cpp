@@ -116,7 +116,8 @@ const InteractionRoot::Value &InteractionRoot::getParameter( int propertyHandle 
     IntegerClassAndPropertyNameSPMap::const_iterator icmCit =
       get_handle_class_and_property_name_sp_map().find(propertyHandle);
     if (icmCit == get_handle_class_and_property_name_sp_map().end()) {
-//        logger.error("getParameter: propertyHandle {} does not exist.", propertyHandle);
+        BOOST_LOG_SEV(get_logger(), error) << "getParameter: propertyHandle (" << propertyHandle
+          <<") does not exist";
         return valueDefault;
     }
 
@@ -138,7 +139,7 @@ void InteractionRoot::setParameters( const RTI::ParameterHandleValuePairSet &pro
               std::string( value, valueLength )
             );
         } catch ( ... ) {
-            std::cerr << "setParameters: Exception caught!" << std::endl;
+            BOOST_LOG_SEV(get_logger(), error) << "setParameters: Exception caught!";
         }
     }
 }
@@ -188,13 +189,13 @@ void InteractionRoot::init(RTI::RTIambassador *rti) {
             get_class_handle() = rti->getInteractionClassHandle(get_hla_class_name().c_str());
             isNotInitialized = false;
         } catch (RTI::FederateNotExecutionMember e) {
-//            logger.error("could not initialize: Federate Not Execution Member", e);
+            BOOST_LOG_SEV(get_logger(), error) << "could not initialize class handle: federate not execution member";
             return;
         } catch (RTI::NameNotFound e) {
-//            logger.error("could not initialize: Name Not Found", e);
+            BOOST_LOG_SEV(get_logger(), error) << "could not initialize class handle: name not found";
             return;
         } catch (...) {
-//            logger.error(e);
+            BOOST_LOG_SEV(get_logger(), error) << "could not initialize class handle: unspecified exception ... retry";
 #ifdef _WIN32
             Sleep( 500 );
 #else
@@ -223,13 +224,13 @@ void InteractionRoot::publish_interaction(RTI::RTIambassador *rti) {
             rti->publishInteractionClass(get_class_handle());
             isNotPublished = false;
         } catch (RTI::FederateNotExecutionMember e) {
-//            logger.error("could not publish: Federate Not Execution Member", e);
+            BOOST_LOG_SEV(get_logger(), error) << "could not publish: federate not execution member";
             return;
         } catch (RTI::InteractionClassNotDefined e) {
-//            logger.error("could not publish: Interaction Class Not Defined", e);
+            BOOST_LOG_SEV(get_logger(), error) << "could not publish: interaction class not defined";
             return;
         } catch (...) {
-//            logger.error(e);
+            BOOST_LOG_SEV(get_logger(), error) << "could not publish: unspecified exception ... retry";
 #ifdef _WIN32
             Sleep( 500 );
 #else
@@ -238,7 +239,7 @@ void InteractionRoot::publish_interaction(RTI::RTIambassador *rti) {
         }
     }
 
-//    logger.debug("publish: {}", get_hla_class_name());
+    BOOST_LOG_SEV(get_logger(), debug) << "publish_interaction: interaction published";
 }
 
 
@@ -254,16 +255,16 @@ void InteractionRoot::unpublish_interaction(RTI::RTIambassador *rti) {
             rti->unpublishInteractionClass(get_class_handle());
             isNotUnpublished = false;
         } catch (RTI::FederateNotExecutionMember e) {
-//            logger.error("could not unpublish: Federate Not Execution Member", e);
+            BOOST_LOG_SEV(get_logger(), error) << "could not unpublish: federate not execution member";
             return;
         } catch (RTI::InteractionClassNotDefined e) {
-//            logger.error("could not unpublish: Interaction Class Not Defined", e);
+            BOOST_LOG_SEV(get_logger(), error) << "could not unpublish: interaction class not defined";
             return;
         } catch (RTI::InteractionClassNotPublished e) {
-//            logger.error("could not unpublish: Interaction Class Not Published", e);
+            BOOST_LOG_SEV(get_logger(), error) << "could not unpublish: interaction class not published";
             return;
         } catch (...) {
-//            logger.error(e);
+            BOOST_LOG_SEV(get_logger(), error) << "could not unpublish: unspecified exception ... retry";
 #ifdef _WIN32
             Sleep( 500 );
 #else
@@ -272,7 +273,7 @@ void InteractionRoot::unpublish_interaction(RTI::RTIambassador *rti) {
         }
     }
 
-//    logger.debug("unpublish: {}", get_hla_class_name());
+    BOOST_LOG_SEV(get_logger(), debug) << "unpublish_interaction: interaction unpublished";
 }
 
 
@@ -290,13 +291,13 @@ void InteractionRoot::subscribe_interaction(RTI::RTIambassador *rti) {
             rti->subscribeInteractionClass(get_class_handle());
             isNotSubscribed = false;
         } catch (RTI::FederateNotExecutionMember e) {
-//            logger.error("could not subscribe: Federate Not Execution Member", e);
+            BOOST_LOG_SEV(get_logger(), error) << "could not subscribe: federate not execution member";
             return;
         } catch (RTI::InteractionClassNotDefined e) {
-//            logger.error("could not subscribe: Interaction Class Not Defined", e);
+            BOOST_LOG_SEV(get_logger(), error) << "could not subscribe: class not defined";
             return;
         } catch (...) {
-//            logger.error(e);
+            BOOST_LOG_SEV(get_logger(), error) << "could not subscribe: unspecified exception ... retry";
 #ifdef _WIN32
             Sleep( 500 );
 #else
@@ -305,7 +306,7 @@ void InteractionRoot::subscribe_interaction(RTI::RTIambassador *rti) {
         }
     }
 
-//    logger.debug("subscribe: {}", get_hla_class_name());
+    BOOST_LOG_SEV(get_logger(), debug) << "subscribe_interaction: interaction subscribed";
 }
 
 
@@ -321,16 +322,16 @@ void InteractionRoot::unsubscribe_interaction(RTI::RTIambassador *rti) {
             rti->unsubscribeInteractionClass(get_class_handle());
             isNotUnsubscribed = false;
         } catch (RTI::FederateNotExecutionMember e) {
-//            logger.error("could not unsubscribe: Federate Not Execution Member", e);
+            BOOST_LOG_SEV(get_logger(), error) << "could not unsubscribe: federate not execution member";
             return;
         } catch (RTI::InteractionClassNotDefined e) {
-//            logger.error("could not unsubscribe: Interaction Class Not Defined", e);
+            BOOST_LOG_SEV(get_logger(), error) << "could not unsubscribe: class not defined";
             return;
         } catch (RTI::InteractionClassNotSubscribed e) {
-//            logger.error("could not unsubscribe: Interaction Class Not Subscribed", e);
+            BOOST_LOG_SEV(get_logger(), error) << "could not unsubscribe: class not subscribed";
             return;
         } catch (...) {
-//            logger.error(e);
+            BOOST_LOG_SEV(get_logger(), error) << "could not unsubscribe: unspecified exception ... retry";
 #ifdef _WIN32
             Sleep( 500 );
 #else
@@ -339,7 +340,7 @@ void InteractionRoot::unsubscribe_interaction(RTI::RTIambassador *rti) {
         }
     }
 
-//    logger.debug("unsubscribe: {}", get_hla_class_name());
+    BOOST_LOG_SEV(get_logger(), debug) << "unsubscribe_interaction: interaction unsubscribed";
 }
 
 
@@ -385,25 +386,25 @@ void InteractionRoot::sendInteraction( RTI::RTIambassador *rti, double time ) {
 //            createLog( time, true );
             interactionNotSent = false;
         } catch ( RTI::InteractionClassNotDefined & ) {
-            std::cerr << "ERROR:  " << getCppClassName() << ":  could not send interaction:  Interaction Class Not Defined" << std::endl;
+            BOOST_LOG_SEV(get_logger(), error) << "could not send interaction:  interaction class \"" << get_hla_class_name() << "\" not defined";
             return;
         } catch ( RTI::InteractionClassNotPublished & ) {
-            std::cerr << "ERROR:  " << getCppClassName() << ":  could not send interaction:  Interaction Class Not Published" << std::endl;
+            BOOST_LOG_SEV(get_logger(), error) << "could not send interaction:  interaction class \"" << get_hla_class_name() << "\" not published";
             return;
         } catch ( RTI::InteractionParameterNotDefined & ) {
-            std::cerr << "ERROR:  " << getCppClassName() << ":  could not send interaction:  Interaction Parameter Not Defined" << std::endl;
+            BOOST_LOG_SEV(get_logger(), error) << "could not send interaction:  parameter for interaction class \"" << get_hla_class_name() << "\" not defined";
             return;
         } catch ( RTI::InvalidFederationTime & ) {
-            std::cerr << "ERROR:  " << getCppClassName() << ":  could not send interaction:  Invalid Federation Time" << std::endl;
+            BOOST_LOG_SEV(get_logger(), error) << "could not send interaction:  invalid federation time (" << time << ")";
             return;
         } catch ( RTI::FederateNotExecutionMember & ) {
-            std::cerr << "ERROR:  " << getCppClassName() << ":  could not send interaction:  Federate Not Execution Member" << std::endl;
+            BOOST_LOG_SEV(get_logger(), error) << "could not send interaction:  federate not execution member";
             return;
         } catch ( RTI::ConcurrentAccessAttempted & ) {
-            std::cerr << "ERROR:  " << getCppClassName() << ":  could not send interaction:  ConcurrentAccessAttempted" << std::endl;
+            BOOST_LOG_SEV(get_logger(), error) << "could not send interaction:  concurrent access attempted";
             return;
         } catch ( ... ) {
-            std::cerr << "ERROR:  " << getCppClassName() << ":  could not send interaction:  Exception caught ... retry" << std::endl;
+            BOOST_LOG_SEV(get_logger(), error) << "could not send interaction:  unspecified exception caught -- retry";
 #ifdef _WIN32
             Sleep( 500 );
 #else
@@ -421,22 +422,22 @@ void InteractionRoot::sendInteraction( RTI::RTIambassador *rti ) {
             rti->sendInteraction(  getClassHandle(), *datamembers, 0  );
 //            createLog( 0, true );
         } catch ( RTI::InteractionClassNotDefined & ) {
-            std::cerr << "ERROR:  " << getCppClassName() << ":  could not send interaction:  Interaction Class Not Defined" << std::endl;
+            BOOST_LOG_SEV(get_logger(), error) << "could not send interaction:  interaction class \"" << get_hla_class_name() << "\" not defined";
             return;
         } catch ( RTI::InteractionClassNotPublished & ) {
-            std::cerr << "ERROR:  " << getCppClassName() << ":  could not send interaction:  Interaction Class Not Published" << std::endl;
+            BOOST_LOG_SEV(get_logger(), error) << "could not send interaction:  interaction class \"" << get_hla_class_name() << "\" not published";
             return;
         } catch ( RTI::InteractionParameterNotDefined & ) {
-            std::cerr << "ERROR:  " << getCppClassName() << ":  could not send interaction:  Interaction Parameter Not Defined" << std::endl;
+            BOOST_LOG_SEV(get_logger(), error) << "could not send interaction:  parameter for interaction class \"" << get_hla_class_name() << "\" not defined";
             return;
         } catch ( RTI::FederateNotExecutionMember & ) {
-            std::cerr << "ERROR:  " << getCppClassName() << ":  could not send interaction:  Federate Not Execution Member" << std::endl;
+            BOOST_LOG_SEV(get_logger(), error) << "could not send interaction:  federate not execution member";
             return;
         } catch ( RTI::ConcurrentAccessAttempted & ) {
-            std::cerr << "ERROR:  " << getCppClassName() << ":  could not send interaction:  ConcurrentAccessAttempted" << std::endl;
+            BOOST_LOG_SEV(get_logger(), error) << "could not send interaction:  concurrent access attempted";
             return;
         } catch ( ... ) {
-            std::cerr << "ERROR:  " << getCppClassName() << ":  could not send interaction:  Exception caught ... retry" << std::endl;
+            BOOST_LOG_SEV(get_logger(), error) << "could not send interaction:  unspecified exception caught -- retry";
 #ifdef _WIN32
             Sleep( 500 );
 #else
@@ -499,7 +500,8 @@ InteractionRoot::SP InteractionRoot::fromJson(const std::string &jsonString) {
     const std::string className(topLevelJSONObject["messaging_name"].asString());
     SP interactionRootSP = create_interaction(className);
     if (!interactionRootSP) {
-//        logger.error("InteractionRoot:  fromJson(std::string):  no such interaction class \"{}\"", className);
+        BOOST_LOG_SEV(get_logger(), error) << "fromJson(std::string):  no such interaction class \""
+          << className << "\"";
         return SP();
     }
 

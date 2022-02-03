@@ -37,6 +37,8 @@
 #ifndef _OBJECT_ROOT_CLASS
 #define _OBJECT_ROOT_CLASS
 
+#define BOOST_LOG_DYN_LINK
+
 #include <string>
 #include <vector>
 #include <algorithm>
@@ -48,10 +50,17 @@
 #include <list>
 #include <cctype>
 #include <cstdlib>
+#include <typeinfo>
 
 #include <boost/shared_ptr.hpp>
 #include <boost/algorithm/string.hpp>
 #include <boost/algorithm/string/join.hpp>
+
+#include <boost/log/expressions/keyword.hpp>
+#include <boost/log/trivial.hpp>
+#include <boost/log/sources/severity_logger.hpp>
+#include <boost/log/attributes.hpp>
+#include <boost/log/utility/setup/common_attributes.hpp>
 
 #include <jsoncpp/json/json.h>
 
@@ -74,9 +83,17 @@ namespace org {
  namespace cpswt {
   namespace hla {
 
+namespace logging = boost::log;
+namespace logging_source = boost::log::sources;
+namespace attrs = boost::log::attributes;
+
+using namespace logging::trivial;
+
 class ObjectRoot : public ObjectRootInterface {
 
 public:
+    typedef logging_source::severity_logger< severity_level > severity_logger;
+
     typedef boost::shared_ptr<ObjectRoot> SP;
     typedef RTI::AttributeHandleValuePairSet PropertyHandleValuePairSet;
     typedef boost::shared_ptr<PropertyHandleValuePairSet> PropertyHandleValuePairSetSP;
@@ -104,6 +121,7 @@ public:
     typedef std::map< std::string, PubsubFunctionPtr > ClassNamePubSubMap;
     typedef std::map< std::string, std::string> DatamemberTypeMap;typedef std::map< std::string, AttributeHandleSetSP > StringAttributesHandleSetSPMap;
     typedef std::unordered_map< int, SP > ObjectHandleInstanceSPMap;
+
 
 private:
     static int generate_unique_id() {
@@ -578,26 +596,7 @@ private:
       const std::string &attributeName,
       bool publish,
       bool insert
-    ) {
-        StringClassAndPropertyNameSetSPMap::const_iterator samItr =
-          stringClassAndPropertyNameSetSPMap.find( className );
-        if ( samItr == stringClassAndPropertyNameSetSPMap.end() ) {
-            // ERROR
-            return;
-        }
-
-        ClassAndPropertyNameSP classAndPropertyNameSP = findProperty(className, attributeName);
-        if (!classAndPropertyNameSP) {
-            // ERROR
-            return;
-        }
-
-        if (insert) {
-            samItr->second->insert(*classAndPropertyNameSP);
-        } else {
-            samItr->second->erase(*classAndPropertyNameSP);
-        }
-    }
+    );
 
     //----------------------------------------
     // CLASS-NAME PUBLISHED-ATTRIBUTE-NAME SET
@@ -728,25 +727,19 @@ public:
           getAttributeAux(getHlaClassName(), propertyName);
 
         if (!propertyClassNameAndValueSP) {
-//            logger.error(
-//              "setattribute(\"{}\", {} value): could not find \"{}\" attribute of class \"{}\" or its " +
-//              "superclasses.", propertyName, value.getClass().getName(), propertyName, getHlaClassName()
-//            );
+            BOOST_LOG_SEV(get_logger(), error) << "setAttribute(\"" << propertyName << "\", "
+              << typeid(T).name() << " value): could not find \"" << propertyName
+              << "\" attribute in class \"" << getHlaClassName() << "\" or any of its superclasses.";
             return;
         }
 
         Value currentValue = *propertyClassNameAndValueSP->getValueSP();
 
         if (!currentValue.setValue(value)) {
-//            logger.error(
-//              "setattribute(\"{}\", {} value): \"value\" is incorrect type \"{}\" for \"{}\" parameter, " +
-//              "should be of type \"{}\".",
-//              propertyName,
-//              value.getClass().getName(),
-//              value.getClass().getName(),
-//              propertyName,
-//              currentValue.getClass().getName()
-//            );
+            BOOST_LOG_SEV(get_logger(), error) << "setAttribute(\"" << propertyName << "\", "
+              << typeid(T).name() << " value): \"value\" is incorrect type \"" << typeid(T).name()
+              << "\" for \"" << propertyName << "\" parameter, should be of type \""
+              << currentValue.getTypeName() << "\"";
         }
     }
 
@@ -757,20 +750,28 @@ public:
           get_handle_class_and_property_name_sp_map().find(propertyHandle);
 
         if (hcmItr == get_handle_class_and_property_name_sp_map().end()) {
-//            logger.error(
-//              "setAttribute(int, Object value): propertyHandle {} does not exist.",
-//              propertyHandle
-//            );
+            BOOST_LOG_SEV(get_logger(), error) << "setAttribute(int propertyHandle, "
+              << typeid(T).name() << " value): propertyHandle (" << propertyHandle << ") does not exist.";
             return;
+        }
+
+        ClassAndPropertyName &classAndPropertyName = *hcmItr->second;
+
+        ClassAndPropertyNameValueSPMap::iterator cvmItr = _classAndPropertyNameValueSPMap.find(classAndPropertyName);
+        if (cvmItr == _classAndPropertyNameValueSPMap.end()) {
+            BOOST_LOG_SEV(get_logger(), error) << "setAttribute(int propertyHandle, "
+            << typeid(T).name() << " value): propertyHandle (" << propertyHandle
+            << ") corresponds to property of name \"" << classAndPropertyName.getPropertyName()
+            << "\", which does not exist in class \"" << getHlaClassName() << "\" (it's defined in class \""
+            << classAndPropertyName.getClassName() << "\")";
         }
 
         Value &currentValue = *_classAndPropertyNameValueSPMap[*hcmItr->second];
         if (!currentValue.setValue(value)) {
-//            logger.error(
-//                "setAttribute: propertyHandle {} corresponds to property of name \"{}\", which " +
-//                "does not exist in class \"{}\" (it's defined in class\"{}\")",
-//                propertyHandle, propertyName, getClass(), classAndPropertyName.getClassName()
-//            );
+            BOOST_LOG_SEV(get_logger(), error) << "setAttribute(int propertyHandle, "
+              << typeid(T).name() << " value): \"value\" is incorrect type \"" << typeid(T).name()
+              << "\" for \"" << classAndPropertyName.getPropertyName() << "\" parameter, should be of type \""
+              << currentValue.getTypeName() << "\"";
         }
     }
 
@@ -810,6 +811,23 @@ public:
 
 
 
+private:
+    static severity_logger &get_logger_aux() {
+        static severity_logger logger;
+        logger.add_attribute("MessagingClassName", attrs::constant< std::string >(
+          "ObjectRoot"
+        ));
+
+        logging::add_common_attributes();
+        return logger;
+    }
+
+public:
+    static severity_logger &get_logger() {
+        static severity_logger &logger = get_logger_aux();
+        return logger;
+    }
+
     // ----------------------------------------------------------------------------
     // STATIC DATAMEMBERS AND CODE THAT DEAL WITH NAMES
     // THIS CODE IS STATIC BECAUSE IT IS CLASS-DEPENDENT AND NOT INSTANCE-DEPENDENT
@@ -817,7 +835,7 @@ public:
 
 public:
     /**
-     * Returns the fully-qualified (dot-delimited) name of the org.cpswt.hla.ObjectRoot object class.
+     * Returns the fully-qualified (dot-delimited) name of the ::org::cpswt::hla::ObjectRoot object class.
      * Note: As this is a static method, it is NOT polymorphic, and so, if called on
      * a reference will return the name of the class pertaining to the reference,
      * rather than the name of the class for the instance referred to by the reference.

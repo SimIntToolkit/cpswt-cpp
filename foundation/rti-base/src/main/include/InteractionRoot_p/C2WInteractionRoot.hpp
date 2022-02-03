@@ -55,6 +55,23 @@ public:
     typedef ::org::cpswt::hla::InteractionRoot Super;
     typedef boost::shared_ptr< C2WInteractionRoot > SP;
 
+private:
+    static severity_logger &get_logger_aux() {
+        static severity_logger logger;
+        logger.add_attribute("MessagingClassName", attrs::constant< std::string >(
+          "InteractionRoot.C2WInteractionRoot"
+        ));
+
+        logging::add_common_attributes();
+        return logger;
+    }
+
+public:
+    static severity_logger &get_logger() {
+        static severity_logger &logger = get_logger_aux();
+        return logger;
+    }
+
     // ----------------------------------------------------------------------------
     // STATIC DATAMEMBERS AND CODE THAT DEAL WITH NAMES
     // THIS CODE IS STATIC BECAUSE IT IS CLASS-DEPENDENT AND NOT INSTANCE-DEPENDENT
@@ -62,7 +79,7 @@ public:
 
 public:
     /**
-     * Returns the fully-qualified (dot-delimited) name of the org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot interaction class.
+     * Returns the fully-qualified (dot-delimited) name of the ::org::cpswt::hla::InteractionRoot_p::C2WInteractionRoot interaction class.
      * Note: As this is a static method, it is NOT polymorphic, and so, if called on
      * a reference will return the name of the class pertaining to the reference,
      * rather than the name of the class for the instance referred to by the reference.
@@ -649,6 +666,29 @@ public:
     //------------------------------
     // END INSTANCE CREATION METHODS
     //------------------------------
+
+    // THIS METHOD ACTS AS AN ERROR DETECTOR -- ALL INSTANCE OF C2WInteractionRoot
+    // SHOULD HAVE NON-EMPTY VALUES FOR THEIR originFed AND sourceFed PARAMETERS.
+public:
+    virtual void sendInteraction( RTI::RTIambassador *rtiAmbassador, double time ) {
+        if ( get_sourceFed().empty() || get_originFed().empty() ) {
+            BOOST_LOG_SEV(get_logger(), error) << "sourceFed and/or originFed not specified";
+            return;
+        }
+        Super::sendInteraction( rtiAmbassador, time );
+    }
+
+    // THIS METHOD ACTS AS AN ERROR DETECTOR -- ALL INSTANCE OF C2WInteractionRoot
+    // SHOULD HAVE NON-EMPTY VALUES FOR THEIR originFed AND sourceFed PARAMETERS.
+
+    virtual void sendInteraction( RTI::RTIambassador *rtiAmbassador ) {
+        if ( get_sourceFed().empty() || get_originFed().empty() ) {
+            BOOST_LOG_SEV(get_logger(), error) << "sourceFed and/or originFed not specified";
+            return;
+        }
+        Super::sendInteraction( rtiAmbassador );
+    }
+
 
 };
    } // NAMESPACE "InteractionRoot_p"

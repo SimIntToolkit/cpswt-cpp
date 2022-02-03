@@ -73,9 +73,16 @@ tasks.withType(CppCompile::class.java).configureEach {
 }
 
 tasks.withType(LinkExecutable::class.java).configureEach {
+
+    val linkLibraryList = listOf(
+        "cppunit", "jsoncpp", "boost_log_setup", "boost_log", "boost_system", "boost_thread", "pthread"
+    )
+
+    val linkLibraryOptionList = linkLibraryList.map { "-l$it" }
+
     linkerArgs.addAll(toolChain.map { toolChain ->
         when(toolChain) {
-            is Gcc, is Clang -> listOf("-lcppunit", "-ljsoncpp")
+            is Gcc, is Clang -> linkLibraryOptionList
             else -> listOf()
         }
     })
