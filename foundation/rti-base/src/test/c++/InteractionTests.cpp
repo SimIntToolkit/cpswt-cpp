@@ -356,7 +356,7 @@ BOOST_LOG_ATTRIBUTE_KEYWORD(timestamp, "TimeStamp", boost::posix_time::ptime);
 void InteractionTests::basicLogTest() {
 
     boost::shared_ptr< text_sink > stringSink = boost::make_shared< text_sink >();
-    boost::shared_ptr< std::ostringstream > ostringstreamSP = boost::make_shared< std::ostringstream >("f.u");
+    boost::shared_ptr< std::ostringstream > ostringstreamSP = boost::make_shared< std::ostringstream >();
 
     stringSink->locked_backend()->add_stream( ostringstreamSP );
 
