@@ -10,6 +10,14 @@
 #include "ObjectRoot.hpp"
 #include "ObjectRoot_p/FederateObject.hpp"
 
+#include <boost/date_time/posix_time/posix_time.hpp>
+#include <boost/log/expressions.hpp>
+#include <boost/regex.hpp>
+#include <boost/smart_ptr/shared_ptr.hpp>
+#include <boost/algorithm/string.hpp>
+#include <list>
+#include <sstream>
+
 
 using InteractionRoot = ::org::cpswt::hla::InteractionRoot;
 using ObjectRoot = ::org::cpswt::hla::ObjectRoot;
@@ -21,6 +29,10 @@ using SimEnd = ::org::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::Simul
 using FederateObject = ::org::cpswt::hla::ObjectRoot_p::FederateObject;
 
 typedef std::set<std::string> StringSet;
+typedef std::list<std::string> StringList;
+
+namespace expr = boost::log::expressions;
+namespace attrs = boost::log::attributes;
 
 template<typename COLLECTION>
 void printCollection(std::ostream &os, const COLLECTION &collection) {
@@ -84,11 +96,22 @@ void InteractionTests::classHandleTest() {
     RTI::RTIambassador rtiAmbassador(&rtiAmbassadorTest1);
 
     InteractionRoot::publish_interaction(&rtiAmbassador);
+    InteractionRoot::unpublish_interaction(&rtiAmbassador);
+
     C2WInteractionRoot::publish_interaction(&rtiAmbassador);
+    C2WInteractionRoot::unpublish_interaction(&rtiAmbassador);
+
     SimLog::publish_interaction(&rtiAmbassador);
+    SimLog::unpublish_interaction(&rtiAmbassador);
+
     HighPrio::publish_interaction(&rtiAmbassador);
+    HighPrio::unpublish_interaction(&rtiAmbassador);
+
     SimulationControl::publish_interaction(&rtiAmbassador);
+    SimulationControl::unpublish_interaction(&rtiAmbassador);
+
     SimEnd::publish_interaction(&rtiAmbassador);
+    SimEnd::unpublish_interaction(&rtiAmbassador);
 
     CPPUNIT_ASSERT_EQUAL(
             RTIAmbassadorTest1::get_class_name_handle_map().find("InteractionRoot")->second,
@@ -293,6 +316,7 @@ void InteractionTests::propertyHandleTest() {
     RTI::RTIambassador rtiAmbassador(&rtiAmbassadorTest1);
 
     HighPrio::publish_interaction(&rtiAmbassador);
+    HighPrio::unpublish_interaction(&rtiAmbassador);
 
     int expectedValue = RTIAmbassadorTest1::get_class_and_property_name_parameter_handle_map().find(
             ClassAndPropertyName("InteractionRoot.C2WInteractionRoot", "originFed")
@@ -323,6 +347,48 @@ void InteractionTests::propertyHandleTest() {
     )->second;
 
     CPPUNIT_ASSERT_EQUAL(expectedValue, FederateObject::get_attribute_handle("FederateHost"));
+}
+
+BOOST_LOG_ATTRIBUTE_KEYWORD(messagingClassName, "MessagingClassName", std::string);
+BOOST_LOG_ATTRIBUTE_KEYWORD(severity, "Severity", logging::trivial::severity_level);
+BOOST_LOG_ATTRIBUTE_KEYWORD(timestamp, "TimeStamp", boost::posix_time::ptime);
+
+void InteractionTests::basicLogTest() {
+
+    boost::shared_ptr< text_sink > stringSink = boost::make_shared< text_sink >();
+    boost::shared_ptr< std::ostringstream > ostringstreamSP = boost::make_shared< std::ostringstream >("f.u");
+
+    stringSink->locked_backend()->add_stream( ostringstreamSP );
+
+    stringSink->set_formatter(
+        expr::stream << messagingClassName << " <" << timestamp << "> [" << severity << "]: " << expr::smessage
+    );
+    logging::core::get()->add_sink(stringSink);
+
+    RTIAmbassadorTest1 rtiAmbassadorTest1;
+    RTI::RTIambassador rtiAmbassador(&rtiAmbassadorTest1);
+    HighPrio::publish_interaction(&rtiAmbassador);
+    HighPrio::unpublish_interaction(&rtiAmbassador);
+
+    std::string timeRegexString = R"(\d{4}-\w{3}-\d{2} \d{2}:\d{2}:\d{2}.\d*)";
+    std::string publishingRegexString = "(?:un)?publish_interaction: interaction (?:un)?published";
+
+    std::string logLineRegexString = HighPrio::get_hla_class_name() + " <" + timeRegexString + R"(> \[debug\]: )"
+      + publishingRegexString;
+
+    boost::regex logLineRegex{ logLineRegexString };
+
+    std::string loggerOutput = ostringstreamSP->str();
+
+    StringList logLineList;
+    boost::algorithm::split(logLineList, loggerOutput, boost::is_any_of("\n"));
+    if (logLineList.size() > 0 && logLineList.back() == "") {
+        logLineList.pop_back();
+    }
+
+    for(StringList::const_iterator stlCit = logLineList.begin() ; stlCit != logLineList.end() ; ++stlCit) {
+        CPPUNIT_ASSERT(boost::regex_match(*stlCit, logLineRegex));
+    }
 }
 
 CPPUNIT_TEST_SUITE_REGISTRATION( InteractionTests );
