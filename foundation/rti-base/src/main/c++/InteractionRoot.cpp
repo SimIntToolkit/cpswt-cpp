@@ -42,23 +42,6 @@ namespace org {
 
 bool InteractionRoot::static_init_var = InteractionRoot::static_init();
 
-std::string InteractionRoot::join(const std::list<std::string> &joinList, const std::string &delimiter) {
-    std::string retval;
-
-    if (joinList.empty()) {
-        return retval;
-    }
-
-    std::list<std::string>::const_iterator strItr = joinList.begin();
-    retval += *strItr++;
-    while(strItr != joinList.end()) {
-        retval += delimiter + *strItr++;
-    }
-
-    return retval;
-}
-
-
 ClassAndPropertyNameSP InteractionRoot::findProperty(const std::string &className, const std::string &propertyName) {
 
     std::list<std::string> classNameComponents;
@@ -171,10 +154,8 @@ int InteractionRoot::get_parameter_handle_aux(const std::string &className, cons
     if (cimCit != get_class_and_property_name_handle_map().end()) {
         return cimCit->second;
     }
-//    logger.error(
-//      "get_parameter_handle: could not find handle for \"{}\" parameter of class \"{}\" or its " +
-//      "superclasses.", propertyName, className
-//    );
+    BOOST_LOG_SEV(get_logger(), error) << "get_parameter_handle: could not find handle for \""
+      << propertyName << "\" parameter of class \"" << className << "\" or its superclasses";
     return -1;
 }
 

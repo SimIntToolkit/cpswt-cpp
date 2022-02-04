@@ -42,23 +42,6 @@ namespace org {
 
 bool ObjectRoot::static_init_var = ObjectRoot::static_init();
 
-std::string ObjectRoot::join(const std::list<std::string> &joinList, const std::string &delimiter) {
-    std::string retval;
-
-    if (joinList.empty()) {
-        return retval;
-    }
-
-    std::list<std::string>::const_iterator strItr = joinList.begin();
-    retval += *strItr++;
-    while(strItr != joinList.end()) {
-        retval += delimiter + *strItr++;
-    }
-
-    return retval;
-}
-
-
 ClassAndPropertyNameSP ObjectRoot::findProperty(const std::string &className, const std::string &propertyName) {
 
     std::list<std::string> classNameComponents;
@@ -328,10 +311,8 @@ int ObjectRoot::get_attribute_handle_aux(const std::string &className, const std
     if (cimCit != get_class_and_property_name_handle_map().end()) {
         return cimCit->second;
     }
-//    logger.error(
-//      "get_attribute_handle: could not find handle for \"{}\" attribute of class \"{}\" or its " +
-//      "superclasses.", propertyName, className
-//    );
+    BOOST_LOG_SEV(get_logger(), error) << "get_attribute_handle: could not find handle for \""
+      << propertyName << "\" attribute of class \"" << className << "\" or its superclasses";
     return -1;
 }
 

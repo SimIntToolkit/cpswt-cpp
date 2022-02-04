@@ -54,7 +54,6 @@
 
 #include <boost/shared_ptr.hpp>
 #include <boost/algorithm/string.hpp>
-#include <boost/algorithm/string/join.hpp>
 
 #include <boost/log/expressions/keyword.hpp>
 #include <boost/log/trivial.hpp>
