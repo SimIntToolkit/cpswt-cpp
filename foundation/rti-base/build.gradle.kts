@@ -81,7 +81,7 @@ tasks.withType(CppCompile::class.java).configureEach {
 tasks.withType(LinkExecutable::class.java).configureEach {
 
     val linkLibraryList = listOf(
-        "cppunit", "jsoncpp", "boost_log_setup", "boost_log", "boost_system", "boost_thread", "pthread"
+        "cppunit", "jsoncpp", "boost_log_setup", "boost_log", "boost_system", "boost_thread", "pthread", "boost_regex"
     )
 
     val linkLibraryOptionList = linkLibraryList.map { "-l$it" }
