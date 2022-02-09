@@ -178,7 +178,7 @@ void SynchronizedFederate::joinFederation() {
 
 	intJoin->set_sourceFed( getFederateId() );
 	intJoin->set_originFed( getFederateId() );
-	intJoin->set_FederateType( getFederateId() );
+	intJoin->set_FederateType( getFederateType() );
 	intJoin->set_FederateId( getFederateId() );
     intJoin->set_IsLateJoiner(get_IsLateJoiner());
 
