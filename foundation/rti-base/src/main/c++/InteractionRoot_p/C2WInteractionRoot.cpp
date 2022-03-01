@@ -41,298 +41,66 @@ namespace org {
 bool C2WInteractionRoot::static_init_var = C2WInteractionRoot::static_init();
 
 bool C2WInteractionRoot::static_init() {
+    BOOST_LOG_SEV(get_logger(), info) << "Class \"::org::cpswt::hla::InteractionRoot_p::C2WInteractionRoot\" loaded.";
+
     // ADD THIS CLASS TO THE _classNameSet DEFINED IN InteractionRoot
     get_hla_class_name_set().insert(get_hla_class_name());
 
-    // ADD CLASS OBJECT OF THIS CLASS TO _classNameClassMap DEFINED IN InteractionRoot
-    get_class_name_instance_sp_map()[get_hla_class_name()] = SP(new C2WInteractionRoot());
+    InteractionRoot::NoInstanceInit noInstanceInit;
+    SP instanceSP = SP( new C2WInteractionRoot(noInstanceInit) );
+    get_hla_class_name_instance_sp_map()[get_hla_class_name()] = instanceSP;
+
+    ClassAndPropertyNameSetSP classAndPropertyNameSetSP( new ClassAndPropertyNameSet() );
+    classAndPropertyNameSetSP->emplace(
+        "InteractionRoot.C2WInteractionRoot", "actualLogicalGenerationTime"
+    );
+
+    get_class_and_property_name_initial_value_sp_map()[ClassAndPropertyName( "InteractionRoot.C2WInteractionRoot", "actualLogicalGenerationTime" )] =
+      ValueSP( new Value( static_cast<double>(0) ));
+    classAndPropertyNameSetSP->emplace(
+        "InteractionRoot.C2WInteractionRoot", "federateFilter"
+    );
+
+    get_class_and_property_name_initial_value_sp_map()[ClassAndPropertyName( "InteractionRoot.C2WInteractionRoot", "federateFilter" )] =
+      ValueSP( new Value( std::string("") ));
+    classAndPropertyNameSetSP->emplace(
+        "InteractionRoot.C2WInteractionRoot", "originFed"
+    );
+
+    get_class_and_property_name_initial_value_sp_map()[ClassAndPropertyName( "InteractionRoot.C2WInteractionRoot", "originFed" )] =
+      ValueSP( new Value( std::string("") ));
+    classAndPropertyNameSetSP->emplace(
+        "InteractionRoot.C2WInteractionRoot", "sourceFed"
+    );
+
+    get_class_and_property_name_initial_value_sp_map()[ClassAndPropertyName( "InteractionRoot.C2WInteractionRoot", "sourceFed" )] =
+      ValueSP( new Value( std::string("") ));
 
     // ADD THIS CLASS'S _classAndPropertyNameSet TO _classNamePropertyNameSetMap DEFINED
     // IN InteractionRoot
-    get_class_name_class_and_property_name_set_sp_map()[get_hla_class_name()] = get_class_and_property_name_set_sp();
+    get_class_name_class_and_property_name_set_sp_map()[get_hla_class_name()] = classAndPropertyNameSetSP;
 
-    // ADD THIS CLASS'S _allClassAndPropertyNameSet TO _classNameAllPropertyNameSetMap DEFINED
+    ClassAndPropertyNameSetSP allClassAndPropertyNameSetSP( new ClassAndPropertyNameSet() );
+
+    allClassAndPropertyNameSetSP->emplace(
+        "InteractionRoot.C2WInteractionRoot", "actualLogicalGenerationTime"
+    );
+
+    allClassAndPropertyNameSetSP->emplace(
+        "InteractionRoot.C2WInteractionRoot", "federateFilter"
+    );
+
+    allClassAndPropertyNameSetSP->emplace(
+        "InteractionRoot.C2WInteractionRoot", "originFed"
+    );
+
+    allClassAndPropertyNameSetSP->emplace(
+        "InteractionRoot.C2WInteractionRoot", "sourceFed"
+    );// ADD THIS CLASS'S _allClassAndPropertyNameSet TO _classNameAllPropertyNameSetMap DEFINED
     // IN InteractionRoot
-    get_class_name_all_class_and_property_name_set_sp_map()[get_hla_class_name()] =
-      get_all_class_and_property_name_set_sp();
-    get_class_and_property_name_set_sp()->emplace(
-        "InteractionRoot.C2WInteractionRoot", "actualLogicalGenerationTime"
-    );
-    get_class_and_property_name_set_sp()->emplace(
-        "InteractionRoot.C2WInteractionRoot", "federateFilter"
-    );
-    get_class_and_property_name_set_sp()->emplace(
-        "InteractionRoot.C2WInteractionRoot", "originFed"
-    );
-    get_class_and_property_name_set_sp()->emplace(
-        "InteractionRoot.C2WInteractionRoot", "sourceFed"
-    );
-
-    get_all_class_and_property_name_set_sp()->emplace(
-        "InteractionRoot.C2WInteractionRoot", "actualLogicalGenerationTime"
-    );
-
-    get_all_class_and_property_name_set_sp()->emplace(
-        "InteractionRoot.C2WInteractionRoot", "federateFilter"
-    );
-
-    get_all_class_and_property_name_set_sp()->emplace(
-        "InteractionRoot.C2WInteractionRoot", "originFed"
-    );
-
-    get_all_class_and_property_name_set_sp()->emplace(
-        "InteractionRoot.C2WInteractionRoot", "sourceFed"
-    );
+    get_class_name_all_class_and_property_name_set_sp_map()[get_hla_class_name()] = allClassAndPropertyNameSetSP;
 
     return true;
-}
-
-
-int C2WInteractionRoot::get_parameter_handle_aux(const std::string &className, const std::string &propertyName) {
-    ClassAndPropertyName key(get_hla_class_name(), propertyName);
-    ClassAndPropertyNameIntegerMap::const_iterator cimCit = get_class_and_property_name_handle_map().find(key);
-    if (cimCit != get_class_and_property_name_handle_map().end()) {
-        return cimCit->second;
-    }
-    return Super::get_parameter_handle_aux(className, propertyName);
-}
-
-
-void C2WInteractionRoot::init(RTI::RTIambassador *rti) {
-    if (get_is_initialized()) return;
-    get_is_initialized() = true;
-    Super::init(rti);
-
-    bool isNotInitialized = true;
-    while(isNotInitialized) {
-        try {
-            get_class_handle() = rti->getInteractionClassHandle(get_hla_class_name().c_str());
-            isNotInitialized = false;
-        } catch (RTI::FederateNotExecutionMember e) {
-            BOOST_LOG_SEV(get_logger(), error) << "could not initialize class handle: federate not execution member";
-            return;
-        } catch (RTI::NameNotFound e) {
-            BOOST_LOG_SEV(get_logger(), error) << "could not initialize class handle: name not found";
-            return;
-        } catch (...) {
-            BOOST_LOG_SEV(get_logger(), error) << "could not initialize class handle: unspecified exception ... retry";
-#ifdef _WIN32
-            Sleep( 500 );
-#else
-            usleep( 500000 );
-#endif
-        }
-    }
-
-    get_class_name_handle_map()[get_hla_class_name()] = get_class_handle();
-    get_class_handle_name_map()[get_class_handle()] = get_hla_class_name();
-    get_class_handle_simple_name_map()[get_class_handle()] = get_simple_class_name();
-
-    ClassAndPropertyNameSP classAndPropertyNameSP;
-
-    isNotInitialized = true;
-    int propertyHandle;
-    while(isNotInitialized) {
-        try {
-
-            propertyHandle = rti->getParameterHandle("actualLogicalGenerationTime", get_class_handle());
-            classAndPropertyNameSP = ClassAndPropertyNameSP( new ClassAndPropertyName(
-              get_hla_class_name(), "actualLogicalGenerationTime"
-            ) );
-            get_class_and_property_name_handle_map()[*classAndPropertyNameSP] = propertyHandle;
-            get_handle_class_and_property_name_sp_map()[propertyHandle] = classAndPropertyNameSP;
-
-            propertyHandle = rti->getParameterHandle("federateFilter", get_class_handle());
-            classAndPropertyNameSP = ClassAndPropertyNameSP( new ClassAndPropertyName(
-              get_hla_class_name(), "federateFilter"
-            ) );
-            get_class_and_property_name_handle_map()[*classAndPropertyNameSP] = propertyHandle;
-            get_handle_class_and_property_name_sp_map()[propertyHandle] = classAndPropertyNameSP;
-
-            propertyHandle = rti->getParameterHandle("originFed", get_class_handle());
-            classAndPropertyNameSP = ClassAndPropertyNameSP( new ClassAndPropertyName(
-              get_hla_class_name(), "originFed"
-            ) );
-            get_class_and_property_name_handle_map()[*classAndPropertyNameSP] = propertyHandle;
-            get_handle_class_and_property_name_sp_map()[propertyHandle] = classAndPropertyNameSP;
-
-            propertyHandle = rti->getParameterHandle("sourceFed", get_class_handle());
-            classAndPropertyNameSP = ClassAndPropertyNameSP( new ClassAndPropertyName(
-              get_hla_class_name(), "sourceFed"
-            ) );
-            get_class_and_property_name_handle_map()[*classAndPropertyNameSP] = propertyHandle;
-            get_handle_class_and_property_name_sp_map()[propertyHandle] = classAndPropertyNameSP;
-
-            isNotInitialized = false;
-        } catch (RTI::FederateNotExecutionMember e) {
-            BOOST_LOG_SEV(get_logger(), error)
-              << "could not initialize parameter handle: federate not execution member";
-            return;
-        } catch (RTI::InteractionClassNotDefined e) {
-            BOOST_LOG_SEV(get_logger(), error)
-              << "could not initialize parameter handle: interaction class not defined";
-            return;
-        } catch (RTI::NameNotFound e) {
-            BOOST_LOG_SEV(get_logger(), error) << "could not initialize parameter handle: name not found";
-            return;
-        } catch (...) {
-            BOOST_LOG_SEV(get_logger(), error)
-              << "could not initialize parameter handle: unspecified exception ... retry";
-#ifdef _WIN32
-            Sleep( 500 );
-#else
-            usleep( 500000 );
-#endif
-        }
-    }
-}
-
-
-void C2WInteractionRoot::publish_interaction(RTI::RTIambassador *rti) {
-    if (get_is_published()) {
-        return;
-    }
-    get_is_published() = true;
-
-    init(rti);
-
-    bool isNotPublished = true;
-    while(isNotPublished) {
-        try {
-            rti->publishInteractionClass(get_class_handle());
-            isNotPublished = false;
-        } catch (RTI::FederateNotExecutionMember e) {
-            BOOST_LOG_SEV(get_logger(), error) << "could not publish: federate not execution member";
-            return;
-        } catch (RTI::InteractionClassNotDefined e) {
-            BOOST_LOG_SEV(get_logger(), error) << "could not publish: interaction class not defined";
-            return;
-        } catch (...) {
-            BOOST_LOG_SEV(get_logger(), error) << "could not publish: unspecified exception ... retry";
-#ifdef _WIN32
-            Sleep( 500 );
-#else
-            usleep( 500000 );
-#endif
-        }
-    }
-
-    BOOST_LOG_SEV(get_logger(), debug) << "publish_interaction: interaction published";
-}
-
-
-void C2WInteractionRoot::unpublish_interaction(RTI::RTIambassador *rti) {
-    if (!get_is_published()) return;
-    get_is_published() = false;
-
-    init(rti);
-
-    bool isNotUnpublished = true;
-    while(isNotUnpublished) {
-        try {
-            rti->unpublishInteractionClass(get_class_handle());
-            isNotUnpublished = false;
-        } catch (RTI::FederateNotExecutionMember e) {
-            BOOST_LOG_SEV(get_logger(), error) << "could not unpublish: federate not execution member";
-            return;
-        } catch (RTI::InteractionClassNotDefined e) {
-            BOOST_LOG_SEV(get_logger(), error) << "could not unpublish: interaction class not defined";
-            return;
-        } catch (RTI::InteractionClassNotPublished e) {
-            BOOST_LOG_SEV(get_logger(), error) << "could not unpublish: interaction class not published";
-            return;
-        } catch (...) {
-            BOOST_LOG_SEV(get_logger(), error) << "could not unpublish: unspecified exception ... retry";
-#ifdef _WIN32
-            Sleep( 500 );
-#else
-            usleep( 500000 );
-#endif
-        }
-    }
-
-    BOOST_LOG_SEV(get_logger(), debug) << "unpublish_interaction: interaction unpublished";
-}
-
-
-void C2WInteractionRoot::subscribe_interaction(RTI::RTIambassador *rti) {
-    if (get_is_subscribed()) {
-        return;
-    }
-    get_is_subscribed() = true;
-
-    init(rti);
-
-    bool isNotSubscribed = true;
-    while(isNotSubscribed) {
-        try {
-            rti->subscribeInteractionClass(get_class_handle());
-            isNotSubscribed = false;
-        } catch (RTI::FederateNotExecutionMember e) {
-            BOOST_LOG_SEV(get_logger(), error) << "could not subscribe: federate not execution member";
-            return;
-        } catch (RTI::InteractionClassNotDefined e) {
-            BOOST_LOG_SEV(get_logger(), error) << "could not subscribe: class not defined";
-            return;
-        } catch (...) {
-            BOOST_LOG_SEV(get_logger(), error) << "could not subscribe: unspecified exception ... retry";
-#ifdef _WIN32
-            Sleep( 500 );
-#else
-            usleep( 500000 );
-#endif
-        }
-    }
-
-    BOOST_LOG_SEV(get_logger(), debug) << "subscribe_interaction: interaction subscribed";
-}
-
-
-void C2WInteractionRoot::unsubscribe_interaction(RTI::RTIambassador *rti) {
-    if (!get_is_subscribed()) return;
-    get_is_subscribed() = false;
-
-    init(rti);
-
-    bool isNotUnsubscribed = true;
-    while(isNotUnsubscribed) {
-        try {
-            rti->unsubscribeInteractionClass(get_class_handle());
-            isNotUnsubscribed = false;
-        } catch (RTI::FederateNotExecutionMember e) {
-            BOOST_LOG_SEV(get_logger(), error) << "could not unsubscribe: federate not execution member";
-            return;
-        } catch (RTI::InteractionClassNotDefined e) {
-            BOOST_LOG_SEV(get_logger(), error) << "could not unsubscribe: class not defined";
-            return;
-        } catch (RTI::InteractionClassNotSubscribed e) {
-            BOOST_LOG_SEV(get_logger(), error) << "could not unsubscribe: class not subscribed";
-            return;
-        } catch (...) {
-            BOOST_LOG_SEV(get_logger(), error) << "could not unsubscribe: unspecified exception ... retry";
-#ifdef _WIN32
-            Sleep( 500 );
-#else
-            usleep( 500000 );
-#endif
-        }
-    }
-
-    BOOST_LOG_SEV(get_logger(), debug) << "unsubscribe_interaction: interaction unsubscribed";
-}
-
-
-C2WInteractionRoot::PropertyClassNameAndValueSP C2WInteractionRoot::getParameterAux(
-  const std::string &className, const std::string &propertyName
-) const {
-
-    ClassAndPropertyNameSP classAndPropertyNameSP = findProperty(className, propertyName);
-    return classAndPropertyNameSP
-      ? PropertyClassNameAndValueSP( new PropertyClassNameAndValue(
-          classAndPropertyNameSP->getClassName(),
-          _classAndPropertyNameValueSPMap.find(*classAndPropertyNameSP)->second
-      ) )
-      : PropertyClassNameAndValueSP();
 }
    } // NAMESPACE "InteractionRoot_p"
   } // NAMESPACE "hla"

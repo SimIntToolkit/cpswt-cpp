@@ -73,11 +73,10 @@ public:
     }
 
     // ----------------------------------------------------------------------------
-    // STATIC DATAMEMBERS AND CODE THAT DEAL WITH NAMES
+    // STATIC PROPERTIES AND CODE THAT DEAL WITH NAMES
     // THIS CODE IS STATIC BECAUSE IT IS CLASS-DEPENDENT AND NOT INSTANCE-DEPENDENT
     // ----------------------------------------------------------------------------
 
-public:
     /**
      * Returns the fully-qualified (dot-delimited) name of the ::org::cpswt::hla::ObjectRoot_p::FederateObject object class.
      * Note: As this is a static method, it is NOT polymorphic, and so, if called on
@@ -108,20 +107,8 @@ public:
      *
      * @return the name of this object class
      */
-    static const std::string &get_simple_class_name() {
-        static const std::string simpleClassName("FederateObject");
-        return simpleClassName;
-    }
-
-    /**
-     * Returns the simple name (last name in its fully-qualified dot-delimited name)
-     * of this instance's object class.
-     * Polymorphic equivalent of the get_simple_class_name static method.
-     *
-     * @return the simple name of this instance's object class
-     */
-    const std::string &getSimpleClassName() const override {
-        return get_simple_class_name();
+    static const std::string get_simple_class_name() {
+        return ObjectRoot::get_simple_class_name(get_hla_class_name());
     }
 
     /**
@@ -140,23 +127,6 @@ public:
     }
 
     /**
-     * Returns the fully-qualified (dot-delimited) hla class name of this instance's object class.
-     * Polymorphic equivalent of get_hla_class_name static method.
-     *
-     * @return the fully-qualified (dot-delimited) name of this instance's object class
-     */
-    const std::string &getHlaClassName() const override {
-        return get_hla_class_name();
-    }
-
-private:
-    static ClassAndPropertyNameSetSP &get_class_and_property_name_set_sp() {
-        static ClassAndPropertyNameSetSP classAndPropertyNameSetSP(new ClassAndPropertyNameSet());
-        return classAndPropertyNameSetSP;
-    }
-
-public:
-    /**
      * Returns a sorted list containing the names of all of the non-hidden attributes in the
      * org.cpswt.hla.ObjectRoot_p.FederateObject object class.
      * The property names are paired with name of the hla class in which they are defined in a
@@ -171,36 +141,9 @@ public:
      * paired with name of the hla class in which they are defined in a ClassAndPropertyName POJO.
      */
     static ClassAndPropertyNameList get_attribute_names() {
-        const ClassAndPropertyNameSet &classAndPropertyNameSet(*get_class_and_property_name_set_sp());
-        std::list<ClassAndPropertyName> classAndPropertyNameList(
-          classAndPropertyNameSet.begin(), classAndPropertyNameSet.end()
-        );
-        classAndPropertyNameList.sort();
-        return classAndPropertyNameList;
+        return ObjectRoot::get_attribute_names( get_hla_class_name() );
     }
 
-    /**
-     * Returns a sorted list containing the names of all of the non-hiddenattributes of an
-     * object class instance.
-     * The property names are paired with name of the hla class in which they are defined in a
-     * ClassAndPropertyName POJO.
-     * Polymorphic equivalent to get_attribute_names static method.
-     *
-     * @return sorted list containing the names of all of the attributes of an
-     * object class instance paired with name of the hla class in which they are defined in a
-     * ClassAndPropertyName POJO.
-     */
-    const ClassAndPropertyNameList getAttributeNames() const override {
-        return get_attribute_names();
-    }
-
-private:
-    static ClassAndPropertyNameSetSP &get_all_class_and_property_name_set_sp() {
-        static ClassAndPropertyNameSetSP allClassAndPropertyNameSetSP(new ClassAndPropertyNameSet());
-        return allClassAndPropertyNameSetSP;
-    }
-
-public:
     /**
      * Returns a sorted list containing the names of all of the attributes in the
      * org.cpswt.hla.ObjectRoot_p.FederateObject object class.
@@ -216,64 +159,22 @@ public:
      * paired with name of the hla class in which they are defined in a ClassAndPropertyName POJO.
      */
     static ClassAndPropertyNameList get_all_attribute_names() {
-        const ClassAndPropertyNameSet &allClassAndPropertyNameSet(*get_all_class_and_property_name_set_sp());
-        ClassAndPropertyNameList allClassAndPropertyNameList(
-          allClassAndPropertyNameSet.begin(), allClassAndPropertyNameSet.end()
-        );
-        allClassAndPropertyNameList.sort();
-        return allClassAndPropertyNameList;
+        return ObjectRoot::get_all_attribute_names( get_hla_class_name() );
     }
 
-    /**
-     * Returns a sorted list containing the names of all of the attributes of an
-     * object class instance.
-     * The property names are paired with name of the hla class in which they are defined in a
-     * ClassAndPropertyName POJO.
-     * Polymorphic equivalent of get_all_attribute_names() static method.
-     *
-     * @return sorted list containing the names of all of the attributes of an
-     * object class instance paired with name of the hla class in which they are defined in a
-     * ClassAndPropertyName POJO.
-     */
-    const ClassAndPropertyNameList getAllAttributeNames() const override {
-        return get_all_attribute_names();
-    }
-
-protected:
-    static ClassAndPropertyNameSetSP &get_published_class_and_property_name_set_sp() {
-        static ClassAndPropertyNameSetSP publishedAttributeNameSetSP(new ClassAndPropertyNameSet());
-        return publishedAttributeNameSetSP;
-    }
-
-    virtual const ClassAndPropertyNameSetSP &getPublishedClassAndPropertyNameSetSP() {
-        return get_published_class_and_property_name_set_sp();
-    }
-
-    static ClassAndPropertyNameSetSP &get_subscribed_class_and_property_name_set_sp() {
-        static ClassAndPropertyNameSetSP subscribedAttributeNameSetSP(new ClassAndPropertyNameSet());
-        return subscribedAttributeNameSetSP;
-    }
-
-    virtual const ClassAndPropertyNameSetSP &getSubscribedClassAndPropertyNameSetSP() {
-        return get_subscribed_class_and_property_name_set_sp();
-    }
-
-
-public:
     /*
-     * INITIALIZE STATIC DATAMEMBERS THAT DEAL WITH NAMES
+     * INITIALIZE STATIC PROPERTYS THAT DEAL WITH NAMES
      */
     static bool static_init();
     static bool static_init_var;
 
     // --------------------------------------------------------
-    // END OF STATIC DATAMEMBERS AND CODE THAT DEAL WITH NAMES.
+    // END OF STATIC PROPERTYS AND CODE THAT DEAL WITH NAMES.
     // --------------------------------------------------------
 
 
-public:
     // ----------------------------------------------------------------------------
-    // STATIC DATAMEMBERS AND CODE THAT DEAL WITH HANDLES.
+    // STATIC PROPERTYS AND CODE THAT DEAL WITH HANDLES.
     // THIS CODE IS STATIC BECAUSE IT IS CLASS-DEPENDENT AND NOT INSTANCE-DEPENDENT
     // ----------------------------------------------------------------------------
     /**
@@ -285,92 +186,39 @@ public:
      *
      * @return the RTI assigned integer handle that represents this object class
      */
-    static int &get_class_handle() {
-        static int _handle;
-        return _handle;
+    static int get_class_handle() {
+        return get_class_name_handle_map()[get_hla_class_name()];
     }
 
-    /**
-     * Returns the handle (RTI assigned) of this instance's object class.
-     * Polymorphic equivalent for get_class_handle static method.
-     *
-     * @return the handle (RTI assigned) if this instance's object class
-     */
-    int getClassHandle() const override {
-        return get_class_handle();
-    }
-
-
-protected:
-    /*
-     * THIS IS A PROTECTED METHOD THAT WILL (TRY TO) RETURN THE HANDLE OF A GIVEN DATAMEMBER, GIVEN THE DATAMEMBER'S NAME.
-     * FOR A GIVEN CLASS, IT WILL ATTEMPT TO FIND THE ENTRY IN THE _classAndPropertyNameHandleMap USING AS A KEY
-     * A ClassAndPropertyName POJO, ClassAndPropertyName(A, B), WHERE "A" IS THE FULL CLASS NAME OF THIS CLASS,
-     * AND "B" IS THE NAME OF THE DATAMEMBER. IF THERE IS NO SUCH ENTRY, THIS METHOD CALLS THE SAME METHOD IN ITS
-     * SUPER CLASS.  THIS METHOD CHAIN BOTTOMS OUT IN THE "InteractionRoot" CLASS, WHERE AN ERROR IS RAISED INDICATING
-     * THERE IS NO SUCH DATAMEMBER.
-     *
-     * THE "className" ARGUMENT IS THE FULL NAME OF THE CLASS FOR WHICH THIS METHOD WAS ORIGINALLY CALLED, I.E. THE NAME
-     * OF THE CLASS AT THE TOP OF THE CALL-CHAIN.  IT IS INCLUDED FOR ERROR REPORTING IN THE "InteractionRoot" CLASS.
-     *
-     * THIS METHOD IS INDIRECTLY CALLED VIA THE "get_attribute_handle(String)" METHOD BELOW, WHICH PROVIDES THE
-     * VALUE FOR THE "className" ARGUMENT.
-     */
-    static int get_attribute_handle_aux(const std::string &className, const std::string &propertyName);
-
-public:
     /**
      * Returns the handle of an attribute (RTI assigned) of
      * this object class (i.e. "org.cpswt.hla.ObjectRoot_p.FederateObject") given the attribute's name.
      *
      * @param propertyName name of attribute
-     * @return the handle (RTI assigned) of the attribute "propertyName" of object class "className"
+     * @return the handle (RTI assigned) of the attribute "propertyName" of object class "hlaClassName"
      */
     static int get_attribute_handle(const std::string &propertyName) {
-        return get_attribute_handle_aux(get_hla_class_name(), propertyName);
+        return ObjectRoot::get_attribute_handle(get_hla_class_name(), propertyName);
+    }
+
+    static AttributeHandleSetSP get_published_attribute_handle_set_sp() {
+        return ObjectRoot::get_published_attribute_handle_set_sp( get_hla_class_name() );
     }
 
     /**
-     * Returns the handle associated with the given attribute name for an object class instance
-     * Polymorphic equivalent of get_attribute_handle static method.
+     * Returns a data structure containing the handles of all attributes for this object
+     * class that are currently marked for subscription.  To actually subscribe to these
+     * attributes, a federate must call &lt;objectclassname&gt;.subscribe( RTIambassador rti ).
      *
-     * @param propertyName the name of a attribute that belongs to this object class
-     * @return the RTI handle associated with the attribute name, or -1 if not found
+     * @return data structure containing the handles of all attributes for this object
+     * class that are currently marked for subscription
      */
-    virtual int getAttributeHandle(const std::string &propertyName) {
-        return get_attribute_handle(propertyName);
-    }
-
-private:
-    static AttributeHandleSetSP get_published_attribute_handle_set_sp() {
-        static AttributeHandleSetSP publishedAttributeHandleSetSP(
-          RTI::AttributeHandleSetFactory::create( 3 )
-        );
-        return publishedAttributeHandleSetSP;
-    }
-
     static AttributeHandleSetSP get_subscribed_attribute_handle_set_sp() {
-        static AttributeHandleSetSP subscribedAttributeHandleSetSP(
-          RTI::AttributeHandleSetFactory::create( 3 )
-        );
-        return subscribedAttributeHandleSetSP;
+        return ObjectRoot::get_subscribed_attribute_handle_set_sp( get_hla_class_name() );
     }
-
-private:
-    static bool &get_is_initialized() {
-        static bool isInitialized = false;
-        return isInitialized;
-    }
-
-protected:
-    /*
-     * THIS FUNCTION INITIALIZES ALL OF THE HANDLES ASSOCIATED WITH THIS OBJECT CLASS
-     * IT NEEDS THE RTI TO DO SO.
-     */
-    static void init(RTI::RTIambassador *rti);
 
     // ----------------------------------------------------------
-    // END OF STATIC DATAMEMBERS AND CODE THAT DEAL WITH HANDLES.
+    // END OF STATIC PROPERTYS AND CODE THAT DEAL WITH HANDLES.
     // ----------------------------------------------------------
 
 
@@ -378,30 +226,14 @@ protected:
     // METHODS FOR PUBLISHING/SUBSCRIBING-TO THIS CLASS
     //-------------------------------------------------
 
-private:
-    static bool &get_is_published() {
-        static bool isPublished = false;
-        return isPublished;
-    }
-
-public:
     /**
      * Publishes the org.cpswt.hla.ObjectRoot_p.FederateObject object class for a federate.
      *
      * @param rti handle to the Local RTI Component
      */
-    static void publish_object(RTI::RTIambassador *rti);
-
-    /**
-     * Publishes the object class of this instance of the class for a federate.
-     * Polymorphic equalivalent of publish_object static method.
-     *
-     * @param rti handle to the Local RTI Component
-     */
-    virtual void publishObject(RTI::RTIambassador *rti) {
-        publish_object(rti);
+    static void publish_object(RTI::RTIambassador *rti) {
+        ObjectRoot::publish_object( get_hla_class_name(), rti );
     }
-
 
     /**
      * Unpublishes the org.cpswt.hla.ObjectRoot_p.FederateObject object class for a federate.
@@ -409,22 +241,8 @@ public:
      * @param rti handle to the Local RTI Component, usu. obtained through the
      *            {@link SynchronizedFederate#getLRC()} call
      */
-    static void unpublish_object(RTI::RTIambassador *rti);
-
-    /**
-     * Unpublishes the object class of this instance of this class for a federate.
-     * Polymorphic equivalent of unpublish_object static method.
-     *
-     * @param rti handle to the Local RTI Component
-     */
-    virtual void unpublishObject(RTI::RTIambassador *rti) {
-        unpublish_object(rti);
-    }
-
-private:
-    static bool &get_is_subscribed() {
-        static bool isSubscribed = false;
-        return isSubscribed;
+    static void unpublish_object(RTI::RTIambassador *rti) {
+        ObjectRoot::unpublish_object( get_hla_class_name(), rti);
     }
 
 /**
@@ -432,17 +250,8 @@ private:
  *
  * @param rti handle to the Local RTI Component
  */
-public:
-    static void subscribe_object(RTI::RTIambassador *rti);
-
-    /**
-     * Subscribes a federate to the object class of this instance of this class.
-     * Polymorphic equivalent of subscribe_object static method.
-     *
-     * @param rti handle to the Local RTI Component
-     */
-    virtual void subscribeObject(RTI::RTIambassador *rti) {
-        subscribe_object(rti);
+    static void subscribe_object(RTI::RTIambassador *rti) {
+        ObjectRoot::subscribe_object( get_hla_class_name(), rti );
     }
 
     /**
@@ -450,23 +259,22 @@ public:
      *
      * @param rti handle to the Local RTI Component
      */
-    static void unsubscribe_object(RTI::RTIambassador *rti);
+    static void unsubscribe_object(RTI::RTIambassador *rti) {
+        ObjectRoot::unsubscribe_object( get_hla_class_name(), rti );
+    }
 
-public:
-    /**
-     * Unsubscribes a federate from the object class of this instance of this class.
-     *
-     * @param rti handle to the Local RTI Component
-     */
-    virtual void unsubscribeObject(RTI::RTIambassador *rti) {
-        unsubscribe_object(rti);
+    static ClassAndPropertyNameSetSP get_published_attribute_name_set_sp() {
+        return ObjectRoot::get_class_name_published_class_and_property_name_set_sp_map()[get_hla_class_name()];
+    }
+
+    static ClassAndPropertyNameSetSP get_subscribed_attribute_name_set_sp() {
+        return ObjectRoot::get_class_name_subscribed_class_and_property_name_set_sp_map()[get_hla_class_name()];
     }
 
     //-----------------------------------------------------
     // END METHODS FOR PUBLISHING/SUBSCRIBING-TO THIS CLASS
     //-----------------------------------------------------
 
-public:
     /**
      * Return true if "handle" is equal to the handle (RTI assigned) of this class
      * (that is, the org.cpswt.hla.ObjectRoot_p.FederateObject object class).
@@ -480,11 +288,9 @@ public:
         return handle == get_class_handle();
     }
 
-
-    //--------------------------------
-    // DATAMEMBER MANIPULATION METHODS
-    //--------------------------------
-public:
+    //------------------------------
+    // PROPERTY MANIPULATION METHODS
+    //------------------------------
 
 
     /**
@@ -585,56 +391,9 @@ public:
         return _classAndPropertyNameValueSPMap[key]->getTime();
     }
 
-protected:
-    virtual PropertyClassNameAndValueSP getAttributeAux(
-      const std::string &className, const std::string &propertyName
-    ) const;
-
-    void classAndPropertyNameValueSPMapInit() {
-
-        _classAndPropertyNameValueSPMap.emplace( std::make_pair(
-          ClassAndPropertyName(get_hla_class_name(), "FederateHandle"),
-          ValueSP(  new Value( static_cast<int>(0) )  )
-        ) );
-
-        _classAndPropertyNameValueSPMap.emplace( std::make_pair(
-          ClassAndPropertyName(get_hla_class_name(), "FederateHost"),
-          ValueSP(  new Value( std::string("") )  )
-        ) );
-
-        _classAndPropertyNameValueSPMap.emplace( std::make_pair(
-          ClassAndPropertyName(get_hla_class_name(), "FederateType"),
-          ValueSP(  new Value( std::string("") )  )
-        ) );
-    }
-
     //------------------------------------
-    // END DATAMEMBER MANIPULATION METHODS
+    // END PROPERTY MANIPULATION METHODS
     //------------------------------------
-
-    //-------------
-    // CONSTRUCTORS
-    //-------------
-    
-    FederateObject() {
-        FederateObject::classAndPropertyNameValueSPMapInit();
-    }
-
-    FederateObject( const PropertyHandleValuePairSet &propertyMap ) {
-        FederateObject::classAndPropertyNameValueSPMapInit();
-        setAttributes(propertyMap);
-    }
-
-    FederateObject( const RTIfedTime &rtiFedTime ) {
-        FederateObject::classAndPropertyNameValueSPMapInit();
-    }
-
-    FederateObject(const PropertyHandleValuePairSet &propertyMap, const RTIfedTime &rtiFedTime) {
-        FederateObject::classAndPropertyNameValueSPMapInit();
-        setAttributes(propertyMap);
-        setTime(rtiFedTime);
-    }
-
 
     //--------------------------
     // INSTANCE CREATION METHODS
@@ -650,6 +409,18 @@ public:
 
     virtual ObjectRoot::SP createObject() {
         return create_object();
+    }
+
+    static SP create(const RTIfedTime &rtiFedTime) {
+        return SP(new FederateObject(rtiFedTime));
+    }
+
+    static ObjectRoot::SP create_object(const RTIfedTime &rtiFedTime) {
+        return SP(new FederateObject(rtiFedTime));
+    }
+
+    virtual ObjectRoot::SP createObject(const RTIfedTime &rtiFedTime) {
+        return create_object(rtiFedTime);
     }
 
     static SP create(
@@ -668,18 +439,6 @@ public:
       const RTI::AttributeHandleValuePairSet &propertyMap
     ) {
         return create_object(propertyMap);
-    }
-
-    static SP create(const RTIfedTime &rtiFedTime) {
-        return SP(new FederateObject(rtiFedTime));
-    }
-
-    static ObjectRoot::SP create_object(const RTIfedTime &rtiFedTime) {
-        return SP(new FederateObject(rtiFedTime));
-    }
-
-    virtual ObjectRoot::SP createObject(const RTIfedTime &rtiFedTime) {
-        return create_object(rtiFedTime);
     }
 
     static SP create(
@@ -713,10 +472,10 @@ public:
     * Note:  This method only marks the "FederateHandle" attribute for publication.
     * To actually publish the attribute, the federate must (re)publish its containing
     * object class.
-    * (using <objectClassName>.publish_object( RTIambassador rti ) ).
+    * (using <objectClassName>.publish_object( RTIambassador *rti ) ).
     */
     static void publish_FederateHandle_attribute() {
-        get_published_class_and_property_name_set_sp()->emplace(get_hla_class_name(), "FederateHandle");
+        publish_attribute( get_hla_class_name(), "FederateHandle" );
     }
 
     /**
@@ -725,12 +484,10 @@ public:
     * Note:  This method only marks the "FederateHandle" attribute for unpublication.
     * To actually publish the attribute, the federate must (re)publish its containing
     * object class.
-    * (using <objectClassName>.publish_object( RTIambassador rti ) ).
+    * (using <objectClassName>.publish_object( RTIambassador *rti ) ).
     */
     static void unpublish_FederateHandle_attribute() {
-        get_published_class_and_property_name_set_sp()->erase(
-          ClassAndPropertyName(get_hla_class_name(), "FederateHandle")
-        );
+        unpublish_attribute( get_hla_class_name(), "FederateHandle" );
     }
 
     /**
@@ -739,10 +496,10 @@ public:
     * Note:  This method only marks the "FederateHandle" attribute for subscription.
     * To actually subscribe to the attribute, the federate must (re)subscribe to its
     * containing object class.
-    * (using <objectClassName>.subscribe_object( RTIambassador rti ) ).
+    * (using <objectClassName>.subscribe_object( RTIambassador *rti ) ).
     */
     static void subscribe_FederateHandle_attribute() {
-        get_subscribed_class_and_property_name_set_sp()->emplace(get_hla_class_name(), "FederateHandle");
+        subscribe_attribute( get_hla_class_name(), "FederateHandle" );
     }
 
     /**
@@ -751,12 +508,10 @@ public:
     * Note:  This method only marks the "FederateHandle" attribute for unsubscription.
     * To actually unsubscribe to the attribute, the federate must (re)subscribe to its
     * containing object class.
-    * (using <objectClassName>.subscribe_object( RTIambassador rti ) ).
+    * (using <objectClassName>.subscribe_object( RTIambassador *rti ) ).
     */
     static void unsubscribe_FederateHandle_attribute() {
-        get_subscribed_class_and_property_name_set_sp()->erase(ClassAndPropertyName(
-          get_hla_class_name(), "FederateHandle"
-        ));
+        unsubscribe_attribute( get_hla_class_name(), "FederateHandle" );
     }
 
     /**
@@ -765,10 +520,10 @@ public:
     * Note:  This method only marks the "FederateHost" attribute for publication.
     * To actually publish the attribute, the federate must (re)publish its containing
     * object class.
-    * (using <objectClassName>.publish_object( RTIambassador rti ) ).
+    * (using <objectClassName>.publish_object( RTIambassador *rti ) ).
     */
     static void publish_FederateHost_attribute() {
-        get_published_class_and_property_name_set_sp()->emplace(get_hla_class_name(), "FederateHost");
+        publish_attribute( get_hla_class_name(), "FederateHost" );
     }
 
     /**
@@ -777,12 +532,10 @@ public:
     * Note:  This method only marks the "FederateHost" attribute for unpublication.
     * To actually publish the attribute, the federate must (re)publish its containing
     * object class.
-    * (using <objectClassName>.publish_object( RTIambassador rti ) ).
+    * (using <objectClassName>.publish_object( RTIambassador *rti ) ).
     */
     static void unpublish_FederateHost_attribute() {
-        get_published_class_and_property_name_set_sp()->erase(
-          ClassAndPropertyName(get_hla_class_name(), "FederateHost")
-        );
+        unpublish_attribute( get_hla_class_name(), "FederateHost" );
     }
 
     /**
@@ -791,10 +544,10 @@ public:
     * Note:  This method only marks the "FederateHost" attribute for subscription.
     * To actually subscribe to the attribute, the federate must (re)subscribe to its
     * containing object class.
-    * (using <objectClassName>.subscribe_object( RTIambassador rti ) ).
+    * (using <objectClassName>.subscribe_object( RTIambassador *rti ) ).
     */
     static void subscribe_FederateHost_attribute() {
-        get_subscribed_class_and_property_name_set_sp()->emplace(get_hla_class_name(), "FederateHost");
+        subscribe_attribute( get_hla_class_name(), "FederateHost" );
     }
 
     /**
@@ -803,12 +556,10 @@ public:
     * Note:  This method only marks the "FederateHost" attribute for unsubscription.
     * To actually unsubscribe to the attribute, the federate must (re)subscribe to its
     * containing object class.
-    * (using <objectClassName>.subscribe_object( RTIambassador rti ) ).
+    * (using <objectClassName>.subscribe_object( RTIambassador *rti ) ).
     */
     static void unsubscribe_FederateHost_attribute() {
-        get_subscribed_class_and_property_name_set_sp()->erase(ClassAndPropertyName(
-          get_hla_class_name(), "FederateHost"
-        ));
+        unsubscribe_attribute( get_hla_class_name(), "FederateHost" );
     }
 
     /**
@@ -817,10 +568,10 @@ public:
     * Note:  This method only marks the "FederateType" attribute for publication.
     * To actually publish the attribute, the federate must (re)publish its containing
     * object class.
-    * (using <objectClassName>.publish_object( RTIambassador rti ) ).
+    * (using <objectClassName>.publish_object( RTIambassador *rti ) ).
     */
     static void publish_FederateType_attribute() {
-        get_published_class_and_property_name_set_sp()->emplace(get_hla_class_name(), "FederateType");
+        publish_attribute( get_hla_class_name(), "FederateType" );
     }
 
     /**
@@ -829,12 +580,10 @@ public:
     * Note:  This method only marks the "FederateType" attribute for unpublication.
     * To actually publish the attribute, the federate must (re)publish its containing
     * object class.
-    * (using <objectClassName>.publish_object( RTIambassador rti ) ).
+    * (using <objectClassName>.publish_object( RTIambassador *rti ) ).
     */
     static void unpublish_FederateType_attribute() {
-        get_published_class_and_property_name_set_sp()->erase(
-          ClassAndPropertyName(get_hla_class_name(), "FederateType")
-        );
+        unpublish_attribute( get_hla_class_name(), "FederateType" );
     }
 
     /**
@@ -843,10 +592,10 @@ public:
     * Note:  This method only marks the "FederateType" attribute for subscription.
     * To actually subscribe to the attribute, the federate must (re)subscribe to its
     * containing object class.
-    * (using <objectClassName>.subscribe_object( RTIambassador rti ) ).
+    * (using <objectClassName>.subscribe_object( RTIambassador *rti ) ).
     */
     static void subscribe_FederateType_attribute() {
-        get_subscribed_class_and_property_name_set_sp()->emplace(get_hla_class_name(), "FederateType");
+        subscribe_attribute( get_hla_class_name(), "FederateType" );
     }
 
     /**
@@ -855,13 +604,39 @@ public:
     * Note:  This method only marks the "FederateType" attribute for unsubscription.
     * To actually unsubscribe to the attribute, the federate must (re)subscribe to its
     * containing object class.
-    * (using <objectClassName>.subscribe_object( RTIambassador rti ) ).
+    * (using <objectClassName>.subscribe_object( RTIambassador *rti ) ).
     */
     static void unsubscribe_FederateType_attribute() {
-        get_subscribed_class_and_property_name_set_sp()->erase(ClassAndPropertyName(
-          get_hla_class_name(), "FederateType"
-        ));
+        unsubscribe_attribute( get_hla_class_name(), "FederateType" );
     }
+
+    //-------------
+    // CONSTRUCTORS
+    //-------------
+public:
+    FederateObject() : Super( get_hla_class_name() ) { }
+
+    FederateObject( const PropertyHandleValuePairSet &propertyMap ) : Super( get_hla_class_name(), propertyMap ) { }
+
+    FederateObject( const RTIfedTime &rtiFedTime ) : Super( get_hla_class_name(), rtiFedTime ) { }
+
+    FederateObject(const PropertyHandleValuePairSet &propertyMap, const RTIfedTime &rtiFedTime) :
+       Super( get_hla_class_name(), propertyMap, rtiFedTime ) { }
+
+protected:
+    FederateObject(ObjectRoot::NoInstanceInit &noInstanceInit) : Super(noInstanceInit) { }
+
+    FederateObject( const std::string &hlaClassName ) : Super( hlaClassName ) { }
+
+    FederateObject( const std::string &hlaClassName, const PropertyHandleValuePairSet &propertyMap ) :
+      Super( hlaClassName, propertyMap ) { }
+
+    FederateObject( const std::string &hlaClassName, const RTIfedTime &rtiFedTime ) :
+      Super( hlaClassName, rtiFedTime ) { }
+
+    FederateObject(
+      const std::string &hlaClassName, const PropertyHandleValuePairSet &propertyMap, const RTIfedTime &rtiFedTime
+    ) : Super( hlaClassName, propertyMap, rtiFedTime ) { }
 
 };
    } // NAMESPACE "ObjectRoot_p"

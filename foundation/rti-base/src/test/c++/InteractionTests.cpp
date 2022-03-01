@@ -1,5 +1,4 @@
 #include "InteractionTests.hpp"
-#include "RTIAmbassadorTest1.hh"
 
 #include "InteractionRoot.hpp"
 #include "InteractionRoot_p/C2WInteractionRoot.hpp"
@@ -17,6 +16,7 @@
 #include <boost/algorithm/string.hpp>
 #include <list>
 #include <sstream>
+#include <iostream>
 
 
 using InteractionRoot = ::org::cpswt::hla::InteractionRoot;
@@ -60,6 +60,24 @@ std::ostream &operator<<(std::ostream &os, const ClassAndPropertyNameList &class
     return os;
 }
 
+RTI::RTIambassador *InteractionTests::get_rti_ambassador_1_ptr() {
+    static RTIAmbassadorTest1 rtiAmbassadorTest1;
+    static RTI::RTIambassador rtiAmbassador(&rtiAmbassadorTest1);
+    return &rtiAmbassador;
+}
+
+void InteractionTests::init_1() {
+    if (get_is_initialized()) {
+        return;
+    }
+    get_is_initialized() = true;
+
+    std::cout << "INITIALIZING ... " << std::flush;
+    InteractionRoot::init(get_rti_ambassador_1_ptr());
+    ObjectRoot::init(get_rti_ambassador_1_ptr());
+    std::cout << "DONE" << std::endl;
+}
+
 void InteractionTests::messagingNamesTest() {
 
     std::set<std::string> expectedInteractionClassNameSet;
@@ -92,27 +110,6 @@ void InteractionTests::messagingNamesTest() {
 }
 
 void InteractionTests::classHandleTest() {
-    RTIAmbassadorTest1 rtiAmbassadorTest1;
-    RTI::RTIambassador rtiAmbassador(&rtiAmbassadorTest1);
-
-    InteractionRoot::publish_interaction(&rtiAmbassador);
-    InteractionRoot::unpublish_interaction(&rtiAmbassador);
-
-    C2WInteractionRoot::publish_interaction(&rtiAmbassador);
-    C2WInteractionRoot::unpublish_interaction(&rtiAmbassador);
-
-    SimLog::publish_interaction(&rtiAmbassador);
-    SimLog::unpublish_interaction(&rtiAmbassador);
-
-    HighPrio::publish_interaction(&rtiAmbassador);
-    HighPrio::unpublish_interaction(&rtiAmbassador);
-
-    SimulationControl::publish_interaction(&rtiAmbassador);
-    SimulationControl::unpublish_interaction(&rtiAmbassador);
-
-    SimEnd::publish_interaction(&rtiAmbassador);
-    SimEnd::unpublish_interaction(&rtiAmbassador);
-
     CPPUNIT_ASSERT_EQUAL(
             RTIAmbassadorTest1::get_class_name_handle_map().find("InteractionRoot")->second,
             static_cast<RTI::InteractionClassHandle>(InteractionRoot::get_class_handle())
@@ -311,13 +308,6 @@ void InteractionTests::parameterNamesTest() {
 }
 
 void InteractionTests::propertyHandleTest() {
-
-    RTIAmbassadorTest1 rtiAmbassadorTest1;
-    RTI::RTIambassador rtiAmbassador(&rtiAmbassadorTest1);
-
-    HighPrio::publish_interaction(&rtiAmbassador);
-    HighPrio::unpublish_interaction(&rtiAmbassador);
-
     int expectedValue = RTIAmbassadorTest1::get_class_and_property_name_parameter_handle_map().find(
             ClassAndPropertyName("InteractionRoot.C2WInteractionRoot", "originFed")
     )->second;
@@ -339,8 +329,6 @@ void InteractionTests::propertyHandleTest() {
 
     CPPUNIT_ASSERT_EQUAL(expectedValue, HighPrio::get_parameter_handle("FedName"));
     CPPUNIT_ASSERT_EQUAL(expectedValue, SimLog::get_parameter_handle("FedName"));
-
-    FederateObject::publish_object(&rtiAmbassador);
 
     expectedValue = RTIAmbassadorTest1::get_class_and_property_name_attribute_handle_map().find(
             ClassAndPropertyName("ObjectRoot.FederateObject", "FederateHost")
@@ -371,9 +359,11 @@ void InteractionTests::basicLogTest() {
     HighPrio::unpublish_interaction(&rtiAmbassador);
 
     std::string timeRegexString = R"(\d{4}-\w{3}-\d{2} \d{2}:\d{2}:\d{2}.\d*)";
-    std::string publishingRegexString = "(?:un)?publish_interaction: interaction (?:un)?published";
+    std::string highPrioHlaClassNameRegexString = std::string("\\Q") + HighPrio::get_hla_class_name() + "\\E";
+    std::string publishingRegexString = std::string("(?:un)?publish_interaction: \"") +
+      highPrioHlaClassNameRegexString + "\" interaction (?:un)?published";
 
-    std::string logLineRegexString = HighPrio::get_hla_class_name() + " <" + timeRegexString + R"(> \[debug\]: )"
+    std::string logLineRegexString = InteractionRoot::get_hla_class_name() + " <" + timeRegexString + R"(> \[debug\]: )"
       + publishingRegexString;
 
     boost::regex logLineRegex{ logLineRegexString };
