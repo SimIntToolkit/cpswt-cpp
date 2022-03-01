@@ -78,7 +78,7 @@ struct InteractionRootInterface {
 
     virtual const std::string &getCppClassName() const = 0;
 
-    virtual const std::string &getSimpleClassName() const = 0;
+    virtual const std::string getSimpleClassName() const = 0;
 
     virtual const std::string &getHlaClassName() const = 0;
 
@@ -99,6 +99,10 @@ struct InteractionRootInterface {
     virtual void setTime(double time) = 0;
 
     virtual void setTime(const RTIfedTime &rtiFedTime) = 0;
+
+    virtual const Value &getParameter(
+      const std::string &className, const std::string &propertyName
+    ) const = 0;
 
     virtual const Value &getParameter( const std::string &propertyName ) const = 0;
 

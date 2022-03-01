@@ -32,6 +32,7 @@
  * @author Harmon Nine
  */
 
+
 #include <sstream>
 #include "ObjectRoot.hpp"
 
@@ -42,10 +43,168 @@ namespace org {
 
 bool ObjectRoot::static_init_var = ObjectRoot::static_init();
 
-ClassAndPropertyNameSP ObjectRoot::findProperty(const std::string &className, const std::string &propertyName) {
+void ObjectRoot::init(RTI::RTIambassador *rtiAmbassador) {
+    if (get_is_initialized()) {
+        return;
+    }
+    set_is_initialized(true);
+
+    //-------------------------------------------------------------------------
+    // hlaClassNameSet (get_hla_class_name_set()) IS POPULATED BY
+    // - STATIC INITIALIZATION BLOCKS IN THE DERIVED INTERACTION/OBJECT CLASSES
+    // - THE DYNAMIC-MESSAGE-CLASSES FILE
+    //-------------------------------------------------------------------------
+    for(const std::string &hlaClassName: get_hla_class_name_set()) {
+
+        //----------------------------------------------------
+        // GET HANDLE FOR hlaClassName TO INITIALIZE
+        // - _classNameHandleMap (get_class_name_handle_map())
+        // - _classHandleNameMap (get_class_handle_name_map())
+        //----------------------------------------------------
+        bool isNotInitialized = true;
+        int classHandle = 0;
+        while(isNotInitialized) {
+            try {
+                classHandle = rtiAmbassador->getObjectClassHandle(hlaClassName.c_str());
+                get_class_name_handle_map()[hlaClassName] = classHandle;
+                get_class_handle_name_map()[classHandle] = hlaClassName;
+                isNotInitialized = false;
+            } catch (RTI::FederateNotExecutionMember e) {
+                BOOST_LOG_SEV(get_logger(), error) << "could not initialize: federate not execution member";
+                return;
+            } catch (RTI::NameNotFound e) {
+                BOOST_LOG_SEV(get_logger(), error) << "could not initialize: name not found";
+                return;
+            } catch (...) {
+                BOOST_LOG_SEV(get_logger(), error) <<
+                  "could not initialize:  unspecified exception caught ... retry";
+                defaultSleep();
+            }
+        }
+
+        //------------------------------------------------------------------------------------
+        // _classAndPropertyNameSetSPMap (get_class_name_class_and_property_name_set_sp_map())
+        // MAPS hlaClassName TO THE PROPERTIES (PARAMETERS OR ATTRIBUTES)
+        // DEFINED *DIRECTLY* IN THE hlaClassName CLASS
+        //
+        // GET HANDLE FOR THESE PROPERTIES TO INITIALIZE
+        // - _classAndPropertyNameHandleMap (get_class_and_property_name_handle_map())
+        // - _handleClassAndPropertyNameMap (get_handle_class_and_property_name_sp_map())
+        //------------------------------------------------------------------------------------
+        ClassAndPropertyNameSet &classAndPropertyNameSet =
+          *get_class_name_class_and_property_name_set_sp_map()[hlaClassName];
+        for(const ClassAndPropertyName &classAndPropertyName: classAndPropertyNameSet) {
+            isNotInitialized = true;
+            while(isNotInitialized) {
+                try {
+                    int propertyHandle = rtiAmbassador->getAttributeHandle(
+                      classAndPropertyName.getPropertyName().c_str(), classHandle
+                    );
+                    get_class_and_property_name_handle_map()[classAndPropertyName] = propertyHandle;
+                    get_handle_class_and_property_name_sp_map()[propertyHandle] = ClassAndPropertyNameSP(
+                        new ClassAndPropertyName(classAndPropertyName)
+                    );
+                    isNotInitialized = false;
+                } catch (RTI::FederateNotExecutionMember e) {
+                    BOOST_LOG_SEV(get_logger(), error) << "could not initialize: federate not execution member";
+                    return;
+                } catch (RTI::ObjectClassNotDefined e) {
+                    BOOST_LOG_SEV(get_logger(), error) <<
+                      "could not initialize: object class not defined";
+                    return;
+                } catch (RTI::NameNotFound e) {
+                    BOOST_LOG_SEV(get_logger(), error) << "could not initialize: name not found";
+                    return;
+                } catch (...) {
+                    BOOST_LOG_SEV(get_logger(), error) <<
+                      "could not initialize:  unspecified exception caught ... retry";
+                    defaultSleep();
+                }
+            }
+        }
+
+        //-------------------------------------------------------
+        // INITIALIZE ALL CLASSES TO NOT-PUBLISHED NOT-SUBSCRIBED
+        //-------------------------------------------------------
+        get_class_name_publish_status_map()[hlaClassName] = false;
+        get_class_name_subscribe_status_map()[hlaClassName] = false;
+        //------------------------------------------------------------------------------------------------------
+        // FOR OBJECTS, INITIALIZE
+        // - _classNamePublishedAttributeHandleSetMap (get_class_name_published_attribute_handle_set_sp_map())
+        // - _classNameSubscribedAttributeHandleSetMap (get_class_name_subscribed_attribute_handle_set_sp_map())
+        // - _classNamePublishedAttributeNameSetMap (get_class_name_published_attribute_name_set_sp_map())
+        // - _classNameSubscribedAttributeNameSetMap (get_class_name_subscribed_attribute_name_set_sp_map())
+        //
+        // EACH hlaClassName INITIALLY HAS
+        // - NO PUBLISHED ATTRIBUTE HANDLES/NAMES
+        // - NO SUBSCRIBED ATTRIBUTE HANDLES/NAMES
+        //------------------------------------------------------------------------------------------------------
+        AttributeHandleSetSP publishedAttributeHandleSetSP(
+          RTI::AttributeHandleSetFactory::create( 0 )
+        );
+        get_class_name_published_attribute_handle_set_sp_map()[hlaClassName] = publishedAttributeHandleSetSP;
+
+        AttributeHandleSetSP subscribedAttributeHandleSetSP(
+          RTI::AttributeHandleSetFactory::create( 0 )
+        );
+        get_class_name_subscribed_attribute_handle_set_sp_map()[hlaClassName] = subscribedAttributeHandleSetSP;
+
+        ClassAndPropertyNameSetSP publishedAttributeNameSetSP(new ClassAndPropertyNameSet());
+        get_class_name_published_class_and_property_name_set_sp_map()[hlaClassName] = publishedAttributeNameSetSP;
+
+        ClassAndPropertyNameSetSP subscribedAttributeNameSetSP(new ClassAndPropertyNameSet());
+        get_class_name_subscribed_class_and_property_name_set_sp_map()[hlaClassName] = subscribedAttributeNameSetSP;
+    }
+}
+
+void ObjectRoot::get_class_pub_sub_class_and_property_name_sp(
+  const StringClassAndPropertyNameSetSPMap &stringClassAndPropertyNameSetSPMap,
+  const std::string &hlaClassName,
+  const std::string &attributeName,
+  bool publish,
+  bool insert
+) {
+    StringClassAndPropertyNameSetSPMap::const_iterator samItr =
+      stringClassAndPropertyNameSetSPMap.find( hlaClassName );
+    if ( samItr == stringClassAndPropertyNameSetSPMap.end() ) {
+
+        std::string prefix = insert ? "" : "un";
+        std::string pubsub = publish ? "publish" : "subscribe";
+
+        BOOST_LOG_SEV(get_logger(), error) << "Could not " << prefix << pubsub
+          << " \"" << attributeName << "\" attribute of object class \"" << hlaClassName
+          << "\": class does not exist";
+
+        return;
+    }
+
+    ClassAndPropertyNameSP classAndPropertyNameSP = findProperty(hlaClassName, attributeName);
+    if (!classAndPropertyNameSP) {
+
+        std::string prefix = insert ? "" : "un";
+        std::string pubsub = publish ? "publish" : "subscribe";
+
+        BOOST_LOG_SEV(get_logger(), error) << "Could not " << prefix << pubsub
+          << " \"" << attributeName << "\" attribute of object class \"" << hlaClassName
+          << "\": \"" << attributeName << "\" attribute does not exist in the \""
+          << hlaClassName << "\" class or any of its base classes";
+
+        return;
+    }
+
+    if (insert) {
+        samItr->second->insert(*classAndPropertyNameSP);
+    } else {
+        samItr->second->erase(*classAndPropertyNameSP);
+    }
+}
+
+ClassAndPropertyNameSP ObjectRoot::findProperty(
+  const std::string &hlaClassName, const std::string &propertyName
+) {
 
     std::list<std::string> classNameComponents;
-    boost::algorithm::split(classNameComponents, className, boost::is_any_of("."));
+    boost::algorithm::split(classNameComponents, hlaClassName, boost::is_any_of("."));
 
     while(!classNameComponents.empty()) {
         std::string localClassName = boost::algorithm::join(classNameComponents, ".");
@@ -59,39 +218,208 @@ ClassAndPropertyNameSP ObjectRoot::findProperty(const std::string &className, co
     }
 
     return ClassAndPropertyNameSP();
-}ObjectRoot::SP ObjectRoot::create_object( int classHandle, const RTI::AttributeHandleValuePairSet &propertyMap ) {
-	IntegerStringMap::iterator ismItr = get_class_handle_name_map().find( classHandle );
-	if ( ismItr == get_class_handle_name_map().end() ) {
-		return SP();
-	}
-
-	StringInstanceSPMap::iterator simItr = get_class_name_instance_sp_map().find( ismItr->second );
-	if ( simItr == get_class_name_instance_sp_map().end() ) {
-		return SP();
-	}
-
-	SP sp = simItr->second->createObject();
-	sp->setAttributes( propertyMap );
-
-	return sp;
 }
 
-ObjectRoot::SP ObjectRoot::create_object( int classHandle, const RTI::AttributeHandleValuePairSet &propertyMap, const RTIfedTime &rtiFedTime ) {
-	IntegerStringMap::iterator ismItr = get_class_handle_name_map().find( classHandle );
-	if ( ismItr == get_class_handle_name_map().end() ) {
-		return SP();
-	}
+ObjectRoot::PropertyHandleValuePairSetSP ObjectRoot::createPropertyHandleValuePairSetSP( bool force ) {
 
-	StringInstanceSPMap::iterator simItr = get_class_name_instance_sp_map().find( ismItr->second );
-	if ( simItr == get_class_name_instance_sp_map().end() ) {
-		return SP();
-	}
+    int count;
+    if (force) {
+        count = _classAndPropertyNameValueSPMap.size();
+    } else {
+        count = 0;
+        for(
+          ClassAndPropertyNameValueSPMap::const_iterator cvmCit = _classAndPropertyNameValueSPMap.begin();
+          cvmCit != _classAndPropertyNameValueSPMap.end();
+          ++cvmCit
+        ) {
+            if (cvmCit->second->shouldBeUpdated(false)) {
+                ++count;
+            }
+        }
+    }
 
-	SP sp = simItr->second->createObject(rtiFedTime);
-	sp->setAttributes( propertyMap );
-	sp->setTime( rtiFedTime.getTime() );
+    PropertyHandleValuePairSetSP propertyHandleValuePairSetSP(  RTI::AttributeSetFactory::create( count )  );
+    PropertyHandleValuePairSet &propertyHandleValuePairSet = *propertyHandleValuePairSetSP;
 
-	return sp;
+    for(
+      ClassAndPropertyNameValueSPMap::const_iterator cvmCit = _classAndPropertyNameValueSPMap.begin();
+      cvmCit != _classAndPropertyNameValueSPMap.end();
+      ++cvmCit
+    ) {
+        int handle = get_class_and_property_name_handle_map()[cvmCit->first];
+        std::string value = static_cast<std::string>(*cvmCit->second);
+        propertyHandleValuePairSet.add(handle, value.c_str(), value.size() + 1);
+    }
+
+    return propertyHandleValuePairSetSP;
+}
+
+const ObjectRoot::Value &ObjectRoot::getAttribute( int propertyHandle ) const {
+    static const Value valueDefault(false);
+    IntegerClassAndPropertyNameSPMap::const_iterator icmCit =
+      get_handle_class_and_property_name_sp_map().find(propertyHandle);
+    if (icmCit == get_handle_class_and_property_name_sp_map().end()) {
+        BOOST_LOG_SEV(get_logger(), error) << "getAttribute: propertyHandle (" << propertyHandle
+          <<") does not exist";
+        return valueDefault;
+    }
+
+    const ValueSP valueSP = _classAndPropertyNameValueSPMap.find(*icmCit->second)->second;
+    return *valueSP;
+}
+
+void ObjectRoot::publish_object(const std::string &hlaClassName, RTI::RTIambassador *rti) {
+
+    if (get_is_published_aux(hlaClassName, true)) {
+        return;
+    }
+
+    RTI::AttributeHandleSet &publishedAttributeHandleSet =
+      *get_class_name_published_attribute_handle_set_sp_map()[hlaClassName];
+    publishedAttributeHandleSet.empty();
+
+    ClassAndPropertyNameSet &publishedAttributeNameSet =
+      *get_class_name_published_class_and_property_name_set_sp_map()[hlaClassName];
+
+    for(ClassAndPropertyName key : publishedAttributeNameSet) {
+        try {
+            publishedAttributeHandleSet.add(get_class_and_property_name_handle_map()[key]);
+            BOOST_LOG_SEV(get_logger(), trace) << "publish " << hlaClassName << ":" << key;
+        } catch (...) {
+            BOOST_LOG_SEV(get_logger(), error) << "could not publish \"" << key << "\" attribute.";
+        }
+    }
+
+    int classHandle = get_class_name_handle_map()[hlaClassName];
+    bool isNotPublished = true;
+    while(isNotPublished) {
+        try {
+            rti->publishObjectClass(classHandle, publishedAttributeHandleSet);
+            isNotPublished = false;
+        } catch (RTI::FederateNotExecutionMember e) {
+            BOOST_LOG_SEV(get_logger(), error) << "could not publish: federate not execution member";
+            return;
+        } catch (RTI::ObjectClassNotDefined e) {
+            BOOST_LOG_SEV(get_logger(), error) << "could not publish: object class not defined";
+            return;
+        } catch (...) {
+            BOOST_LOG_SEV(get_logger(), error) << "could not publish: unspecified exception caught ... retry";
+            defaultSleep();
+        }
+    }
+
+    BOOST_LOG_SEV(get_logger(), debug) << "publish_object: \"" << hlaClassName << "\" object published";
+
+    set_is_published(hlaClassName, true);
+}
+
+void ObjectRoot::subscribe_object(const std::string &hlaClassName, RTI::RTIambassador *rti) {
+
+    if (get_is_subscribed_aux(hlaClassName, true)) {
+        return;
+    }
+
+    RTI::AttributeHandleSet &subscribedAttributeHandleSet =
+      *get_class_name_subscribed_attribute_handle_set_sp_map()[hlaClassName];
+    subscribedAttributeHandleSet.empty();
+
+    ClassAndPropertyNameSet &subscribedAttributeNameSet =
+      *get_class_name_subscribed_class_and_property_name_set_sp_map()[hlaClassName];
+
+    for(ClassAndPropertyName key : subscribedAttributeNameSet) {
+        try {
+            subscribedAttributeHandleSet.add(get_class_and_property_name_handle_map()[key]);
+            BOOST_LOG_SEV(get_logger(), trace) << "subscribe " << hlaClassName << ":" << key;
+        } catch (...) {
+            BOOST_LOG_SEV(get_logger(), error) << "could not subscribe \"" << key << "\" attribute.";
+        }
+    }
+
+    int classHandle = get_class_name_handle_map()[hlaClassName];
+    bool isNotSubscribed = true;
+    while(isNotSubscribed) {
+        try {
+            rti->subscribeObjectClassAttributes(classHandle, subscribedAttributeHandleSet);
+            isNotSubscribed = false;
+        } catch (RTI::FederateNotExecutionMember e) {
+            BOOST_LOG_SEV(get_logger(), error) << "could not subscribe: federate not execution member";
+            return;
+        } catch (RTI::ObjectClassNotDefined e) {
+            BOOST_LOG_SEV(get_logger(), error) << "could not subscribe: object class not defined";
+            return;
+        } catch (...) {
+            BOOST_LOG_SEV(get_logger(), error) << "could not subscribe: unspecified exception caught ... retry";
+            defaultSleep();
+        }
+    }
+
+    BOOST_LOG_SEV(get_logger(), debug) << "subscribe_object: \"" << hlaClassName << "\" object subscribed";
+
+    set_is_subscribed(hlaClassName, true);
+}
+
+void ObjectRoot::unpublish_object(const std::string &hlaClassName, RTI::RTIambassador *rti) {
+
+    if (!get_is_published_aux(hlaClassName, false)) {
+        return;
+    }
+
+    int classHandle = get_class_name_handle_map()[hlaClassName];
+
+    bool isNotUnpublished = true;
+    while(isNotUnpublished) {
+        try {
+            rti->unpublishObjectClass(classHandle);
+            isNotUnpublished = false;
+        } catch (RTI::FederateNotExecutionMember e) {
+            BOOST_LOG_SEV(get_logger(), error) << "could not unpublish: federate not execution member";
+            return;
+        } catch (RTI::ObjectClassNotDefined e) {
+            BOOST_LOG_SEV(get_logger(), error) << "could not unpublish: object class not defined";
+            return;
+        } catch (RTI::ObjectClassNotPublished e) {
+            BOOST_LOG_SEV(get_logger(), error) << "could not unpublish: object class not published";
+            return;
+        } catch (...) {
+            BOOST_LOG_SEV(get_logger(), error) << "could not unpublish: unspecified exception caught ... retry";
+            defaultSleep();
+        }
+    }
+    BOOST_LOG_SEV(get_logger(), debug) << "unpublish_object: \"" << hlaClassName << "\" object unpublished";
+
+    set_is_published(hlaClassName, false);
+}
+
+void ObjectRoot::unsubscribe_object(const std::string &hlaClassName, RTI::RTIambassador *rti) {
+
+    if (!get_is_subscribed_aux(hlaClassName, false)) {
+        return;
+    }
+
+    int classHandle = get_class_name_handle_map()[hlaClassName];
+
+    bool isNotUnsubscribed = true;
+    while(isNotUnsubscribed) {
+        try {
+            rti->unsubscribeObjectClass(classHandle);
+            isNotUnsubscribed = false;
+        } catch (RTI::FederateNotExecutionMember e) {
+            BOOST_LOG_SEV(get_logger(), error) << "could not unsubscribe: federate not execution member";
+            return;
+        } catch (RTI::ObjectClassNotDefined e) {
+            BOOST_LOG_SEV(get_logger(), error) << "could not unsubscribe: object class not defined";
+            return;
+        } catch (RTI::ObjectClassNotSubscribed e) {
+            BOOST_LOG_SEV(get_logger(), error) << "could not unsubscribe: object class not subscribed";
+            return;
+        } catch (...) {
+            BOOST_LOG_SEV(get_logger(), error) << "could not unsubscribe: unspecified exception caught ... retry";
+            defaultSleep();
+        }
+    }
+    BOOST_LOG_SEV(get_logger(), debug) << "unsubscribe_object: \"" << hlaClassName << "\" object unsubscribed";
+
+    set_is_subscribed(hlaClassName, false);
 }
 
 void ObjectRoot::registerObject( RTI::RTIambassador *rti ) {
@@ -173,53 +501,13 @@ void ObjectRoot::unregisterObject( RTI::RTIambassador *rti ) {
     }
 }
 
-void ObjectRoot::get_class_pub_sub_class_and_property_name_sp(
-  const StringClassAndPropertyNameSetSPMap &stringClassAndPropertyNameSetSPMap,
-  const std::string &className,
-  const std::string &attributeName,
-  bool publish,
-  bool insert
-) {
-    StringClassAndPropertyNameSetSPMap::const_iterator samItr =
-      stringClassAndPropertyNameSetSPMap.find( className );
-    if ( samItr == stringClassAndPropertyNameSetSPMap.end() ) {
-
-        std::string prefix = insert ? "" : "un";
-        std::string pubsub = publish ? "publish" : "subscribe";
-
-        BOOST_LOG_SEV(get_logger(), error) << "Could not " << prefix << pubsub
-          << " \"" << attributeName << "\" attribute of object class \"" << className
-          << "\": class does not exist";
-
-        return;
-    }
-
-    ClassAndPropertyNameSP classAndPropertyNameSP = findProperty(className, attributeName);
-    if (!classAndPropertyNameSP) {
-
-        std::string prefix = insert ? "" : "un";
-        std::string pubsub = publish ? "publish" : "subscribe";
-
-        BOOST_LOG_SEV(get_logger(), error) << "Could not " << prefix << pubsub
-          << " \"" << attributeName << "\" attribute of object class \"" << className
-          << "\": \"" << attributeName << "\" attribute does not exist in the \""
-          << className << "\" class or any of its base classes";
-
-        return;
-    }
-
-    if (insert) {
-        samItr->second->insert(*classAndPropertyNameSP);
-    } else {
-        samItr->second->erase(*classAndPropertyNameSP);
-    }
-}
-
 void ObjectRoot::requestUpdate( RTI::RTIambassador *rti ) {
 	bool requestNotSubmitted = true;
 	while( requestNotSubmitted ) {
 		try {
-			rti->requestObjectAttributeValueUpdate( getObjectHandle(), *get_subscribed_attribute_handle_set_sp() );
+			rti->requestObjectAttributeValueUpdate(
+			  getObjectHandle(), *get_subscribed_attribute_handle_set_sp( getInstanceHlaClassName() )
+			);
 			requestNotSubmitted = false;
 		} catch ( RTI::FederateNotExecutionMember & ) {
             BOOST_LOG_SEV(get_logger(), error) << getCppClassName()
@@ -240,18 +528,22 @@ void ObjectRoot::requestUpdate( RTI::RTIambassador *rti ) {
 	}
 }
 
-const ObjectRoot::Value &ObjectRoot::getAttribute( int propertyHandle ) const {
-    static const Value valueDefault(false);
-    IntegerClassAndPropertyNameSPMap::const_iterator icmCit =
-      get_handle_class_and_property_name_sp_map().find(propertyHandle);
-    if (icmCit == get_handle_class_and_property_name_sp_map().end()) {
-        BOOST_LOG_SEV(get_logger(), error) << "getAttribute: propertyHandle (" << propertyHandle
-          <<") does not exist";
-        return valueDefault;
+void ObjectRoot::initializeProperties(const std::string &hlaClassName) {
+    setInstanceHlaClassName(get_hla_class_name());
+    if (get_hla_class_name_set().find(hlaClassName) == get_hla_class_name_set().end()) {
+        BOOST_LOG_SEV(get_logger(), error)
+          << "ObjectRoot( const std::string &hlaClassName ): hlaClassName \"" << hlaClassName
+          << "\" is not defined -- creating dummy object with fictitious type \"" << hlaClassName
+          << "\"";
+          return;
     }
-
-    const ValueSP valueSP = _classAndPropertyNameValueSPMap.find(*icmCit->second)->second;
-    return *valueSP;
+    StringClassAndPropertyNameSetSPMap::const_iterator ccmCit =
+      get_class_name_all_class_and_property_name_set_sp_map().find(hlaClassName);
+    const ClassAndPropertyNameSet &allClassAndPropertyNameSet = *ccmCit->second;
+    for(const ClassAndPropertyName &classAndPropertyName: allClassAndPropertyNameSet) {
+        _classAndPropertyNameValueSPMap[classAndPropertyName] =
+          ValueSP( new Value(*get_class_and_property_name_initial_value_sp_map()[classAndPropertyName]) );
+    }
 }
 
 void ObjectRoot::setAttributes( const RTI::AttributeHandleValuePairSet &propertyMap ) {
@@ -273,292 +565,27 @@ void ObjectRoot::setAttributes( const RTI::AttributeHandleValuePairSet &property
     }
 }
 
-
 bool ObjectRoot::static_init() {
+    BOOST_LOG_SEV(get_logger(), info) << "Class \"::org::cpswt::hla::ObjectRoot\" loaded.";
+
     // ADD THIS CLASS TO THE _classNameSet DEFINED IN ObjectRoot
     get_hla_class_name_set().insert(get_hla_class_name());
 
-    // ADD CLASS OBJECT OF THIS CLASS TO _classNameClassMap DEFINED IN ObjectRoot
-    get_class_name_instance_sp_map()[get_hla_class_name()] = SP(new ObjectRoot());
+    ObjectRoot::NoInstanceInit noInstanceInit;
+    SP instanceSP = SP( new ObjectRoot(noInstanceInit) );
+    get_hla_class_name_instance_sp_map()[get_hla_class_name()] = instanceSP;
+
+    ClassAndPropertyNameSetSP classAndPropertyNameSetSP( new ClassAndPropertyNameSet() );
 
     // ADD THIS CLASS'S _classAndPropertyNameSet TO _classNamePropertyNameSetMap DEFINED
     // IN ObjectRoot
-    get_class_name_class_and_property_name_set_sp_map()[get_hla_class_name()] = get_class_and_property_name_set_sp();
+    get_class_name_class_and_property_name_set_sp_map()[get_hla_class_name()] = classAndPropertyNameSetSP;
 
-    // ADD THIS CLASS'S _allClassAndPropertyNameSet TO _classNameAllPropertyNameSetMap DEFINED
+    ClassAndPropertyNameSetSP allClassAndPropertyNameSetSP( new ClassAndPropertyNameSet() );// ADD THIS CLASS'S _allClassAndPropertyNameSet TO _classNameAllPropertyNameSetMap DEFINED
     // IN ObjectRoot
-    get_class_name_all_class_and_property_name_set_sp_map()[get_hla_class_name()] =
-      get_all_class_and_property_name_set_sp();
-
-    get_class_name_published_attribute_name_set_sp_map()[get_hla_class_name()] =
-      get_published_class_and_property_name_set_sp();
-    get_class_name_published_attribute_name_set_sp_map()[get_hla_class_name()] =
-      get_subscribed_class_and_property_name_set_sp();
-
-    get_class_name_published_attribute_handle_set_sp_map()[get_hla_class_name()] =
-      get_published_attribute_handle_set_sp();
-
-    get_class_name_subscribed_attribute_handle_set_sp_map()[get_hla_class_name()] =
-      get_subscribed_attribute_handle_set_sp();
+    get_class_name_all_class_and_property_name_set_sp_map()[get_hla_class_name()] = allClassAndPropertyNameSetSP;
 
     return true;
-}
-
-
-int ObjectRoot::get_attribute_handle_aux(const std::string &className, const std::string &propertyName) {
-    ClassAndPropertyName key(get_hla_class_name(), propertyName);
-    ClassAndPropertyNameIntegerMap::const_iterator cimCit = get_class_and_property_name_handle_map().find(key);
-    if (cimCit != get_class_and_property_name_handle_map().end()) {
-        return cimCit->second;
-    }
-    BOOST_LOG_SEV(get_logger(), error) << "get_attribute_handle: could not find handle for \""
-      << propertyName << "\" attribute of class \"" << className << "\" or its superclasses";
-    return -1;
-}
-
-
-void ObjectRoot::init(RTI::RTIambassador *rti) {
-    if (get_is_initialized()) return;
-    get_is_initialized() = true;
-
-    bool isNotInitialized = true;
-    while(isNotInitialized) {
-        try {
-            get_class_handle() = rti->getObjectClassHandle(get_hla_class_name().c_str());
-            isNotInitialized = false;
-        } catch (RTI::FederateNotExecutionMember e) {
-            BOOST_LOG_SEV(get_logger(), error) << "could not initialize class handle: federate not execution member";
-            return;
-        } catch (RTI::NameNotFound e) {
-            BOOST_LOG_SEV(get_logger(), error) << "could not initialize class handle: name not found";
-            return;
-        } catch (...) {
-            BOOST_LOG_SEV(get_logger(), error) << "could not initialize class handle: unspecified exception ... retry";
-#ifdef _WIN32
-            Sleep( 500 );
-#else
-            usleep( 500000 );
-#endif
-        }
-    }
-
-    get_class_name_handle_map()[get_hla_class_name()] = get_class_handle();
-    get_class_handle_name_map()[get_class_handle()] = get_hla_class_name();
-    get_class_handle_simple_name_map()[get_class_handle()] = get_simple_class_name();
-}
-
-
-void ObjectRoot::publish_object(RTI::RTIambassador *rti) {
-    if (get_is_published()) {
-        return;
-    }
-    get_is_published() = true;
-
-    init(rti);
-
-    get_published_attribute_handle_set_sp()->empty();
-    for(
-      ClassAndPropertyNameSet::const_iterator cnsCit = get_published_class_and_property_name_set_sp()->begin() ;
-      cnsCit != get_published_class_and_property_name_set_sp()->end() ;
-      ++cnsCit
-    ) {
-        try {
-            get_published_attribute_handle_set_sp()->add(get_class_and_property_name_handle_map()[*cnsCit]);
-            BOOST_LOG_SEV(get_logger(), trace) << "publish_object: adding \"" << cnsCit->getPropertyName()
-              << "\" attribute to attribute set";
-        } catch (...) {
-            BOOST_LOG_SEV(get_logger(), error) << "could not publish \"" << cnsCit->getPropertyName()
-              << "\" attribute";
-        }
-    }
-
-    bool isNotPublished = true;
-    while(isNotPublished) {
-        try {
-            rti->publishObjectClass(get_class_handle(), *get_published_attribute_handle_set_sp());
-            isNotPublished = false;
-        } catch (RTI::FederateNotExecutionMember e) {
-            BOOST_LOG_SEV(get_logger(), error) << "could not publish: federate not execution member";
-            return;
-        } catch (RTI::ObjectClassNotDefined e) {
-            BOOST_LOG_SEV(get_logger(), error) << "could not publish: object class not defined";
-            return;
-        } catch (...) {
-            BOOST_LOG_SEV(get_logger(), error) << "could not publish: unspecified exception ... retry";
-#ifdef _WIN32
-            Sleep( 500 );
-#else
-            usleep( 500000 );
-#endif
-        }
-    }
-
-    BOOST_LOG_SEV(get_logger(), debug) << "publish_object: object published";
-}
-
-
-void ObjectRoot::unpublish_object(RTI::RTIambassador *rti) {
-    if (!get_is_published()) return;
-    get_is_published() = false;
-
-    init(rti);
-
-    bool isNotUnpublished = true;
-    while(isNotUnpublished) {
-        try {
-            rti->unpublishObjectClass(get_class_handle());
-            isNotUnpublished = false;
-        } catch (RTI::FederateNotExecutionMember e) {
-            BOOST_LOG_SEV(get_logger(), error) << "could not unpublish: federate not execution member";
-            return;
-        } catch (RTI::ObjectClassNotDefined e) {
-            BOOST_LOG_SEV(get_logger(), error) << "could not unpublish: object class not defined";
-            return;
-        } catch (RTI::ObjectClassNotPublished e) {
-            BOOST_LOG_SEV(get_logger(), error) << "could not unpublish: object class not published";
-            return;
-        } catch (...) {
-            BOOST_LOG_SEV(get_logger(), error) << "could not unpublish: unspecified exception ... retry";
-#ifdef _WIN32
-            Sleep( 500 );
-#else
-            usleep( 500000 );
-#endif
-        }
-    }
-
-    BOOST_LOG_SEV(get_logger(), debug) << "unpublish_object: object unpublished";
-}
-
-
-void ObjectRoot::subscribe_object(RTI::RTIambassador *rti) {
-    if (get_is_subscribed()) {
-        return;
-    }
-    get_is_subscribed() = true;
-
-    init(rti);
-
-    get_subscribed_attribute_handle_set_sp()->empty();
-    for(
-      ClassAndPropertyNameSet::const_iterator cnsCit = get_subscribed_class_and_property_name_set_sp()->begin() ;
-      cnsCit != get_subscribed_class_and_property_name_set_sp()->end() ;
-      ++cnsCit
-    ) {
-        try {
-            get_subscribed_attribute_handle_set_sp()->add(get_class_and_property_name_handle_map()[*cnsCit]);
-            BOOST_LOG_SEV(get_logger(), trace) << "subscribe_object: adding \"" << cnsCit->getPropertyName()
-              << "\" attribute to attribute set";
-        } catch (...) {
-            BOOST_LOG_SEV(get_logger(), error) << "could not subscribe to \"" << cnsCit->getPropertyName()
-              << "\" attribute";
-        }
-    }
-
-    bool isNotSubscribed = true;
-    while(isNotSubscribed) {
-        try {
-            rti->subscribeObjectClassAttributes(get_class_handle(), *get_subscribed_attribute_handle_set_sp());
-            isNotSubscribed = false;
-        } catch (RTI::FederateNotExecutionMember e) {
-            BOOST_LOG_SEV(get_logger(), error) << "could not subscribe: federate not execution member";
-            return;
-        } catch (RTI::ObjectClassNotDefined e) {
-            BOOST_LOG_SEV(get_logger(), error) << "could not subscribe: class not defined";
-            return;
-        } catch (...) {
-            BOOST_LOG_SEV(get_logger(), error) << "could not subscribe: unspecified exception ... retry";
-#ifdef _WIN32
-            Sleep( 500 );
-#else
-            usleep( 500000 );
-#endif
-        }
-    }
-
-    BOOST_LOG_SEV(get_logger(), debug) << "subscribe_object: object subscribed";
-}
-
-
-void ObjectRoot::unsubscribe_object(RTI::RTIambassador *rti) {
-    if (!get_is_subscribed()) return;
-    get_is_subscribed() = false;
-
-    init(rti);
-
-    bool isNotUnsubscribed = true;
-    while(isNotUnsubscribed) {
-        try {
-            rti->unsubscribeObjectClass(get_class_handle());
-            isNotUnsubscribed = false;
-        } catch (RTI::FederateNotExecutionMember e) {
-            BOOST_LOG_SEV(get_logger(), error) << "could not unsubscribe: federate not execution member";
-            return;
-        } catch (RTI::ObjectClassNotDefined e) {
-            BOOST_LOG_SEV(get_logger(), error) << "could not unsubscribe: class not defined";
-            return;
-        } catch (RTI::ObjectClassNotSubscribed e) {
-            BOOST_LOG_SEV(get_logger(), error) << "could not unsubscribe: class not subscribed";
-            return;
-        } catch (...) {
-            BOOST_LOG_SEV(get_logger(), error) << "could not unsubscribe: unspecified exception ... retry";
-#ifdef _WIN32
-            Sleep( 500 );
-#else
-            usleep( 500000 );
-#endif
-        }
-    }
-
-    BOOST_LOG_SEV(get_logger(), debug) << "unsubscribe_object: object unsubscribed";
-}
-
-
-ObjectRoot::PropertyClassNameAndValueSP ObjectRoot::getAttributeAux(
-  const std::string &className, const std::string &propertyName
-) const {
-
-    ClassAndPropertyNameSP classAndPropertyNameSP = findProperty(className, propertyName);
-    return classAndPropertyNameSP
-      ? PropertyClassNameAndValueSP( new PropertyClassNameAndValue(
-          classAndPropertyNameSP->getClassName(),
-          _classAndPropertyNameValueSPMap.find(*classAndPropertyNameSP)->second
-      ) )
-      : PropertyClassNameAndValueSP();
-}
-
-ObjectRoot::PropertyHandleValuePairSetSP ObjectRoot::createPropertyHandleValuePairSetSP( bool force ) {
-
-    int count;
-    if (force) {
-        count = _classAndPropertyNameValueSPMap.size();
-    } else {
-        count = 0;
-        for(
-          ClassAndPropertyNameValueSPMap::const_iterator cvmCit = _classAndPropertyNameValueSPMap.begin();
-          cvmCit != _classAndPropertyNameValueSPMap.end();
-          ++cvmCit
-        ) {
-            if (cvmCit->second->shouldBeUpdated(false)) {
-                ++count;
-            }
-        }
-    }
-
-    PropertyHandleValuePairSetSP propertyHandleValuePairSetSP(  RTI::AttributeSetFactory::create( count )  );
-    PropertyHandleValuePairSet &propertyHandleValuePairSet = *propertyHandleValuePairSetSP;
-
-    for(
-      ClassAndPropertyNameValueSPMap::const_iterator cvmCit = _classAndPropertyNameValueSPMap.begin();
-      cvmCit != _classAndPropertyNameValueSPMap.end();
-      ++cvmCit
-    ) {
-        int handle = get_class_and_property_name_handle_map()[cvmCit->first];
-        std::string value = static_cast<std::string>(*cvmCit->second);
-        propertyHandleValuePairSet.add(handle, value.c_str(), value.size() + 1);
-    }
-
-    return propertyHandleValuePairSetSP;
 }
 
 void ObjectRoot::updateAttributeValues( RTI::RTIambassador *rti, double time, bool force ) {
@@ -728,6 +755,71 @@ void ObjectRoot::fromJson(const std::string &jsonString) {
                 );
                 break;
         }
+    }
+}
+
+void ObjectRoot::readFederateDynamicMessageClasses(std::istream &dynamicMessaingTypesInputStream) {
+
+    Json::Value dynamicMessageTypes;
+    dynamicMessaingTypesInputStream >> dynamicMessageTypes;
+
+    Json::Value federationMessaging = get_federation_json()["objects"];
+
+    std::unordered_set< std::string > localHlaClassNameSet;
+
+    Json::Value dynamicHlaClassNames = dynamicMessageTypes["objects"];
+    for(Json::Value hlaClassNameJsonValue: dynamicHlaClassNames) {
+        std::string hlaClassName = hlaClassNameJsonValue.asString();
+        std::list<std::string> hlaClassNameComponents;
+        boost::algorithm::split(hlaClassNameComponents, hlaClassName, boost::is_any_of("."));
+        while(!hlaClassNameComponents.empty()) {
+            const std::string localHlaClassName( boost::algorithm::join(hlaClassNameComponents, ".") );
+            localHlaClassNameSet.insert(localHlaClassName);
+            hlaClassNameComponents.pop_back();
+        }
+    }
+
+    for(const std::string &hlaClassName: localHlaClassNameSet) {
+
+        get_hla_class_name_set().insert(hlaClassName);
+
+        ClassAndPropertyNameSetSP classAndPropertyNameSetSP( new ClassAndPropertyNameSet() );
+        ClassAndPropertyNameSet &classAndPropertyNameSet(*classAndPropertyNameSetSP);
+
+        Json::Value messagingPropertyDataMap = federationMessaging[hlaClassName];
+        for(const std::string &propertyName: messagingPropertyDataMap.getMemberNames()) {
+            ClassAndPropertyName classAndPropertyName(hlaClassName, propertyName);
+            classAndPropertyNameSet.insert(classAndPropertyName);
+
+            Json::Value typeDataMap = messagingPropertyDataMap[propertyName];
+            if (!typeDataMap["Hidden"].asBool()) {
+                const std::string propertyTypeString = typeDataMap["AttributeType"].asString();
+                get_class_and_property_name_initial_value_sp_map()[classAndPropertyName] =
+                  ValueSP( new Value(*get_type_initial_value_sp_map()[propertyTypeString]) );
+            }
+        }
+
+        get_class_name_class_and_property_name_set_sp_map()[hlaClassName] = classAndPropertyNameSetSP;
+    }
+
+    for(const std::string &hlaClassName: localHlaClassNameSet) {
+
+        ClassAndPropertyNameSetSP allClassAndPropertyNameSetSP( new ClassAndPropertyNameSet() );
+        ClassAndPropertyNameSet &allClassAndPropertyNameSet(*allClassAndPropertyNameSetSP);
+
+        std::list<std::string> hlaClassNameComponents;
+        boost::algorithm::split(hlaClassNameComponents, hlaClassName, boost::is_any_of("."));
+        while(!hlaClassNameComponents.empty()) {
+            const std::string localHlaClassName( boost::algorithm::join(hlaClassNameComponents, ".") );
+            ClassAndPropertyNameSet &localClassAndPropertyNameSet =
+              *get_class_name_class_and_property_name_set_sp_map()[localHlaClassName];
+            allClassAndPropertyNameSet.insert(
+              localClassAndPropertyNameSet.begin(), localClassAndPropertyNameSet.end()
+            );
+            hlaClassNameComponents.pop_back();
+        }
+
+        get_class_name_all_class_and_property_name_set_sp_map()[hlaClassName] = allClassAndPropertyNameSetSP;
     }
 }
 

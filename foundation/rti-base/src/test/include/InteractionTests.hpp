@@ -3,6 +3,8 @@
 
 #define BOOST_LOG_DYN_LINK
 
+#include "RTIAmbassadorTest1.hh"
+
 #include <cppunit/extensions/HelperMacros.h>
 
 #include <boost/log/core.hpp>
@@ -18,6 +20,15 @@ public:
     typedef sinks::synchronous_sink< sinks::text_ostream_backend > text_sink;
 
 private:
+    static RTI::RTIambassador *get_rti_ambassador_1_ptr();
+
+    static bool &get_is_initialized() {
+        static bool isInitialized = false;
+        return isInitialized;
+    }
+
+    static void init_1();
+
     static bool null_filter(const logging::attribute_value_set &attrs) {
         return false;
     }
@@ -36,6 +47,7 @@ private:
 public:
 
     InteractionTests() : CppUnit::TestCase() {
+        init_1();
         nullSink = boost::make_shared< text_sink >();
         nullSink->set_filter(&null_filter);
         logging::core::get()->add_sink(nullSink);
