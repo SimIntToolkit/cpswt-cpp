@@ -78,7 +78,7 @@ struct ObjectRootInterface {
 
     virtual const std::string &getCppClassName() const = 0;
 
-    virtual const std::string &getSimpleClassName() const = 0;
+    virtual const std::string getSimpleClassName() const = 0;
 
     virtual const std::string &getHlaClassName() const = 0;
 
@@ -99,6 +99,10 @@ struct ObjectRootInterface {
     virtual void setTime(double time) = 0;
 
     virtual void setTime(const RTIfedTime &rtiFedTime) = 0;
+
+    virtual const Value &getAttribute(
+      const std::string &className, const std::string &propertyName
+    ) const = 0;
 
     virtual const Value &getAttribute( const std::string &propertyName ) const = 0;
 
