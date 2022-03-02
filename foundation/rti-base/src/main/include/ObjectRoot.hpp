@@ -968,7 +968,7 @@ public:
             return;
         }
 
-        Value currentValue = *propertyClassNameAndValueSP->getValueSP();
+        Value &currentValue = *propertyClassNameAndValueSP->getValueSP();
 
         if (!currentValue.setValue(value)) {
             BOOST_LOG_SEV(get_logger(), error) << "setAttribute(\"" << propertyName << "\", "

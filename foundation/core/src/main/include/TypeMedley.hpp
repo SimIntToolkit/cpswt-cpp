@@ -146,7 +146,7 @@ public:
 
     bool setValue(const std::string &value);
 
-    operator bool() {
+    bool asBool() const {
         switch(_dataType) {
             case CHARACTER:
                 return _value[0] != '0' && static_cast<char>(boost::lexical_cast<int>(_value)) != '0';
@@ -157,49 +157,77 @@ public:
         }
     }
 
-    operator char() {
+    operator bool() const {
+        return asBool();
+    }
+
+    char asChar() const {
         if (_dataType == STRING) {
             return _value.empty() ? '\0' : _value[0];
         }
         return static_cast<char>(boost::lexical_cast<double>(_value));
     }
 
-    operator short() {
+    operator char() const {
+         return asChar();
+    }
+
+    short asShort() const {
         if (_dataType == STRING && !hasDoubleFormat(_value)) {
             return static_cast<short>(_value.empty());
         }
         return static_cast<short>(boost::lexical_cast<double>(_value));
     }
 
-    operator int() {
+    operator short() const {
+        return asShort();
+    }
+
+    int asInt() const {
         if (_dataType == STRING && !hasDoubleFormat(_value)) {
             return static_cast<int>(_value.empty());
         }
         return static_cast<int>(boost::lexical_cast<double>(_value));
     }
 
-    operator long() {
+    operator int() const {
+        return asInt();
+    }
+
+    long asLong() const {
         if (_dataType == STRING && !hasDoubleFormat(_value)) {
             return static_cast<long>(_value.empty());
         }
         return static_cast<long>(boost::lexical_cast<double>(_value));
     }
 
-    operator float() {
+    operator long() const {
+        return asLong();
+    }
+
+    float asFloat() const {
         if (_dataType == STRING && !hasDoubleFormat(_value)) {
             return static_cast<float>(_value.empty());
         }
         return static_cast<float>(boost::lexical_cast<double>(_value));
     }
 
-    operator double() {
+    operator float() const {
+        return asFloat();
+    }
+
+    double asDouble() const {
         if (_dataType == STRING && !hasDoubleFormat(_value)) {
             return static_cast<double>(_value.empty());
         }
         return boost::lexical_cast<double>(_value);
     }
 
-    operator std::string() {
+    operator double() const {
+        return asDouble();
+    }
+
+    std::string asString() const {
         switch(_dataType) {
             case BOOLEAN:
                 return boost::lexical_cast<int>(_value) ? "true" : "false";
@@ -210,6 +238,10 @@ public:
             default:
                 return _value;
         }
+    }
+
+    operator std::string() const {
+        return asString();
     }
 };
 
