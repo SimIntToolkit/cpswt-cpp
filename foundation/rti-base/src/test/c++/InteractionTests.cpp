@@ -381,4 +381,68 @@ void InteractionTests::basicLogTest() {
     }
 }
 
+void InteractionTests::dynamicMessagingTest() {
+    InteractionRoot dynamicSimLogInteraction(SimLog::get_hla_class_name());
+    InteractionRoot *dynamicSimLogInteractionPtr = &dynamicSimLogInteraction;
+
+    SimLog *simLogPtr1 = dynamic_cast<SimLog *>(dynamicSimLogInteractionPtr);
+    CPPUNIT_ASSERT(simLogPtr1 == nullptr);
+    CPPUNIT_ASSERT_EQUAL(SimLog::get_hla_class_name(), dynamicSimLogInteraction.getInstanceHlaClassName());
+
+    std::string string1("string1");
+    double doubleValue1(1.2);
+
+    dynamicSimLogInteraction.setParameter("InteractionRoot.C2WInteractionRoot", "originFed", string1);
+    dynamicSimLogInteraction.setParameter("Time", doubleValue1);
+
+    CPPUNIT_ASSERT_EQUAL(string1, static_cast<std::string>(dynamicSimLogInteraction.getParameter("originFed")));
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(
+      doubleValue1, static_cast<double>(dynamicSimLogInteraction.getParameter("Time")), 0.01
+    );
+
+    std::string string2("string2");
+    double doubleValue2(3.4);
+
+    dynamicSimLogInteraction.setParameter("originFed", string2);
+    dynamicSimLogInteraction.setParameter("Time", doubleValue2);
+
+    CPPUNIT_ASSERT_EQUAL(string2, static_cast<std::string>(dynamicSimLogInteraction.getParameter("originFed")));
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(
+      doubleValue2, static_cast<double>(dynamicSimLogInteraction.getParameter("Time")), 0.01
+    );
+
+    InteractionRoot::SP staticSimLogInteractionSP1 = InteractionRoot::create_interaction(SimLog::get_hla_class_name());
+    InteractionRoot *staticSimLogInteraction1Ptr = staticSimLogInteractionSP1.get();
+
+    SimLog *simLogPtr2 = dynamic_cast<SimLog *>(staticSimLogInteraction1Ptr);
+
+    CPPUNIT_ASSERT(simLogPtr2 != nullptr);
+    CPPUNIT_ASSERT_EQUAL(SimLog::get_hla_class_name(), staticSimLogInteractionSP1->getInstanceHlaClassName());
+
+    std::string string3("string3");
+    double doubleValue3(5.6);
+
+    SimLog &simLogInteraction = *simLogPtr2;
+    simLogInteraction.setParameter("originFed", string3);
+    simLogInteraction.setParameter("Time", doubleValue3);
+
+    CPPUNIT_ASSERT_EQUAL(string3, static_cast<std::string>(simLogInteraction.getParameter("originFed")));
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(doubleValue3, static_cast<double>(simLogInteraction.getParameter("Time")), 0.01);
+
+    CPPUNIT_ASSERT_EQUAL(string3, simLogInteraction.get_originFed());
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(doubleValue3, simLogInteraction.get_Time(), 0.01);
+
+    std::string string4("string4");
+    double doubleValue4(17.3);
+
+    simLogInteraction.set_originFed(string4);
+    simLogInteraction.set_Time(doubleValue4);
+
+    CPPUNIT_ASSERT_EQUAL(string4, simLogInteraction.getParameter("originFed").asString());
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(doubleValue4, simLogInteraction.getParameter("Time").asDouble(), 0.01);
+
+    CPPUNIT_ASSERT_EQUAL(string4, simLogInteraction.get_originFed());
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(doubleValue4, simLogInteraction.get_Time(), 0.01);
+}
+
 CPPUNIT_TEST_SUITE_REGISTRATION( InteractionTests );

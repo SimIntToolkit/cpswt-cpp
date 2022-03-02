@@ -529,7 +529,7 @@ void ObjectRoot::requestUpdate( RTI::RTIambassador *rti ) {
 }
 
 void ObjectRoot::initializeProperties(const std::string &hlaClassName) {
-    setInstanceHlaClassName(get_hla_class_name());
+    setInstanceHlaClassName(hlaClassName);
     if (get_hla_class_name_set().find(hlaClassName) == get_hla_class_name_set().end()) {
         BOOST_LOG_SEV(get_logger(), error)
           << "ObjectRoot( const std::string &hlaClassName ): hlaClassName \"" << hlaClassName

@@ -42,6 +42,7 @@ private:
     CPPUNIT_TEST(parameterNamesTest);
     CPPUNIT_TEST(propertyHandleTest);
     CPPUNIT_TEST(basicLogTest);
+    CPPUNIT_TEST(dynamicMessagingTest);
     CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -58,6 +59,7 @@ public:
     void parameterNamesTest();
     void propertyHandleTest();
     void basicLogTest();
+    void dynamicMessagingTest();
 };
 
 #endif // _INTERACTION_TESTS
