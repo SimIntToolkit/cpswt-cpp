@@ -27,6 +27,8 @@ private:
         return isInitialized;
     }
 
+    static void interaction_root_dynamic_init();
+
     static void init_1();
 
     static bool null_filter(const logging::attribute_value_set &attrs) {
@@ -43,10 +45,10 @@ private:
     CPPUNIT_TEST(propertyHandleTest);
     CPPUNIT_TEST(basicLogTest);
     CPPUNIT_TEST(dynamicMessagingTest);
+    CPPUNIT_TEST(valueTest);
     CPPUNIT_TEST_SUITE_END();
 
 public:
-
     InteractionTests() : CppUnit::TestCase() {
         init_1();
         nullSink = boost::make_shared< text_sink >();
@@ -54,12 +56,15 @@ public:
         logging::core::get()->add_sink(nullSink);
     }
 
+    void setUp() override;
+
     void messagingNamesTest();
     void classHandleTest();
     void parameterNamesTest();
     void propertyHandleTest();
     void basicLogTest();
     void dynamicMessagingTest();
+    void valueTest();
 };
 
 #endif // _INTERACTION_TESTS

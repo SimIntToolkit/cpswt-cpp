@@ -8,65 +8,85 @@
 using InteractionRoot = ::org::cpswt::hla::InteractionRoot;
 using ObjectRoot = ::org::cpswt::hla::ObjectRoot;
 
-const RTIAmbassadorTest1::ClassNameToHandleMap &RTIAmbassadorTest1::get_class_name_handle_map_aux() {
-    static ClassNameToHandleMap classNameToHandleMap;
+const RTIAmbassadorTest1::ClassNameHandleMap &RTIAmbassadorTest1::get_class_name_handle_map_aux() {
+    static ClassNameHandleMap classNameHandleMap;
 
     int handleValue = 0;
 
-    classNameToHandleMap["InteractionRoot"] =
+    classNameHandleMap["InteractionRoot"] =
       static_cast<RTI::InteractionClassHandle>(handleValue++);
 
-    classNameToHandleMap["InteractionRoot.C2WInteractionRoot"] =
+    classNameHandleMap["InteractionRoot.C2WInteractionRoot"] =
       static_cast<RTI::InteractionClassHandle>(handleValue++);
 
-    classNameToHandleMap["InteractionRoot.C2WInteractionRoot.ActionBase"] =
+    classNameHandleMap["InteractionRoot.C2WInteractionRoot.ActionBase"] =
       static_cast<RTI::InteractionClassHandle>(handleValue++);
 
-    classNameToHandleMap["InteractionRoot.C2WInteractionRoot.FederateJoinInteraction"] =
+    classNameHandleMap["InteractionRoot.C2WInteractionRoot.FederateJoinInteraction"] =
       static_cast<RTI::InteractionClassHandle>(handleValue++);
 
-    classNameToHandleMap["InteractionRoot.C2WInteractionRoot.FederateResignInteraction"] =
+    classNameHandleMap["InteractionRoot.C2WInteractionRoot.FederateResignInteraction"] =
       static_cast<RTI::InteractionClassHandle>(handleValue++);
 
-    classNameToHandleMap["InteractionRoot.C2WInteractionRoot.OutcomeBase"] =
+    classNameHandleMap["InteractionRoot.C2WInteractionRoot.OutcomeBase"] =
       static_cast<RTI::InteractionClassHandle>(handleValue++);
 
-    classNameToHandleMap["InteractionRoot.C2WInteractionRoot.SimLog"] =
+    classNameHandleMap["InteractionRoot.C2WInteractionRoot.SimLog"] =
       static_cast<RTI::InteractionClassHandle>(handleValue++);
 
-    classNameToHandleMap["InteractionRoot.C2WInteractionRoot.SimLog.HighPrio"] =
+    classNameHandleMap["InteractionRoot.C2WInteractionRoot.SimLog.HighPrio"] =
       static_cast<RTI::InteractionClassHandle>(handleValue++);
 
-    classNameToHandleMap["InteractionRoot.C2WInteractionRoot.SimLog.HighPrio"] =
+    classNameHandleMap["InteractionRoot.C2WInteractionRoot.SimLog.HighPrio"] =
       static_cast<RTI::InteractionClassHandle>(handleValue++);
 
-    classNameToHandleMap["InteractionRoot.C2WInteractionRoot.SimLog.LowPrio"] =
+    classNameHandleMap["InteractionRoot.C2WInteractionRoot.SimLog.LowPrio"] =
       static_cast<RTI::InteractionClassHandle>(handleValue++);
 
-    classNameToHandleMap["InteractionRoot.C2WInteractionRoot.SimLog.MediumPrio"] =
+    classNameHandleMap["InteractionRoot.C2WInteractionRoot.SimLog.MediumPrio"] =
       static_cast<RTI::InteractionClassHandle>(handleValue++);
 
-    classNameToHandleMap["InteractionRoot.C2WInteractionRoot.SimLog.VeryLowPrio"] =
+    classNameHandleMap["InteractionRoot.C2WInteractionRoot.SimLog.VeryLowPrio"] =
       static_cast<RTI::InteractionClassHandle>(handleValue++);
 
-    classNameToHandleMap["InteractionRoot.C2WInteractionRoot.SimulationControl"] =
+    classNameHandleMap["InteractionRoot.C2WInteractionRoot.SimulationControl"] =
       static_cast<RTI::InteractionClassHandle>(handleValue++);
 
-    classNameToHandleMap["InteractionRoot.C2WInteractionRoot.SimulationControl.SimEnd"] =
+    classNameHandleMap["InteractionRoot.C2WInteractionRoot.SimulationControl.SimEnd"] =
       static_cast<RTI::InteractionClassHandle>(handleValue++);
 
-    classNameToHandleMap["InteractionRoot.C2WInteractionRoot.SimulationControl.SimPause"] =
+    classNameHandleMap["InteractionRoot.C2WInteractionRoot.SimulationControl.SimPause"] =
       static_cast<RTI::InteractionClassHandle>(handleValue++);
 
-    classNameToHandleMap["InteractionRoot.C2WInteractionRoot.SimulationControl.SimResume"] =
+    classNameHandleMap["InteractionRoot.C2WInteractionRoot.SimulationControl.SimResume"] =
       static_cast<RTI::InteractionClassHandle>(handleValue++);
 
-    return classNameToHandleMap;
+    classNameHandleMap["InteractionRoot.TestBase"] =
+      static_cast<RTI::InteractionClassHandle>(handleValue++);
+
+    classNameHandleMap["InteractionRoot.TestBase.DerivedBase"] =
+      static_cast<RTI::InteractionClassHandle>(handleValue++);
+
+    return classNameHandleMap;
 }
 
+const RTIAmbassadorTest1::ClassHandleNameMap &RTIAmbassadorTest1::get_class_handle_name_map_aux() {
+    const ClassNameHandleMap &classNameHandleMap = get_class_name_handle_map();
+
+    static ClassHandleNameMap classHandleNameMap;
+    for(
+      ClassNameHandleMap::const_iterator chmCit = classNameHandleMap.begin() ;
+      chmCit != classNameHandleMap.end() ;
+      ++chmCit
+    ) {
+        classHandleNameMap[chmCit->second] = chmCit->first;
+    }
+
+    return classHandleNameMap;
+}
 
 const RTIAmbassadorTest1::ClassAndPropertyNameHandleMap
-  &RTIAmbassadorTest1::get_class_and_property_name_parameter_handle_map_aux() {
+  &RTIAmbassadorTest1::get_interaction_class_and_property_name_handle_map_aux() {
 
     static ClassAndPropertyNameHandleMap interactionClassAndPropertyNameHandleMap;
 
@@ -110,11 +130,27 @@ const RTIAmbassadorTest1::ClassAndPropertyNameHandleMap
             ClassAndPropertyName("InteractionRoot.C2WInteractionRoot.FederateResignInteraction", "IsLateJoiner")
     ] = get_new_int_value();
 
+    interactionClassAndPropertyNameHandleMap[
+            ClassAndPropertyName("InteractionRoot.TestBase", "field1")
+    ] =get_new_int_value();
+    interactionClassAndPropertyNameHandleMap[
+            ClassAndPropertyName("InteractionRoot.TestBase", "field2")
+    ] = get_new_int_value();
+    interactionClassAndPropertyNameHandleMap[
+            ClassAndPropertyName("InteractionRoot.TestBase.TestDerived", "field3")
+    ] = get_new_int_value();
+    interactionClassAndPropertyNameHandleMap[
+            ClassAndPropertyName("InteractionRoot.TestBase.TestDerived", "field4")
+    ] = get_new_int_value();
+    interactionClassAndPropertyNameHandleMap[
+            ClassAndPropertyName("InteractionRoot.TestBase.TestDerived", "field5")
+    ] = get_new_int_value();
+
     return interactionClassAndPropertyNameHandleMap;
 }
 
 const RTIAmbassadorTest1::ClassAndPropertyNameHandleMap
-  &RTIAmbassadorTest1::get_class_and_property_name_attribute_handle_map_aux() {
+  &RTIAmbassadorTest1::get_object_class_and_property_name_handle_map_aux() {
 
     static ClassAndPropertyNameHandleMap objectClassAndPropertyNameHandleMap;
 
@@ -135,7 +171,7 @@ const RTIAmbassadorTest1::ClassAndPropertyNameHandleMap
 RTI::InteractionClassHandle RTIAmbassadorTest1::getInteractionClassHandle(const char *theName) throw (
   RTI::NameNotFound, RTI::FederateNotExecutionMember, RTI::ConcurrentAccessAttempted, RTI::RTIinternalError
 ) {
-    ClassNameToHandleMap::const_iterator chmCit = get_class_name_handle_map().find(theName);
+    ClassNameHandleMap::const_iterator chmCit = get_class_name_handle_map().find(theName);
     return chmCit == get_class_name_handle_map().end() ?
       std::numeric_limits<RTI::InteractionClassHandle>::max() : chmCit->second;
 }
@@ -151,7 +187,7 @@ RTI::ParameterHandle RTIAmbassadorTest1::getParameterHandle(
 ) {
     std::string hlaClassName = InteractionRoot::get_hla_class_name(whichClass);
     ClassAndPropertyName classAndPropertyName(hlaClassName, std::string(theName));
-    return get_class_and_property_name_parameter_handle_map().find(classAndPropertyName)->second;
+    return get_interaction_class_and_property_name_handle_map().find(classAndPropertyName)->second;
 }
 
 RTI::AttributeHandle RTIAmbassadorTest1::getAttributeHandle(
@@ -165,5 +201,30 @@ RTI::AttributeHandle RTIAmbassadorTest1::getAttributeHandle(
 ) {
     std::string hlaClassName = ObjectRoot::get_hla_class_name(whichClass);
     ClassAndPropertyName classAndPropertyName(hlaClassName, std::string(theName));
-    return get_class_and_property_name_attribute_handle_map().find(classAndPropertyName)->second;
+    return get_object_class_and_property_name_handle_map().find(classAndPropertyName)->second;
+}
+
+void RTIAmbassadorTest1::publishInteractionClass(RTI::InteractionClassHandle theInteraction) throw (
+  RTI::InteractionClassNotDefined,
+  RTI::FederateNotExecutionMember,
+  RTI::ConcurrentAccessAttempted,
+  RTI::SaveInProgress,
+  RTI::RestoreInProgress,
+  RTI::RTIinternalError
+) {
+    const std::string &interactionName = get_class_handle_name_map().find(theInteraction)->second;
+    get_published_interaction_class_name_set_aux().insert(interactionName);
+}
+
+void RTIAmbassadorTest1::subscribeInteractionClass(RTI::InteractionClassHandle theInteraction, RTI::Boolean active)
+throw (
+  RTI::InteractionClassNotDefined,
+  RTI::FederateNotExecutionMember,
+  RTI::ConcurrentAccessAttempted,
+  RTI::SaveInProgress,
+  RTI::RestoreInProgress,
+  RTI::RTIinternalError
+) {
+    const std::string &interactionName = get_class_handle_name_map().find(theInteraction)->second;
+    get_subscribed_interaction_class_name_set_aux().insert(interactionName);
 }
