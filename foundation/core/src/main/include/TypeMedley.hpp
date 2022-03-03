@@ -146,6 +146,10 @@ public:
 
     bool setValue(const std::string &value);
 
+    bool setValue(const char *cString) {
+        return setValue(std::string(cString));
+    }
+
     bool asBool() const {
         switch(_dataType) {
             case CHARACTER:
