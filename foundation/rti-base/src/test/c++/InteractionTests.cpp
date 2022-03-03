@@ -60,6 +60,65 @@ std::ostream &operator<<(std::ostream &os, const ClassAndPropertyNameList &class
     return os;
 }
 
+void InteractionTests::interaction_root_dynamic_init() {
+    const std::string federationJson =
+            std::string("{\n") +
+            "    \"interactions\": {\n" +
+            "        \"InteractionRoot\": {},\n" +
+            "        \"InteractionRoot.TestBase\": {\n" +
+            "             \"field1\": {\n" +
+            "                 \"Hidden\": false,\n" +
+            "                 \"ParameterType\": \"String\"\n" +
+            "             },\n" +
+            "             \"field2\": {\n" +
+            "                 \"Hidden\": false,\n" +
+            "                 \"ParameterType\": \"int\"\n" +
+            "             }\n" +
+            "        },\n" +
+            "        \"InteractionRoot.TestBase.TestDerived\": {\n" +
+            "             \"field3\": {\n" +
+            "                 \"Hidden\": false,\n" +
+            "                 \"ParameterType\": \"boolean\"\n" +
+            "             },\n" +
+            "             \"field4\": {\n" +
+            "                 \"Hidden\": false,\n" +
+            "                 \"ParameterType\": \"long\"\n" +
+            "             },\n" +
+            "             \"field5\": {\n" +
+            "                 \"Hidden\": false,\n" +
+            "                 \"ParameterType\": \"double\"\n" +
+            "             }\n" +
+            "        },\n" +
+            "        \"InteractionRoot.OtherClass\": {\n" +
+            "             \"field1\": {\n" +
+            "                 \"Hidden\": false,\n" +
+            "                 \"ParameterType\": \"boolean\"\n" +
+            "             },\n" +
+            "             \"field2\": {\n" +
+            "                 \"Hidden\": false,\n" +
+            "                 \"ParameterType\": \"long\"\n" +
+            "             },\n" +
+            "             \"field3\": {\n" +
+            "                 \"Hidden\": false,\n" +
+            "                 \"ParameterType\": \"double\"\n" +
+            "             }\n" +
+            "        }\n" +
+            "    }\n" +
+            "}\n";
+
+    const std::string dynamicMessageTypes =
+            std::string("{\n") +
+            "    \"interactions\": [\n" +
+            "        \"InteractionRoot.TestBase\",\n" +
+            "        \"InteractionRoot.TestBase.TestDerived\"\n" +
+            "    ]\n" +
+            "}\n";
+
+    std::istringstream federationJsonInputStream(federationJson);
+    std::istringstream dynamicMessagingTypesInputStream(dynamicMessageTypes);
+    InteractionRoot::loadDynamicClassFederationData(federationJsonInputStream, dynamicMessagingTypesInputStream);
+}
+
 RTI::RTIambassador *InteractionTests::get_rti_ambassador_1_ptr() {
     static RTIAmbassadorTest1 rtiAmbassadorTest1;
     static RTI::RTIambassador rtiAmbassador(&rtiAmbassadorTest1);
@@ -73,9 +132,14 @@ void InteractionTests::init_1() {
     get_is_initialized() = true;
 
     std::cout << "INITIALIZING ... " << std::flush;
+    interaction_root_dynamic_init();
     InteractionRoot::init(get_rti_ambassador_1_ptr());
     ObjectRoot::init(get_rti_ambassador_1_ptr());
     std::cout << "DONE" << std::endl;
+}
+
+void InteractionTests::setUp() {
+    RTIAmbassadorTest1::clearPubSub();
 }
 
 void InteractionTests::messagingNamesTest() {
@@ -97,6 +161,8 @@ void InteractionTests::messagingNamesTest() {
     expectedInteractionClassNameSet.insert("InteractionRoot.C2WInteractionRoot.SimulationControl.SimEnd");
     expectedInteractionClassNameSet.insert("InteractionRoot.C2WInteractionRoot.SimulationControl.SimPause");
     expectedInteractionClassNameSet.insert("InteractionRoot.C2WInteractionRoot.SimulationControl.SimResume");
+    expectedInteractionClassNameSet.insert("InteractionRoot.TestBase");
+    expectedInteractionClassNameSet.insert("InteractionRoot.TestBase.TestDerived");
 
     const std::set<std::string> &actualInteractionClassNameSet = InteractionRoot::get_interaction_hla_class_name_set();
     CPPUNIT_ASSERT_EQUAL(expectedInteractionClassNameSet, actualInteractionClassNameSet);
@@ -308,7 +374,7 @@ void InteractionTests::parameterNamesTest() {
 }
 
 void InteractionTests::propertyHandleTest() {
-    int expectedValue = RTIAmbassadorTest1::get_class_and_property_name_parameter_handle_map().find(
+    int expectedValue = RTIAmbassadorTest1::get_interaction_class_and_property_name_handle_map().find(
             ClassAndPropertyName("InteractionRoot.C2WInteractionRoot", "originFed")
     )->second;
 
@@ -316,21 +382,21 @@ void InteractionTests::propertyHandleTest() {
     CPPUNIT_ASSERT_EQUAL(expectedValue, SimLog::get_parameter_handle("originFed"));
     CPPUNIT_ASSERT_EQUAL(expectedValue, C2WInteractionRoot::get_parameter_handle("originFed"));
 
-    expectedValue = RTIAmbassadorTest1::get_class_and_property_name_parameter_handle_map().find(
+    expectedValue = RTIAmbassadorTest1::get_interaction_class_and_property_name_handle_map().find(
             ClassAndPropertyName("InteractionRoot.C2WInteractionRoot.SimLog", "FedName")
     )->second;
 
     CPPUNIT_ASSERT_EQUAL(expectedValue, HighPrio::get_parameter_handle("FedName"));
     CPPUNIT_ASSERT_EQUAL(expectedValue, SimLog::get_parameter_handle("FedName"));
 
-    expectedValue = RTIAmbassadorTest1::get_class_and_property_name_parameter_handle_map().find(
+    expectedValue = RTIAmbassadorTest1::get_interaction_class_and_property_name_handle_map().find(
             ClassAndPropertyName("InteractionRoot.C2WInteractionRoot.SimLog", "FedName")
     )->second;
 
     CPPUNIT_ASSERT_EQUAL(expectedValue, HighPrio::get_parameter_handle("FedName"));
     CPPUNIT_ASSERT_EQUAL(expectedValue, SimLog::get_parameter_handle("FedName"));
 
-    expectedValue = RTIAmbassadorTest1::get_class_and_property_name_attribute_handle_map().find(
+    expectedValue = RTIAmbassadorTest1::get_object_class_and_property_name_handle_map().find(
             ClassAndPropertyName("ObjectRoot.FederateObject", "FederateHost")
     )->second;
 
@@ -443,6 +509,29 @@ void InteractionTests::dynamicMessagingTest() {
 
     CPPUNIT_ASSERT_EQUAL(string4, simLogInteraction.get_originFed());
     CPPUNIT_ASSERT_DOUBLES_EQUAL(doubleValue4, simLogInteraction.get_Time(), 0.01);
+}
+
+void InteractionTests::valueTest() {
+
+    InteractionRoot testBase("InteractionRoot.TestBase");
+    testBase.setParameter("field1", "value1");
+    testBase.setParameter("field2", 5);
+
+    InteractionRoot testDerived("InteractionRoot.TestBase.TestDerived");
+    testDerived.setParameter("field1", "value2");
+    testDerived.setParameter("field2", -6);
+    testDerived.setParameter("field3", true);
+    testDerived.setParameter("field4", 10L);
+    testDerived.setParameter("field5", 3.14);
+
+    CPPUNIT_ASSERT_EQUAL(std::string("value1"), testBase.getParameter("field1").asString());
+    CPPUNIT_ASSERT_EQUAL(5, testBase.getParameter("field2").asInt());
+
+    CPPUNIT_ASSERT_EQUAL(std::string("value2"), testDerived.getParameter("field1").asString());
+    CPPUNIT_ASSERT_EQUAL(-6, testDerived.getParameter("field2").asInt());
+    CPPUNIT_ASSERT(testDerived.getParameter("field3").asBool());
+    CPPUNIT_ASSERT_EQUAL(10L, testDerived.getParameter("field4").asLong());
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(3.14, testDerived.getParameter("field5").asDouble(), 0.01);
 }
 
 CPPUNIT_TEST_SUITE_REGISTRATION( InteractionTests );
