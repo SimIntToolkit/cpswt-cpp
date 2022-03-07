@@ -92,12 +92,11 @@ void HLAInterface::processInteractions( void ) {
 
         int classHandle = interactionRootSP->getClassHandle();
 
-        if (  NetworkPacket::match( classHandle )  ) {
-            NetworkPacket::SP networkPacketSP = boost::static_pointer_cast< NetworkPacket >( interactionRootSP );
+        if ( interactionRootSP->isDynamicInstance() ) {
             InteractionMsg *interactionMsgPtr = new InteractionMsg( getInteractionMessageLabel().c_str() );
             interactionMsgPtr->setToHLA( true );
             interactionMsgPtr->setMessageNo( AttackCoordinator::getUniqueNo() );
-            interactionMsgPtr->setInteractionRootSP( networkPacketSP );
+            interactionMsgPtr->setInteractionRootSP( interactionRootSP );
             interactionMsgPtr->setTimestamp( networkPacketSP->getTime() );
             interactionMsgPtr->setByteLength(networkPacketSP->get_numBytes());
 
@@ -700,6 +699,13 @@ void HLAInterface::initialize(int stage) {
         setStepSize(par( "federate_step_size" ).doubleValue());
         setLookahead(par( "federate_lookahead" ).doubleValue());
 
+        std::string federation_json_file_name = par( "federation_json_file_name" ).stringValue();
+        std::string dynamic_messaging_classes_json_file_name = par( "dynamic_messaging_classes_json_file_name" ).stringValue();
+
+        if (!federation_json_file_name.empty() && !dynamic_messaging_classes_json_file_name.empty()){
+            initializeDynamicMessaging(federation_json_file_name, dynamic_messaging_classes_json_file_name);
+        }
+
         setup();
     }
 
@@ -781,6 +787,10 @@ void HLAInterface::setup() {
     StartNetworkIPFirewall::subscribe_interaction( getRTI() );
     StopNetworkIPFirewall::subscribe_interaction( getRTI() );
 
+    for(const std::string &dynamicHlaClassName: InteractionRoot::get_dynamic_class_name_set()) {
+        InteractionRoot::publish_interaction(dynamicHlaClassName);
+        InteractionRoot::subscribe_interaction(dynamicHlaClassName);
+    }
 
     SubscribedInteractionFilter::get_singleton().initialize();
 
