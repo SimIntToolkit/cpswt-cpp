@@ -58,14 +58,30 @@ public:
     typedef ::org::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::OmnetCommand Super;
     typedef boost::shared_ptr< AttacksNotYetImplemented > SP;
 
+private:
+    static severity_logger &get_logger_aux() {
+        static severity_logger logger;
+        logger.add_attribute("MessagingClassName", attrs::constant< std::string >(
+          "InteractionRoot.C2WInteractionRoot.ActionBase.OmnetCommand.AttacksNotYetImplemented"
+        ));
+
+        logging::add_common_attributes();
+        return logger;
+    }
+
+public:
+    static severity_logger &get_logger() {
+        static severity_logger &logger = get_logger_aux();
+        return logger;
+    }
+
     // ----------------------------------------------------------------------------
-    // STATIC DATAMEMBERS AND CODE THAT DEAL WITH NAMES
+    // STATIC PROPERTIES AND CODE THAT DEAL WITH NAMES
     // THIS CODE IS STATIC BECAUSE IT IS CLASS-DEPENDENT AND NOT INSTANCE-DEPENDENT
     // ----------------------------------------------------------------------------
 
-public:
     /**
-     * Returns the fully-qualified (dot-delimited) name of the org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.ActionBase_p.OmnetCommand_p.AttacksNotYetImplemented interaction class.
+     * Returns the fully-qualified (dot-delimited) name of the ::org::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::OmnetCommand_p::AttacksNotYetImplemented interaction class.
      * Note: As this is a static method, it is NOT polymorphic, and so, if called on
      * a reference will return the name of the class pertaining to the reference,
      * rather than the name of the class for the instance referred to by the reference.
@@ -94,20 +110,8 @@ public:
      *
      * @return the name of this interaction class
      */
-    static const std::string &get_simple_class_name() {
-        static const std::string simpleClassName("AttacksNotYetImplemented");
-        return simpleClassName;
-    }
-
-    /**
-     * Returns the simple name (last name in its fully-qualified dot-delimited name)
-     * of this instance's interaction class.
-     * Polymorphic equivalent of the get_simple_class_name static method.
-     *
-     * @return the simple name of this instance's interaction class
-     */
-    const std::string &getSimpleClassName() const override {
-        return get_simple_class_name();
+    static const std::string get_simple_class_name() {
+        return InteractionRoot::get_simple_class_name(get_hla_class_name());
     }
 
     /**
@@ -135,13 +139,6 @@ public:
         return get_hla_class_name();
     }
 
-private:
-    static ClassAndPropertyNameSetSP &get_class_and_property_name_set_sp() {
-        static ClassAndPropertyNameSetSP classAndPropertyNameSetSP(new ClassAndPropertyNameSet());
-        return classAndPropertyNameSetSP;
-    }
-
-public:
     /**
      * Returns a sorted list containing the names of all of the non-hidden parameters in the
      * org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.ActionBase_p.OmnetCommand_p.AttacksNotYetImplemented interaction class.
@@ -157,36 +154,9 @@ public:
      * paired with name of the hla class in which they are defined in a ClassAndPropertyName POJO.
      */
     static ClassAndPropertyNameList get_parameter_names() {
-        const ClassAndPropertyNameSet &classAndPropertyNameSet(*get_class_and_property_name_set_sp());
-        std::list<ClassAndPropertyName> classAndPropertyNameList(
-          classAndPropertyNameSet.begin(), classAndPropertyNameSet.end()
-        );
-        classAndPropertyNameList.sort();
-        return classAndPropertyNameList;
+        return InteractionRoot::get_parameter_names( get_hla_class_name() );
     }
 
-    /**
-     * Returns a sorted list containing the names of all of the non-hiddenparameters of an
-     * interaction class instance.
-     * The property names are paired with name of the hla class in which they are defined in a
-     * ClassAndPropertyName POJO.
-     * Polymorphic equivalent to get_parameter_names static method.
-     *
-     * @return sorted list containing the names of all of the parameters of an
-     * interaction class instance paired with name of the hla class in which they are defined in a
-     * ClassAndPropertyName POJO.
-     */
-    const ClassAndPropertyNameList getParameterNames() const override {
-        return get_parameter_names();
-    }
-
-private:
-    static ClassAndPropertyNameSetSP &get_all_class_and_property_name_set_sp() {
-        static ClassAndPropertyNameSetSP allClassAndPropertyNameSetSP(new ClassAndPropertyNameSet());
-        return allClassAndPropertyNameSetSP;
-    }
-
-public:
     /**
      * Returns a sorted list containing the names of all of the parameters in the
      * org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.ActionBase_p.OmnetCommand_p.AttacksNotYetImplemented interaction class.
@@ -202,45 +172,22 @@ public:
      * paired with name of the hla class in which they are defined in a ClassAndPropertyName POJO.
      */
     static ClassAndPropertyNameList get_all_parameter_names() {
-        const ClassAndPropertyNameSet &allClassAndPropertyNameSet(*get_all_class_and_property_name_set_sp());
-        ClassAndPropertyNameList allClassAndPropertyNameList(
-          allClassAndPropertyNameSet.begin(), allClassAndPropertyNameSet.end()
-        );
-        allClassAndPropertyNameList.sort();
-        return allClassAndPropertyNameList;
+        return InteractionRoot::get_all_parameter_names( get_hla_class_name() );
     }
 
-    /**
-     * Returns a sorted list containing the names of all of the parameters of an
-     * interaction class instance.
-     * The property names are paired with name of the hla class in which they are defined in a
-     * ClassAndPropertyName POJO.
-     * Polymorphic equivalent of get_all_parameter_names() static method.
-     *
-     * @return sorted list containing the names of all of the parameters of an
-     * interaction class instance paired with name of the hla class in which they are defined in a
-     * ClassAndPropertyName POJO.
-     */
-    const ClassAndPropertyNameList getAllParameterNames() const override {
-        return get_all_parameter_names();
-    }
-
-
-public:
     /*
-     * INITIALIZE STATIC DATAMEMBERS THAT DEAL WITH NAMES
+     * INITIALIZE STATIC PROPERTYS THAT DEAL WITH NAMES
      */
     static bool static_init();
     static bool static_init_var;
 
     // --------------------------------------------------------
-    // END OF STATIC DATAMEMBERS AND CODE THAT DEAL WITH NAMES.
+    // END OF STATIC PROPERTYS AND CODE THAT DEAL WITH NAMES.
     // --------------------------------------------------------
 
 
-public:
     // ----------------------------------------------------------------------------
-    // STATIC DATAMEMBERS AND CODE THAT DEAL WITH HANDLES.
+    // STATIC PROPERTYS AND CODE THAT DEAL WITH HANDLES.
     // THIS CODE IS STATIC BECAUSE IT IS CLASS-DEPENDENT AND NOT INSTANCE-DEPENDENT
     // ----------------------------------------------------------------------------
     /**
@@ -252,77 +199,23 @@ public:
      *
      * @return the RTI assigned integer handle that represents this interaction class
      */
-    static int &get_class_handle() {
-        static int _handle;
-        return _handle;
+    static int get_class_handle() {
+        return get_class_name_handle_map()[get_hla_class_name()];
     }
 
-    /**
-     * Returns the handle (RTI assigned) of this instance's interaction class.
-     * Polymorphic equivalent for get_class_handle static method.
-     *
-     * @return the handle (RTI assigned) if this instance's interaction class
-     */
-    int getClassHandle() const override {
-        return get_class_handle();
-    }
-
-
-protected:
-    /*
-     * THIS IS A PROTECTED METHOD THAT WILL (TRY TO) RETURN THE HANDLE OF A GIVEN DATAMEMBER, GIVEN THE DATAMEMBER'S NAME.
-     * FOR A GIVEN CLASS, IT WILL ATTEMPT TO FIND THE ENTRY IN THE _classAndPropertyNameHandleMap USING AS A KEY
-     * A ClassAndPropertyName POJO, ClassAndPropertyName(A, B), WHERE "A" IS THE FULL CLASS NAME OF THIS CLASS,
-     * AND "B" IS THE NAME OF THE DATAMEMBER. IF THERE IS NO SUCH ENTRY, THIS METHOD CALLS THE SAME METHOD IN ITS
-     * SUPER CLASS.  THIS METHOD CHAIN BOTTOMS OUT IN THE "InteractionRoot" CLASS, WHERE AN ERROR IS RAISED INDICATING
-     * THERE IS NO SUCH DATAMEMBER.
-     *
-     * THE "className" ARGUMENT IS THE FULL NAME OF THE CLASS FOR WHICH THIS METHOD WAS ORIGINALLY CALLED, I.E. THE NAME
-     * OF THE CLASS AT THE TOP OF THE CALL-CHAIN.  IT IS INCLUDED FOR ERROR REPORTING IN THE "InteractionRoot" CLASS.
-     *
-     * THIS METHOD IS INDIRECTLY CALLED VIA THE "get_parameter_handle(String)" METHOD BELOW, WHICH PROVIDES THE
-     * VALUE FOR THE "className" ARGUMENT.
-     */
-    static int get_parameter_handle_aux(const std::string &className, const std::string &propertyName);
-
-public:
     /**
      * Returns the handle of an parameter (RTI assigned) of
      * this interaction class (i.e. "org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.ActionBase_p.OmnetCommand_p.AttacksNotYetImplemented") given the parameter's name.
      *
      * @param propertyName name of parameter
-     * @return the handle (RTI assigned) of the parameter "propertyName" of interaction class "className"
+     * @return the handle (RTI assigned) of the parameter "propertyName" of interaction class "hlaClassName"
      */
     static int get_parameter_handle(const std::string &propertyName) {
-        return get_parameter_handle_aux(get_hla_class_name(), propertyName);
+        return InteractionRoot::get_parameter_handle(get_hla_class_name(), propertyName);
     }
-
-    /**
-     * Returns the handle associated with the given parameter name for an interaction class instance
-     * Polymorphic equivalent of get_parameter_handle static method.
-     *
-     * @param propertyName the name of a parameter that belongs to this interaction class
-     * @return the RTI handle associated with the parameter name, or -1 if not found
-     */
-    virtual int getParameterHandle(const std::string &propertyName) {
-        return get_parameter_handle(propertyName);
-    }
-
-private:
-    static bool &get_is_initialized() {
-        static bool isInitialized = false;
-        return isInitialized;
-    }
-
-protected:
-    /*
-     * THIS FUNCTION INITIALIZES ALL OF THE HANDLES ASSOCIATED WITH THIS INTERACTION CLASS
-     * IT NEEDS THE RTI TO DO SO.
-     */
-    static void init(RTI::RTIambassador *rti);
 
     // ----------------------------------------------------------
-    // END OF STATIC DATAMEMBERS AND CODE THAT DEAL WITH HANDLES.
+    // END OF STATIC PROPERTYS AND CODE THAT DEAL WITH HANDLES.
     // ----------------------------------------------------------
 
 
@@ -330,30 +223,14 @@ protected:
     // METHODS FOR PUBLISHING/SUBSCRIBING-TO THIS CLASS
     //-------------------------------------------------
 
-private:
-    static bool &get_is_published() {
-        static bool isPublished = false;
-        return isPublished;
-    }
-
-public:
     /**
      * Publishes the org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.ActionBase_p.OmnetCommand_p.AttacksNotYetImplemented interaction class for a federate.
      *
      * @param rti handle to the Local RTI Component
      */
-    static void publish_interaction(RTI::RTIambassador *rti);
-
-    /**
-     * Publishes the interaction class of this instance of the class for a federate.
-     * Polymorphic equalivalent of publish_interaction static method.
-     *
-     * @param rti handle to the Local RTI Component
-     */
-    virtual void publishInteraction(RTI::RTIambassador *rti) {
-        publish_interaction(rti);
+    static void publish_interaction(RTI::RTIambassador *rti) {
+        InteractionRoot::publish_interaction( get_hla_class_name(), rti );
     }
-
 
     /**
      * Unpublishes the org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.ActionBase_p.OmnetCommand_p.AttacksNotYetImplemented interaction class for a federate.
@@ -361,22 +238,8 @@ public:
      * @param rti handle to the Local RTI Component, usu. obtained through the
      *            {@link SynchronizedFederate#getLRC()} call
      */
-    static void unpublish_interaction(RTI::RTIambassador *rti);
-
-    /**
-     * Unpublishes the interaction class of this instance of this class for a federate.
-     * Polymorphic equivalent of unpublish_interaction static method.
-     *
-     * @param rti handle to the Local RTI Component
-     */
-    virtual void unpublishInteraction(RTI::RTIambassador *rti) {
-        unpublish_interaction(rti);
-    }
-
-private:
-    static bool &get_is_subscribed() {
-        static bool isSubscribed = false;
-        return isSubscribed;
+    static void unpublish_interaction(RTI::RTIambassador *rti) {
+        InteractionRoot::unpublish_interaction( get_hla_class_name(), rti);
     }
 
 /**
@@ -384,17 +247,8 @@ private:
  *
  * @param rti handle to the Local RTI Component
  */
-public:
-    static void subscribe_interaction(RTI::RTIambassador *rti);
-
-    /**
-     * Subscribes a federate to the interaction class of this instance of this class.
-     * Polymorphic equivalent of subscribe_interaction static method.
-     *
-     * @param rti handle to the Local RTI Component
-     */
-    virtual void subscribeInteraction(RTI::RTIambassador *rti) {
-        subscribe_interaction(rti);
+    static void subscribe_interaction(RTI::RTIambassador *rti) {
+        InteractionRoot::subscribe_interaction( get_hla_class_name(), rti );
     }
 
     /**
@@ -402,23 +256,14 @@ public:
      *
      * @param rti handle to the Local RTI Component
      */
-    static void unsubscribe_interaction(RTI::RTIambassador *rti);
-
-public:
-    /**
-     * Unsubscribes a federate from the interaction class of this instance of this class.
-     *
-     * @param rti handle to the Local RTI Component
-     */
-    virtual void unsubscribeInteraction(RTI::RTIambassador *rti) {
-        unsubscribe_interaction(rti);
+    static void unsubscribe_interaction(RTI::RTIambassador *rti) {
+        InteractionRoot::unsubscribe_interaction( get_hla_class_name(), rti );
     }
 
     //-----------------------------------------------------
     // END METHODS FOR PUBLISHING/SUBSCRIBING-TO THIS CLASS
     //-----------------------------------------------------
 
-public:
     /**
      * Return true if "handle" is equal to the handle (RTI assigned) of this class
      * (that is, the org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.ActionBase_p.OmnetCommand_p.AttacksNotYetImplemented interaction class).
@@ -432,40 +277,13 @@ public:
         return handle == get_class_handle();
     }
 
-
-    //--------------------------------
-    // DATAMEMBER MANIPULATION METHODS
-    //--------------------------------
-public:
-
-protected:
-    virtual PropertyClassNameAndValueSP getParameterAux(
-      const std::string &className, const std::string &propertyName
-    ) const;
+    //------------------------------
+    // PROPERTY MANIPULATION METHODS
+    //------------------------------
 
     //------------------------------------
-    // END DATAMEMBER MANIPULATION METHODS
+    // END PROPERTY MANIPULATION METHODS
     //------------------------------------
-
-    //-------------
-    // CONSTRUCTORS
-    //-------------
-    
-    AttacksNotYetImplemented() {
-    }
-
-    AttacksNotYetImplemented( const PropertyHandleValuePairSet &propertyMap ) {
-        setParameters(propertyMap);
-    }
-
-    AttacksNotYetImplemented( const RTIfedTime &rtiFedTime ) {
-    }
-
-    AttacksNotYetImplemented(const PropertyHandleValuePairSet &propertyMap, const RTIfedTime &rtiFedTime) {
-        setParameters(propertyMap);
-        setTime(rtiFedTime);
-    }
-
 
     //--------------------------
     // INSTANCE CREATION METHODS
@@ -481,6 +299,18 @@ public:
 
     virtual InteractionRoot::SP createInteraction() {
         return create_interaction();
+    }
+
+    static SP create(const RTIfedTime &rtiFedTime) {
+        return SP(new AttacksNotYetImplemented(rtiFedTime));
+    }
+
+    static InteractionRoot::SP create_interaction(const RTIfedTime &rtiFedTime) {
+        return SP(new AttacksNotYetImplemented(rtiFedTime));
+    }
+
+    virtual InteractionRoot::SP createInteraction(const RTIfedTime &rtiFedTime) {
+        return create_interaction(rtiFedTime);
     }
 
     static SP create(
@@ -499,18 +329,6 @@ public:
       const RTI::ParameterHandleValuePairSet &propertyMap
     ) {
         return create_interaction(propertyMap);
-    }
-
-    static SP create(const RTIfedTime &rtiFedTime) {
-        return SP(new AttacksNotYetImplemented(rtiFedTime));
-    }
-
-    static InteractionRoot::SP create_interaction(const RTIfedTime &rtiFedTime) {
-        return SP(new AttacksNotYetImplemented(rtiFedTime));
-    }
-
-    virtual InteractionRoot::SP createInteraction(const RTIfedTime &rtiFedTime) {
-        return create_interaction(rtiFedTime);
     }
 
     static SP create(
@@ -537,6 +355,34 @@ public:
     //------------------------------
     // END INSTANCE CREATION METHODS
     //------------------------------
+
+    //-------------
+    // CONSTRUCTORS
+    //-------------
+public:
+    AttacksNotYetImplemented() : Super( get_hla_class_name() ) { }
+
+    AttacksNotYetImplemented( const PropertyHandleValuePairSet &propertyMap ) : Super( get_hla_class_name(), propertyMap ) { }
+
+    AttacksNotYetImplemented( const RTIfedTime &rtiFedTime ) : Super( get_hla_class_name(), rtiFedTime ) { }
+
+    AttacksNotYetImplemented(const PropertyHandleValuePairSet &propertyMap, const RTIfedTime &rtiFedTime) :
+       Super( get_hla_class_name(), propertyMap, rtiFedTime ) { }
+
+protected:
+    AttacksNotYetImplemented(InteractionRoot::NoInstanceInit &noInstanceInit) : Super(noInstanceInit) { }
+
+    AttacksNotYetImplemented( const std::string &hlaClassName ) : Super( hlaClassName ) { }
+
+    AttacksNotYetImplemented( const std::string &hlaClassName, const PropertyHandleValuePairSet &propertyMap ) :
+      Super( hlaClassName, propertyMap ) { }
+
+    AttacksNotYetImplemented( const std::string &hlaClassName, const RTIfedTime &rtiFedTime ) :
+      Super( hlaClassName, rtiFedTime ) { }
+
+    AttacksNotYetImplemented(
+      const std::string &hlaClassName, const PropertyHandleValuePairSet &propertyMap, const RTIfedTime &rtiFedTime
+    ) : Super( hlaClassName, propertyMap, rtiFedTime ) { }
 
 };
       } // NAMESPACE "OmnetCommand_p"
