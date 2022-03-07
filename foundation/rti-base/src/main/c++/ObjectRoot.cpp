@@ -762,10 +762,10 @@ void ObjectRoot::fromJson(const std::string &jsonString) {
     }
 }
 
-void ObjectRoot::readFederateDynamicMessageClasses(std::istream &dynamicMessaingTypesInputStream) {
+void ObjectRoot::readFederateDynamicMessageClasses(std::istream &dynamicMessagingTypesInputStream) {
 
     Json::Value dynamicMessageTypes;
-    dynamicMessaingTypesInputStream >> dynamicMessageTypes;
+    dynamicMessagingTypesInputStream >> dynamicMessageTypes;
 
     Json::Value federationMessaging = get_federation_json()["objects"];
 
