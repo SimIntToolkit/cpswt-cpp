@@ -129,6 +129,16 @@ public:
     }
 
     /**
+     * Returns the fully-qualified (dot-delimited) hla class name of this instance's interaction class.
+     * Polymorphic equivalent of get_hla_class_name static method.
+     *
+     * @return the fully-qualified (dot-delimited) name of this instance's interaction class
+     */
+    const std::string &getHlaClassName() const override {
+        return get_hla_class_name();
+    }
+
+    /**
      * Returns a sorted list containing the names of all of the non-hidden parameters in the
      * org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.SimLog_p.HighPrio interaction class.
      * The property names are paired with name of the hla class in which they are defined in a

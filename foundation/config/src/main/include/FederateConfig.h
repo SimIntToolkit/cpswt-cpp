@@ -30,6 +30,9 @@ public:
     long federateRTIInitWaitTimeMs;//=20;
     double lookAhead;// = 0.1;
     double stepSize ;//=1 ;
+    std::string federationJsonFileName;
+    std::string federateDynamicMessagingJsonFileName;
+
     std::string configFileName ;//= "configfile.json";
 };
 

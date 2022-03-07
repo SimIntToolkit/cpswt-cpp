@@ -75,6 +75,16 @@ void FederateConfigParser::parseJson(std::string configFileName, FederateConfig 
     } catch (pt::ptree_error &e) {
         std::cerr << e.what() << std::endl;
     }
+    try {
+        obj->federationJsonFileName = iroot.get<std::string>("federationJsonFileName");
+    } catch (pt::ptree_error &e) {
+        std::cerr << e.what() << std::endl;
+    }
+    try {
+        obj->federateDynamicMessagingJsonFileName = iroot.get<std::string>("federateDynamicMessagingJsonFileName");
+    } catch (pt::ptree_error &e) {
+        std::cerr << e.what() << std::endl;
+    }
 
 }
 
@@ -91,7 +101,9 @@ FederateConfig* FederateConfigParser::parseArgs(const int argc, char *argv[]) {
             ("isLateJoiner", po::value<std::string>()->implicit_value("false"),
              "Whether the federate is LateJoiner? default: false")
             ("lookAhead", po::value<double>()->implicit_value(0.0), "Lookahead values, default 0.0")
-            ("stepSize", po::value<double>()->implicit_value(1.0), "Simulation step size, default:1.0");
+            ("stepSize", po::value<double>()->implicit_value(1.0), "Simulation step size, default:1.0")
+            ("federationJsonFileName", po::value<std::string>()->implicit_value(""), "Path of file containing all messaging information for this federation, default:\"\"")
+            ("federateDynamicMessagingJsonFileName", po::value<std::string>()->implicit_value(""), "Path of file containing list of dynamic messaging classes for this federate, default:\"\"");
 
     po::variables_map vm;
 
@@ -124,13 +136,10 @@ FederateConfig* FederateConfigParser::parseArgs(const int argc, char *argv[]) {
 
     }
 
-
 //    std::cout << "lookahead: " << fedConfig->lookAhead << " stepSize: " << fedConfig->stepSize
 //              << " federateType: " << fedConfig->federateType << " federationID: " << fedConfig->federationId
 //              << " isLateJoiner: " << std::boolalpha << fedConfig->isLateJoiner << std::endl;
 //
-
-
 
     if (vm.count("federateType"))
         fedConfig->federateType = vm["federateType"].as<std::string>();
@@ -147,10 +156,20 @@ FederateConfig* FederateConfigParser::parseArgs(const int argc, char *argv[]) {
     if (vm.count("stepSize"))
         fedConfig->stepSize = vm["stepSize"].as<double>();
 
+    if (vm.count("federationJsonFileName"))
+        fedConfig->federationJsonFileName = vm["federationJsonFileName"].as<std::string>();
 
-    std::cout << "lookahead: " << fedConfig->lookAhead << " stepSize: " << fedConfig->stepSize
-              << " federateType: " << fedConfig->federateType << " federationID: " << fedConfig->federationId
-              << " isLateJoiner: " << std::boolalpha << fedConfig->isLateJoiner << std::endl;
+    if (vm.count("federateDynamicMessagingJsonFileName"))
+        fedConfig->federateDynamicMessagingJsonFileName = vm["federateDynamicMessagingJsonFileName"].as<std::string>();
+
+    std::cout << "lookahead: " << fedConfig->lookAhead
+              << ", stepSize: " << fedConfig->stepSize
+              << ", federateType: \"" << fedConfig->federateType
+              << "\", federationID: \"" << fedConfig->federationId
+              << "\", isLateJoiner: " << std::boolalpha << fedConfig->isLateJoiner
+              << ", federationJsonFileName: \"" << fedConfig->federationJsonFileName
+              << "\", federateDynamicMessagingJsonFileName: \"" << fedConfig->federateDynamicMessagingJsonFileName
+              << "\"" << std::endl;
 
     return fedConfig;
 
