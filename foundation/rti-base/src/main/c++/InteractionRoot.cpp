@@ -538,10 +538,10 @@ InteractionRoot::SP InteractionRoot::fromJson(const std::string &jsonString) {
     return interactionRootSP;
 }
 
-void InteractionRoot::readFederateDynamicMessageClasses(std::istream &dynamicMessaingTypesInputStream) {
+void InteractionRoot::readFederateDynamicMessageClasses(std::istream &dynamicMessagingTypesInputStream) {
 
     Json::Value dynamicMessageTypes;
-    dynamicMessaingTypesInputStream >> dynamicMessageTypes;
+    dynamicMessagingTypesInputStream >> dynamicMessageTypes;
 
     Json::Value federationMessaging = get_federation_json()["interactions"];
 

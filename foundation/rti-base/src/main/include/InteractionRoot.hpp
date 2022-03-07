@@ -1388,10 +1388,11 @@ public:
 
     static void readFederateDynamicMessageClasses( const std::string &dynamicMessageTypesJsonFileString ) {
         std::ifstream dynamicMessageTypesInputFileStream( dynamicMessageTypesJsonFileString );
-
+        readFederateDynamicMessageClasses(dynamicMessageTypesInputFileStream);
+        dynamicMessageTypesInputFileStream.close();
     }
 
-    static void readFederateDynamicMessageClasses(std::istream &dynamicMessaingTypesInputStream);
+    static void readFederateDynamicMessageClasses(std::istream &dynamicMessagingTypesInputStream);
 
     static void loadDynamicClassFederationData(
       std::istream &federationJsonReader, std::istream &federateDynamicMessageClassesReader
