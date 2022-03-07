@@ -28,6 +28,7 @@
 #define RTI_USES_STD_FSTREAM
 #endif
 
+#include <fstream>
 #include <string>
 #include <set>
 #include <map>
@@ -139,8 +140,6 @@ protected:
 	 	 _timeAdvanceMode = SF_TIME_ADVANCE_REQUEST;
 	 }
 
-
-
 	SynchronizedFederate( FederateConfig *fedconfig)
 	{
 		this->_federationId = fedconfig->federationId;
@@ -160,8 +159,16 @@ protected:
 		temp<<fedconfig->federateType<<random_variable;
 		this->_federateId=temp.str();      //str is temp as string
         setpgid( 0, 0 );
-		 
-		 
+
+        if (
+                !fedconfig->federationJsonFileName.empty() &&
+                        !fedconfig->federateDynamicMessagingJsonFileName.empty()
+        ) {
+            initializeDynamicMessaging(
+                    fedconfig->federationJsonFileName, fedconfig->federateDynamicMessagingJsonFileName
+            );
+        }
+
 		//   _lockFileName = getenv( "EXEDIR" );
 		//   if ( !_lockFileName.empty() ) {
 		//       _lockFileName += "/";
@@ -180,8 +187,38 @@ protected:
 
 	void destroyRTI( void ) {
 		// delete _rti;
-		_rti = 0;
+		_rti = nullptr;
 	}
+
+    void initializeMessaging() {
+        InteractionRoot::init(getRTI());
+        ObjectRoot::init(getRTI());
+    }
+
+    void initializeDynamicMessaging(
+      std::istream &federationJsonInputStream, std::istream &federateDynamicMessagingClassesJsonInputStream
+    ) {
+        InteractionRoot::loadDynamicClassFederationData(
+          federationJsonInputStream, federateDynamicMessagingClassesJsonInputStream
+        );
+
+        federationJsonInputStream.seekg(0);
+        federateDynamicMessagingClassesJsonInputStream.seekg(0);
+
+        ObjectRoot::loadDynamicClassFederationData(
+          federationJsonInputStream, federateDynamicMessagingClassesJsonInputStream
+        );
+
+        initializeMessaging();
+    }
+
+    void initializeDynamicMessaging(
+            const std::string &federationJsonFileName, const std::string &federateDynamicMessagingClassesJsonFileName
+    ) {
+        std::ifstream federationJsonInputStream(federationJsonFileName);
+        std::ifstream federateDynamicMessagingClassJsonInputStream(federateDynamicMessagingClassesJsonFileName);
+        initializeDynamicMessaging(federationJsonInputStream, federateDynamicMessagingClassJsonInputStream);
+    }
 
 	// void joinFederation( const std::string &federation_id, const std::string &federate_id, bool ignoreLockFile = true );
 	void joinFederation();

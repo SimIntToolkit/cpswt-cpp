@@ -193,13 +193,13 @@ protected:
         return hlaClassNameSet;
     }
 
-    //----------------------------------------------------------------------------
+    //--------------------------------------------------------------------------
     // METHODS THAT USE HLA CLASS-NAME-SET
     //
     // ALSO USED BY:
     // - ObjectRoot( const std::string &hlaClassName ) DYNAMIC CONSTRUCTOR
     // - readFederateDynamicMessageClasses(Reader reader) BELOW
-    //----------------------------------------------------------------------------
+    //--------------------------------------------------------------------------
 public:
     static const StringSet &get_object_hla_class_name_set() {
         return get_hla_class_name_set();
@@ -208,6 +208,35 @@ public:
     //-----------------------
     // END HLA CLASS-NAME-SET
     //-----------------------
+
+    //---------------------------
+    // DYNAMIC HLA CLASS-NAME SET
+    //---------------------------
+private:
+    static StringSet &get_dynamic_hla_class_name_set_aux() {
+        static StringSet dynamicHlaClassNameSet;
+        return dynamicHlaClassNameSet;
+    }
+
+    //--------------------------------------------
+    // METHODS THAT USE DYNAMIC HLA CLASS-NAME SET
+    //--------------------------------------------
+public:
+    static const StringSet &get_dynamic_hla_class_name_set() {
+        return get_dynamic_hla_class_name_set_aux();
+    }
+
+    static bool is_dynamic_class(const std::string &hlaClassName) {
+        return get_dynamic_hla_class_name_set().find(hlaClassName) != get_dynamic_hla_class_name_set().end();
+    }
+
+    bool isDynamicInstance() {
+        return getHlaClassName() != getInstanceHlaClassName();
+    }
+
+    //-------------------------------
+    // END DYNAMIC HLA CLASS-NAME SET
+    //-------------------------------
 
     //-------------------------------------------------------------------------
     // CLASS-NAME PROPERTY-NAME-SET MAP
@@ -964,7 +993,7 @@ public:
         if (!propertyClassNameAndValueSP) {
             BOOST_LOG_SEV(get_logger(), error) << "setAttribute(\"" << propertyName << "\", "
               << typeid(T).name() << " value): could not find \"" << propertyName
-              << "\" attribute in class \"" << getHlaClassName() << "\" or any of its superclasses.";
+              << "\" attribute in class \"" << getInstanceHlaClassName() << "\" or any of its superclasses.";
             return;
         }
 
@@ -976,6 +1005,18 @@ public:
               << "\" for \"" << propertyName << "\" parameter, should be of type \""
               << currentValue.getTypeName() << "\"";
         }
+    }
+
+    template<typename T>
+    void setAttribute(const ClassAndPropertyName &classAndPropertyName, const T &value) {
+        setAttribute(
+          classAndPropertyName.getClassName(), classAndPropertyName.getPropertyName(), value
+        );
+    }
+
+    template<typename T>
+    void setAttribute(const ClassAndPropertyNameSP &classAndPropertyNameSP, const T &value) {
+        setAttribute(*classAndPropertyNameSP, value);
     }
 
     template<typename T>
@@ -991,6 +1032,9 @@ private:
         if (classAndPropertyNameSP) {
             ClassAndPropertyNameValueSPMap::const_iterator cvmCit =
               _classAndPropertyNameValueSPMap.find(*classAndPropertyNameSP);
+            if (cvmCit == _classAndPropertyNameValueSPMap.end()) {
+                return PropertyClassNameAndValueSP();
+            }
             ValueSP valueSP = cvmCit->second;
             return PropertyClassNameAndValueSP(
               new PropertyClassNameAndValue(classAndPropertyNameSP->getClassName(), valueSP)
@@ -1001,6 +1045,14 @@ private:
     }
 
 public:
+    bool hasAttribute(const std::string &hlaClassName, const std::string &propertyName) {
+        return static_cast<bool>(getAttributeAux(hlaClassName, propertyName));
+    }
+
+    bool hasAttribute(const std::string &propertyName) {
+        return hasAttribute(getInstanceHlaClassName(), propertyName);
+    }
+
     const Value &getAttribute(
       const std::string &hlaClassName, const std::string &propertyName
     ) const override {
@@ -1010,6 +1062,16 @@ public:
           getAttributeAux(hlaClassName, propertyName);
 
         return propertyClassNameAndValueSP ? *propertyClassNameAndValueSP->getValueSP() : value;
+    }
+
+    const Value &getAttribute(const ClassAndPropertyName &classAndPropertyName) {
+        return getAttribute(
+          classAndPropertyName.getClassName(), classAndPropertyName.getPropertyName()
+        );
+    }
+
+    const Value &getAttribute(const ClassAndPropertyNameSP &classAndPropertyNameSP) {
+        return getAttribute(*classAndPropertyNameSP);
     }
 
     const Value &getAttribute(const std::string &propertyName) const override {
@@ -1095,6 +1157,16 @@ public:
     static const std::string &get_hla_class_name() {
         static const std::string hlaClassName("ObjectRoot");
         return hlaClassName;
+    }
+
+    /**
+     * Returns the fully-qualified (dot-delimited) hla class name of this instance's object class.
+     * Polymorphic equivalent of get_hla_class_name static method.
+     *
+     * @return the fully-qualified (dot-delimited) name of this instance's object class
+     */
+    const std::string &getHlaClassName() const override {
+        return get_hla_class_name();
     }
 
     /**
@@ -1483,7 +1555,7 @@ public:
             BOOST_LOG_SEV(get_logger(), error) << "setAttribute(int propertyHandle, "
             << typeid(T).name() << " value): propertyHandle (" << propertyHandle
             << ") corresponds to property of name \"" << classAndPropertyName.getPropertyName()
-            << "\", which does not exist in class \"" << getHlaClassName() << "\" (it's defined in class \""
+            << "\", which does not exist in class \"" << getInstanceHlaClassName() << "\" (it's defined in class \""
             << classAndPropertyName.getClassName() << "\")";
         }
 
@@ -1521,16 +1593,6 @@ public:
      */
     const std::string getSimpleClassName() const override {
         return get_simple_class_name( getInstanceHlaClassName() );
-    }
-
-    /**
-     * Returns the fully-qualified (dot-delimited) hla class name of this instance's object class.
-     * Polymorphic equivalent of get_hla_class_name static method.
-     *
-     * @return the fully-qualified (dot-delimited) name of this instance's object class
-     */
-    const std::string &getHlaClassName() const override {
-        return getInstanceHlaClassName();
     }
 
     /**

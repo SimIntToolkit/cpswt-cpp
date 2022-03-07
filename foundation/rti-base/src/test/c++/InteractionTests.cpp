@@ -451,8 +451,11 @@ void InteractionTests::dynamicMessagingTest() {
     InteractionRoot dynamicSimLogInteraction(SimLog::get_hla_class_name());
     InteractionRoot *dynamicSimLogInteractionPtr = &dynamicSimLogInteraction;
 
+    CPPUNIT_ASSERT(dynamicSimLogInteraction.isDynamicInstance());
+
     SimLog *simLogPtr1 = dynamic_cast<SimLog *>(dynamicSimLogInteractionPtr);
     CPPUNIT_ASSERT(simLogPtr1 == nullptr);
+
     CPPUNIT_ASSERT_EQUAL(SimLog::get_hla_class_name(), dynamicSimLogInteraction.getInstanceHlaClassName());
 
     std::string string1("string1");
@@ -480,9 +483,11 @@ void InteractionTests::dynamicMessagingTest() {
     InteractionRoot::SP staticSimLogInteractionSP1 = InteractionRoot::create_interaction(SimLog::get_hla_class_name());
     InteractionRoot *staticSimLogInteraction1Ptr = staticSimLogInteractionSP1.get();
 
-    SimLog *simLogPtr2 = dynamic_cast<SimLog *>(staticSimLogInteraction1Ptr);
+    CPPUNIT_ASSERT(!staticSimLogInteractionSP1->isDynamicInstance());
 
+    SimLog *simLogPtr2 = dynamic_cast<SimLog *>(staticSimLogInteraction1Ptr);
     CPPUNIT_ASSERT(simLogPtr2 != nullptr);
+
     CPPUNIT_ASSERT_EQUAL(SimLog::get_hla_class_name(), staticSimLogInteractionSP1->getInstanceHlaClassName());
 
     std::string string3("string3");

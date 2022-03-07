@@ -56,6 +56,10 @@ void ObjectRoot::init(RTI::RTIambassador *rtiAmbassador) {
     //-------------------------------------------------------------------------
     for(const std::string &hlaClassName: get_hla_class_name_set()) {
 
+        if (get_hla_class_name_instance_sp_map().find(hlaClassName) == get_hla_class_name_instance_sp_map().end()) {
+            get_dynamic_hla_class_name_set_aux().insert(hlaClassName);
+        }
+
         //----------------------------------------------------
         // GET HANDLE FOR hlaClassName TO INITIALIZE
         // - _classNameHandleMap (get_class_name_handle_map())
