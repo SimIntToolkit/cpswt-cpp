@@ -19,11 +19,18 @@ dependencyResolutionManagement {
         maven {
             isAllowInsecureProtocol = true
             url = uri("http://$archivaHostId:$archivaPort/repository/snapshots")
-
         }
     }
 }
 
+buildscript {
+    repositories {
+        gradlePluginPortal()
+    }
+    dependencies {
+        classpath(group="org.json", name="json", version="20210307")
+    }
+}
 
 include("foundation")
 

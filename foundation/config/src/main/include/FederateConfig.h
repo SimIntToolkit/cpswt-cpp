@@ -31,7 +31,7 @@ public:
     double lookAhead;// = 0.1;
     double stepSize ;//=1 ;
     std::string federationJsonFileName;
-    std::string federateDynamicMessagingJsonFileName;
+    std::string federateDynamicMessagingClassesJsonFileName;
 
     std::string configFileName ;//= "configfile.json";
 };

@@ -27,11 +27,13 @@
 #include <regex>
 #include <utility>
 #include <boost/algorithm/string.hpp>
+#include <boost/shared_ptr.hpp>
 #include <map>
 
 class TypeMedley {
 public:
     enum DataType { BOOLEAN, CHARACTER, SHORT, INTEGER, LONG, FLOAT, DOUBLE, STRING };
+    typedef boost::shared_ptr<TypeMedley> SP;
 
 private:
     static std::regex &get_double_regex() {

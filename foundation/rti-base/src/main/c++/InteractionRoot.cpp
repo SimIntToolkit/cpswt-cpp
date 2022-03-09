@@ -56,6 +56,8 @@ void InteractionRoot::init(RTI::RTIambassador *rtiAmbassador) {
     //-------------------------------------------------------------------------
     for(const std::string &hlaClassName: get_hla_class_name_set()) {
 
+        BOOST_LOG_SEV(get_logger(), info) << "Initializing HLA class \"" << hlaClassName << "\"";
+
         if (get_hla_class_name_instance_sp_map().find(hlaClassName) == get_hla_class_name_instance_sp_map().end()) {
             get_dynamic_hla_class_name_set_aux().insert(hlaClassName);
         }

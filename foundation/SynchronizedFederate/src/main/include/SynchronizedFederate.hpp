@@ -80,6 +80,9 @@ private:
 
 	std::string _FederateId;
 	std::string _FederateType;
+
+	std::string _federationJsonFileName;
+	std::string _federateDynamicMessagingClassesJsonFileName;
 	bool _IsLateJoiner;
 
 
@@ -128,9 +131,18 @@ private:
 protected:
 	static C2WLogger* _logger;
 
-	 SynchronizedFederate( void ) : _federateId( "" ), _federationId( "" ), _timeConstrainedNotEnabled( true ), _timeRegulationNotEnabled( true ), _simEndNotSubscribed( true ), _currentTime( 0 ), _lookahead( 0 ), _IsLateJoiner(false), _FederateType("")
-	 {
-	 	 setpgid( 0, 0 );
+	SynchronizedFederate( void ) :
+	  _federateId( "" ),
+	  _federationId( "" ),
+	  _timeConstrainedNotEnabled( true ),
+	  _timeRegulationNotEnabled( true ),
+	  _simEndNotSubscribed( true ),
+	  _currentTime( 0 ),
+	  _lookahead( 0 ),
+	  _IsLateJoiner(false),
+	  _FederateType("") {
+
+		setpgid( 0, 0 );
 //	 	 _lockFileName = getenv( "EXEDIR" );
 //	 	 if ( !_lockFileName.empty() ) {
 //	 	     _lockFileName += "/";
@@ -140,8 +152,7 @@ protected:
 	 	 _timeAdvanceMode = SF_TIME_ADVANCE_REQUEST;
 	 }
 
-	SynchronizedFederate( FederateConfig *fedconfig)
-	{
+	SynchronizedFederate( FederateConfig *fedconfig) {
 		this->_federationId = fedconfig->federationId;
 		this->_timeConstrainedNotEnabled = true;
 		this->_timeRegulationNotEnabled = true;
@@ -150,6 +161,9 @@ protected:
 		setLookahead(fedconfig->lookAhead);
 		this->_IsLateJoiner= fedconfig->isLateJoiner;
 		this->_FederateType = fedconfig->federateType;
+		this->_federationJsonFileName = fedconfig->federationJsonFileName;
+		this->_federateDynamicMessagingClassesJsonFileName = fedconfig->federateDynamicMessagingClassesJsonFileName;
+
 		setStepSize(fedconfig->stepSize);
 
 
@@ -159,15 +173,6 @@ protected:
 		temp<<fedconfig->federateType<<random_variable;
 		this->_federateId=temp.str();      //str is temp as string
         setpgid( 0, 0 );
-
-        if (
-                !fedconfig->federationJsonFileName.empty() &&
-                        !fedconfig->federateDynamicMessagingJsonFileName.empty()
-        ) {
-            initializeDynamicMessaging(
-                    fedconfig->federationJsonFileName, fedconfig->federateDynamicMessagingJsonFileName
-            );
-        }
 
 		//   _lockFileName = getenv( "EXEDIR" );
 		//   if ( !_lockFileName.empty() ) {
@@ -215,6 +220,10 @@ protected:
     void initializeDynamicMessaging(
             const std::string &federationJsonFileName, const std::string &federateDynamicMessagingClassesJsonFileName
     ) {
+        if (federationJsonFileName.empty() || federateDynamicMessagingClassesJsonFileName.empty()) {
+            initializeMessaging();
+            return;
+        }
         std::ifstream federationJsonInputStream(federationJsonFileName);
         std::ifstream federateDynamicMessagingClassJsonInputStream(federateDynamicMessagingClassesJsonFileName);
         initializeDynamicMessaging(federationJsonInputStream, federateDynamicMessagingClassJsonInputStream);
@@ -239,9 +248,7 @@ protected:
 	    return _federationId;
 	}
 
-
 	std::string getFederationManagerName( void ) const { return SynchronizedFederate::FEDERATION_MANAGER_NAME; }
-
 
 	void setFederateType( const std::string &federateType ) {
         _FederateType = federateType;
@@ -250,6 +257,18 @@ protected:
 	    return _FederateType;
 	}
 
+	void setFederationJsonFileName( const std::string &federationJsonFileName ) {
+        _federationJsonFileName = federationJsonFileName;
+    }
+	std::string getFederationJsonFileName( void ) const {
+	    return _federationJsonFileName;
+	}
+
+	void setFederateDynamicMessagingClassesJsonFileName(
+	  const std::string &federateDynamicMessagingClassesJsonFileName
+	) {
+        _federateDynamicMessagingClassesJsonFileName = federateDynamicMessagingClassesJsonFileName;
+    }
 
 	bool get_IsLateJoiner( void ) const { return _IsLateJoiner; }
 
