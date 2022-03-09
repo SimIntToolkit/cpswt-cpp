@@ -1,12 +1,12 @@
-import java.util.regex.Pattern
-import java.net.URL
-import java.security.MessageDigest
-import java.math.BigInteger
-import java.nio.file.Files
 import java.nio.file.FileVisitResult
-import java.nio.file.SimpleFileVisitor
+import java.nio.file.Files
 import java.nio.file.Path
+import java.nio.file.SimpleFileVisitor
 import java.nio.file.attribute.BasicFileAttributes
+import java.io.FileWriter
+import org.json.JSONObject
+
+
 
 plugins {
     `cpp-application`
@@ -124,6 +124,37 @@ tasks.register("processMessageFiles") {
     }
 }
 
+tasks.withType(InstallExecutable::class.java).configureEach {
+    doLast {
+        val libraryDirectory = File(installDirectory.asFile.get(), "lib")
+        val sharedObjectFileList = libraryDirectory.listFiles { file -> file.name.endsWith(".so") }!!.toList()
+
+        val pattern = java.util.regex.Pattern.compile("(.*)_(?:debug|release)")
+
+        for(file in sharedObjectFileList) {
+            val fileName = file.name
+            val matcher = pattern.matcher(fileName)
+            if (matcher.find()) {
+                val libName = matcher.group(1)
+                val libraryFile = File(libraryDirectory, "lib${libName}.so")
+                Files.createSymbolicLink(libraryFile.toPath(), File(fileName).toPath())
+            }
+        }
+
+        val executableFileString = installedExecutable.get().asFile.absolutePath
+
+        val topLevelJSONObject = JSONObject();
+        topLevelJSONObject.put("libraryDirectoryString", libraryDirectory.absolutePath);
+        topLevelJSONObject.put("installedExecutableString", executableFileString);
+
+        val jsonFile = File(project.projectDir, "OmnetFederateInfo.json")
+        val fileWriter = FileWriter(jsonFile)
+        fileWriter.use {
+            fileWriter.write(topLevelJSONObject.toString(4))
+        }
+    }
+}
+
 tasks.withType(CppCompile::class.java).configureEach {
     dependsOn("processMessageFiles")
 
@@ -198,11 +229,13 @@ tasks.withType(LinkExecutable::class.java).configureEach {
     val linkerOptionList = listOf("--export-dynamic", "--no-as-needed")
 
     val linkWholeLibraryList = listOf(
-        "INET", "RTI-NG_64", "FedTime_64", "boost_regex", "boost_program_options"
+        "INET", "RTI-NG_64", "FedTime_64"
     )
 
     val linkLibraryList = listOf(
-        "oppmain", "oppcmdenv", "oppenvir", "oppqtenv", "opplayout", "oppsim", "dl", "stdc++", "jvm", "jsoncpp"
+        "oppmain", "oppcmdenv", "oppenvir", "oppqtenv", "opplayout", "oppsim", "dl", "stdc++", "jvm", "jsoncpp",
+        "boost_regex", "boost_program_options", "boost_log_setup", "boost_log", "boost_system",
+        "boost_thread", "pthread"
     )
 
     val linkCompleteLibraryList = linkWholeLibraryList + linkLibraryList

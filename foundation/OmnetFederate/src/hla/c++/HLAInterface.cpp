@@ -2,6 +2,7 @@
  * HLAInterface.cc
  *
  */
+#include <fstream>
 
 #include <HLAInterface.h>
 #include "C2WConsoleLogger.hpp"
@@ -14,8 +15,6 @@
 #include "SubscribedInteractionFilter.hpp"
 
 #include <inet/common/packet/Packet.h>
-
-#include <messages/InteractionMsg_m.h>
 
 #include "CPSWTIpv4.h"
 
@@ -83,6 +82,74 @@ using StartSnifferAttack = ::org::cpswt::hla::InteractionRoot_p::C2WInteractionR
 using StopSnifferAttack = ::org::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::OmnetCommand_p::StopSnifferAttack;
 
 
+void HLAInterface::ConnectionData::assignFromJson(const Json::Value &jsonValue) {
+
+    if (jsonValue.isMember("senderHost")) {
+        senderHost = jsonValue["senderHost"].asString();
+    }
+    if (jsonValue.isMember("senderHostApp")) {
+        senderHostApp = jsonValue["senderHostApp"].asString();
+    }
+    if (jsonValue.isMember("senderAppIndex")) {
+        senderAppIndex = jsonValue["senderAppIndex"].asInt();
+    }
+
+    if (jsonValue.isMember("receiverHost")) {
+        receiverHost = jsonValue["receiverHost"].asString();
+    }
+    if (jsonValue.isMember("receiverHostApp")) {
+        receiverHostApp = jsonValue["receiverHostApp"].asString();
+    }
+    if (jsonValue.isMember("receiverAppIndex")) {
+        receiverAppIndex = jsonValue["receiverAppIndex"].asInt();
+    }
+    if (jsonValue.isMember("receiverAppInterface")) {
+        receiverAppInterface = jsonValue["receiverAppInterface"].asString();
+    }
+
+    if (jsonValue.isMember("numBytes")) {
+        numBytes = jsonValue["numBytes"].asInt();
+    }
+}
+
+void HLAInterface::populateInteractionMsg(InteractionMsg &interactionMsg, InteractionRoot &interactionRoot) {
+
+    ConnectionData connectionData;
+
+    if (messaging_host_config_json.isMember("default")) {
+        connectionData.assignFromJson( messaging_host_config_json["default"] );
+    }
+
+    if (messaging_host_config_json.isMember("interactions")) {
+        Json::Value configJsonForInteractions = messaging_host_config_json["interactions"];
+
+        if (configJsonForInteractions.isMember("default")) {
+            connectionData.assignFromJson( configJsonForInteractions["default"] );
+        }
+
+        if ( interactionRoot.hasParameter("originFed") ) {
+            const std::string originFedName = interactionRoot.getParameter("originFed").asString();
+
+            if ( configJsonForInteractions.isMember(originFedName) ) {
+                Json::Value federateConfigJson = configJsonForInteractions[ originFedName ];
+
+                connectionData.assignFromJson( federateConfigJson );
+            }
+        }
+    }
+
+    interactionMsg.setSenderHost( connectionData.senderHost.c_str() );
+    interactionMsg.setSenderHostApp( connectionData.senderHostApp.c_str() );
+    interactionMsg.setSenderAppIndex( connectionData.senderAppIndex );
+
+    interactionMsg.setReceiverHost( connectionData.receiverHost.c_str() );
+    interactionMsg.setReceiverHostApp( connectionData.receiverHostApp.c_str() );
+    interactionMsg.setReceiverAppIndex( connectionData.receiverAppIndex );
+    interactionMsg.setReceiverAppInterface( connectionData.receiverAppInterface.c_str() );
+
+    interactionMsg.setByteLength( connectionData.numBytes );
+}
+
 void HLAInterface::processInteractions( void ) {
 
     InteractionRoot::SP interactionRootSP;
@@ -93,26 +160,28 @@ void HLAInterface::processInteractions( void ) {
         int classHandle = interactionRootSP->getClassHandle();
 
         if ( interactionRootSP->isDynamicInstance() ) {
+
             InteractionMsg *interactionMsgPtr = new InteractionMsg( getInteractionMessageLabel().c_str() );
+
             interactionMsgPtr->setToHLA( true );
             interactionMsgPtr->setMessageNo( AttackCoordinator::getUniqueNo() );
             interactionMsgPtr->setInteractionRootSP( interactionRootSP );
-            interactionMsgPtr->setTimestamp( networkPacketSP->getTime() );
-            interactionMsgPtr->setByteLength(networkPacketSP->get_numBytes());
+            interactionMsgPtr->setTimestamp( interactionRootSP->getTime() );
+            interactionMsgPtr->setByteLength( 20 );
 
-             std::string hostName = networkPacketSP->get_senderHost();
-             std::string appName = networkPacketSP->get_senderHostApp();
-             int appIndex = networkPacketSP->get_senderAppIndex();
+            populateInteractionMsg( *interactionMsgPtr, *interactionRootSP );
 
             auto c_packetChunk = inet::makeShared<inet::cPacketChunk>(interactionMsgPtr);
             inet::Packet *packet = new inet::Packet(getInteractionMessageLabel().c_str(), c_packetChunk);
 
-             cModule *udpAppWrapperModule = AttackCoordinator::getSingleton().getAppSpecModule( hostName, appName, appIndex );
+             cModule *udpAppWrapperModule = AttackCoordinator::getSingleton().getAppSpecModule(
+                     interactionMsgPtr->getSenderHost(), interactionMsgPtr->getSenderHostApp(), interactionMsgPtr->getSenderAppIndex()
+             );
              if ( udpAppWrapperModule != 0 ) {
                 sendDirect( packet, udpAppWrapperModule, "hlaIn" );
              } else {
                  std::cerr << "WARNING:  HLAInterface:  could not find module corresponding to (hostname,appName) = (" <<
-                  hostName << "," << appName << ")" << std::endl;
+                  interactionMsgPtr->getSenderHost() << "," << interactionMsgPtr->getSenderHostApp() << ")" << std::endl;
                  std::cerr << "Current modules are: " << std::endl;
                  std::cerr << AttackCoordinator::getSingleton().listAppSpecProperties();
                  std::cerr << std::endl;
@@ -699,12 +768,14 @@ void HLAInterface::initialize(int stage) {
         setStepSize(par( "federate_step_size" ).doubleValue());
         setLookahead(par( "federate_lookahead" ).doubleValue());
 
-        std::string federation_json_file_name = par( "federation_json_file_name" ).stringValue();
-        std::string dynamic_messaging_classes_json_file_name = par( "dynamic_messaging_classes_json_file_name" ).stringValue();
+        setFederationJsonFileName( par( "federation_json_file_name" ).stringValue() );
+        setFederateDynamicMessagingClassesJsonFileName( par( "dynamic_messaging_classes_json_file_name" ).stringValue() );
 
-        if (!federation_json_file_name.empty() && !dynamic_messaging_classes_json_file_name.empty()){
-            initializeDynamicMessaging(federation_json_file_name, dynamic_messaging_classes_json_file_name);
-        }
+        std::string messaging_host_config_file_name = par( "messaging_host_config_file_name" ).stringValue();
+
+        std::ifstream messaging_host_config_input_stream(messaging_host_config_file_name);
+        messaging_host_config_input_stream >> messaging_host_config_json;
+        messaging_host_config_input_stream.close();
 
         setup();
     }
@@ -787,9 +858,9 @@ void HLAInterface::setup() {
     StartNetworkIPFirewall::subscribe_interaction( getRTI() );
     StopNetworkIPFirewall::subscribe_interaction( getRTI() );
 
-    for(const std::string &dynamicHlaClassName: InteractionRoot::get_dynamic_class_name_set()) {
-        InteractionRoot::publish_interaction(dynamicHlaClassName);
-        InteractionRoot::subscribe_interaction(dynamicHlaClassName);
+    for(const std::string &dynamicHlaClassName: InteractionRoot::get_dynamic_hla_class_name_set()) {
+        InteractionRoot::publish_interaction(dynamicHlaClassName, getRTI() );
+        InteractionRoot::subscribe_interaction(dynamicHlaClassName, getRTI() );
     }
 
     SubscribedInteractionFilter::get_singleton().initialize();
@@ -894,9 +965,9 @@ void HLAInterface::handleMessage( omnetpp::cMessage* msg ) {
 
         InteractionMsg *interactionMsg = dynamic_cast< InteractionMsg * >( c_packetPtr );
 
-        NetworkPacket::SP networkPacketSP = boost::static_pointer_cast< NetworkPacket >( interactionMsg->getInteractionRootSP() );
-        networkPacketSP->set_sourceFed( getFederateId() );
-        networkPacketSP->sendInteraction( getRTI(), timestamp );
+        InteractionRoot::SP interactionRootSP = interactionMsg->getInteractionRootSP();
+        interactionRootSP->setParameter("sourceFed", getFederateId() );
+        interactionRootSP->sendInteraction( getRTI(), timestamp );
         // std::cerr << "Sending interaction with timestamp " << boost::lexical_cast< std::string >( timestamp ) << std::endl;
 //    } else if ( msgKind == OBJECT ) {
 //        ObjectMsg *objectMsgPtr = static_cast< ObjectMsg * >( msg );

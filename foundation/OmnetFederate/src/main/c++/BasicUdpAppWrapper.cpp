@@ -107,80 +107,79 @@ void BasicUdpAppWrapper::sendToUDP( inet::Packet *packet, const inet::Ipv4Addres
     auto c_packetChunkPtr = packet->template peekAtFront<inet::cPacketChunk>();
     inet::cPacket *c_packetPtr = c_packetChunkPtr->getPacket();
 
-    InteractionMsg *interactionMsg = dynamic_cast< InteractionMsg * >( c_packetPtr );
-	if ( interactionMsg == 0 ) {
+    InteractionMsg *interactionMsgPtr = dynamic_cast< InteractionMsg * >( c_packetPtr );
+	if ( interactionMsgPtr == 0 ) {
 		std::cerr << "Hostname \"" << getHostName() << "\":  BasicUdpAppWrapper:  sendToUDP method:  sending non-InteractionMsg-containing-Packet into network." << std::endl;
 		Super::sendToUDP( packet, destAddr, destPort );
 		return;
 	}
 
-    InteractionRoot::SP interactionRootSP = interactionMsg->getInteractionRootSP();
+    InteractionRoot::SP interactionRootSP = interactionMsgPtr->getInteractionRootSP();
 
     // Integrity attack, if any
-    if ( NetworkPacket::match( interactionRootSP->getClassHandle() ) && AttackCoordinator::getSingleton().isIntegrityAttackEnabled( getHostName() ) ) {
+//    if ( NetworkPacket::match( interactionRootSP->getClassHandle() ) && AttackCoordinator::getSingleton().isIntegrityAttackEnabled( getHostName() ) ) {
+//
+//        // std::cout << "Got network packet, and integrity attack is enabled" << std::endl;
+//        // std::cout << "Got interaction is: " << interactionRootSP << std::endl;
+//
+//        NetworkPacket::SP networkPacketSP = boost::static_pointer_cast< NetworkPacket >( interactionRootSP );
+//
+//        // std::cout << "The corresponding NetworkPacketSP = ";
+//        // if ( networkPacketSP ) {
+//        //     std::cout << networkPacketSP << std::endl;
+//        // } else {
+//        //     std::cout << "NULL";
+//        // }
+//
+//        AttackCoordinator::IntegrityAttackParams &iap = AttackCoordinator::getSingleton().getIntegrityAttackParams( this, getHostName() );
+//        networkPacketSP = tweakIncoming(
+//                networkPacketSP,
+//                iap.getIntMultiplier(),
+//                iap.getIntAdder(),
+//                iap.getLongMultiplier(),
+//                iap.getLongAdder(),
+//                iap.getDoubleMultiplier(),
+//                iap.getDoubleAdder(),
+//                iap.getBooleanEnableFlip(),
+//                iap.getStringReplacement()
+//        );
+//        interactionMsgPtr->setInteractionRootSP(  boost::static_pointer_cast< InteractionRoot >( networkPacketSP )  );
+//    }
 
-        // std::cout << "Got network packet, and integrity attack is enabled" << std::endl;
-        // std::cout << "Got interaction is: " << interactionRootSP << std::endl;
+    if ( interactionMsgPtr->getToHLA() ) {
 
-        NetworkPacket::SP networkPacketSP = boost::static_pointer_cast< NetworkPacket >( interactionRootSP );
+        std::cout << "BasicUdpAppWrapper: \"" << getHostName() << "\" sending cPacket to HLA" << std::endl;
 
-        // std::cout << "The corresponding NetworkPacketSP = ";
-        // if ( networkPacketSP ) {
-        //     std::cout << networkPacketSP << std::endl;
-        // } else {
-        //     std::cout << "NULL";
-        // }
-
-        AttackCoordinator::IntegrityAttackParams &iap = AttackCoordinator::getSingleton().getIntegrityAttackParams( this, getHostName() );
-        networkPacketSP = tweakIncoming(
-                networkPacketSP,
-                iap.getIntMultiplier(),
-                iap.getIntAdder(),
-                iap.getLongMultiplier(),
-                iap.getLongAdder(),
-                iap.getDoubleMultiplier(),
-                iap.getDoubleAdder(),
-                iap.getBooleanEnableFlip(),
-                iap.getStringReplacement()
-        );
-        interactionMsg->setInteractionRootSP(  boost::static_pointer_cast< InteractionRoot >( networkPacketSP )  );
-    }
-
-    if ( interactionMsg->getToHLA() ) {
-
-        // std::cout << "BasicUdpAppWrapper: \"" << getHostName() << "\" sending cPacket to HLA" << std::endl;
-
-		if (  NetworkPacket::match( interactionRootSP->getClassHandle() ) && AttackCoordinator::getSingleton().modifyToHLAPackets( getHostName() )  ) {
-		    NetworkPacket::SP networkPacketSP = boost::static_pointer_cast< NetworkPacket >( interactionRootSP );
-		    networkPacketSP = modifyOutgoing( networkPacketSP );
-		    interactionMsg->setInteractionRootSP(  boost::static_pointer_cast< InteractionRoot >( networkPacketSP )  );
-		}
+//		if (  NetworkPacket::match( interactionRootSP->getClassHandle() ) && AttackCoordinator::getSingleton().modifyToHLAPackets( getHostName() )  ) {
+//		    NetworkPacket::SP networkPacketSP = boost::static_pointer_cast< NetworkPacket >( interactionRootSP );
+//		    networkPacketSP = modifyOutgoing( networkPacketSP );
+//		    interactionMsgPtr->setInteractionRootSP(  boost::static_pointer_cast< InteractionRoot >( networkPacketSP )  );
+//		}
 
         sendDirect( packet, _hlaModulePtr, "hlaOut" );
 
 		return;
 	}
 
-	if (  !NetworkPacket::match( interactionRootSP->getClassHandle() )  ) {
-		std::cerr << "WARNING:  Hostname \"" << getHostName() << "\":  BasicUdpAppWrapper:  handleMessage method:  Wrapped interaction is not of type \"NetworkPacket\":  ignoring" << std::endl;
-		delete packet;
-		return;
-	}
+//	if (  !NetworkPacket::match( interactionRootSP->getClassHandle() )  ) {
+//		std::cerr << "WARNING:  Hostname \"" << getHostName() << "\":  BasicUdpAppWrapper:  handleMessage method:  Wrapped interaction is not of type \"NetworkPacket\":  ignoring" << std::endl;
+//		delete packet;
+//		return;
+//	}
 
-	NetworkPacket::SP networkPacketSP = boost::static_pointer_cast< NetworkPacket >( interactionRootSP );
-	if (  AttackCoordinator::getSingleton().modifyFromHLAPackets( getHostName() )  ) {
-        networkPacketSP = modifyIncoming( networkPacketSP );
-        interactionRootSP = boost::static_pointer_cast< InteractionRoot >( networkPacketSP );
-        interactionMsg->setInteractionRootSP( interactionRootSP );
-	}
+//	NetworkPacket::SP networkPacketSP = boost::static_pointer_cast< NetworkPacket >( interactionRootSP );
+//	if (  AttackCoordinator::getSingleton().modifyFromHLAPackets( getHostName() )  ) {
+//        networkPacketSP = modifyIncoming( networkPacketSP );
+//        interactionRootSP = boost::static_pointer_cast< InteractionRoot >( networkPacketSP );
+//        interactionMsgPtr->setInteractionRootSP( interactionRootSP );
+//	}
 
-	std::string receiverHost( networkPacketSP->get_receiverHost() );
-	std::string receiverHostApp( networkPacketSP->get_receiverHostApp() );
-	int receiverAppIndex( networkPacketSP->get_receiverAppIndex() );
-	std::string receiverAppInterface( networkPacketSP->get_receiverAppInterface() );
+    std::string receiverHost( interactionMsgPtr->getReceiverHost() );
+    std::string receiverHostApp( interactionMsgPtr->getReceiverHostApp() );
+    int receiverAppIndex( interactionMsgPtr->getReceiverAppIndex() );
+    std::string receiverAppInterface( interactionMsgPtr->getReceiverAppInterface() );
 
 	// Udpate message length
-	interactionMsg->setByteLength( networkPacketSP->get_numBytes() );
 
 	if ( receiverAppIndex == -1 ) {
 		// std::cerr << "Hostname \"" << getHostName() << "\":  BasicUdpAppWrapper:  handleMessage method:  sending InteractionMsg to application-specified destination in network." << std::endl;

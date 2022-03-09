@@ -83,7 +83,7 @@ void SynchronizedFederate::joinFederation() {
 	// std::stringstream temp;  //temp as in temporary
 
    	// std::cout << "[" << federate_id << "] federate joining federation [" << federation_id << "] ... " << std::flush;
-	   std::cout << " federate joining federation ...." <<std::flush;
+	   std::cout << " federate joining federation ...." << std::flush;
 
 	//_federateId = federate_id; (old)
 	// _federationId = federation_id;
@@ -163,6 +163,8 @@ void SynchronizedFederate::joinFederation() {
 #endif
 
 	std::cout << "done." << std::endl;
+
+    initializeDynamicMessaging(_federationJsonFileName, _federateDynamicMessagingClassesJsonFileName);
 
 	// Federate state interaction pubsub
 	FederateJoinInteraction::publish_interaction( getRTI() );

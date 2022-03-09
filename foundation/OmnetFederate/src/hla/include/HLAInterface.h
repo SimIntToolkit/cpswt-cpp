@@ -15,9 +15,13 @@
 #include <SynchronizedFederate.hpp>
 #include <AttackCoordinator.h>
 
+#include <messages/InteractionMsg_m.h>
+
 #include <messages/ObjectMsg_m.h>
 
 #include <inet/common/INETDefs.h>
+
+#include <jsoncpp/json/json.h>
 
 
 class HLAInterface : public omnetpp::cSimpleModule, public SynchronizedFederate {
@@ -47,6 +51,28 @@ private:
 	inet::cMessage *_interactionArrivalMsg;
 	bool _noInteractionArrivalFlag;
 
+	struct ConnectionData {
+	    std::string senderHost;
+	    std::string senderHostApp;
+	    int senderAppIndex;
+
+	    std::string receiverHost;
+	    std::string receiverHostApp;
+	    int receiverAppIndex;
+	    std::string receiverAppInterface;
+
+	    int numBytes;
+
+	    ConnectionData() :
+	        senderHost(""), senderHostApp(""), senderAppIndex(0),
+	        receiverHost(""), receiverHostApp(""), receiverAppIndex(0), receiverAppInterface(""),
+	        numBytes(10) {}
+
+	    void assignFromJson(const Json::Value &jsonValue);
+	};
+
+	Json::Value messaging_host_config_json;
+
 	static HLAInterface *&getHLAInterfacePtr( void ) {
 		static HLAInterface *hlaInterfacePtr = 0;
 		return hlaInterfacePtr;
@@ -70,7 +96,8 @@ public:
 	//
 	// SYNCHRONIZED-FEDERATE METHODS
 	//
-	  
+	void populateInteractionMsg(InteractionMsg &interactionMsg, InteractionRoot &interactionRoot);
+
     void processInteractions( void );
     
     void interactionArrival( void );
