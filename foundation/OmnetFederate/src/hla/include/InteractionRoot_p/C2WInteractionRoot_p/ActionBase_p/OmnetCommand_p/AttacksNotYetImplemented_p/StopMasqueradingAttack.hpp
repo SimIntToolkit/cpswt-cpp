@@ -42,8 +42,6 @@
 
 #include <boost/unordered_set.hpp>
 
-using ::org::cpswt::hla::InteractionRoot;
-
 
 namespace org {
  namespace cpswt {
@@ -56,6 +54,7 @@ namespace org {
 
 class StopMasqueradingAttack : public ::org::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::OmnetCommand_p::AttacksNotYetImplemented {
 public:
+//    using ::org::cpswt::hla::InteractionRoot;
     typedef ::org::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::OmnetCommand_p::AttacksNotYetImplemented Super;
     typedef boost::shared_ptr< StopMasqueradingAttack > SP;
 

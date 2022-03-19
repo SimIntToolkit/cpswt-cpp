@@ -42,8 +42,6 @@
 
 #include <boost/unordered_set.hpp>
 
-using ::org::cpswt::hla::InteractionRoot;
-
 
 namespace org {
  namespace cpswt {
@@ -55,6 +53,7 @@ namespace org {
 
 class StopNetworkIPFirewall : public ::org::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::OmnetCommand {
 public:
+//    using ::org::cpswt::hla::InteractionRoot;
     typedef ::org::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::OmnetCommand Super;
     typedef boost::shared_ptr< StopNetworkIPFirewall > SP;
 
