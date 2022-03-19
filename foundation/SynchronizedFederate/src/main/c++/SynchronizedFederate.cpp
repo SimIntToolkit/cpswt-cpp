@@ -178,8 +178,6 @@ void SynchronizedFederate::joinFederation() {
             // joinInteraction.setFederateType(this.federateType);
             // joinInteraction.setLateJoiner(this.isLateJoiner);
 
-	intJoin->set_sourceFed( getFederateId() );
-	intJoin->set_originFed( getFederateId() );
 	intJoin->set_FederateType( getFederateType() );
 	intJoin->set_FederateId( getFederateId() );
     intJoin->set_IsLateJoiner(get_IsLateJoiner());
@@ -187,8 +185,7 @@ void SynchronizedFederate::joinFederation() {
 	
     std::cout << "Sending Join interaction #-"  << std::endl;
 
-    intJoin->sendInteraction( getRTI(), _currentTime );
-
+    sendInteraction( intJoin, _currentTime );
 }
 
 void SynchronizedFederate::enableTimeConstrained( void ) throw( RTI::FederateNotExecutionMember ){
@@ -357,14 +354,12 @@ void SynchronizedFederate::resignFederationExecution( RTI::ResignAction resignAc
     }
     
 	FederateResignInteraction::SP intResign = FederateResignInteraction::create();
-	intResign->set_sourceFed( getFederateId() );
-	intResign->set_originFed( getFederateId() );
 	intResign->set_FederateType( getFederateType() );
 	intResign->set_FederateId( getFederateId() );
     intResign->set_IsLateJoiner(get_IsLateJoiner());
 
 	std::cout << "Sending Resign interaction #-"  << std::endl;
-    intResign->sendInteraction( getRTI(), _currentTime );
+    sendInteraction( intResign, _currentTime );
 }
 
 /**

@@ -56,8 +56,6 @@ void InteractionRoot::init(RTI::RTIambassador *rtiAmbassador) {
     //-------------------------------------------------------------------------
     for(const std::string &hlaClassName: get_hla_class_name_set()) {
 
-        BOOST_LOG_SEV(get_logger(), info) << "Initializing HLA class \"" << hlaClassName << "\"";
-
         if (get_hla_class_name_instance_sp_map().find(hlaClassName) == get_hla_class_name_instance_sp_map().end()) {
             get_dynamic_hla_class_name_set_aux().insert(hlaClassName);
         }
@@ -374,6 +372,7 @@ bool InteractionRoot::static_init() {
     return true;
 }
 
+
 void InteractionRoot::sendInteraction( RTI::RTIambassador *rti, double time ) {
     bool interactionNotSent = true;
     while ( interactionNotSent ) {
@@ -471,7 +470,7 @@ std::string InteractionRoot::toJson() {
         }
     }
     Json::StreamWriterBuilder streamWriterBuilder;
-    streamWriterBuilder["commandStyle"] = "None";
+    streamWriterBuilder["commentStyle"] = "None";
     streamWriterBuilder["indentation"] = "    ";
     std::unique_ptr<Json::StreamWriter> streamWriterUPtr(streamWriterBuilder.newStreamWriter());
     std::ostringstream stringOutputStream;

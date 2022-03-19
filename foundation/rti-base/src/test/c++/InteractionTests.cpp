@@ -18,6 +18,7 @@
 #include <sstream>
 #include <iostream>
 
+#include <jsoncpp/json/json.h>
 
 using InteractionRoot = ::org::cpswt::hla::InteractionRoot;
 using ObjectRoot = ::org::cpswt::hla::ObjectRoot;
@@ -153,7 +154,6 @@ void InteractionTests::messagingNamesTest() {
     expectedInteractionClassNameSet.insert("InteractionRoot.C2WInteractionRoot.OutcomeBase");
     expectedInteractionClassNameSet.insert("InteractionRoot.C2WInteractionRoot.SimLog");
     expectedInteractionClassNameSet.insert("InteractionRoot.C2WInteractionRoot.SimLog.HighPrio");
-    expectedInteractionClassNameSet.insert("InteractionRoot.C2WInteractionRoot.SimLog.HighPrio");
     expectedInteractionClassNameSet.insert("InteractionRoot.C2WInteractionRoot.SimLog.LowPrio");
     expectedInteractionClassNameSet.insert("InteractionRoot.C2WInteractionRoot.SimLog.MediumPrio");
     expectedInteractionClassNameSet.insert("InteractionRoot.C2WInteractionRoot.SimLog.VeryLowPrio");
@@ -281,10 +281,7 @@ void InteractionTests::parameterNamesTest() {
             C2WInteractionRoot::get_hla_class_name(), "federateFilter"
     );
     expectedC2WInteractionRootParameterList.emplace_back(
-            C2WInteractionRoot::get_hla_class_name(), "originFed"
-    );
-    expectedC2WInteractionRootParameterList.emplace_back(
-            C2WInteractionRoot::get_hla_class_name(), "sourceFed"
+            C2WInteractionRoot::get_hla_class_name(), "federateSequence"
     );
     expectedC2WInteractionRootParameterList.sort();
 
@@ -375,12 +372,12 @@ void InteractionTests::parameterNamesTest() {
 
 void InteractionTests::propertyHandleTest() {
     int expectedValue = RTIAmbassadorTest1::get_interaction_class_and_property_name_handle_map().find(
-            ClassAndPropertyName("InteractionRoot.C2WInteractionRoot", "originFed")
+            ClassAndPropertyName("InteractionRoot.C2WInteractionRoot", "federateSequence")
     )->second;
 
-    CPPUNIT_ASSERT_EQUAL(expectedValue, HighPrio::get_parameter_handle("originFed"));
-    CPPUNIT_ASSERT_EQUAL(expectedValue, SimLog::get_parameter_handle("originFed"));
-    CPPUNIT_ASSERT_EQUAL(expectedValue, C2WInteractionRoot::get_parameter_handle("originFed"));
+    CPPUNIT_ASSERT_EQUAL(expectedValue, HighPrio::get_parameter_handle("federateSequence"));
+    CPPUNIT_ASSERT_EQUAL(expectedValue, SimLog::get_parameter_handle("federateSequence"));
+    CPPUNIT_ASSERT_EQUAL(expectedValue, C2WInteractionRoot::get_parameter_handle("federateSequence"));
 
     expectedValue = RTIAmbassadorTest1::get_interaction_class_and_property_name_handle_map().find(
             ClassAndPropertyName("InteractionRoot.C2WInteractionRoot.SimLog", "FedName")
@@ -447,6 +444,19 @@ void InteractionTests::basicLogTest() {
     }
 }
 
+std::string createJsonArrayString(const std::string &value) {
+    Json::Value jsonArray(Json::arrayValue);
+    jsonArray.append( value );
+
+    Json::StreamWriterBuilder streamWriterBuilder;
+    streamWriterBuilder["commentStyle"] = "None";
+    std::unique_ptr<Json::StreamWriter> streamWriterUPtr(streamWriterBuilder.newStreamWriter());
+    std::ostringstream stringOutputStream;
+    streamWriterUPtr->write(jsonArray, &stringOutputStream);
+
+    return stringOutputStream.str();
+}
+
 void InteractionTests::dynamicMessagingTest() {
     InteractionRoot dynamicSimLogInteraction(SimLog::get_hla_class_name());
     InteractionRoot *dynamicSimLogInteractionPtr = &dynamicSimLogInteraction;
@@ -461,10 +471,11 @@ void InteractionTests::dynamicMessagingTest() {
     std::string string1("string1");
     double doubleValue1(1.2);
 
-    dynamicSimLogInteraction.setParameter("InteractionRoot.C2WInteractionRoot", "originFed", string1);
+    std::string jsonArrayString1 = createJsonArrayString(string1);
+    dynamicSimLogInteraction.setParameter("InteractionRoot.C2WInteractionRoot", "federateSequence", jsonArrayString1);
     dynamicSimLogInteraction.setParameter("Time", doubleValue1);
 
-    CPPUNIT_ASSERT_EQUAL(string1, static_cast<std::string>(dynamicSimLogInteraction.getParameter("originFed")));
+    CPPUNIT_ASSERT_EQUAL(string1, C2WInteractionRoot::get_origin_federate_id(dynamicSimLogInteraction));
     CPPUNIT_ASSERT_DOUBLES_EQUAL(
       doubleValue1, static_cast<double>(dynamicSimLogInteraction.getParameter("Time")), 0.01
     );
@@ -472,18 +483,22 @@ void InteractionTests::dynamicMessagingTest() {
     std::string string2("string2");
     double doubleValue2(3.4);
 
-    dynamicSimLogInteraction.setParameter("originFed", string2);
+    C2WInteractionRoot::update_federate_sequence(dynamicSimLogInteraction, string2);
     dynamicSimLogInteraction.setParameter("Time", doubleValue2);
 
-    CPPUNIT_ASSERT_EQUAL(string2, static_cast<std::string>(dynamicSimLogInteraction.getParameter("originFed")));
+    C2WInteractionRoot::StringList federateSequenceList1 =
+      C2WInteractionRoot::get_federate_sequence_list(dynamicSimLogInteraction);
+
+    CPPUNIT_ASSERT_EQUAL(string1, federateSequenceList1.front());
+    CPPUNIT_ASSERT_EQUAL(string2, federateSequenceList1.back());
     CPPUNIT_ASSERT_DOUBLES_EQUAL(
       doubleValue2, static_cast<double>(dynamicSimLogInteraction.getParameter("Time")), 0.01
     );
 
     InteractionRoot::SP staticSimLogInteractionSP1 = InteractionRoot::create_interaction(SimLog::get_hla_class_name());
-    InteractionRoot *staticSimLogInteraction1Ptr = staticSimLogInteractionSP1.get();
-
     CPPUNIT_ASSERT(!staticSimLogInteractionSP1->isDynamicInstance());
+
+    InteractionRoot *staticSimLogInteraction1Ptr = staticSimLogInteractionSP1.get();
 
     SimLog *simLogPtr2 = dynamic_cast<SimLog *>(staticSimLogInteraction1Ptr);
     CPPUNIT_ASSERT(simLogPtr2 != nullptr);
@@ -494,25 +509,25 @@ void InteractionTests::dynamicMessagingTest() {
     double doubleValue3(5.6);
 
     SimLog &simLogInteraction = *simLogPtr2;
-    simLogInteraction.setParameter("originFed", string3);
+    C2WInteractionRoot::update_federate_sequence(simLogInteraction, string3);
     simLogInteraction.setParameter("Time", doubleValue3);
 
-    CPPUNIT_ASSERT_EQUAL(string3, static_cast<std::string>(simLogInteraction.getParameter("originFed")));
+    CPPUNIT_ASSERT_EQUAL(string3, C2WInteractionRoot::get_source_federate_id(simLogInteraction));
     CPPUNIT_ASSERT_DOUBLES_EQUAL(doubleValue3, static_cast<double>(simLogInteraction.getParameter("Time")), 0.01);
 
-    CPPUNIT_ASSERT_EQUAL(string3, simLogInteraction.get_originFed());
+    CPPUNIT_ASSERT_EQUAL(string3, simLogInteraction.getSourceFederateId());
     CPPUNIT_ASSERT_DOUBLES_EQUAL(doubleValue3, simLogInteraction.get_Time(), 0.01);
 
     std::string string4("string4");
     double doubleValue4(17.3);
 
-    simLogInteraction.set_originFed(string4);
+    simLogInteraction.updateFederateSequence(string4);
     simLogInteraction.set_Time(doubleValue4);
 
-    CPPUNIT_ASSERT_EQUAL(string4, simLogInteraction.getParameter("originFed").asString());
+    CPPUNIT_ASSERT_EQUAL(string4, C2WInteractionRoot::get_source_federate_id(simLogInteraction));
     CPPUNIT_ASSERT_DOUBLES_EQUAL(doubleValue4, simLogInteraction.getParameter("Time").asDouble(), 0.01);
 
-    CPPUNIT_ASSERT_EQUAL(string4, simLogInteraction.get_originFed());
+    CPPUNIT_ASSERT_EQUAL(string4, simLogInteraction.getSourceFederateId());
     CPPUNIT_ASSERT_DOUBLES_EQUAL(doubleValue4, simLogInteraction.get_Time(), 0.01);
 }
 
