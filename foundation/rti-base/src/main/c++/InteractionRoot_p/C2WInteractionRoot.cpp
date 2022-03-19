@@ -32,11 +32,54 @@
  * @author Harmon Nine
  */
 
+
+
 #include "InteractionRoot_p/C2WInteractionRoot.hpp"
 namespace org {
  namespace cpswt {
   namespace hla {
    namespace InteractionRoot_p {
+
+void C2WInteractionRoot::update_federate_sequence_aux(
+  ::org::cpswt::hla::InteractionRoot &interactionRoot, const std::string &federateId
+) {
+    std::string federateSequence = interactionRoot.getParameter("federateSequence").asString();
+
+    Json::Value jsonArray(Json::arrayValue);
+    if (  is_federate_sequence( federateSequence )  ) {
+        std::istringstream jsonInputStream( federateSequence );
+        jsonInputStream >> jsonArray;
+    }
+
+    jsonArray.append( federateId );
+
+    Json::StreamWriterBuilder streamWriterBuilder;
+    streamWriterBuilder["commentStyle"] = "None";
+    std::unique_ptr<Json::StreamWriter> streamWriterUPtr(streamWriterBuilder.newStreamWriter());
+    std::ostringstream stringOutputStream;
+    streamWriterUPtr->write(jsonArray, &stringOutputStream);
+
+    interactionRoot.setParameter("federateSequence", stringOutputStream.str());
+}
+
+C2WInteractionRoot::StringList C2WInteractionRoot::get_federate_sequence_list_aux(const ::org::cpswt::hla::InteractionRoot &interactionRoot) {
+    StringList retval;
+
+    const std::string federateSequence = interactionRoot.getParameter("federateSequence").asString();
+
+    if (  is_federate_sequence( federateSequence )  ) {
+        Json::Value jsonArray(Json::arrayValue);
+
+        std::istringstream jsonInputStream( federateSequence );
+        jsonInputStream >> jsonArray;
+
+        for(Json::Value::const_iterator jsaCit = jsonArray.begin() ; jsaCit != jsonArray.end() ; ++jsaCit) {
+            retval.push_back( jsaCit->asString() );
+        }
+    }
+
+    return retval;
+}
 
 bool C2WInteractionRoot::static_init_var = C2WInteractionRoot::static_init();
 
@@ -64,16 +107,10 @@ bool C2WInteractionRoot::static_init() {
     get_class_and_property_name_initial_value_sp_map()[ClassAndPropertyName( "InteractionRoot.C2WInteractionRoot", "federateFilter" )] =
       ValueSP( new Value( std::string("") ));
     classAndPropertyNameSetSP->emplace(
-        "InteractionRoot.C2WInteractionRoot", "originFed"
+        "InteractionRoot.C2WInteractionRoot", "federateSequence"
     );
 
-    get_class_and_property_name_initial_value_sp_map()[ClassAndPropertyName( "InteractionRoot.C2WInteractionRoot", "originFed" )] =
-      ValueSP( new Value( std::string("") ));
-    classAndPropertyNameSetSP->emplace(
-        "InteractionRoot.C2WInteractionRoot", "sourceFed"
-    );
-
-    get_class_and_property_name_initial_value_sp_map()[ClassAndPropertyName( "InteractionRoot.C2WInteractionRoot", "sourceFed" )] =
+    get_class_and_property_name_initial_value_sp_map()[ClassAndPropertyName( "InteractionRoot.C2WInteractionRoot", "federateSequence" )] =
       ValueSP( new Value( std::string("") ));
 
     // ADD THIS CLASS'S _classAndPropertyNameSet TO _classNamePropertyNameSetMap DEFINED
@@ -91,17 +128,14 @@ bool C2WInteractionRoot::static_init() {
     );
 
     allClassAndPropertyNameSetSP->emplace(
-        "InteractionRoot.C2WInteractionRoot", "originFed"
-    );
-
-    allClassAndPropertyNameSetSP->emplace(
-        "InteractionRoot.C2WInteractionRoot", "sourceFed"
+        "InteractionRoot.C2WInteractionRoot", "federateSequence"
     );// ADD THIS CLASS'S _allClassAndPropertyNameSet TO _classNameAllPropertyNameSetMap DEFINED
     // IN InteractionRoot
     get_class_name_all_class_and_property_name_set_sp_map()[get_hla_class_name()] = allClassAndPropertyNameSetSP;
 
     return true;
 }
+
    } // NAMESPACE "InteractionRoot_p"
   } // NAMESPACE "hla"
  } // NAMESPACE "cpswt"

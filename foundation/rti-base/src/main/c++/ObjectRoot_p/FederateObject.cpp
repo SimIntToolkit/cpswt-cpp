@@ -32,6 +32,8 @@
  * @author Harmon Nine
  */
 
+
+
 #include "ObjectRoot_p/FederateObject.hpp"
 namespace org {
  namespace cpswt {
@@ -92,6 +94,7 @@ bool FederateObject::static_init() {
 
     return true;
 }
+
    } // NAMESPACE "ObjectRoot_p"
   } // NAMESPACE "hla"
  } // NAMESPACE "cpswt"

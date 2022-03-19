@@ -4,6 +4,7 @@
 #include "ObjectRoot.hpp"
 
 #include <limits>
+#include <iostream>
 
 using InteractionRoot = ::org::cpswt::hla::InteractionRoot;
 using ObjectRoot = ::org::cpswt::hla::ObjectRoot;
@@ -32,9 +33,6 @@ const RTIAmbassadorTest1::ClassNameHandleMap &RTIAmbassadorTest1::get_class_name
       static_cast<RTI::InteractionClassHandle>(handleValue++);
 
     classNameHandleMap["InteractionRoot.C2WInteractionRoot.SimLog"] =
-      static_cast<RTI::InteractionClassHandle>(handleValue++);
-
-    classNameHandleMap["InteractionRoot.C2WInteractionRoot.SimLog.HighPrio"] =
       static_cast<RTI::InteractionClassHandle>(handleValue++);
 
     classNameHandleMap["InteractionRoot.C2WInteractionRoot.SimLog.HighPrio"] =
@@ -97,10 +95,7 @@ const RTIAmbassadorTest1::ClassAndPropertyNameHandleMap
             ClassAndPropertyName("InteractionRoot.C2WInteractionRoot", "federateFilter")
     ] = get_new_int_value();
     interactionClassAndPropertyNameHandleMap[
-            ClassAndPropertyName("InteractionRoot.C2WInteractionRoot", "originFed")
-    ] = get_new_int_value();
-    interactionClassAndPropertyNameHandleMap[
-            ClassAndPropertyName("InteractionRoot.C2WInteractionRoot", "sourceFed")
+            ClassAndPropertyName("InteractionRoot.C2WInteractionRoot", "federateSequence")
     ] = get_new_int_value();
     interactionClassAndPropertyNameHandleMap[
             ClassAndPropertyName("InteractionRoot.C2WInteractionRoot.SimLog", "Comment")
@@ -172,6 +167,7 @@ RTI::InteractionClassHandle RTIAmbassadorTest1::getInteractionClassHandle(const 
   RTI::NameNotFound, RTI::FederateNotExecutionMember, RTI::ConcurrentAccessAttempted, RTI::RTIinternalError
 ) {
     ClassNameHandleMap::const_iterator chmCit = get_class_name_handle_map().find(theName);
+
     return chmCit == get_class_name_handle_map().end() ?
       std::numeric_limits<RTI::InteractionClassHandle>::max() : chmCit->second;
 }
