@@ -40,9 +40,11 @@
 #include "InteractionRoot.hpp"
 #include "C2WException.hpp"
 
-#include <boost/unordered_set.hpp>
+#include <list>
 
-using ::org::cpswt::hla::InteractionRoot;
+#include <boost/regex.hpp>
+
+#include <boost/unordered_set.hpp>
 
 
 namespace org {
@@ -52,8 +54,11 @@ namespace org {
 
 class C2WInteractionRoot : public ::org::cpswt::hla::InteractionRoot {
 public:
+//    using ::org::cpswt::hla::InteractionRoot;
     typedef ::org::cpswt::hla::InteractionRoot Super;
     typedef boost::shared_ptr< C2WInteractionRoot > SP;
+
+    typedef std::list<std::string> StringList;
 
 private:
     static severity_logger &get_logger_aux() {
@@ -324,45 +329,23 @@ public:
 
 
     /**
-     * Set the value of the "originFed" parameter to "value" for this parameter.
+     * Set the value of the "federateSequence" parameter to "value" for this parameter.
      *
-     * @param value the new value for the "originFed" parameter
+     * @param value the new value for the "federateSequence" parameter
      */
-    void set_originFed(const std::string & newValue) {
-        ClassAndPropertyName key(get_hla_class_name(), "originFed");
+    void set_federateSequence(const std::string & newValue) {
+        ClassAndPropertyName key(get_hla_class_name(), "federateSequence");
         Value &value(*_classAndPropertyNameValueSPMap[key]);
         value.setValue(newValue);
     }
 
     /**
-     * Returns the value of the "originFed" parameter of this interaction.
+     * Returns the value of the "federateSequence" parameter of this interaction.
      *
-     * @return the value of the "originFed" parameter
+     * @return the value of the "federateSequence" parameter
      */
-    std::string get_originFed() {
-        ClassAndPropertyName key(get_hla_class_name(), "originFed");
-        return static_cast<std::string>(*_classAndPropertyNameValueSPMap[key]);
-    }
-
-
-    /**
-     * Set the value of the "sourceFed" parameter to "value" for this parameter.
-     *
-     * @param value the new value for the "sourceFed" parameter
-     */
-    void set_sourceFed(const std::string & newValue) {
-        ClassAndPropertyName key(get_hla_class_name(), "sourceFed");
-        Value &value(*_classAndPropertyNameValueSPMap[key]);
-        value.setValue(newValue);
-    }
-
-    /**
-     * Returns the value of the "sourceFed" parameter of this interaction.
-     *
-     * @return the value of the "sourceFed" parameter
-     */
-    std::string get_sourceFed() {
-        ClassAndPropertyName key(get_hla_class_name(), "sourceFed");
+    std::string get_federateSequence() {
+        ClassAndPropertyName key(get_hla_class_name(), "federateSequence");
         return static_cast<std::string>(*_classAndPropertyNameValueSPMap[key]);
     }
 
@@ -440,29 +423,100 @@ public:
     //------------------------------
     // END INSTANCE CREATION METHODS
     //------------------------------
+private:
+    static boost::regex &get_federate_sequence_regex() {
+        static boost::regex federateSequenceRegex(
+          "\\s*\\[(?:\\s*\"(?:[^\"]|(?:\\\\)*\\\")+\",)*\\s*\"(?:[^\"]|(?:\\\\)*\\\")+\"\\s*\\]\\s*"
+        );
+        return federateSequenceRegex;
+    }
 
-    // THIS METHOD ACTS AS AN ERROR DETECTOR -- ALL INSTANCE OF C2WInteractionRoot
-    // SHOULD HAVE NON-EMPTY VALUES FOR THEIR originFed AND sourceFed PARAMETERS.
+    static bool is_federate_sequence(const std::string &federateSequence) {
+        return boost::regex_match( federateSequence, get_federate_sequence_regex() );
+    }
+
+    static void update_federate_sequence_aux(::org::cpswt::hla::InteractionRoot &interactionRoot, const std::string &federateId);
+    static StringList get_federate_sequence_list_aux(const ::org::cpswt::hla::InteractionRoot &interactionRoot);
+
 public:
-    virtual void sendInteraction( RTI::RTIambassador *rtiAmbassador, double time ) {
-        if ( get_sourceFed().empty() || get_originFed().empty() ) {
-            BOOST_LOG_SEV(get_logger(), error) << "sourceFed and/or originFed not specified";
+    static void update_federate_sequence(::org::cpswt::hla::InteractionRoot &interactionRoot, const std::string &federateId) {
+        const std::string &instanceHlaClassName = interactionRoot.getInstanceHlaClassName();
+
+        if ( instanceHlaClassName.find("InteractionRoot.C2WInteractionRoot", 0) == 0 ) {
+            update_federate_sequence_aux(interactionRoot, federateId);
+        }
+    }
+
+    static void update_federate_sequence(::org::cpswt::hla::InteractionRoot::SP &interactionRootSP, const std::string &federateId) {
+        return update_federate_sequence(*interactionRootSP, federateId);
+    }
+
+    void updateFederateSequence(const std::string &federateId) {
+        update_federate_sequence_aux(*this, federateId);
+    }
+
+    static StringList get_federate_sequence_list(const ::org::cpswt::hla::InteractionRoot &interactionRoot) {
+        const std::string &instanceHlaClassName = interactionRoot.getInstanceHlaClassName();
+
+        return instanceHlaClassName.find("InteractionRoot.C2WInteractionRoot", 0) == 0 ?
+            get_federate_sequence_list_aux(interactionRoot) : StringList();
+    }
+
+    static StringList get_federate_sequence_list(::org::cpswt::hla::InteractionRoot::SP interactionRootSP) {
+        return get_federate_sequence_list(*interactionRootSP);
+    }
+
+    StringList getFederateSequenceList() {
+        return get_federate_sequence_list(*this);
+    }
+
+    static std::string get_origin_federate_id( const ::org::cpswt::hla::InteractionRoot &interactionRoot ) {
+        StringList federateSequenceList = get_federate_sequence_list(interactionRoot);
+        return federateSequenceList.empty() ? std::string() : federateSequenceList.front();
+    }
+
+    static std::string get_origin_federate_id( ::org::cpswt::hla::InteractionRoot::SP &interactionRootSP ) {
+        return get_origin_federate_id( *interactionRootSP );
+    }
+
+    std::string getOriginFederateId() const {
+        return  get_origin_federate_id(*this);
+    }
+
+    static std::string get_source_federate_id( const ::org::cpswt::hla::InteractionRoot &interactionRoot ) {
+        StringList federateSequenceList = get_federate_sequence_list( interactionRoot );
+        return federateSequenceList.empty() ? std::string() : federateSequenceList.back();
+    }
+
+    static std::string get_source_federate_id( ::org::cpswt::hla::InteractionRoot::SP &interactionRootSP ) {
+        return get_source_federate_id( *interactionRootSP );
+    }
+
+    std::string getSourceFederateId() const {
+        return  get_source_federate_id(*this);
+    }
+
+    // THIS METHOD ACTS AS AN ERROR DETECTOR -- ALL INSTANCES OF C2WInteractionRoot
+    // SHOULD HAVE A NON-EMPTY JSON-ARRAY VALUE FOR THEIR federateSequence PARAMETER.
+    void sendInteraction( RTI::RTIambassador *rtiAmbassador, double time ) override {
+        if (  !is_federate_sequence( get_federateSequence() )  ) {
+            BOOST_LOG_SEV(get_logger(), error) << "federateSequence parameter is invalid: must contain sequence " <<
+                "of federate-ids of federates that have handled this interaction.";
             return;
         }
         Super::sendInteraction( rtiAmbassador, time );
     }
 
-    // THIS METHOD ACTS AS AN ERROR DETECTOR -- ALL INSTANCE OF C2WInteractionRoot
-    // SHOULD HAVE NON-EMPTY VALUES FOR THEIR originFed AND sourceFed PARAMETERS.
-
-    virtual void sendInteraction( RTI::RTIambassador *rtiAmbassador ) {
-        if ( get_sourceFed().empty() || get_originFed().empty() ) {
-            BOOST_LOG_SEV(get_logger(), error) << "sourceFed and/or originFed not specified";
+    // THIS METHOD ACTS AS AN ERROR DETECTOR -- ALL INSTANCES OF C2WInteractionRoot
+    // SHOULD HAVE A NON-EMPTY JSON-ARRAY VALUE FOR THEIR federateSequence PARAMETER.
+    void sendInteraction( RTI::RTIambassador *rtiAmbassador ) override {
+        if (  !is_federate_sequence( get_federateSequence() )   ) {
+            BOOST_LOG_SEV(get_logger(), error) << "federateSequence parameter is invalid: must contain sequence " <<
+                "of federate-ids of federates that have handled this interaction.";
             return;
         }
         Super::sendInteraction( rtiAmbassador );
     }
-
 
     //-------------
     // CONSTRUCTORS

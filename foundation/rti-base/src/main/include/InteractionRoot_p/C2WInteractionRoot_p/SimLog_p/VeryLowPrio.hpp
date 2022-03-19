@@ -42,8 +42,6 @@
 
 #include <boost/unordered_set.hpp>
 
-using ::org::cpswt::hla::InteractionRoot;
-
 
 namespace org {
  namespace cpswt {
@@ -54,6 +52,7 @@ namespace org {
 
 class VeryLowPrio : public ::org::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::SimLog {
 public:
+//    using ::org::cpswt::hla::InteractionRoot;
     typedef ::org::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::SimLog Super;
     typedef boost::shared_ptr< VeryLowPrio > SP;
 

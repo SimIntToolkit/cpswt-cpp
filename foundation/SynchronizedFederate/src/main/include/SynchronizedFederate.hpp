@@ -62,6 +62,7 @@ class SynchronizedFederate : public NullFederateAmbassador {
 
 public:
     using ObjectRoot = ::org::cpswt::hla::ObjectRoot;
+    using InteractionRoot = ::org::cpswt::hla::InteractionRoot;
     using C2WInteractionRoot = ::org::cpswt::hla::InteractionRoot_p::C2WInteractionRoot;
     using SimEnd = ::org::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::SimulationControl_p::SimEnd;
     using FederateJoinInteraction = ::org::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::FederateJoinInteraction;
@@ -231,7 +232,24 @@ protected:
 
 	// void joinFederation( const std::string &federation_id, const std::string &federate_id, bool ignoreLockFile = true );
 	void joinFederation();
-	
+
+    void sendInteraction( InteractionRoot &interactionRoot, double time ) {
+        C2WInteractionRoot::update_federate_sequence(interactionRoot, getFederateId());
+        interactionRoot.sendInteraction(getRTI(), time);
+    }
+
+    void sendInteraction( InteractionRoot::SP interactionRootSP, double time ) {
+        sendInteraction(*interactionRootSP, time);
+    }
+
+    void sendInteraction(InteractionRoot &interactionRoot) {
+        C2WInteractionRoot::update_federate_sequence(interactionRoot, getFederateId());
+        interactionRoot.sendInteraction(getRTI());
+    }
+
+    void sendInteraction( InteractionRoot::SP interactionRootSP ) {
+        sendInteraction(*interactionRootSP);
+    }
 
 	void setFederateId(const std::string &federateId) {
 	    _federateId = federateId;

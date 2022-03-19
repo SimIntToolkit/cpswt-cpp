@@ -42,8 +42,6 @@
 
 #include <boost/unordered_set.hpp>
 
-using ::org::cpswt::hla::InteractionRoot;
-
 
 namespace org {
  namespace cpswt {
@@ -54,6 +52,7 @@ namespace org {
 
 class SimResume : public ::org::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::SimulationControl {
 public:
+//    using ::org::cpswt::hla::InteractionRoot;
     typedef ::org::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::SimulationControl Super;
     typedef boost::shared_ptr< SimResume > SP;
 

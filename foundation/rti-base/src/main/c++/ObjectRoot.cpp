@@ -592,6 +592,7 @@ bool ObjectRoot::static_init() {
     return true;
 }
 
+
 void ObjectRoot::updateAttributeValues( RTI::RTIambassador *rti, double time, bool force ) {
     PropertyHandleValuePairSetSP propertyHandleValuePairSetSP = createPropertyHandleValuePairSetSP( force );
     if ( propertyHandleValuePairSetSP->size() == 0 ) {

@@ -42,8 +42,6 @@
 
 #include <boost/unordered_set.hpp>
 
-using ::org::cpswt::hla::ObjectRoot;
-
 
 namespace org {
  namespace cpswt {
@@ -52,6 +50,7 @@ namespace org {
 
 class FederateObject : public ::org::cpswt::hla::ObjectRoot {
 public:
+//    using ::org::cpswt::hla::ObjectRoot;
     typedef ::org::cpswt::hla::ObjectRoot Super;
     typedef boost::shared_ptr< FederateObject > SP;
 
