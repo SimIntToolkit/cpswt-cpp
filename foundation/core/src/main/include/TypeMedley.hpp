@@ -146,6 +146,40 @@ public:
         return true;
     }
 
+    bool setValue(const TypeMedley &other) {
+        if (getDataType() == other.getDataType()) {
+            _value = other._value;
+            return true;
+        }
+
+        switch( other.getDataType() ) {
+            case BOOLEAN:
+                setValue( other.asBool() );
+                break;
+            case CHARACTER:
+                setValue( other.asChar() );
+                break;
+            case SHORT:
+                setValue( other.asShort() );
+                break;
+            case INTEGER:
+                setValue( other.asInt() );
+                break;
+            case LONG:
+                setValue( other.asLong() );
+                break;
+            case FLOAT:
+                setValue( other.asFloat() );
+                break;
+            case DOUBLE:
+                setValue( other.asDouble() );
+                break;
+            case STRING:
+                setValue( other.asString() );
+                break;
+            }
+    }
+
     bool setValue(const std::string &value);
 
     bool setValue(const char *cString) {

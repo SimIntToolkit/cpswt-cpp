@@ -114,65 +114,37 @@ void BasicUdpAppWrapper::sendToUDP( inet::Packet *packet, const inet::Ipv4Addres
 		return;
 	}
 
-    InteractionRoot::SP interactionRootSP = interactionMsgPtr->getInteractionRootSP();
+    InteractionRoot &interactionRoot = *interactionMsgPtr->getInteractionRootSP();
 
-    // Integrity attack, if any
-//    if ( NetworkPacket::match( interactionRootSP->getClassHandle() ) && AttackCoordinator::getSingleton().isIntegrityAttackEnabled( getHostName() ) ) {
-//
-//        // std::cout << "Got network packet, and integrity attack is enabled" << std::endl;
-//        // std::cout << "Got interaction is: " << interactionRootSP << std::endl;
-//
-//        NetworkPacket::SP networkPacketSP = boost::static_pointer_cast< NetworkPacket >( interactionRootSP );
-//
-//        // std::cout << "The corresponding NetworkPacketSP = ";
-//        // if ( networkPacketSP ) {
-//        //     std::cout << networkPacketSP << std::endl;
-//        // } else {
-//        //     std::cout << "NULL";
-//        // }
-//
-//        AttackCoordinator::IntegrityAttackParams &iap = AttackCoordinator::getSingleton().getIntegrityAttackParams( this, getHostName() );
-//        networkPacketSP = tweakIncoming(
-//                networkPacketSP,
-//                iap.getIntMultiplier(),
-//                iap.getIntAdder(),
-//                iap.getLongMultiplier(),
-//                iap.getLongAdder(),
-//                iap.getDoubleMultiplier(),
-//                iap.getDoubleAdder(),
-//                iap.getBooleanEnableFlip(),
-//                iap.getStringReplacement()
-//        );
-//        interactionMsgPtr->setInteractionRootSP(  boost::static_pointer_cast< InteractionRoot >( networkPacketSP )  );
-//    }
+	//
+	// INTEGRITY ATTACK
+	//
+	if ( AttackCoordinator::getSingleton().isIntegrityAttackEnabled( getHostName() ) ) {
+
+        std::cout << "Got network packet, and integrity attack is enabled" << std::endl;
+        std::cout << "Got interaction is: " << interactionRoot << std::endl;
+
+        AttackCoordinator::IntegrityAttackParams &iap = AttackCoordinator::getSingleton().getIntegrityAttackParams( this, getHostName() );
+
+        tweakIncoming( interactionRoot, iap);
+    }
 
     if ( interactionMsgPtr->getToHLA() ) {
 
         std::cout << "BasicUdpAppWrapper: \"" << getHostName() << "\" sending cPacket to HLA" << std::endl;
 
-//		if (  NetworkPacket::match( interactionRootSP->getClassHandle() ) && AttackCoordinator::getSingleton().modifyToHLAPackets( getHostName() )  ) {
-//		    NetworkPacket::SP networkPacketSP = boost::static_pointer_cast< NetworkPacket >( interactionRootSP );
-//		    networkPacketSP = modifyOutgoing( networkPacketSP );
-//		    interactionMsgPtr->setInteractionRootSP(  boost::static_pointer_cast< InteractionRoot >( networkPacketSP )  );
-//		}
+		if (  AttackCoordinator::getSingleton().modifyToHLAPackets( getHostName() )  ) {
+		    setToDefaultValues( interactionRoot );
+		}
 
         sendDirect( packet, _hlaModulePtr, "hlaOut" );
 
 		return;
 	}
 
-//	if (  !NetworkPacket::match( interactionRootSP->getClassHandle() )  ) {
-//		std::cerr << "WARNING:  Hostname \"" << getHostName() << "\":  BasicUdpAppWrapper:  handleMessage method:  Wrapped interaction is not of type \"NetworkPacket\":  ignoring" << std::endl;
-//		delete packet;
-//		return;
-//	}
-
-//	NetworkPacket::SP networkPacketSP = boost::static_pointer_cast< NetworkPacket >( interactionRootSP );
-//	if (  AttackCoordinator::getSingleton().modifyFromHLAPackets( getHostName() )  ) {
-//        networkPacketSP = modifyIncoming( networkPacketSP );
-//        interactionRootSP = boost::static_pointer_cast< InteractionRoot >( networkPacketSP );
-//        interactionMsgPtr->setInteractionRootSP( interactionRootSP );
-//	}
+	if (  AttackCoordinator::getSingleton().modifyFromHLAPackets( getHostName() )  ) {
+	    setToDefaultValues( interactionRoot );
+	}
 
     std::string receiverHost( interactionMsgPtr->getReceiverHost() );
     std::string receiverHostApp( interactionMsgPtr->getReceiverHostApp() );
@@ -203,42 +175,27 @@ void BasicUdpAppWrapper::sendToUDP( inet::Packet *packet, const inet::Ipv4Addres
 	Super::sendToUDP( packet, destinationIPAddress, destinationPort );
 }
 
-NetworkPacket::SP BasicUdpAppWrapper::modifyIncoming( NetworkPacket::SP networkPacketSP ) {
-    std::string data = networkPacketSP->get_data();
-    int dataLen = data.length();
-    if(dataLen == 0) {
-        dataLen++;
+void BasicUdpAppWrapper::setToDefaultValues( InteractionRoot &interactionRoot ) {
+    InteractionRoot defaultInteractionRoot( interactionRoot.getInstanceHlaClassName() );
+
+    const InteractionRoot::ClassAndPropertyNameValueSPMap &classAndPropertyValueSPMap = interactionRoot.getClassAndPropertyNameValueSPMap();
+    const InteractionRoot::ClassAndPropertyNameValueSPMap &defaultClassAndPropertyValueSPMap = defaultInteractionRoot.getClassAndPropertyNameValueSPMap();
+
+    for(
+      InteractionRoot::ClassAndPropertyNameValueSPMap::const_iterator cvmCit = classAndPropertyValueSPMap.begin() ;
+      cvmCit != classAndPropertyValueSPMap.end() ;
+      ++cvmCit
+    ) {
+        TypeMedley &value = *cvmCit->second;
+        TypeMedley &defaultValue = *defaultClassAndPropertyValueSPMap.find(cvmCit->first)->second;
+
+        value.setValue(defaultValue);
     }
-    std::stringstream dataSS;
-    for(int i=0; i<dataLen; i++) {
-        dataSS << "#";
-    }
-    networkPacketSP->set_data( dataSS.str() );
-    return networkPacketSP;
 }
 
-NetworkPacket::SP BasicUdpAppWrapper::modifyOutgoing( NetworkPacket::SP networkPacketSP ) {
-    std::string data = networkPacketSP->get_data();
-    int dataLen = data.length();
-    if(dataLen == 0) {
-        dataLen++;
-    }
-    std::stringstream dataSS;
-    for(int i=0; i<dataLen; i++) {
-        dataSS << "#";
-    }
-    networkPacketSP->set_data( dataSS.str() );
-    return networkPacketSP;
-}
+void BasicUdpAppWrapper::tweakIncoming( InteractionRoot &interactionRoot, AttackCoordinator::IntegrityAttackParams &iap) {
 
-NetworkPacket::SP BasicUdpAppWrapper::tweakIncoming( NetworkPacket::SP networkPacketSP, int intMultiplier, int intAdder, long longMultiplier, long longAdder, double doubleMultiplier, double doubleAdder, bool booleanEnableFlip, const std::string &stringReplacement ) {
-
-
-    std::string interactionJson = networkPacketSP->get_data();
-
-    InteractionRoot::SP wrappedInteractionSP = InteractionRoot::fromJson(interactionJson);
-
-    const InteractionRoot::ClassAndPropertyNameValueSPMap &classAndPropertyValueSPMap = wrappedInteractionSP->getClassAndPropertyNameValueSPMap();
+    const InteractionRoot::ClassAndPropertyNameValueSPMap &classAndPropertyValueSPMap = interactionRoot.getClassAndPropertyNameValueSPMap();
 
     for(
       InteractionRoot::ClassAndPropertyNameValueSPMap::const_iterator cvmCit = classAndPropertyValueSPMap.begin() ;
@@ -247,46 +204,31 @@ NetworkPacket::SP BasicUdpAppWrapper::tweakIncoming( NetworkPacket::SP networkPa
     ) {
         TypeMedley &value = *cvmCit->second;
 
-        TypeMedley::DataType dataType = value.getDataType();
-
-        switch(dataType) {
-
-            case TypeMedley::INTEGER: {
-                int currentValue = static_cast<int>(value);
-                int newValue = (currentValue * intMultiplier) + intAdder;
-                value.setValue(newValue);
-                break;
-            }
-
-            case TypeMedley::LONG: {
-                long currentValue = static_cast<long>(value);
-                long newValue = (currentValue * longMultiplier) + longAdder;
-                value.setValue(newValue);
-                break;
-            }
-
-            case TypeMedley::DOUBLE: {
-                double currentValue = static_cast<double>(value);
-                double newValue = (currentValue * doubleMultiplier) + doubleAdder;
-                value.setValue(newValue);
-                break;
-            }
+        switch( value.getDataType() ) {
 
             case TypeMedley::BOOLEAN: {
-                bool currentValue = static_cast<bool>(value);
-                bool newValue = booleanEnableFlip ? !currentValue : currentValue;
-                value.setValue(newValue);
+                if ( iap.getBooleanEnableFlip() ) {
+                    value.setValue( !value.asBool() );
+                }
                 break;
             }
-
-            case TypeMedley::STRING: {
-                std::string currentValue = static_cast<std::string>(value);
-                std::string newValue = stringReplacement.empty() ? currentValue : stringReplacement;
-                value.setValue(newValue);
+            case TypeMedley::DOUBLE: {
+                value.setValue( value.asDouble() * iap.getDoubleMultiplier() + iap.getDoubleAdder() );
                 break;
+            }
+            case TypeMedley::INTEGER: {
+                value.setValue( value.asInt() * iap.getIntMultiplier() + iap.getIntAdder() );
+                break;
+            }
+            case TypeMedley::LONG: {
+                value.setValue( value.asLong() * iap.getLongMultiplier() + iap.getLongAdder() );
+                break;
+            }
+            case TypeMedley::STRING: {
+                if (!iap.getStringReplacement().empty()) {
+                    value.setValue( iap.getStringReplacement() );
+                }
             }
         }
     }
-    networkPacketSP->set_data(wrappedInteractionSP->toJson());
-    return networkPacketSP;
 }

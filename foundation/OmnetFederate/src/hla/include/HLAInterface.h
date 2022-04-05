@@ -9,6 +9,7 @@
 
 #include <string>
 #include <set>
+#include <vector>
 
 #include <omnetpp.h>
 
@@ -31,8 +32,8 @@ using ObjectRoot = ::org::cpswt::hla::ObjectRoot;
 public:
 	typedef SynchronizedFederate Super;
 	enum MessageType { INTERACTION, OBJECT };
-	
 
+	typedef std::set<std::string> StringSet;
 	//
 	// HLAInterface CAN ACCESS IP MODULES OF HOSTS USING THE FOLLOWING CODE */
 	//
@@ -51,27 +52,57 @@ private:
 	inet::cMessage *_interactionArrivalMsg;
 	bool _noInteractionArrivalFlag;
 
-	struct ConnectionData {
-	    std::string senderHost;
-	    std::string senderHostApp;
-	    int senderAppIndex;
+    struct FederateHostConfig {
+        std::string host;
+        std::string hostApp;
+        int appIndex;
+        std::string appInterface;
 
-	    std::string receiverHost;
-	    std::string receiverHostApp;
-	    int receiverAppIndex;
-	    std::string receiverAppInterface;
+        void assignFromJson(const Json::Value &jsonValue);
 
-	    int numBytes;
+        FederateHostConfig() :
+            host(""), hostApp(""), appIndex(0), appInterface("") {}
 
-	    ConnectionData() :
-	        senderHost(""), senderHostApp(""), senderAppIndex(0),
-	        receiverHost(""), receiverHostApp(""), receiverAppIndex(0), receiverAppInterface(""),
-	        numBytes(10) {}
+        FederateHostConfig(const Json::Value &jsonValue) {
+            assignFromJson(jsonValue);
+        }
+    };
 
-	    void assignFromJson(const Json::Value &jsonValue);
+    typedef std::map<std::string, FederateHostConfig> FederateNameToHostConfigMap;
+
+    FederateNameToHostConfigMap _federateNameToHostConfigMap;
+
+    void initializeFederateHostConfigMap(const std::string &federateHostConfigJsonFileName);
+
+	struct MessagingInfo {
+	    std::string _publishedFullHlaClassName;
+	    int _payloadSize;
+
+	    MessagingInfo(const std::string &publishedFullHlaClassName, int payloadSize) {
+	        _publishedFullHlaClassName = publishedFullHlaClassName;
+	        _payloadSize = payloadSize;
+	    }
+
+	    const std::string &getPublishedFullHlaClassName() const {
+	        return _publishedFullHlaClassName;
+	    }
+
+	    int getPayloadSize() const {
+	        return _payloadSize;
+	    }
 	};
 
-	Json::Value messaging_host_config_json;
+	typedef std::vector<std::string> StringVector;
+	typedef std::map< StringVector, MessagingInfo > FederateSequenceMessagingInfoMap;
+
+	typedef std::map< std::string, FederateSequenceMessagingInfoMap> MessagingFederateSequenceMessagingInfoMap;
+
+	StringSet _dynamicPublishFullHlaClassNameSet;
+    StringSet _dynamicSubscribeFullHlaClassNameSet;
+
+	MessagingFederateSequenceMessagingInfoMap _messagingFederateSequenceMessagingInfoMap;
+
+    void initializeFederateSequenceToMessagingInfoMap(const std::string &federateSequenceToMessagingInfoJsonFileName);
 
 	static HLAInterface *&getHLAInterfacePtr( void ) {
 		static HLAInterface *hlaInterfacePtr = 0;
@@ -96,7 +127,7 @@ public:
 	//
 	// SYNCHRONIZED-FEDERATE METHODS
 	//
-	void populateInteractionMsg(InteractionMsg &interactionMsg, InteractionRoot &interactionRoot);
+	bool populateInteractionMsg(InteractionMsg &interactionMsg, const std::string &sendingFederateName, const std::string &receivingFederateName);
 
     void processInteractions( void );
     

@@ -82,72 +82,111 @@ using StartSnifferAttack = ::org::cpswt::hla::InteractionRoot_p::C2WInteractionR
 using StopSnifferAttack = ::org::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::OmnetCommand_p::StopSnifferAttack;
 
 
-void HLAInterface::ConnectionData::assignFromJson(const Json::Value &jsonValue) {
+void HLAInterface::FederateHostConfig::assignFromJson(const Json::Value &jsonValue) {
 
-    if (jsonValue.isMember("senderHost")) {
-        senderHost = jsonValue["senderHost"].asString();
+    if (jsonValue.isMember("Host")) {
+        host = jsonValue["Host"].asString();
     }
-    if (jsonValue.isMember("senderHostApp")) {
-        senderHostApp = jsonValue["senderHostApp"].asString();
+    if (jsonValue.isMember("HostApp")) {
+        hostApp = jsonValue["HostApp"].asString();
     }
-    if (jsonValue.isMember("senderAppIndex")) {
-        senderAppIndex = jsonValue["senderAppIndex"].asInt();
+    if (jsonValue.isMember("AppIndex")) {
+        appIndex = jsonValue["AppIndex"].asInt();
     }
-
-    if (jsonValue.isMember("receiverHost")) {
-        receiverHost = jsonValue["receiverHost"].asString();
-    }
-    if (jsonValue.isMember("receiverHostApp")) {
-        receiverHostApp = jsonValue["receiverHostApp"].asString();
-    }
-    if (jsonValue.isMember("receiverAppIndex")) {
-        receiverAppIndex = jsonValue["receiverAppIndex"].asInt();
-    }
-    if (jsonValue.isMember("receiverAppInterface")) {
-        receiverAppInterface = jsonValue["receiverAppInterface"].asString();
-    }
-
-    if (jsonValue.isMember("numBytes")) {
-        numBytes = jsonValue["numBytes"].asInt();
+    if (jsonValue.isMember("AppInterface")) {
+        appInterface = jsonValue["AppInterface"].asString();
     }
 }
 
-void HLAInterface::populateInteractionMsg(InteractionMsg &interactionMsg, InteractionRoot &interactionRoot) {
+void HLAInterface::initializeFederateHostConfigMap(const std::string &federateHostConfigJsonFileName) {
 
-    ConnectionData connectionData;
+    Json::Value federate_host_config_json;
 
-    if (messaging_host_config_json.isMember("default")) {
-        connectionData.assignFromJson( messaging_host_config_json["default"] );
+    std::ifstream federateHostConfigJsonInputStream(federateHostConfigJsonFileName);
+    federateHostConfigJsonInputStream >> federate_host_config_json;
+    federateHostConfigJsonInputStream.close();
+
+    for( Json::Value::const_iterator fcmCit = federate_host_config_json.begin() ; fcmCit != federate_host_config_json.end() ; ++fcmCit ) {
+        std::string federateName = fcmCit.key().asString();
+        Json::Value hostConfig = federate_host_config_json[ federateName ];
+        _federateNameToHostConfigMap.emplace(federateName, hostConfig);
     }
+}
 
-    if (messaging_host_config_json.isMember("interactions")) {
-        Json::Value configJsonForInteractions = messaging_host_config_json["interactions"];
+void HLAInterface::initializeFederateSequenceToMessagingInfoMap(const std::string &federateSequenceToMessagingInfoJsonFileName) {
 
-        if (configJsonForInteractions.isMember("default")) {
-            connectionData.assignFromJson( configJsonForInteractions["default"] );
-        }
+    Json::Value federate_sequence_to_messaging_info_json;
 
-        if ( interactionRoot.hasParameter("originFed") ) {
-            const std::string originFedName = interactionRoot.getParameter("originFed").asString();
+    std::ifstream federateSequenceToMessagingInfoJsonInputStream(federateSequenceToMessagingInfoJsonFileName);
+    federateSequenceToMessagingInfoJsonInputStream >> federate_sequence_to_messaging_info_json;
+    federateSequenceToMessagingInfoJsonInputStream.close();
 
-            if ( configJsonForInteractions.isMember(originFedName) ) {
-                Json::Value federateConfigJson = configJsonForInteractions[ originFedName ];
+    for( Json::Value::const_iterator fsmCit = federate_sequence_to_messaging_info_json.begin() ; fsmCit != federate_sequence_to_messaging_info_json.end() ; ++fsmCit ) {
 
-                connectionData.assignFromJson( federateConfigJson );
+        std::string receivingFullHlaClassName( fsmCit.key().asString() );
+
+        _dynamicSubscribeFullHlaClassNameSet.insert( receivingFullHlaClassName );
+
+        Json::Value federateSequenceMessagingInfoArray = federate_sequence_to_messaging_info_json[ receivingFullHlaClassName ];
+
+        FederateSequenceMessagingInfoMap federateSequenceMessagingInfoMap;
+
+        for(int ix = 0 ; ix < federateSequenceMessagingInfoArray.size() ; ++ix) {
+            Json::Value federateSequenceMessagingInfoJsonMap = federateSequenceMessagingInfoArray[ix];
+            Json::Value federateSequenceJson = federateSequenceMessagingInfoJsonMap[ "federate_sequence" ];
+            StringVector federateSequenceVector;
+
+            for(int jx = 0 ; jx < federateSequenceJson.size() ; ++jx) {
+                federateSequenceVector.push_back(federateSequenceJson[jx].asString());
             }
+
+            Json::Value messaging_info_json = federateSequenceMessagingInfoJsonMap[ "messaging_info" ];
+
+            std::string sendingFullHlaClassName( messaging_info_json[ "full_hla_class_name" ].asString() );
+            _dynamicPublishFullHlaClassNameSet.insert( sendingFullHlaClassName );
+
+            MessagingInfo messagingInfo( sendingFullHlaClassName, messaging_info_json[ "payload_size" ].asInt() );
+
+            federateSequenceMessagingInfoMap.emplace( federateSequenceVector, messagingInfo );
         }
+
+        _messagingFederateSequenceMessagingInfoMap[ receivingFullHlaClassName ] = federateSequenceMessagingInfoMap;
     }
 
-    interactionMsg.setSenderHost( connectionData.senderHost.c_str() );
-    interactionMsg.setSenderHostApp( connectionData.senderHostApp.c_str() );
-    interactionMsg.setSenderAppIndex( connectionData.senderAppIndex );
+}
 
-    interactionMsg.setReceiverHost( connectionData.receiverHost.c_str() );
-    interactionMsg.setReceiverHostApp( connectionData.receiverHostApp.c_str() );
-    interactionMsg.setReceiverAppIndex( connectionData.receiverAppIndex );
-    interactionMsg.setReceiverAppInterface( connectionData.receiverAppInterface.c_str() );
+bool HLAInterface::populateInteractionMsg(InteractionMsg &interactionMsg, const std::string &sendingFederateName, const std::string &receivingFederateName) {
 
-    interactionMsg.setByteLength( connectionData.numBytes );
+    {
+        FederateNameToHostConfigMap::const_iterator fhmCit = _federateNameToHostConfigMap.find(sendingFederateName);
+        if ( fhmCit == _federateNameToHostConfigMap.end() ) {
+            std::cerr << "Name of sending federate \"" << sendingFederateName << "\" not found in federate-host-config table: skipping ..." << std::endl;
+            return false;
+        }
+
+        const FederateHostConfig &federateHostConfig( fhmCit->second );
+
+        interactionMsg.setSenderHost( federateHostConfig.host.c_str() );
+        interactionMsg.setSenderHostApp( federateHostConfig.hostApp.c_str() );
+        interactionMsg.setSenderAppIndex( federateHostConfig.appIndex );
+    }
+
+    {
+        FederateNameToHostConfigMap::const_iterator fhmCit = _federateNameToHostConfigMap.find(receivingFederateName);
+        if ( fhmCit == _federateNameToHostConfigMap.end() ) {
+            std::cerr << "Name of receiving federate \"" << receivingFederateName << "\" not found in federate-host-config table: skipping ..." << std::endl;
+            return false;
+        }
+
+        const FederateHostConfig &federateHostConfig( fhmCit->second );
+
+        interactionMsg.setReceiverHost( federateHostConfig.host.c_str() );
+        interactionMsg.setReceiverHostApp( federateHostConfig.hostApp.c_str() );
+        interactionMsg.setReceiverAppIndex( federateHostConfig.appIndex );
+        interactionMsg.setReceiverAppInterface( federateHostConfig.appInterface.c_str() );
+    }
+
+    return true;
 }
 
 void HLAInterface::processInteractions( void ) {
@@ -162,14 +201,70 @@ void HLAInterface::processInteractions( void ) {
         if ( interactionRootSP->isDynamicInstance() ) {
 
             InteractionMsg *interactionMsgPtr = new InteractionMsg( getInteractionMessageLabel().c_str() );
-
             interactionMsgPtr->setToHLA( true );
             interactionMsgPtr->setMessageNo( AttackCoordinator::getUniqueNo() );
-            interactionMsgPtr->setInteractionRootSP( interactionRootSP );
             interactionMsgPtr->setTimestamp( interactionRootSP->getTime() );
-            interactionMsgPtr->setByteLength( 20 );
 
-            populateInteractionMsg( *interactionMsgPtr, *interactionRootSP );
+            std::string instanceHlaClassName = interactionRootSP->getInstanceHlaClassName();
+
+            MessagingFederateSequenceMessagingInfoMap::const_iterator mfmCit = _messagingFederateSequenceMessagingInfoMap.find( instanceHlaClassName );
+            if ( mfmCit == _messagingFederateSequenceMessagingInfoMap.end() ) {
+                std::cerr << "No entry for HLA class \"" << instanceHlaClassName << "\" in _messagingFederateSequenceMessagingInfoMap: skipping ..." << std::endl;
+                continue;
+            }
+
+            C2WInteractionRoot::StringList federateSequenceList(  C2WInteractionRoot::get_federate_sequence_list( *interactionRootSP )  );
+
+            if ( federateSequenceList.empty() ) {
+                std::cerr << "FederateSequence for instance of HLA class \"" << instanceHlaClassName << "\" is empty: skipping ..." << std::endl;
+                continue;
+            }
+
+            const FederateSequenceMessagingInfoMap &federateSequenceMessagingInfoMap = mfmCit->second;
+
+            StringVector federateSequenceVector( federateSequenceList.begin(), federateSequenceList.end() );
+
+            FederateSequenceMessagingInfoMap::const_iterator fmmCit = federateSequenceMessagingInfoMap.find( federateSequenceVector );
+
+            if ( fmmCit == federateSequenceMessagingInfoMap.end() ) {
+                std::cerr << "No entry for federateSequence [ ";
+                bool first = true;
+                for( StringVector::const_iterator fsvCit = federateSequenceVector.begin() ; fsvCit != federateSequenceVector.end() ; ++fsvCit ) {
+                    if (first) {
+                        first = false;
+                    } else {
+                        std::cerr << ", ";
+                    }
+
+                    std::cerr << "\"" << *fsvCit << "\"";
+                }
+                std::cerr << " ] for HLA class \"" << instanceHlaClassName << "\": skipping ...";
+            }
+
+            const MessagingInfo &messagingInfo = fmmCit->second;
+
+            std::string publishedFullHlaClassName( messagingInfo.getPublishedFullHlaClassName() );
+
+            InteractionRoot::SP sendInteractionRootSP(  new InteractionRoot( publishedFullHlaClassName )  );
+
+            ClassAndPropertyNameList classAndPropertyNameList = interactionRootSP->getAllParameterNames();
+            for( ClassAndPropertyNameList::const_iterator cplCit = classAndPropertyNameList.begin() ; cplCit != classAndPropertyNameList.end() ; ++cplCit ) {
+                InteractionRoot::Value value = interactionRootSP->getParameter( *cplCit );
+                sendInteractionRootSP->setParameter( *cplCit, value);
+            }
+
+            std::string sendingFederateName( federateSequenceVector.back() );
+
+            size_t position = publishedFullHlaClassName.find_last_of(".");
+            std::string receivingFederateName(  publishedFullHlaClassName.substr( position + 1 )  );
+
+
+            if (  !populateInteractionMsg( *interactionMsgPtr, sendingFederateName, receivingFederateName )  ) {
+                continue;
+            }
+
+            interactionMsgPtr->setInteractionRootSP( sendInteractionRootSP );
+            interactionMsgPtr->setByteLength( messagingInfo.getPayloadSize() );
 
             auto c_packetChunk = inet::makeShared<inet::cPacketChunk>(interactionMsgPtr);
             inet::Packet *packet = new inet::Packet(getInteractionMessageLabel().c_str(), c_packetChunk);
@@ -771,11 +866,13 @@ void HLAInterface::initialize(int stage) {
         setFederationJsonFileName( par( "federation_json_file_name" ).stringValue() );
         setFederateDynamicMessagingClassesJsonFileName( par( "dynamic_messaging_classes_json_file_name" ).stringValue() );
 
-        std::string messaging_host_config_file_name = par( "messaging_host_config_file_name" ).stringValue();
+        std::string federateHostConfigJsonFileName = par( "federate_host_config_json_file_name" ).stringValue();
 
-        std::ifstream messaging_host_config_input_stream(messaging_host_config_file_name);
-        messaging_host_config_input_stream >> messaging_host_config_json;
-        messaging_host_config_input_stream.close();
+        initializeFederateHostConfigMap(federateHostConfigJsonFileName);
+
+        std::string federateSequenceToMessagingInfoJsonFileName = par("federate_sequence_to_messaging_info_json_file_name").stringValue();
+
+        initializeFederateSequenceToMessagingInfoMap(federateSequenceToMessagingInfoJsonFileName);
 
         setup();
     }
@@ -858,9 +955,12 @@ void HLAInterface::setup() {
     StartNetworkIPFirewall::subscribe_interaction( getRTI() );
     StopNetworkIPFirewall::subscribe_interaction( getRTI() );
 
-    for(const std::string &dynamicHlaClassName: InteractionRoot::get_dynamic_hla_class_name_set()) {
-        InteractionRoot::publish_interaction(dynamicHlaClassName, getRTI() );
-        InteractionRoot::subscribe_interaction(dynamicHlaClassName, getRTI() );
+    for(const std::string &dynamicPublishHlaClassName: _dynamicPublishFullHlaClassNameSet) {
+        InteractionRoot::publish_interaction(dynamicPublishHlaClassName, getRTI() );
+    }
+
+    for(const std::string &dynamicSubscribeHlaClassName: _dynamicSubscribeFullHlaClassNameSet) {
+        InteractionRoot::subscribe_interaction(dynamicSubscribeHlaClassName, getRTI() );
     }
 
     SubscribedInteractionFilter::get_singleton().initialize();

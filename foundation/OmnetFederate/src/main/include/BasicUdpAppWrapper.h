@@ -26,6 +26,7 @@
  */
 class BasicUdpAppWrapper : public BasicUdpApp {
 public:
+    using InteractionRoot = ::org::cpswt::hla::InteractionRoot;
     using NetworkPacket = ::org::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::NetworkPacket;
 
 	typedef BasicUdpApp Super;
@@ -72,19 +73,11 @@ protected:
 	virtual void initialize( int stage ) override;
 	virtual void handleMessage(omnetpp::cMessage *msg) override;
 	virtual void sendToUDP( inet::Packet *msg, const inet::Ipv4Address& destAddr, int destPort ) override;
-	virtual NetworkPacket::SP modifyIncoming( NetworkPacket::SP networkPacketSP );
-	virtual NetworkPacket::SP modifyOutgoing( NetworkPacket::SP networkPacketSP );
-	virtual NetworkPacket::SP tweakIncoming(
-	        NetworkPacket::SP networkPacketSP,
-	        int intMultuplier = 1,
-	        int intAdder = 0,
-	        long longMultiplier = 1,
-	        long longAdder = 0,
-	        double doubleMultiplier = 1.0,
-	        double doubleAdder = 0.0,
-	        bool booleanEnableFlip = false,
-	        const std::string &stringReplacement = ""
-	);
+	void setToDefaultValues( InteractionRoot &interactionRoot );
+    void setToDefaultValues( InteractionRoot::SP interactionRootSP ) {
+        setToDefaultValues( *interactionRootSP );
+    }
+	virtual void tweakIncoming(InteractionRoot &interactionRoot, AttackCoordinator::IntegrityAttackParams &iap);
 };
 
 #endif
