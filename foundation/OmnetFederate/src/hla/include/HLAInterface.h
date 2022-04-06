@@ -93,14 +93,15 @@ private:
 	};
 
 	typedef std::vector<std::string> StringVector;
-	typedef std::map< StringVector, MessagingInfo > FederateSequenceMessagingInfoMap;
+	typedef std::vector<MessagingInfo> MessagingInfoVector;
+	typedef std::map< StringVector, MessagingInfoVector > FederateSequenceMessagingInfoVectorMap;
 
-	typedef std::map< std::string, FederateSequenceMessagingInfoMap> MessagingFederateSequenceMessagingInfoMap;
+	typedef std::map< std::string, FederateSequenceMessagingInfoVectorMap> MessagingFederateSequenceMessagingInfoVectorMap;
 
 	StringSet _dynamicPublishFullHlaClassNameSet;
     StringSet _dynamicSubscribeFullHlaClassNameSet;
 
-	MessagingFederateSequenceMessagingInfoMap _messagingFederateSequenceMessagingInfoMap;
+	MessagingFederateSequenceMessagingInfoVectorMap _messagingFederateSequenceMessagingInfoVectorMap;
 
     void initializeFederateSequenceToMessagingInfoMap(const std::string &federateSequenceToMessagingInfoJsonFileName);
 
@@ -127,7 +128,7 @@ public:
 	//
 	// SYNCHRONIZED-FEDERATE METHODS
 	//
-	bool populateInteractionMsg(InteractionMsg &interactionMsg, const std::string &sendingFederateName, const std::string &receivingFederateName);
+	void populateInteractionMsg(InteractionMsg &interactionMsg, const std::string &sendingFederateName, const std::string &receivingFederateName);
 
     void processInteractions( void );
     

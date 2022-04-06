@@ -234,7 +234,7 @@ protected:
 	void joinFederation();
 
     void sendInteraction( InteractionRoot &interactionRoot, double time ) {
-        C2WInteractionRoot::update_federate_sequence(interactionRoot, getFederateId());
+        C2WInteractionRoot::update_federate_sequence(interactionRoot, getFederateType());
         interactionRoot.sendInteraction(getRTI(), time);
     }
 
@@ -243,7 +243,7 @@ protected:
     }
 
     void sendInteraction(InteractionRoot &interactionRoot) {
-        C2WInteractionRoot::update_federate_sequence(interactionRoot, getFederateId());
+        C2WInteractionRoot::update_federate_sequence(interactionRoot, getFederateType());
         interactionRoot.sendInteraction(getRTI());
     }
 
