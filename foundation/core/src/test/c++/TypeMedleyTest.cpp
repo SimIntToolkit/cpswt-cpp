@@ -1,3 +1,33 @@
+/*
+ * Certain portions of this software are Copyright (C) 2006-present
+ * Vanderbilt University, Institute for Software Integrated Systems.
+ *
+ * Certain portions of this software are contributed as a public service by
+ * The National Institute of Standards and Technology (NIST) and are not
+ * subject to U.S. Copyright.
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a
+ * copy of this software and associated documentation files (the "Software"),
+ * to deal in the Software without restriction, including without limitation
+ * the rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following conditions:
+ *
+ * The above Vanderbilt University copyright notice, NIST contribution
+ * notice and this permission and disclaimer notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+ * DEALINGS IN THE SOFTWARE. THE AUTHORS OR COPYRIGHT HOLDERS SHALL NOT HAVE
+ * ANY OBLIGATION TO PROVIDE MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS,
+ * OR MODIFICATIONS.
+ */
+
 #include "TypeMedleyTest.hpp"
 #include <iostream>
 
@@ -177,32 +207,32 @@ void TypeMedleyTest::intZeroTest() {
 }
 
 void TypeMedleyTest::floatTest() {
-    TypeMedley typeMedley(static_cast<float>(53.231));
+    TypeMedley typeMedley(static_cast<float>(-53.231));
     CPPUNIT_ASSERT(typeMedley.getDataType() == TypeMedley::FLOAT);
 
     const auto boolValue = static_cast<bool>(typeMedley);
     CPPUNIT_ASSERT(boolValue);
 
     const auto charValue = static_cast<char>(typeMedley);
-    CPPUNIT_ASSERT_EQUAL(static_cast<char>(53), charValue);
+    CPPUNIT_ASSERT_EQUAL(static_cast<char>(-53), charValue);
 
     const auto shortValue = static_cast<short>(typeMedley);
-    CPPUNIT_ASSERT_EQUAL(static_cast<short>(53), shortValue);
+    CPPUNIT_ASSERT_EQUAL(static_cast<short>(-53), shortValue);
 
     const auto intValue = static_cast<int>(typeMedley);
-    CPPUNIT_ASSERT_EQUAL(static_cast<int>(53), intValue);
+    CPPUNIT_ASSERT_EQUAL(static_cast<int>(-53), intValue);
 
     const auto longValue = static_cast<long>(typeMedley);
-    CPPUNIT_ASSERT_EQUAL(static_cast<long>(53), longValue);
+    CPPUNIT_ASSERT_EQUAL(static_cast<long>(-53), longValue);
 
     const auto floatValue = static_cast<float>(typeMedley);
-    CPPUNIT_ASSERT_DOUBLES_EQUAL(static_cast<float>(53.231), floatValue, 0.001);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(static_cast<float>(-53.231), floatValue, 0.001);
 
     const auto doubleValue = static_cast<double>(typeMedley);
-    CPPUNIT_ASSERT_DOUBLES_EQUAL(static_cast<double>(53.231), doubleValue, 0.001);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(static_cast<double>(-53.231), doubleValue, 0.001);
 
     const auto stringValue = static_cast<std::string>(typeMedley);
-    CPPUNIT_ASSERT(std::regex_match(stringValue, std::regex("53\\.23[0-9]*")));
+    CPPUNIT_ASSERT(std::regex_match(stringValue, std::regex("-53\\.23[0-9]*")));
 }
 
 void TypeMedleyTest::floatWithExponentTest() {

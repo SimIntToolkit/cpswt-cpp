@@ -1,7 +1,33 @@
 /*
- * HLAInterface.cc
+ * Certain portions of this software are Copyright (C) 2006-present
+ * Vanderbilt University, Institute for Software Integrated Systems.
  *
+ * Certain portions of this software are contributed as a public service by
+ * The National Institute of Standards and Technology (NIST) and are not
+ * subject to U.S. Copyright.
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a
+ * copy of this software and associated documentation files (the "Software"),
+ * to deal in the Software without restriction, including without limitation
+ * the rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following conditions:
+ *
+ * The above Vanderbilt University copyright notice, NIST contribution
+ * notice and this permission and disclaimer notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+ * DEALINGS IN THE SOFTWARE. THE AUTHORS OR COPYRIGHT HOLDERS SHALL NOT HAVE
+ * ANY OBLIGATION TO PROVIDE MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS,
+ * OR MODIFICATIONS.
  */
+
 #include <fstream>
 
 #include <HLAInterface.h>
@@ -27,7 +53,8 @@ using DropRouteFromRoutingTable = ::org::cpswt::hla::InteractionRoot_p::C2WInter
 
 using CommandExecutionStatus = ::org::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::CommandExecutionStatus;
 
-using C2WInteractionRoot = ::org::cpswt::hla::InteractionRoot_p::C2WInteractionRoot;
+// USED IN HEADER FILE
+//using C2WInteractionRoot = ::org::cpswt::hla::InteractionRoot_p::C2WInteractionRoot;
 
 using NetworkPacket = ::org::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::NetworkPacket;
 
@@ -136,10 +163,10 @@ void HLAInterface::initializeFederateSequenceToMessagingInfoMap(const std::strin
             Json::Value federateSequenceMessagingInfoVectorJsonArray = federateSequenceMessagingInfoArray[ix];
 
             Json::Value federateSequenceJson = federateSequenceMessagingInfoVectorJsonArray[ "federate_sequence" ];
-            StringVector federateSequenceVector;
+            StringList federateSequenceList;
 
             for(int jx = 0 ; jx < federateSequenceJson.size() ; ++jx) {
-                federateSequenceVector.push_back( federateSequenceJson[jx].asString() );
+                federateSequenceList.push_back( federateSequenceJson[jx].asString() );
             }
 
             Json::Value messaging_info_json_array = federateSequenceMessagingInfoVectorJsonArray[ "messaging_info" ];
@@ -157,7 +184,7 @@ void HLAInterface::initializeFederateSequenceToMessagingInfoMap(const std::strin
                 messagingInfoVector.push_back( messagingInfo );
             }
 
-            federateSequenceMessagingInfoVectorMap.emplace(federateSequenceVector, messagingInfoVector);
+            federateSequenceMessagingInfoVectorMap.emplace(federateSequenceList, messagingInfoVector);
         }
 
         _messagingFederateSequenceMessagingInfoVectorMap[ receivingFullHlaClassName ] = federateSequenceMessagingInfoVectorMap;
@@ -194,53 +221,85 @@ void HLAInterface::processInteractions( void ) {
 
         int classHandle = interactionRootSP->getClassHandle();
 
+        // IS INTERACTION ONE THAT MIGHT BE PROPAGATED THROUGH THE SIMULATED NETWORK?
         if ( interactionRootSP->isDynamicInstance() ) {
 
+            // GET FULL HLA CLASS NAME OF INTERACTION
             std::string instanceHlaClassName = interactionRootSP->getInstanceHlaClassName();
 
+            // IS THIS CLASS NAME ONE THAT COULD BE PROPAGATED?
             MessagingFederateSequenceMessagingInfoVectorMap::const_iterator mfmCit = _messagingFederateSequenceMessagingInfoVectorMap.find( instanceHlaClassName );
             if ( mfmCit == _messagingFederateSequenceMessagingInfoVectorMap.end() ) {
                 std::cerr << "No entry for HLA class \"" << instanceHlaClassName << "\" in _messagingFederateSequenceMessagingInfoVectorMap: skipping ..." << std::endl;
                 continue;
             }
 
-            C2WInteractionRoot::StringList federateSequenceList(  C2WInteractionRoot::get_federate_sequence_list( *interactionRootSP )  );
+            // IF SO, CHECK SEQUENCE OF FEDERATES IT CAME TRHOUGH
+            StringList federateSequenceList(  C2WInteractionRoot::get_federate_sequence_list( *interactionRootSP )  );
 
+            // IF FEDERATE SEQUENCE IS EMPTY, SOMETHING IS WRONG
             if ( federateSequenceList.empty() ) {
                 std::cerr << "FederateSequence for instance of HLA class \"" << instanceHlaClassName << "\" is empty: skipping ..." << std::endl;
                 continue;
             }
 
-            const FederateSequenceMessagingInfoVectorMap &federateSequenceMessagingInfoVectorMap = mfmCit->second;
-
-            StringVector federateSequenceVector( federateSequenceList.begin(), federateSequenceList.end() );
-
-            std::string sendingFederateName( federateSequenceVector.back() );
+            // MAKE SURE SENDING FEDERATE (LAST FEDERATE IN SEQUENCE) HAS A HOST ASSIGNED TO IT
+            std::string sendingFederateName( federateSequenceList.back() );
             FederateNameToHostConfigMap::const_iterator fhmCit = _federateNameToHostConfigMap.find(sendingFederateName);
             if ( fhmCit == _federateNameToHostConfigMap.end() ) {
                 std::cerr << "Name of sending federate \"" << sendingFederateName << "\" not found in federate-host-config table: skipping ..." << std::endl;
                 continue;
             }
+            const FederateSequenceMessagingInfoVectorMap &federateSequenceMessagingInfoVectorMap = mfmCit->second;
 
-            FederateSequenceMessagingInfoVectorMap::const_iterator fmmCit = federateSequenceMessagingInfoVectorMap.find( federateSequenceVector );
+            // CHECK FOR FEDERATE SEQUENCE IN MAP
+            // EACH federateSequenceListKey IN federateSequenceMessagingInfoVectorMap
+            // IS MATCHED AGAINST THE LAST PORTION OF federateSequenceList
+            FederateSequenceMessagingInfoVectorMap::const_iterator fmmCit;
+            for(
+              fmmCit = federateSequenceMessagingInfoVectorMap.begin() ;
+              fmmCit != federateSequenceMessagingInfoVectorMap.end() ;
+              ++fmmCit
+            ) {
+                const StringList &federateSequenceListKey = fmmCit->first;
+                StringList::const_reverse_iterator fskCit = federateSequenceListKey.rbegin();
+                StringList::const_reverse_iterator fslCit = federateSequenceList.rbegin();
 
+                bool match = true;
+                while(fskCit != federateSequenceListKey.rend() & fslCit != federateSequenceList.rend()) {
+                    if (*fskCit != *fslCit) {
+                        match = false;
+                        break;
+                    }
+                    ++fskCit;
+                    ++fslCit;
+                }
+
+                if (match && fskCit == federateSequenceListKey.rend()) {
+                    break;
+                }
+            }
+
+            // IF NOT THERE, REPORT
             if ( fmmCit == federateSequenceMessagingInfoVectorMap.end() ) {
                 std::cerr << "No entry for federateSequence [ ";
                 bool first = true;
-                for( StringVector::const_iterator fsvCit = federateSequenceVector.begin() ; fsvCit != federateSequenceVector.end() ; ++fsvCit ) {
+                for( StringList::const_iterator fslCit = federateSequenceList.begin() ; fslCit != federateSequenceList.end() ; ++fslCit ) {
                     if (first) {
                         first = false;
                     } else {
                         std::cerr << ", ";
                     }
 
-                    std::cerr << "\"" << *fsvCit << "\"";
+                    std::cerr << "\"" << *fslCit << "\"";
                 }
                 std::cerr << " ] for HLA class \"" << instanceHlaClassName << "\": skipping ...";
+                continue;
             }
 
             const MessagingInfoVector &messagingInfoVector = fmmCit->second;
 
+            // OTHERWISE, TRANSLATE RECEIVED INTERACTION TO FEDERATE-SPECIFIC INTERACTIONS AND SEND THROUGH NETWORK
             for( MessagingInfoVector::const_iterator mivCit = messagingInfoVector.begin() ; mivCit != messagingInfoVector.end() ; ++mivCit ) {
 
                 const MessagingInfo &messagingInfo( *mivCit );
@@ -250,6 +309,7 @@ void HLAInterface::processInteractions( void ) {
                 size_t position = publishedFullHlaClassName.find_last_of(".");
                 std::string receivingFederateName(  publishedFullHlaClassName.substr( position + 1 )  );
 
+                // MAKE SURE THERE IS A HOST FOR THE RECEIVING FEDERATE
                 FederateNameToHostConfigMap::const_iterator fhmCit = _federateNameToHostConfigMap.find(receivingFederateName);
                 if ( fhmCit == _federateNameToHostConfigMap.end() ) {
                     std::cerr << "Name of receiving federate \"" << receivingFederateName << "\" not found in federate-host-config table: skipping ..." << std::endl;
@@ -258,6 +318,7 @@ void HLAInterface::processInteractions( void ) {
 
                 InteractionRoot::SP sendInteractionRootSP(  new InteractionRoot( publishedFullHlaClassName )  );
 
+                // COPY PARAMETER VALUES
                 ClassAndPropertyNameList classAndPropertyNameList = interactionRootSP->getAllParameterNames();
                 for( ClassAndPropertyNameList::const_iterator cplCit = classAndPropertyNameList.begin() ; cplCit != classAndPropertyNameList.end() ; ++cplCit ) {
                     InteractionRoot::Value value = interactionRootSP->getParameter( *cplCit );
@@ -273,25 +334,26 @@ void HLAInterface::processInteractions( void ) {
 
                 populateInteractionMsg( *interactionMsgPtr, sendingFederateName, receivingFederateName );
 
-
                 auto c_packetChunk = inet::makeShared<inet::cPacketChunk>(interactionMsgPtr);
                 inet::Packet *packet = new inet::Packet(getInteractionMessageLabel().c_str(), c_packetChunk);
 
-                 cModule *udpAppWrapperModule = AttackCoordinator::getSingleton().getAppSpecModule(
-                         interactionMsgPtr->getSenderHost(), interactionMsgPtr->getSenderHostApp(), interactionMsgPtr->getSenderAppIndex()
-                 );
-                 if ( udpAppWrapperModule != 0 ) {
-                    sendDirect( packet, udpAppWrapperModule, "hlaIn" );
-                 } else {
-                     std::cerr << "WARNING:  HLAInterface:  could not find module corresponding to (hostname,appName) = (" <<
-                      interactionMsgPtr->getSenderHost() << "," << interactionMsgPtr->getSenderHostApp() << ")" << std::endl;
-                     std::cerr << "Current modules are: " << std::endl;
-                     std::cerr << AttackCoordinator::getSingleton().listAppSpecProperties();
-                     std::cerr << std::endl;
-                 }
-                 continue;
+                // SEND PACKET TO "SENDER" HOST
+                cModule *udpAppWrapperModule = AttackCoordinator::getSingleton().getAppSpecModule(
+                        interactionMsgPtr->getSenderHost(), interactionMsgPtr->getSenderHostApp(), interactionMsgPtr->getSenderAppIndex()
+                );
+                if ( udpAppWrapperModule != 0 ) {
+                   sendDirect( packet, udpAppWrapperModule, "hlaIn" );
+                } else {
+                    std::cerr << "WARNING:  HLAInterface:  could not find module corresponding to (hostname,appName) = (" <<
+                     interactionMsgPtr->getSenderHost() << "," << interactionMsgPtr->getSenderHostApp() << ")" << std::endl;
+                    std::cerr << "Current modules are: " << std::endl;
+                    std::cerr << AttackCoordinator::getSingleton().listAppSpecProperties();
+                    std::cerr << std::endl;
+                }
+                continue;
             }
 
+            continue;
         }
 
 
@@ -1029,17 +1091,17 @@ void HLAInterface::setup() {
     _keepAliveMsg = new omnetpp::cMessage( "keepAlive" );
     scheduleAt( omnetpp::simTime(), _keepAliveMsg );
 
-    _readyToRunMsg = new omnetpp::cMessage ( "readyToRun" );
-    scheduleAt( omnetpp::simTime(), _readyToRunMsg );
+//    _readyToRunMsg = new omnetpp::cMessage ( "readyToRun" );
+//    scheduleAt( omnetpp::simTime(), _readyToRunMsg );
 }
 
 void HLAInterface::handleMessage( omnetpp::cMessage* msg ) {
 
     // Check ready to run message
-    if( msg == _readyToRunMsg ) {
-        readyToRun();
-        return;
-    }
+//    if( msg == _readyToRunMsg ) {
+//        readyToRun();
+//        return;
+//    }
 
     // PROCESS ANY INCOMING INTERACTIONS
     if ( msg == _interactionArrivalMsg ) {
