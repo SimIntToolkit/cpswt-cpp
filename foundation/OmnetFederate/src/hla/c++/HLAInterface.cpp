@@ -1138,7 +1138,7 @@ void HLAInterface::handleMessage( omnetpp::cMessage* msg ) {
         InteractionMsg *interactionMsg = dynamic_cast< InteractionMsg * >( c_packetPtr );
 
         InteractionRoot::SP interactionRootSP = interactionMsg->getInteractionRootSP();
-        sendInteraction(interactionRootSP, getRTI());
+        sendInteraction(interactionRootSP, getCurrentTime() + getLookahead());
         // std::cerr << "Sending interaction with timestamp " << boost::lexical_cast< std::string >( timestamp ) << std::endl;
 //    } else if ( msgKind == OBJECT ) {
 //        ObjectMsg *objectMsgPtr = static_cast< ObjectMsg * >( msg );
