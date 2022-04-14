@@ -1138,8 +1138,7 @@ void HLAInterface::handleMessage( omnetpp::cMessage* msg ) {
         InteractionMsg *interactionMsg = dynamic_cast< InteractionMsg * >( c_packetPtr );
 
         InteractionRoot::SP interactionRootSP = interactionMsg->getInteractionRootSP();
-        interactionRootSP->setParameter("sourceFed", getFederateId() );
-        interactionRootSP->sendInteraction( getRTI(), timestamp );
+        sendInteraction(interactionRootSP, getRTI());
         // std::cerr << "Sending interaction with timestamp " << boost::lexical_cast< std::string >( timestamp ) << std::endl;
 //    } else if ( msgKind == OBJECT ) {
 //        ObjectMsg *objectMsgPtr = static_cast< ObjectMsg * >( msg );
