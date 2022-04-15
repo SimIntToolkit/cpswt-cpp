@@ -59,7 +59,10 @@ void Sink2::execute( void ) {
 
 int main( int argc, char *argv[] ) {
 
-	Sink2 sink2( argc, argv );
+    FederateConfigParser *parse_obj = new FederateConfigParser();
+    FederateConfig *fedconfigObj = parse_obj->parseArgs(argc, argv);
+    Sink2 sink2(fedconfigObj);
+	std::cout << "Sink2 created";
 
 	sink2.initialize();
 	sink2.run();

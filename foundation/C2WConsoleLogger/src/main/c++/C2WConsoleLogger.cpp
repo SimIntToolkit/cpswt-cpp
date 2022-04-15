@@ -1,38 +1,47 @@
 /*
- * Copyright (c) 2016, Institute for Software Integrated Systems, Vanderbilt University
- * All rights reserved.
+ * Certain portions of this software are Copyright (C) 2006-present
+ * Vanderbilt University, Institute for Software Integrated Systems.
  *
- * Permission to use, copy, modify, and distribute this software and its
- * documentation for any purpose, without fee, and without written agreement is
- * hereby granted, provided that the above copyright notice, the following
- * two paragraphs and the author appear in all copies of this software.
+ * Certain portions of this software are contributed as a public service by
+ * The National Institute of Standards and Technology (NIST) and are not
+ * subject to U.S. Copyright.
  *
- * IN NO EVENT SHALL THE VANDERBILT UNIVERSITY BE LIABLE TO ANY PARTY FOR
- * DIRECT, INDIRECT, SPECIAL, INCIDENTAL, OR CONSEQUENTIAL DAMAGES ARISING OUT
- * OF THE USE OF THIS SOFTWARE AND ITS DOCUMENTATION, EVEN IF THE VANDERBILT
- * UNIVERSITY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * Permission is hereby granted, free of charge, to any person obtaining a
+ * copy of this software and associated documentation files (the "Software"),
+ * to deal in the Software without restriction, including without limitation
+ * the rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following conditions:
  *
- * THE VANDERBILT UNIVERSITY SPECIFICALLY DISCLAIMS ANY WARRANTIES,
- * INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
- * AND FITNESS FOR A PARTICULAR PURPOSE.  THE SOFTWARE PROVIDED HEREUNDER IS
- * ON AN "AS IS" BASIS, AND THE VANDERBILT UNIVERSITY HAS NO OBLIGATION TO
- * PROVIDE MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
- * 
- * @author Andras Nadas
+ * The above Vanderbilt University copyright notice, NIST contribution
+ * notice and this permission and disclaimer notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+ * DEALINGS IN THE SOFTWARE. THE AUTHORS OR COPYRIGHT HOLDERS SHALL NOT HAVE
+ * ANY OBLIGATION TO PROVIDE MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS,
+ * OR MODIFICATIONS.
  */
+
 #include <boost/lexical_cast.hpp>
 
 #include "C2WConsoleLogger.hpp"
 #include "TypeMedley.hpp"
 
 #include <iostream>
-#include <stdio.h>
+#include <cstdio>
 
 #if __cplusplus <= 199711L
 #define TIME_LOG_FORMAT "%.3f"
 #else
 #define TIME_LOG_FORMAT "%.3lf"
 #endif
+
 
 void C2WConsoleLogger::init( const ArgVector &argVector ){
 	//No initialization needed for the console
@@ -87,7 +96,7 @@ void C2WConsoleLogger::addLog(
 	std::cout << values;
 }
 
-void C2WConsoleLogger::addLog( const std::string &id, const InteractionIf &interactionRoot, double time, const std::string &level ) {
+void C2WConsoleLogger::addLog(const std::string &id, const InteractionRootInterface &interactionRoot, double time, const std::string &level ) {
 
 	std::string logIdString = boost::lexical_cast< std::string >( ++_logId );
 	std::string levelString = level.empty() ? "''" : "'" + level + "'";
@@ -96,15 +105,19 @@ void C2WConsoleLogger::addLog( const std::string &id, const InteractionIf &inter
 	snprintf( timeCharArray, 60, TIME_LOG_FORMAT, time );
 	std::string timeString( timeCharArray );
 
-	StringVector stringVector = interactionRoot.getParameterNames();
-	if ( stringVector.empty() ) {
+	ClassAndPropertyNameList classAndPropertyNameList = interactionRoot.getParameterNames();
+	if ( classAndPropertyNameList.empty() ) {
 		std::string values = "'" + id + "', " + timeString + ", '', '', '', " + levelString +", '" + logIdString + "'";
 
 		std::cout << values;
 	}
-	for( StringVector::iterator issItr = stringVector.begin() ; issItr != stringVector.end() ; ++issItr ) {
+	for(
+            ClassAndPropertyNameList::iterator cplItr = classAndPropertyNameList.begin() ;
+            cplItr != classAndPropertyNameList.end() ;
+            ++cplItr
+    ) {
 
-		std::string parameterName( *issItr );
+		std::string parameterName( *cplItr );
 
 		TypeMedley parameterValue = interactionRoot.getParameter( parameterName );
 		std::string parameterValueString( parameterValue );
@@ -122,7 +135,7 @@ void C2WConsoleLogger::addLog( const std::string &id, const InteractionIf &inter
 
 }
 
-void C2WConsoleLogger::addLog( const std::string &id, const ObjectIf &objectRoot, double time, const std::string &level ) {
+void C2WConsoleLogger::addLog(const std::string &id, const ObjectRootInterface &objectRoot, double time, const std::string &level ) {
 
 	std::string logIdString = boost::lexical_cast< std::string >( ++_logId );
 
@@ -131,15 +144,19 @@ void C2WConsoleLogger::addLog( const std::string &id, const ObjectIf &objectRoot
 	std::string timeString( timeCharArray );
 	std::string levelString = level.empty() ? "''" : "'" + level + "'";
 
-	StringVector stringVector = objectRoot.getAttributeNames();
-	if ( stringVector.empty() ) {
+    ClassAndPropertyNameList classAndPropertyNameList = objectRoot.getAttributeNames();
+	if ( classAndPropertyNameList.empty() ) {
 		std::string values = "'" + id + "', " + timeString + ", '', '', '', " + levelString +", '" + logIdString + "'";
 
 		std::cout << values;
 	}
-	for( StringVector::iterator ossItr = stringVector.begin() ; ossItr != stringVector.end() ; ++ossItr ) {
+    for(
+            ClassAndPropertyNameList::iterator cplItr = classAndPropertyNameList.begin() ;
+            cplItr != classAndPropertyNameList.end() ;
+            ++cplItr
+    ) {
 
-		std::string attributeName( *ossItr );
+		std::string attributeName( *cplItr );
 
 		TypeMedley attributeValue = objectRoot.getAttribute( attributeName );
 		std::string attributeValueString( attributeValue );

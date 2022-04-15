@@ -1,33 +1,49 @@
-//
-// This program is free software: you can redistribute it and/or modify
-// it under the terms of the GNU Lesser General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-// 
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU Lesser General Public License for more details.
-// 
-// You should have received a copy of the GNU Lesser General Public License
-// along with this program.  If not, see http://www.gnu.org/licenses/.
-// 
+/*
+ * Certain portions of this software are Copyright (C) 2006-present
+ * Vanderbilt University, Institute for Software Integrated Systems.
+ *
+ * Certain portions of this software are contributed as a public service by
+ * The National Institute of Standards and Technology (NIST) and are not
+ * subject to U.S. Copyright.
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a
+ * copy of this software and associated documentation files (the "Software"),
+ * to deal in the Software without restriction, including without limitation
+ * the rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following conditions:
+ *
+ * The above Vanderbilt University copyright notice, NIST contribution
+ * notice and this permission and disclaimer notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+ * DEALINGS IN THE SOFTWARE. THE AUTHORS OR COPYRIGHT HOLDERS SHALL NOT HAVE
+ * ANY OBLIGATION TO PROVIDE MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS,
+ * OR MODIFICATIONS.
+ */
 
 #ifndef BASICUDPAPPWRAPPER_H
 #define BASICUDPAPPWRAPPER_H
 
 #include <omnetpp.h>
 #include "BasicUdpApp.h"
-#include "HLAInterface.h"
-#include "INotifiable.h"
-#include "NetworkPacket.hpp"
-
+#include "AttackCoordinator.h"
+#include <InteractionRoot_p/C2WInteractionRoot_p/ActionBase_p/NetworkPacket.hpp>
 
 /**
  * TODO - Generated class
  */
 class BasicUdpAppWrapper : public BasicUdpApp {
 public:
+    using InteractionRoot = ::org::cpswt::hla::InteractionRoot;
+    using NetworkPacket = ::org::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::NetworkPacket;
+
 	typedef BasicUdpApp Super;
 
 private:
@@ -57,6 +73,7 @@ private:
 
 	const std::string _appName;
 	MessageTracker _messageTracker;
+	omnetpp::cModule *_hlaModulePtr;
 
 public:
 	BasicUdpAppWrapper( void ) : _appName( "BasicUdpAppWrapper" ) { }
@@ -67,14 +84,15 @@ public:
 
 protected:
 	void recordInterfaceIPAddresses( void );
-	virtual int numInitStages( void ) const;
-	virtual void initialize( int stage );
-	virtual void receiveChangeNotification( int category, const cPolymorphic *details );
-	virtual void handleMessage(cMessage *msg);
-	virtual void sendToUDP( cPacket *msg, const IPv4Address& destAddr, int destPort );
-	virtual NetworkPacketSP modifyIncoming( NetworkPacketSP networkPacketSP );
-	virtual NetworkPacketSP modifyOutgoing( NetworkPacketSP networkPacketSP );
-	virtual NetworkPacketSP tweakIncoming( NetworkPacketSP networkPacketSP, int intMultuplier = 1, int intAdder = 0, long longMultiplier = 1, long longAdder = 0, double doubleMultiplier = 1.0, double doubleAdder = 0.0, bool booleanEnableFlip = false, const std::string &stringReplacement = "");
+	virtual int numInitStages( void ) const override;
+	virtual void initialize( int stage ) override;
+	virtual void handleMessage(omnetpp::cMessage *msg) override;
+	virtual void sendToUDP( inet::Packet *msg, const inet::Ipv4Address& destAddr, int destPort ) override;
+	void setToDefaultValues( InteractionRoot &interactionRoot );
+    void setToDefaultValues( InteractionRoot::SP interactionRootSP ) {
+        setToDefaultValues( *interactionRootSP );
+    }
+	virtual void tweakIncoming(InteractionRoot &interactionRoot, AttackCoordinator::IntegrityAttackParams &iap);
 };
 
 #endif

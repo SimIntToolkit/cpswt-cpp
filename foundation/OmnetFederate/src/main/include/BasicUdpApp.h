@@ -1,58 +1,72 @@
-//
-// This program is free software: you can redistribute it and/or modify
-// it under the terms of the GNU Lesser General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-// 
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU Lesser General Public License for more details.
-// 
-// You should have received a copy of the GNU Lesser General Public License
-// along with this program.  If not, see http://www.gnu.org/licenses/.
-// 
+/*
+ * Certain portions of this software are Copyright (C) 2006-present
+ * Vanderbilt University, Institute for Software Integrated Systems.
+ *
+ * Certain portions of this software are contributed as a public service by
+ * The National Institute of Standards and Technology (NIST) and are not
+ * subject to U.S. Copyright.
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a
+ * copy of this software and associated documentation files (the "Software"),
+ * to deal in the Software without restriction, including without limitation
+ * the rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following conditions:
+ *
+ * The above Vanderbilt University copyright notice, NIST contribution
+ * notice and this permission and disclaimer notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+ * DEALINGS IN THE SOFTWARE. THE AUTHORS OR COPYRIGHT HOLDERS SHALL NOT HAVE
+ * ANY OBLIGATION TO PROVIDE MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS,
+ * OR MODIFICATIONS.
+ */
 
 #ifndef BASICUDPAPP_H
 #define BASICUDPAPP_H
 
 #include <omnetpp.h>
-#include <UDPSocket.h>
+#include <inet/transportlayer/contract/udp/UdpSocket.h>
 
-#include <InterfaceTable.h>
-#include <IPv4InterfaceData.h>
-#include "InterfaceTableAccess.h"
-#include "NotificationBoard.h"
+#include <inet/networklayer/common/InterfaceTable.h>
+#include <inet/networklayer/ipv4/Ipv4InterfaceData.h>
+#include <inet/common/ModuleAccess.h>
 
-#include "HLAInterface.h"
+#include <inet/common/INETDefs.h>
 
 
 /**
  * TODO - Generated class
  */
-class BasicUdpApp : public cSimpleModule, public INotifiable {
+class BasicUdpApp : public omnetpp::cSimpleModule, public omnetpp::cListener {
 
 private:
-    UDPSocket _socket;
+    inet::UdpSocket _socket;
 	std::string _hostName;
-	cModule *_hostModule;
+	inet::cModule *_hostModule;
 	int _port;
 	int _defaultDestPort;
 
-    IInterfaceTable *_interfaceTable;
-    NotificationBoard *_notificationBoard;
+    inet::IInterfaceTable *_interfaceTable;
+    inet::cModule *_notificationBoard;
 
 protected:
-	virtual int numInitStages( void ) const;
-	virtual void initialize( int stage );
-	virtual void receiveChangeNotification( int category, const cPolymorphic *details );
-	virtual void handleMessage(cMessage *msg);
+    virtual int numInitStages() const override { return inet::NUM_INIT_STAGES; }
+	virtual void initialize( int stage ) override;
+	virtual void receiveSignal(omnetpp::cComponent *source, omnetpp::simsignal_t signalID, omnetpp::cObject *obj, omnetpp::cObject *details) override;
+	virtual void handleMessage(inet::cMessage *msg) override;
 
-	IInterfaceTable *getInterfaceTable( void ) { return _interfaceTable; }
-	NotificationBoard *getNotificationBoard( void ) { return _notificationBoard; }
+	inet::IInterfaceTable *getInterfaceTable( void ) { return _interfaceTable; }
+	inet::cModule *getNotificationBoard( void ) { return _notificationBoard; }
 
 public:
-	cModule *getHostModule( void ) const {
+	inet::cModule *getHostModule( void ) const {
 		return _hostModule;
 	}
 
@@ -67,7 +81,7 @@ public:
 	    return _defaultDestPort;
 	}
 
-    virtual void sendToUDP( cPacket *msg, const IPv4Address& destAddr, int destPort );
+    virtual void sendToUDP( inet::Packet *msg, const inet::Ipv4Address& destAddr, int destPort );
 };
 
 #endif

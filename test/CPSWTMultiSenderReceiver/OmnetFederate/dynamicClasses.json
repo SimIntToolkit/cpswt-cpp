@@ -1,0 +1,9 @@
+{
+    "interactions": [
+        "InteractionRoot.C2WInteractionRoot.TestInteraction",
+        "InteractionRoot.C2WInteractionRoot.TestInteraction.Receiver1",
+        "InteractionRoot.C2WInteractionRoot.TestInteraction.Receiver2",
+        "InteractionRoot.C2WInteractionRoot.TestInteraction.Receiver3"
+    ],
+    "objects": []
+}

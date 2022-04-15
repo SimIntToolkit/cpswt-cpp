@@ -1,86 +1,65 @@
 /*
- * Copyright (c) 2008, Institute for Software Integrated Systems, Vanderbilt University
- * All rights reserved.
+ * Certain portions of this software are Copyright (C) 2006-present
+ * Vanderbilt University, Institute for Software Integrated Systems.
  *
- * Permission to use, copy, modify, and distribute this software and its
- * documentation for any purpose, without fee, and without written agreement is
- * hereby granted, provided that the above copyright notice, the following
- * two paragraphs and the author appear in all copies of this software.
+ * Certain portions of this software are contributed as a public service by
+ * The National Institute of Standards and Technology (NIST) and are not
+ * subject to U.S. Copyright.
  *
- * IN NO EVENT SHALL THE VANDERBILT UNIVERSITY BE LIABLE TO ANY PARTY FOR
- * DIRECT, INDIRECT, SPECIAL, INCIDENTAL, OR CONSEQUENTIAL DAMAGES ARISING OUT
- * OF THE USE OF THIS SOFTWARE AND ITS DOCUMENTATION, EVEN IF THE VANDERBILT
- * UNIVERSITY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * Permission is hereby granted, free of charge, to any person obtaining a
+ * copy of this software and associated documentation files (the "Software"),
+ * to deal in the Software without restriction, including without limitation
+ * the rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following conditions:
  *
- * THE VANDERBILT UNIVERSITY SPECIFICALLY DISCLAIMS ANY WARRANTIES,
- * INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
- * AND FITNESS FOR A PARTICULAR PURPOSE.  THE SOFTWARE PROVIDED HEREUNDER IS
- * ON AN "AS IS" BASIS, AND THE VANDERBILT UNIVERSITY HAS NO OBLIGATION TO
- * PROVIDE MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
+ * The above Vanderbilt University copyright notice, NIST contribution
+ * notice and this permission and disclaimer notice shall be included in all
+ * copies or substantial portions of the Software.
  *
- * @author Himanshu Neema
- * @author Harmon Nine
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+ * DEALINGS IN THE SOFTWARE. THE AUTHORS OR COPYRIGHT HOLDERS SHALL NOT HAVE
+ * ANY OBLIGATION TO PROVIDE MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS,
+ * OR MODIFICATIONS.
  */
 
-/*
- * 	NOTE:  ALL "if" STATEMENTS IN THIS CODE THAT HAD THE FORM:
- *
- *  if (condition) statement;
- *
- *	OR
- *
- *  if (condition) statement1;
- *  else           statement2;
- *
- *  HAVE BEEN CONVERTED TO THE FORMS:
- *
- *  if (condition) {
- *		statement;
- *	}
- *
- *	AND
- *
- *  if (condition) {
- *		statement1;
- *	} else {
- *		statement2;
- *	}
- *
- *	RESPECTIVELY.  THIS IS BECAUSE THE OMNET DEBUGGER APPEARS TO HAVE A PROBLEM
- *  WITH THE NON-BRACED FORMS OF THE IF STATEMENT.  *PLEASE* DO NOT CHANGE IT BACK.
- *  -- H.S.N.
- *
- */
 
-#ifndef _INTERACTION_ROOT
-#define _INTERACTION_ROOT
+#ifndef _INTERACTION_ROOT_CLASS
+#define _INTERACTION_ROOT_CLASS
 
-#ifndef _CRT_SECURE_NO_DEPRECATE
-#define _CRT_SECURE_NO_DEPRECATE
-#endif
-
-#ifndef RTI_USES_STD_FSTREAM
-#define RTI_USES_STD_FSTREAM
-#endif
+#define BOOST_LOG_DYN_LINK
 
 #include <string>
 #include <vector>
 #include <algorithm>
 #include <sstream>
 #include <iostream>
+#include <fstream>
 #include <set>
 #include <map>
+#include <unordered_map>
 #include <list>
-#include <ctype.h>
-#include <stdlib.h>
+#include <cctype>
+#include <cstdlib>
+#include <typeinfo>
 
 #include <boost/shared_ptr.hpp>
+#include <boost/algorithm/string.hpp>
 
-#include <TypeMedley.hpp>
-#include <StringCollections.hpp>
+#include <boost/log/expressions/keyword.hpp>
+#include <boost/log/trivial.hpp>
+#include <boost/log/sources/severity_logger.hpp>
+#include <boost/log/attributes.hpp>
+#include <boost/log/utility/setup/common_attributes.hpp>
 
-#include "RTI.hh"
-#include "fedtime.hh"
+#include <jsoncpp/json/json.h>
+
+#include "InteractionRootInterface.hpp"
 
 #ifdef _WIN32
 #include <windows.h>
@@ -94,425 +73,1344 @@
 #define C2W_RTI_LOGGER_CLS C2WConsoleLogger
 #endif
 
-#include "InteractionIf.hpp"
 
-class InteractionRoot : public InteractionIf{
+namespace org {
+ namespace cpswt {
+  namespace hla {
+
+namespace logging = boost::log;
+namespace logging_source = boost::log::sources;
+namespace attrs = boost::log::attributes;
+
+using namespace logging::trivial;
+
+class InteractionRoot : public InteractionRootInterface {
+
 public:
-	typedef std::map< std::string, StringSet * > NameStringSetPtrMap;
-	typedef std::map< std::string, StringVector * > NameStringVectorPtrMap;
-	typedef std::map< std::string, int > StringIntegerMap;
-	typedef std::map< int, std::string > IntegerStringMap;
+    typedef logging_source::severity_logger< severity_level > severity_logger;
 
-	typedef boost::shared_ptr< InteractionRoot > SP;
-	typedef boost::shared_ptr< RTI::ParameterHandleValuePairSet > ParameterHandleValuePairSetSP;
+    typedef boost::shared_ptr<InteractionRoot> SP;
+    typedef RTI::ParameterHandleValuePairSet PropertyHandleValuePairSet;
+    typedef boost::shared_ptr<PropertyHandleValuePairSet> PropertyHandleValuePairSetSP;
 
-	typedef SP (*FactoryFunctionPtr)( void );
-	typedef std::map< std::string, FactoryFunctionPtr > ClassNameFactoryMap;
+    typedef boost::shared_ptr<ClassAndPropertyNameSet> ClassAndPropertyNameSetSP;
 
-	typedef void (*PubsubFunctionPtr)( RTI::RTIambassador * );
-	typedef std::map< std::string, PubsubFunctionPtr > ClassNamePubSubMap;
-	typedef std::map< std::string, std::string> DatamemberTypeMap;
+    typedef std::map<std::string, ClassAndPropertyNameSetSP> StringClassAndPropertyNameSetSPMap;
+    typedef std::map< std::string, StringVector > NameStringVectorPtrMap;
+    typedef std::map< ClassAndPropertyName, int > ClassAndPropertyNameIntegerMap;
+    typedef std::map<int, ClassAndPropertyNameSP> IntegerClassAndPropertyNameSPMap;
+    typedef std::map<int, std::string> IntegerStringMap;
+    typedef std::map<std::string, int> StringIntegerMap;
+    typedef std::map<std::string, bool> StringBooleanMap;
 
-	static DatamemberTypeMap &getDatamemberTypeMap( void ) {
-		static DatamemberTypeMap datamemberTypeMap;
-		return datamemberTypeMap;
-	}
+    typedef RTI::AttributeHandleSet AttributeHandleSet;
+    typedef boost::shared_ptr<AttributeHandleSet> AttributeHandleSetSP;
+
+    typedef std::map<std::string, SP> StringInstanceSPMap;
+
+    typedef TypeMedley Value;
+
+    typedef boost::shared_ptr<Value> ValueSP;
+    typedef std::unordered_map<ClassAndPropertyName, ValueSP> ClassAndPropertyNameValueSPMap;
+
+    typedef void (*PubsubFunctionPtr)( RTI::RTIambassador * );
+    typedef std::map< std::string, PubsubFunctionPtr > ClassNamePubSubMap;
+    typedef std::map< std::string, std::string> PropertyTypeMap;
 
 protected:
-	static StringSet &getClassNameSet( void ) {
-		static StringSet classNameSet;
-		return classNameSet;
-	}
-
-	static ClassNameFactoryMap &getClassNameFactoryMap( void ) {
-		static ClassNameFactoryMap classNameFactoryMap;
-		return classNameFactoryMap;
-	}
-
-	static ClassNamePubSubMap &getClassNamePublishMap( void ) {
-		static ClassNamePubSubMap classNamePublishMap;
-		return classNamePublishMap;
-	}
-
-	static ClassNamePubSubMap &getClassNameUnpublishMap( void ) {
-		static ClassNamePubSubMap classNameUnpublishMap;
-		return classNameUnpublishMap;
-	}
-
-	static ClassNamePubSubMap &getClassNameSubscribeMap( void ) {
-		static ClassNamePubSubMap classNameSubscribeMap;
-		return classNameSubscribeMap;
-	}
-
-	static ClassNamePubSubMap &getClassNameUnsubscribeMap( void ) {
-		static ClassNamePubSubMap classNameUnsubscribeMap;
-		return classNameUnsubscribeMap;
-	}
-
-	static NameStringVectorPtrMap &getDatamemberClassNameVectorPtrMap( void ) {
-		static NameStringVectorPtrMap datamemberClassNameVectorPtrMap;
-		return datamemberClassNameVectorPtrMap;
-	}
-
-	static NameStringVectorPtrMap &getAllDatamemberClassNameVectorPtrMap( void ) {
-		static NameStringVectorPtrMap allDatamemberClassNameVectorPtrMap;
-		return allDatamemberClassNameVectorPtrMap;
-	}
-
-	static StringIntegerMap &getClassNameHandleMap( void ) {
-		static StringIntegerMap classNameHandleMap;
-		return classNameHandleMap;
-	}
-	static IntegerStringMap &getClassHandleNameMap( void ) {
-		static IntegerStringMap classHandleNameMap;
-		return classHandleNameMap;
-	}
-
-	static StringIntegerMap &getDatamemberNameHandleMap( void ) {
-		static StringIntegerMap datamemberNameHandleMap;
-		return datamemberNameHandleMap;
-	}
-	static IntegerStringMap &getDatamemberHandleNameMap( void ) {
-		static IntegerStringMap datamemberHandleNameMap;
-		return datamemberHandleNameMap;
-	}
-
-private:
-	static int &getHandle( void ) {
-		static int handle;
-		return handle;
-	}
-
-public:
-	static int get_handle( void ) { return getHandle(); }
-	static std::string get_class_name( void ) { return "InteractionRoot"; }
-
-private:
-	static StringVector &getDatamemberNames( void ) {
-		static StringVector datamemberNames;
-		return datamemberNames;
-	}
-
-	static StringVector &getAllDatamemberNames( void ) {
-		static StringVector allDatamemberNames;
-		return allDatamemberNames;
-	}
-
-private:
-	static InteractionRoot::SP factory( void ) {
-		return InteractionRoot::SP( new InteractionRoot() );
-	}
-
-	static std::string &getInitErrorMessage( void ) {
-		static std::string initErrorMessage( "Error:  InteractionRoot:  could not initialize:  " );
-		return initErrorMessage;
-	}
-
-protected:
-	static void init( RTI::RTIambassador *rti );
-
-private:
-	static bool &getIsPublished( void ) {
-		static bool isPublished = false;
-		return isPublished;
-	}
-
-	static std::string &getPublishErrorMessage( void ) {
-		static std::string publishErrorMessage = "Error:  InteractionRoot:  could not publish:  ";
-		return publishErrorMessage;
-	}
-
-public:
-	static void publish( RTI::RTIambassador *rti );
-
-private:
-	static std::string &getUnpublishErrorMessage( void ) {
-		static std::string unpublishErrorMessage = "Error:  InteractionRoot:  could not unpublish:  ";
-		return unpublishErrorMessage;
-	}
-
-public:
-	static void unpublish( RTI::RTIambassador *rti );
-
-private:
-	static bool &getIsSubscribed( void ) {
-		static bool isSubscribed = false;
-		return isSubscribed;
-	}
-	static std::string &getSubscribeErrorMessage( void ) {
-		static std::string subscribedErrorMessage = "Error:  InteractionRoot:  could not subscribe:  ";
-		return subscribedErrorMessage;
-	}
-
-public:
-	static void subscribe( RTI::RTIambassador *rti );
-
-private:
-	static std::string getUnsubscribeErrorMessage( void ) {
-		static std::string unsubscribeErrorMessage = "Error:  InteractionRoot:  could not unsubscribe:  ";
-		return unsubscribeErrorMessage;
-	}
-
-public:
-	static void unsubscribe( RTI::RTIambassador *rti );
-
-	static bool static_init( void );
-
-	static bool match( int handle ) { return handle == get_handle(); }
-
-	virtual int getClassHandle( void ) const { return get_handle(); }
-	virtual std::string getClassName( void ) const { return get_class_name(); }
-	virtual StringVector getParameterNames( void ) const { return get_parameter_names(); }
-	virtual StringVector getAllParameterNames( void ) const { return get_all_parameter_names(); }
-
-	virtual std::string getParameterName( int datamemberHandle ) const {
-		return std::string();
-	}
-
-	int getParameterHandle( const std::string &datamemberName ) const {
-		return get_parameter_handle(getClassName(), datamemberName);
-	}
-
-	virtual void publishInteraction( RTI::RTIambassador *rti ) { publish( rti ); }
-	virtual void subscribeInteraction( RTI::RTIambassador *rti ) { subscribe( rti ); }
-
-	virtual InteractionRoot::SP clone( void ) {
-		return InteractionRoot::SP(  new InteractionRoot( *this )  );
-	}
-
-public:
-	static StringSet get_interaction_names( void ) { return getClassNameSet(); }
-	static StringVector get_parameter_names( const std::string &className ) {
-		NameStringVectorPtrMap::iterator nssItr = getDatamemberClassNameVectorPtrMap().find( className );
-		return nssItr == getDatamemberClassNameVectorPtrMap().end() ? StringVector() : *nssItr->second;
-	}
-
-	static StringVector get_all_parameter_names( const std::string &className ) {
-		NameStringVectorPtrMap::iterator nssItr = getAllDatamemberClassNameVectorPtrMap().find( className );
-		return nssItr == getAllDatamemberClassNameVectorPtrMap().end() ? StringVector() : *nssItr->second;
-	}
-
-	static std::string get_class_name( int classHandle ) {
-		IntegerStringMap::iterator ismItr = getClassHandleNameMap().find( classHandle );
-		return ismItr == getClassHandleNameMap().end() ? std::string() : ismItr->second;
-	}
-
-	static int get_handle( const std::string &className ) {
-		StringIntegerMap::iterator simItr = getClassNameHandleMap().find( className );
-		if ( simItr == getClassNameHandleMap().end() ) {
-			std::cerr << "Bad class name \"" << className << "\" on get_handle." << std::endl;
-			return -1;
-		}
-
-		return simItr->second;
-	}
-
-	static std::string get_parameter_name( int datamemberHandle ) {
-		IntegerStringMap::iterator ismItr = getDatamemberHandleNameMap().find( datamemberHandle );
-		return ismItr == getDatamemberHandleNameMap().end() ? std::string() : ismItr->second;
-	}
-
-	static int get_parameter_handle( const std::string &className, const std::string &datamemberName ) {
-		StringIntegerMap::iterator simItr = getDatamemberNameHandleMap().find( className + "." + datamemberName );
-		if ( simItr == getDatamemberNameHandleMap().end() ) {
-			std::cerr << "Bad parameter \"" << datamemberName << "\" for class \"" << className << "\" on get_parameter_handle." << std::endl;
-			return -1;
-		}
-
-		return simItr->second;
-	}
-
-	static void publish( const std::string &className, RTI::RTIambassador *rti ) {
-		ClassNamePubSubMap::iterator cpmItr = getClassNamePublishMap().find( className );
-		if ( cpmItr == getClassNamePublishMap().end() ) {
-			std::cerr << "Bad class name \"" << className << "\" on publish." << std::endl;
-			return;
-		}
-
-		(*cpmItr->second)( rti );
-	}
-
-	static void unpublish( const std::string &className, RTI::RTIambassador *rti ) {
-		ClassNamePubSubMap::iterator cpmItr = getClassNameUnpublishMap().find( className );
-		if ( cpmItr == getClassNameUnpublishMap().end() ) {
-			std::cerr << "Bad class name \"" << className << "\" on unpublish." << std::endl;
-			return;
-		}
-
-		(*cpmItr->second)( rti );
-	}
-
-	static void subscribe( const std::string &className, RTI::RTIambassador *rti ) {
-		ClassNamePubSubMap::iterator cpmItr = getClassNameSubscribeMap().find( className );
-		if ( cpmItr == getClassNameSubscribeMap().end() ) {
-			std::cerr << "Bad class name \"" << className << "\" on subscribe." << std::endl;
-			return;
-		}
-
-		(*cpmItr->second)( rti );
-	}
-
-	static void unsubscribe( const std::string &className, RTI::RTIambassador *rti ) {
-		ClassNamePubSubMap::iterator cpmItr = getClassNameUnsubscribeMap().find( className );
-		if ( cpmItr == getClassNameSubscribeMap().end() ) {
-			std::cerr << "Bad class name \"" << className << "\" on unsubscribe." << std::endl;
-			return;
-		}
-
-		(*cpmItr->second)( rti );
-	}
-
-public:
-	static SP create_interaction( const std::string &className ) {
-		ClassNameFactoryMap::iterator cfmItr = getClassNameFactoryMap().find( className );
-		return cfmItr == getClassNameFactoryMap().end() ? SP( (InteractionRoot *)0 ) : (*cfmItr->second)();
-	}
-
-	static SP create_interaction( const std::string &className, const RTIfedTime &dlc13FedTime ) {
-		ClassNameFactoryMap::iterator cfmItr = getClassNameFactoryMap().find( className );
-		if ( cfmItr == getClassNameFactoryMap().end() ) {
-			return SP( (InteractionRoot *)0 );
-		}
-
-		SP sp = (*cfmItr->second)();
-		sp->setTime( dlc13FedTime.getTime() );
-		return sp;
-	}
-
-	static SP create_interaction( int classHandle ) {
-		IntegerStringMap::iterator ismItr = getClassHandleNameMap().find( classHandle );
-		return ismItr == getClassHandleNameMap().end() ? SP( (InteractionRoot *)0 ) : create_interaction( ismItr->second );
-	}
-
-	static SP create_interaction( int classHandle, const RTIfedTime &dlc13FedTime ) {
-		IntegerStringMap::iterator ismItr = getClassHandleNameMap().find( classHandle );
-		return ismItr == getClassHandleNameMap().end() ? SP( (InteractionRoot *)0 ) : create_interaction( ismItr->second, dlc13FedTime );
-	}
-
-	static SP create_interaction( int classHandle, const RTI::ParameterHandleValuePairSet &datamemberMap );
-	static SP create_interaction( int classHandle, const RTI::ParameterHandleValuePairSet &datamemberMap, const RTIfedTime &dlc13FedTime );
-
-	static StringVector get_parameter_names() {
-		return StringVector();
-	}
-
-	static StringVector get_all_parameter_names() {
-		return StringVector();
-	}
-
-private:
-	double _time;
-	static C2WLogger* _logger;
-
-public:
-	double getTime( void ) { return _time; }
-
-	void setTime( double time ) { _time = time; }
-	void setTime( const RTIfedTime &dlc13FedTime ) {
-		setTime( dlc13FedTime.getTime() );
-	}
-
-	InteractionRoot( void ) : _time( -1 ) { }
-
-	InteractionRoot( const RTI::ParameterHandleValuePairSet &datamemberMap ) : _time( -1 ) {
-		setParameters( datamemberMap );
-	}
-
-	InteractionRoot( const RTI::ParameterHandleValuePairSet &datamemberMap, const RTIfedTime &dlc13FedTime ) : _time( dlc13FedTime.getTime() ) {
-		setParameters( datamemberMap );
-	}
-
-	static SP create( void ) { return SP( new InteractionRoot ); }
-	static SP create( const RTI::ParameterHandleValuePairSet &datamemberMap ) { return SP(  new InteractionRoot( datamemberMap )  ); }
-	static SP create( const RTI::ParameterHandleValuePairSet &datamemberMap, const RTIfedTime &dlc13FedTime ) {
-		return SP(  new InteractionRoot( datamemberMap, dlc13FedTime )  );
-	}
-
-	virtual TypeMedley getParameter( const std::string &datamemberName ) const {
-		throw std::invalid_argument( getClassName() + " class has no parameter named \"" + datamemberName + "\"" );
-	}
-
-	TypeMedley getParameter( int datamemberHandle ) const {
-		const std::string &datamemberName = getParameterName(datamemberHandle);
-		if (datamemberName.empty()) {
-			throw std::invalid_argument(
-				getClassName() + " class has no parameter with handle (" + boost::lexical_cast< std::string >( datamemberHandle ) + ")"
-			);
-		}
-		return getParameter(datamemberName);
-	}
-
-	void setParameters( const RTI::ParameterHandleValuePairSet &datamemberMap );
-
-private:
-	void setParameter( RTI::Handle handle, const std::string &val ) {
-		if (  !setParameterAux( handle, val )  ) {
-			std::cerr << "set:  bad parameter handle in class \"" + getClassName() + "\"" << std::endl;
-		}
-	}
-
-public:
-	void setParameter( const std::string &datamemberName, TypeMedley value ) {
-		if (  !setParameterAux( datamemberName, value )  ) {
-			std::cerr << "Error:  class \"" << getClassName() << "\":  invalid parameter \"" + datamemberName + "\"" << std::endl;
-		}
-	}
-
-private:
-	bool setParameterAux( int datamemberHandle, const std::string &val ) {
-		const std::string &datamemberName = getParameterName(datamemberHandle);
-		if (datamemberName.empty()) {
-			return false;
-		}
-		return setParameterAux(datamemberName, val);
-	}
-
-protected:
-	virtual bool setParameterAux( const std::string &datamemberName, const std::string &value ) {
-		return false;
-	}
-
-	virtual bool setParameterAux( const std::string &datamemberName, TypeMedley value ) {
-		return false;
-	}
-
-	ParameterHandleValuePairSetSP createDatamemberHandleValuePairSet() {
-		const StringVector &parameterNames = getAllParameterNames();
-		StringVector::size_type numberOfParameters = parameterNames.size();
-
-		ParameterHandleValuePairSetSP datamembers = ParameterHandleValuePairSetSP(RTI::ParameterSetFactory::create(numberOfParameters));
-		for (StringVector::size_type i = 0; i < numberOfParameters; i++) {
-			std::string stringConversion = static_cast< std::string >( getParameter(parameterNames[i]) );
-			datamembers->add( getParameterHandle(parameterNames[i]), stringConversion.c_str(), stringConversion.size() );
-		}
-		return datamembers;
-	}
-
-public:
-	void sendInteraction( RTI::RTIambassador *rti, double time );
-	void sendInteraction( RTI::RTIambassador *rti );
-
-private:
-	static std::string fedName;
-
-public:
-	static bool enablePubLog;
-	static bool enableSubLog;
-	static std::string pubLogLevel;
-	static std::string subLogLevel;
-
-public:
-	static void enablePublishLog(const std::string &interaction, const std::string &fed, const std::string &thislevel, const std::string &globallevel);
-	static void enableSubscribeLog(const std::string &interaction, const std::string &fed, const std::string &thislevel, const std::string &globallevel);
-
-	void createLog( double time, bool isPub = true );
-};
-
-typedef InteractionRoot::SP InteractionRootSP;
-
-static bool call_InteractionRoot_static_init = InteractionRoot::static_init();
-
-std::ostream &operator<<( std::ostream &os, InteractionRoot::SP entitySP );
-std::ostream &operator<<( std::ostream &os, const InteractionRoot &entity );
-
+    static void defaultSleep() {
+#ifdef _WIN32
+        Sleep( 500 );
+#else
+        usleep( 500000 );
 #endif
+    }
+
+private:
+    static int generate_unique_id() {
+        static int globalUniqueId = 0;
+        return globalUniqueId++;
+    }
+
+    const int _uniqueId;
+
+public:
+    int getUniqueId() override {
+        return _uniqueId;
+    }
+
+private:
+    static bool &get_is_initialized_aux() {
+        static bool isInitialized = false;
+        return isInitialized;
+    }
+
+    static bool get_is_initialized() {
+        return get_is_initialized_aux();
+    }
+
+    static void set_is_initialized(bool isInitialized) {
+        get_is_initialized_aux() = isInitialized;
+    }
+
+public:
+    static void init(RTI::RTIambassador *rtiAmbassador);
+
+private:
+    std::string _instanceHlaClassName;
+    
+public:
+    const std::string &getInstanceHlaClassName() const {
+        return _instanceHlaClassName;
+    }
+
+protected:
+    void setInstanceHlaClassName(const std::string &instanceHlaClassName) {
+        _instanceHlaClassName = instanceHlaClassName;
+    }
+
+public:
+    static std::string get_simple_class_name(const std::string &hlaClassName) {
+        size_t position = hlaClassName.find_last_of('.');
+        return position == std::string::npos ? hlaClassName : hlaClassName.substr(position + 1);
+    }
+
+    //-------------------------------------------------------------------------
+    // HLA CLASS-NAME SET
+    //
+    // POPULATED BY:
+    // - STATIC INITIALIZATION BLOCKS IN THE DERIVED INTERACTION/OBJECT CLASSES
+    // - THE DYNAMIC-MESSAGE-CLASSES FILE
+    //-------------------------------------------------------------------------
+protected:
+    static StringSet &get_hla_class_name_set() {
+        static StringSet hlaClassNameSet;
+        return hlaClassNameSet;
+    }
+
+    //--------------------------------------------------------------------------
+    // METHODS THAT USE HLA CLASS-NAME-SET
+    //
+    // ALSO USED BY:
+    // - InteractionRoot( const std::string &hlaClassName ) DYNAMIC CONSTRUCTOR
+    // - readFederateDynamicMessageClasses(Reader reader) BELOW
+    //--------------------------------------------------------------------------
+public:
+    static const StringSet &get_interaction_hla_class_name_set() {
+        return get_hla_class_name_set();
+    }
+
+    //-----------------------
+    // END HLA CLASS-NAME-SET
+    //-----------------------
+
+    //---------------------------
+    // DYNAMIC HLA CLASS-NAME SET
+    //---------------------------
+private:
+    static StringSet &get_dynamic_hla_class_name_set_aux() {
+        static StringSet dynamicHlaClassNameSet;
+        return dynamicHlaClassNameSet;
+    }
+
+    //--------------------------------------------
+    // METHODS THAT USE DYNAMIC HLA CLASS-NAME SET
+    //--------------------------------------------
+public:
+    static const StringSet &get_dynamic_hla_class_name_set() {
+        return get_dynamic_hla_class_name_set_aux();
+    }
+
+    static bool is_dynamic_class(const std::string &hlaClassName) {
+        return get_dynamic_hla_class_name_set().find(hlaClassName) != get_dynamic_hla_class_name_set().end();
+    }
+
+    bool isDynamicInstance() {
+        return getHlaClassName() != getInstanceHlaClassName();
+    }
+
+    //-------------------------------
+    // END DYNAMIC HLA CLASS-NAME SET
+    //-------------------------------
+
+    //-------------------------------------------------------------------------
+    // CLASS-NAME PROPERTY-NAME-SET MAP
+    //
+    // POPULATED BY:
+    // - STATIC INITIALIZATION BLOCKS IN THE DERIVED INTERACTION/OBJECT CLASSES
+    // - THE DYNAMIC-MESSAGE-CLASSES FILE
+    //-------------------------------------------------------------------------
+protected:
+    static StringClassAndPropertyNameSetSPMap &get_class_name_class_and_property_name_set_sp_map() {
+        static StringClassAndPropertyNameSetSPMap classNamePropertyNameSetSPMap;
+        return classNamePropertyNameSetSPMap;
+    }
+
+    //---------------------------------------------------------
+    // METHODS THAT USE CLASS-NAME PROPERTY-NAME-SET MAP
+    //
+    // ALSO USED BY:
+    // - readFederateDynamicMessageClasses(Reader reader) BELOW
+    //---------------------------------------------------------
+public:
+    static ClassAndPropertyNameList get_parameter_names(const std::string &hlaClassName) {
+       StringClassAndPropertyNameSetSPMap::iterator scmItr =
+         get_class_name_class_and_property_name_set_sp_map().find(hlaClassName);
+
+       const ClassAndPropertyNameSet &classAndPropertyNameSet =
+         scmItr == get_class_name_class_and_property_name_set_sp_map().end() ?
+           *ClassAndPropertyNameSetSP(new ClassAndPropertyNameSet()) : *scmItr->second;
+
+       ClassAndPropertyNameList classAndPropertyNameList(
+         classAndPropertyNameSet.begin(), classAndPropertyNameSet.end()
+       );
+
+       classAndPropertyNameList.sort();
+       return classAndPropertyNameList;
+    }
+
+    //-------------------------------------
+    // END CLASS-NAME PROPERTY-NAME-SET MAP
+    //-------------------------------------
+
+    //-------------------------------------
+    // CLASS-NAME ALL-PROPERTY-NAME-SET MAP
+    //-------------------------------------
+protected:
+    static StringClassAndPropertyNameSetSPMap &get_class_name_all_class_and_property_name_set_sp_map() {
+        static StringClassAndPropertyNameSetSPMap classNameAllPropertyNameSetSPMap;
+        return classNameAllPropertyNameSetSPMap;
+    }
+
+    //------------------------------------------------------
+    // METHODS THAT USE CLASS-NAME ALL-PROPERTY-NAME-SET MAP
+    //------------------------------------------------------
+public:
+    static const ClassAndPropertyNameList get_all_parameter_names(const std::string &hlaClassName) {
+       StringClassAndPropertyNameSetSPMap::iterator scmItr =
+         get_class_name_all_class_and_property_name_set_sp_map().find(hlaClassName);
+
+       const ClassAndPropertyNameSet &classAndPropertyNameSet =
+         scmItr == get_class_name_all_class_and_property_name_set_sp_map().end() ?
+           *ClassAndPropertyNameSetSP(new ClassAndPropertyNameSet()) : *scmItr->second;
+
+       ClassAndPropertyNameList classAndPropertyNameList(
+         classAndPropertyNameSet.begin(), classAndPropertyNameSet.end()
+       );
+
+       classAndPropertyNameList.sort();
+       return classAndPropertyNameList;
+    }
+
+    //-------------------------------------------
+    // END CLASS-NAME All-PROPERTY-NAME-SET MAP
+    //-------------------------------------------
+
+    //----------------------------
+    // CLASS-NAME CLASS-HANDLE MAP
+    //
+    // POPULATED BY:
+    // - init(RTIambassador) ABOVE
+    //----------------------------
+protected:
+    static StringIntegerMap &get_class_name_handle_map( void ) {
+        static StringIntegerMap classNameHandleMap;
+        return classNameHandleMap;
+    }
+
+    //---------------------------------------------
+    // METHODS THAT USE CLASS-NAME CLASS-HANDLE MAP
+    //---------------------------------------------
+public:
+    static int get_class_handle(const std::string &hlaClassName) {
+        StringIntegerMap::iterator simItr = get_class_name_handle_map().find(hlaClassName);
+        if (simItr == get_class_name_handle_map().end()) {
+            BOOST_LOG_SEV( get_logger(), error ) << "Could not get handle for hla class \"" <<
+              hlaClassName << "\":  class not defined";
+            return -1;
+        }
+        return simItr->second;
+    }
+
+    static int get_class_handle(const char *hlaClassName) {
+        return get_class_handle(std::string(hlaClassName));
+    }
+
+    //--------------------------------
+    // END CLASS-NAME CLASS-HANDLE MAP
+    //--------------------------------
+
+    //----------------------------
+    // CLASS-HANDLE CLASS-NAME MAP
+    //
+    // POPULATED BY:
+    // - init(RTIambassador) ABOVE
+    //----------------------------
+protected:
+    static IntegerStringMap &get_class_handle_name_map() {
+        static IntegerStringMap classHandleNameMap;
+        return classHandleNameMap;
+    }
+
+    //--------------------------------------------------
+    // METHODS THAT USE ONLY CLASS-HANDLE CLASS-NAME MAP
+    //--------------------------------------------------
+public:
+    static const std::string &get_hla_class_name(int classHandle) {
+        static std::string emptyString;
+        IntegerStringMap::iterator ismItr = get_class_handle_name_map().find(classHandle);
+        return ismItr == get_class_handle_name_map().end() ? emptyString : ismItr->second;
+    }
+
+    static const std::string get_simple_class_name(int classHandle) {
+        IntegerStringMap::const_iterator cnmCit = get_class_handle_name_map().find(classHandle);
+        return cnmCit == get_class_handle_name_map().end() ? std::string("") : get_simple_class_name(cnmCit->second);
+    }
+
+    static SP create_interaction(int classHandle) {
+        IntegerStringMap::iterator ismItr = get_class_handle_name_map().find(classHandle);
+        return ismItr == get_class_handle_name_map().end()
+          ? SP() : create_interaction(ismItr->second);
+    }
+
+    static SP create_interaction(int classHandle, const RTIfedTime &rtiFedTime) {
+        IntegerStringMap::iterator ismItr = get_class_handle_name_map().find(classHandle);
+        return ismItr == get_class_handle_name_map().end()
+          ? SP() : create_interaction(ismItr->second, rtiFedTime);
+    }
+
+    static SP create_interaction(
+      int classHandle, const RTI::ParameterHandleValuePairSet &propertyMap
+    ) {
+        IntegerStringMap::iterator ismItr = get_class_handle_name_map().find( classHandle );
+        return ismItr == get_class_handle_name_map().end() ? SP()
+          : create_interaction( ismItr->second, propertyMap );
+    }
+
+    static SP create_interaction(
+      int classHandle, const RTI::ParameterHandleValuePairSet &propertyMap, const RTIfedTime &rtiFedTime
+    ) {
+        IntegerStringMap::iterator ismItr = get_class_handle_name_map().find( classHandle );
+        return ismItr == get_class_handle_name_map().end() ? SP()
+          : create_interaction( ismItr->second, propertyMap, rtiFedTime );
+    }
+
+    //------------------------------------------------------
+    // END METHODS THAT USE ONLY CLASS-HANDLE CLASS-NAME MAP
+    //------------------------------------------------------
+
+    //-------------------------------------------------------------------------
+    // CLASS-NAME INSTANCE MAP
+    //
+    // POPULATED BY:
+    // - STATIC INITIALIZATION BLOCKS IN THE DERIVED INTERACTION/OBJECT CLASSES
+    //-------------------------------------------------------------------------
+protected:
+    static StringInstanceSPMap &get_hla_class_name_instance_sp_map() {
+        static StringInstanceSPMap hlaClassNameInstanceSPMap;
+        return hlaClassNameInstanceSPMap;
+    }
+
+    //---------------------------------------------
+    // METHODS THAT USER CLASS-NAME INSTANCE-SP MAP
+    //---------------------------------------------
+public:
+    static SP create_interaction(const std::string &hlaClassName) {
+        StringInstanceSPMap::iterator cimItr = get_hla_class_name_instance_sp_map().find(hlaClassName);
+        return cimItr == get_hla_class_name_instance_sp_map().end()
+            ? get_hla_class_name_set().find(hlaClassName) == get_hla_class_name_set().end()
+              ? SP() : SP( new InteractionRoot( hlaClassName ) )
+            : cimItr->second->createInteraction();
+    }
+
+    static SP create_interaction(const std::string &hlaClassName, const RTIfedTime &rtiFedTime) {
+        StringInstanceSPMap::iterator cimItr = get_hla_class_name_instance_sp_map().find( hlaClassName );
+        return cimItr == get_hla_class_name_instance_sp_map().end()
+          ? get_hla_class_name_set().find(hlaClassName) == get_hla_class_name_set().end()
+            ? SP() : SP( new InteractionRoot( hlaClassName, rtiFedTime ) )
+          : cimItr->second->createInteraction(rtiFedTime);
+    }
+
+    static SP create_interaction(
+      const std::string &hlaClassName, const RTI::ParameterHandleValuePairSet &propertyMap
+    ) {
+        StringInstanceSPMap::iterator cimItr = get_hla_class_name_instance_sp_map().find( hlaClassName );
+        return cimItr == get_hla_class_name_instance_sp_map().end()
+          ? get_hla_class_name_set().find(hlaClassName) == get_hla_class_name_set().end()
+            ? SP() : SP( new InteractionRoot( hlaClassName, propertyMap ) )
+          : cimItr->second->createInteraction( propertyMap );
+    }
+
+    static SP create_interaction(
+      const std::string &hlaClassName,
+      const RTI::ParameterHandleValuePairSet &propertyMap,
+      const RTIfedTime &rtiFedTime
+    ) {
+        StringInstanceSPMap::iterator cimItr = get_hla_class_name_instance_sp_map().find( hlaClassName );
+        return cimItr == get_hla_class_name_instance_sp_map().end()
+          ? get_hla_class_name_set().find(hlaClassName) == get_hla_class_name_set().end()
+            ? SP() : SP( new InteractionRoot( hlaClassName, propertyMap, rtiFedTime ) )
+          : cimItr->second->createInteraction( propertyMap, rtiFedTime );
+    }
+
+    //-------------------------------
+    // END CLASS-NAME INSTANCE-SP MAP
+    //-------------------------------
+
+    //------------------------------
+    // CLASS-NAME PUBLISH-STATUS MAP
+    //
+    // POPULATED BY:
+    // - init(RTIambassador) ABOVE
+    //------------------------------
+private:
+    static StringBooleanMap &get_class_name_publish_status_map() {
+        static StringBooleanMap classNamePublishStatusMap;
+        return classNamePublishStatusMap;
+    }
+
+    //-----------------------------------------------
+    // METHODS THAT USE CLASS-NAME PUBLISH-STATUS MAP
+    //-----------------------------------------------
+    static bool get_is_published_aux(const std::string &hlaClassName, bool default_value) {
+        StringBooleanMap::const_iterator sbmCit = get_class_name_publish_status_map().find(hlaClassName);
+        if (sbmCit == get_class_name_publish_status_map().end()) {
+            BOOST_LOG_SEV(get_logger(), error) << "could not get publish status for hla class \"" << hlaClassName
+              << "\":  class does not exist";
+            return default_value;
+        }
+        return sbmCit->second;
+    }
+
+public:
+    static bool get_is_published(const std::string &hlaClassName) {
+        return get_is_published_aux(hlaClassName, false);
+    }
+
+private:
+    static void set_is_published(const std::string &hlaClassName, bool publishStatus) {
+        StringBooleanMap::iterator sbmItr = get_class_name_publish_status_map().find(hlaClassName);
+        if (sbmItr == get_class_name_publish_status_map().end()) {
+            BOOST_LOG_SEV(get_logger(), error) << "could not set publish status for hla class \"" << hlaClassName
+              << "\":  class does not exist";
+            return;
+        }
+
+        sbmItr->second = publishStatus;
+    }
+
+    //----------------------------------
+    // END CLASS-NAME PUBLISH-STATUS MAP
+    //----------------------------------
+
+    //--------------------------------
+    // CLASS-NAME SUBSCRIBE-STATUS MAP
+    //
+    // POPULATED BY:
+    // - init(RTIambassador) ABOVE
+    //--------------------------------
+private:
+    static StringBooleanMap &get_class_name_subscribe_status_map() {
+        static StringBooleanMap classNameSubscribeStatusMap;
+        return classNameSubscribeStatusMap;
+    }
+
+    //-------------------------------------------------
+    // METHODS THAT USE CLASS-NAME SUBSCRIBE-STATUS MAP
+    //-------------------------------------------------
+    static bool get_is_subscribed_aux(const std::string &hlaClassName, bool default_value) {
+        StringBooleanMap::const_iterator sbmCit = get_class_name_subscribe_status_map().find(hlaClassName);
+        if (sbmCit == get_class_name_subscribe_status_map().end()) {
+            BOOST_LOG_SEV(get_logger(), error) << "could not get subscribe status for hla class \"" << hlaClassName
+              << "\":  class does not exist";
+            return default_value;
+        }
+        return sbmCit->second;
+    }
+
+public:
+    static bool get_is_subscribed(const std::string &hlaClassName) {
+        return get_is_subscribed_aux(hlaClassName, false);
+    }
+
+private:
+    static void set_is_subscribed(const std::string &hlaClassName, bool subscribeStatus) {
+        StringBooleanMap::iterator sbmItr = get_class_name_subscribe_status_map().find(hlaClassName);
+        if (sbmItr == get_class_name_subscribe_status_map().end()) {
+            BOOST_LOG_SEV(get_logger(), error) << "could not set subscribe status for hla class \"" << hlaClassName
+              << "\":  class does not exist";
+            return;
+        }
+
+        sbmItr->second = subscribeStatus;
+    }
+
+    //------------------------------------
+    // END CLASS-NAME SUBSCRIBE-STATUS MAP
+    //------------------------------------
+
+    //--------------------------------------------
+    // CLASS-AND-PROPERTY-NAME PROPERTY-HANDLE MAP
+    //--------------------------------------------
+    static ClassAndPropertyNameIntegerMap &get_class_and_property_name_handle_map() {
+        static ClassAndPropertyNameIntegerMap classAndPropertyNameIntegerMap;
+        return classAndPropertyNameIntegerMap;
+    }
+
+    //--------------------------------------------------------------
+    // METHODS THAT USE CLASS-NAME-PROPERTY-NAME PROPERTY-HANDLE MAP
+    //--------------------------------------------------------------
+public:
+    static ClassAndPropertyNameSP findProperty(const std::string &hlaClassName, const std::string &propertyName);
+
+    static int get_parameter_handle(const std::string &hlaClassName, const std::string &propertyName) {
+        ClassAndPropertyNameSP key = findProperty(hlaClassName, propertyName);
+        if (!key) {
+            return -1;
+        }
+
+        return get_class_and_property_name_handle_map()[*key];
+    }
+
+    PropertyHandleValuePairSetSP createPropertyHandleValuePairSetSP();
+
+    //------------------------------------------------
+    // END CLASS-AND-PROPERTY-NAME PROPERTY-HANDLE MAP
+    //------------------------------------------------
+
+    //-----------------------------------------------
+    // PROPERTY-HANDLE CLASS-AND-PROPERTY-NAME-SP MAP
+    //
+    // POPULATED BY:
+    // - init(RTIambassador) ABOVE
+    //-----------------------------------------------
+protected:
+    static IntegerClassAndPropertyNameSPMap &get_handle_class_and_property_name_sp_map() {
+        static IntegerClassAndPropertyNameSPMap handleClassAndPropertyNameSPMap;
+        return handleClassAndPropertyNameSPMap;
+    }
+
+    //----------------------------------------------------------------
+    // METHODS THAT USE PROPERTY-HANDLE CLASS-AND-PROPERTY-NAME-SP MAP
+    //----------------------------------------------------------------
+public:
+    static ClassAndPropertyNameSP get_class_and_parameter_name(int propertyHandle) {
+        IntegerClassAndPropertyNameSPMap::iterator icmItr =
+          get_handle_class_and_property_name_sp_map().find(propertyHandle);
+        return icmItr == get_handle_class_and_property_name_sp_map().end()
+          ? ClassAndPropertyNameSP() : icmItr->second;
+    }
+
+    const static std::string &get_parameter_name(int propertyHandle) {
+        static std::string emptyString;
+        ClassAndPropertyNameSP classAndPropertyNameSP = get_class_and_parameter_name(propertyHandle);
+        return classAndPropertyNameSP ? classAndPropertyNameSP->getPropertyName() : emptyString;
+    }
+
+    /**
+     * Returns the value of the parameter whose handle is "propertyHandle"
+     * (RTI assigned) for this interaction.
+     *
+     * @param propertyHandle handle (RTI assigned) of parameter whose
+     * value to retrieve
+     * @return the value of the parameter whose handle is "propertyHandle"
+     */
+    const Value &getParameter( int propertyHandle ) const override;
+
+    //---------------------------------------------------
+    // END PROPERTY-HANDLE CLASS-AND-PROPERTY-NAME-SP MAP
+    //---------------------------------------------------
+public:
+    static void publish_interaction(const std::string &hlaClassName, RTI::RTIambassador *rti);
+
+public:
+    static void subscribe_interaction(const std::string &hlaClassName, RTI::RTIambassador *rti);
+
+public:
+    static void unpublish_interaction(const std::string &hlaClassName, RTI::RTIambassador *rti);
+
+    static void unsubscribe_interaction(const std::string &hlaClassName, RTI::RTIambassador *rti);
+
+    //-----------------------------------------------------------------------------------------------------------
+    // PROPERTY-CLASS-NAME AND PROPERTY-VALUE-SP DATA CLASS
+    // THIS CLASS IS USED ESPECIALLY FOR THE BENEFIT OF THE SET METHOD BELOW.  WHEN A VALUE IS RETRIEVED FROM THE
+    // classPropertyNameValueMap USING A GET METHOD, IT IS PAIRED WITH THE NAME OF THE CLASS IN WHICH THE
+    // PROPERTY IS DEFINED. IN THIS WAY, THE SET METHOD CAN PLACE THE NEW VALUE FOR THE PROPERTY USING THE
+    // CORRECT (CLASS-NAME, PROPERTY-NAME) KEY.
+    //-----------------------------------------------------------------------------------------------------------
+ protected:
+    class PropertyClassNameAndValue {
+    private:
+        const std::string hlaClassName;
+        const ValueSP valueSP;
+
+    public:
+        PropertyClassNameAndValue(const std::string &hlaClassName, const ValueSP &localValueSP) :
+         hlaClassName(hlaClassName), valueSP(localValueSP) {}
+
+        const std::string &getClassName() const {
+            return hlaClassName;
+        }
+
+        const ValueSP &getValueSP() const {
+            return valueSP;
+        }
+    };
+
+    typedef boost::shared_ptr<PropertyClassNameAndValue> PropertyClassNameAndValueSP;
+
+    //----------------------------------------------
+    // CLASS-AND-PROPERTY-NAME PROPERTY-VALUE-SP MAP
+    //----------------------------------------------
+protected:
+    ClassAndPropertyNameValueSPMap _classAndPropertyNameValueSPMap;
+
+    //---------------------------------------------------------------
+    // METHODS THAT USE CLASS-AND-PROPERTY-NAME PROPERTY-VALUE-SP MAP
+    //---------------------------------------------------------------
+public:
+    const ClassAndPropertyNameValueSPMap &getClassAndPropertyNameValueSPMap() const {
+        return _classAndPropertyNameValueSPMap;
+    }
+
+    template<typename T>
+    void setParameter(
+      const std::string &hlaClassName, const std::string &propertyName, const T &value
+    ) {
+        PropertyClassNameAndValueSP propertyClassNameAndValueSP =
+          getParameterAux(hlaClassName, propertyName);
+
+        if (!propertyClassNameAndValueSP) {
+            BOOST_LOG_SEV(get_logger(), error) << "setParameter(\"" << propertyName << "\", "
+              << typeid(T).name() << " value): could not find \"" << propertyName
+              << "\" parameter in class \"" << getInstanceHlaClassName() << "\" or any of its superclasses.";
+            return;
+        }
+
+        Value &currentValue = *propertyClassNameAndValueSP->getValueSP();
+
+        if (!currentValue.setValue(value)) {
+            BOOST_LOG_SEV(get_logger(), error) << "setParameter(\"" << propertyName << "\", "
+              << typeid(T).name() << " value): \"value\" is incorrect type \"" << typeid(T).name()
+              << "\" for \"" << propertyName << "\" parameter, should be of type \""
+              << currentValue.getTypeName() << "\"";
+        }
+    }
+
+    template<typename T>
+    void setParameter(const ClassAndPropertyName &classAndPropertyName, const T &value) {
+        setParameter(
+          classAndPropertyName.getClassName(), classAndPropertyName.getPropertyName(), value
+        );
+    }
+
+    template<typename T>
+    void setParameter(const ClassAndPropertyNameSP &classAndPropertyNameSP, const T &value) {
+        setParameter(*classAndPropertyNameSP, value);
+    }
+
+    template<typename T>
+    void setParameter(const std::string &propertyName, const T &value) {
+        setParameter(getInstanceHlaClassName(), propertyName, value);
+    }
+
+private:
+    PropertyClassNameAndValueSP getParameterAux(
+      const std::string &hlaClassName, const std::string &propertyName
+    ) const {
+        ClassAndPropertyNameSP classAndPropertyNameSP = findProperty(hlaClassName, propertyName);
+        if (classAndPropertyNameSP) {
+            ClassAndPropertyNameValueSPMap::const_iterator cvmCit =
+              _classAndPropertyNameValueSPMap.find(*classAndPropertyNameSP);
+            if (cvmCit == _classAndPropertyNameValueSPMap.end()) {
+                return PropertyClassNameAndValueSP();
+            }
+            ValueSP valueSP = cvmCit->second;
+            return PropertyClassNameAndValueSP(
+              new PropertyClassNameAndValue(classAndPropertyNameSP->getClassName(), valueSP)
+            );
+        }
+
+        return PropertyClassNameAndValueSP();
+    }
+
+public:
+    bool hasParameter(const std::string &hlaClassName, const std::string &propertyName) {
+        return static_cast<bool>(getParameterAux(hlaClassName, propertyName));
+    }
+
+    bool hasParameter(const std::string &propertyName) {
+        return hasParameter(getInstanceHlaClassName(), propertyName);
+    }
+
+    const Value &getParameter(
+      const std::string &hlaClassName, const std::string &propertyName
+    ) const override {
+        static Value value(0);
+
+        PropertyClassNameAndValueSP propertyClassNameAndValueSP =
+          getParameterAux(hlaClassName, propertyName);
+
+        return propertyClassNameAndValueSP ? *propertyClassNameAndValueSP->getValueSP() : value;
+    }
+
+    const Value &getParameter(const ClassAndPropertyName &classAndPropertyName) {
+        return getParameter(
+          classAndPropertyName.getClassName(), classAndPropertyName.getPropertyName()
+        );
+    }
+
+    const Value &getParameter(const ClassAndPropertyNameSP &classAndPropertyNameSP) {
+        return getParameter(*classAndPropertyNameSP);
+    }
+
+    const Value &getParameter(const std::string &propertyName) const override {
+        return getParameter(getInstanceHlaClassName(), propertyName);
+    }
+
+    //--------------------------------------------------
+    // END CLASS-AND-PROPERTY-NAME PROPERTY-VALUE-SP MAP
+    //--------------------------------------------------
+
+    //---------------------------
+    // START OF INCLUDED TEMPLATE
+    //---------------------------
+
+
+
+private:
+    static severity_logger &get_logger_aux() {
+        static severity_logger logger;
+        logger.add_attribute("MessagingClassName", attrs::constant< std::string >(
+          "InteractionRoot"
+        ));
+
+        logging::add_common_attributes();
+        return logger;
+    }
+
+public:
+    static severity_logger &get_logger() {
+        static severity_logger &logger = get_logger_aux();
+        return logger;
+    }
+
+    // ----------------------------------------------------------------------------
+    // STATIC PROPERTIES AND CODE THAT DEAL WITH NAMES
+    // THIS CODE IS STATIC BECAUSE IT IS CLASS-DEPENDENT AND NOT INSTANCE-DEPENDENT
+    // ----------------------------------------------------------------------------
+
+    /**
+     * Returns the fully-qualified (dot-delimited) name of the ::org::cpswt::hla::InteractionRoot interaction class.
+     * Note: As this is a static method, it is NOT polymorphic, and so, if called on
+     * a reference will return the name of the class pertaining to the reference,
+     * rather than the name of the class for the instance referred to by the reference.
+     * For the polymorphic version of this method, use {@link #getJavaClassName()}.
+     *
+     * @return the fully-qualified Java class name for this interaction class
+     */
+    static const std::string &get_cpp_class_name() {
+        static const std::string cppClassName("::org::cpswt::hla::InteractionRoot");
+        return cppClassName;
+    }
+
+    /**
+     * Returns the fully-qualified (dot-delimited) name of this instance's interaction class.
+     * Polymorphic equivalent of get_java_class_name static method.
+     *
+     * @return the fully-qualified (dot-delimited) name of this instance's interaction class
+     */
+    const std::string &getCppClassName() const override {
+        return get_cpp_class_name();
+    }
+
+    /**
+     * Returns the simple name (the last name in the dot-delimited fully-qualified
+     * class name) of the org.cpswt.hla.InteractionRoot interaction class.
+     *
+     * @return the name of this interaction class
+     */
+    static const std::string get_simple_class_name() {
+        return get_simple_class_name(get_hla_class_name());
+    }
+
+    /**
+     * Returns the fully-qualified (dot-delimited) hla class name of the
+     * InteractionRoot interaction class.
+     * Note: As this is a static method, it is NOT polymorphic, and so, if called on
+     * a reference will return the federation name of the class pertaining to the reference,
+     * rather than the name of the class for the instance referred to by the reference.
+     * For the polymorphic version of this method, use {@link #getHlaClassName()}.
+     *
+     * @return the fully-qualified federation (HLA) class name for this interaction class
+     */
+    static const std::string &get_hla_class_name() {
+        static const std::string hlaClassName("InteractionRoot");
+        return hlaClassName;
+    }
+
+    /**
+     * Returns the fully-qualified (dot-delimited) hla class name of this instance's interaction class.
+     * Polymorphic equivalent of get_hla_class_name static method.
+     *
+     * @return the fully-qualified (dot-delimited) name of this instance's interaction class
+     */
+    const std::string &getHlaClassName() const override {
+        return get_hla_class_name();
+    }
+
+    /**
+     * Returns a sorted list containing the names of all of the non-hidden parameters in the
+     * org.cpswt.hla.InteractionRoot interaction class.
+     * The property names are paired with name of the hla class in which they are defined in a
+     * ClassAndPropertyName POJO.
+     * Note: As this is a static method, it is NOT polymorphic, and so, if called on
+     * a reference will return a set of class-and0parameter names pertaining to the reference,
+     * rather than the parameter names of the class for the instance referred to by
+     * the reference.  For the polymorphic version of this method, use
+     * {@link #getParameterNames()}.
+     *
+     * @return a sorted list of the non-hidden parameter names for this interaction class
+     * paired with name of the hla class in which they are defined in a ClassAndPropertyName POJO.
+     */
+    static ClassAndPropertyNameList get_parameter_names() {
+        return get_parameter_names( get_hla_class_name() );
+    }
+
+    /**
+     * Returns a sorted list containing the names of all of the parameters in the
+     * org.cpswt.hla.InteractionRoot interaction class.
+     * The property names are paired with name of the hla class in which they are defined in a
+     * ClassAndPropertyName POJO.
+     * Note: As this is a static method, it is NOT polymorphic, and so, if called on
+     * a reference will return a set of parameter names pertaining to the reference,
+     * rather than the parameter names of the class for the instance referred to by
+     * the reference.  For the polymorphic version of this method, use
+     * {@link #getParameterNames()}.
+     *
+     * @return a sorted list of the parameter names for this interaction class
+     * paired with name of the hla class in which they are defined in a ClassAndPropertyName POJO.
+     */
+    static ClassAndPropertyNameList get_all_parameter_names() {
+        return get_all_parameter_names( get_hla_class_name() );
+    }
+
+    /*
+     * INITIALIZE STATIC PROPERTYS THAT DEAL WITH NAMES
+     */
+    static bool static_init();
+    static bool static_init_var;
+
+    // --------------------------------------------------------
+    // END OF STATIC PROPERTYS AND CODE THAT DEAL WITH NAMES.
+    // --------------------------------------------------------
+
+
+    // ----------------------------------------------------------------------------
+    // STATIC PROPERTYS AND CODE THAT DEAL WITH HANDLES.
+    // THIS CODE IS STATIC BECAUSE IT IS CLASS-DEPENDENT AND NOT INSTANCE-DEPENDENT
+    // ----------------------------------------------------------------------------
+    /**
+     * Returns the handle (RTI assigned) of the org.cpswt.hla.InteractionRoot interaction class.
+     * Note: As this is a static method, it is NOT polymorphic, and so, if called on
+     * a reference will return the handle of the class pertaining to the reference,
+     * rather than the handle of the class for the instance referred to by the reference.
+     * For the polymorphic version of this method, use {@link #getClassHandle()}.
+     *
+     * @return the RTI assigned integer handle that represents this interaction class
+     */
+    static int get_class_handle() {
+        return get_class_name_handle_map()[get_hla_class_name()];
+    }
+
+    /**
+     * Returns the handle of an parameter (RTI assigned) of
+     * this interaction class (i.e. "org.cpswt.hla.InteractionRoot") given the parameter's name.
+     *
+     * @param propertyName name of parameter
+     * @return the handle (RTI assigned) of the parameter "propertyName" of interaction class "hlaClassName"
+     */
+    static int get_parameter_handle(const std::string &propertyName) {
+        return get_parameter_handle(get_hla_class_name(), propertyName);
+    }
+
+    // ----------------------------------------------------------
+    // END OF STATIC PROPERTYS AND CODE THAT DEAL WITH HANDLES.
+    // ----------------------------------------------------------
+
+
+    //-------------------------------------------------
+    // METHODS FOR PUBLISHING/SUBSCRIBING-TO THIS CLASS
+    //-------------------------------------------------
+
+    /**
+     * Publishes the org.cpswt.hla.InteractionRoot interaction class for a federate.
+     *
+     * @param rti handle to the Local RTI Component
+     */
+    static void publish_interaction(RTI::RTIambassador *rti) {
+        publish_interaction( get_hla_class_name(), rti );
+    }
+
+    /**
+     * Unpublishes the org.cpswt.hla.InteractionRoot interaction class for a federate.
+     *
+     * @param rti handle to the Local RTI Component, usu. obtained through the
+     *            {@link SynchronizedFederate#getLRC()} call
+     */
+    static void unpublish_interaction(RTI::RTIambassador *rti) {
+        unpublish_interaction( get_hla_class_name(), rti);
+    }
+
+/**
+ * Subscribes a federate to the org.cpswt.hla.InteractionRoot interaction class.
+ *
+ * @param rti handle to the Local RTI Component
+ */
+    static void subscribe_interaction(RTI::RTIambassador *rti) {
+        subscribe_interaction( get_hla_class_name(), rti );
+    }
+
+    /**
+     * Unsubscribes a federate from the org.cpswt.hla.InteractionRoot interaction class.
+     *
+     * @param rti handle to the Local RTI Component
+     */
+    static void unsubscribe_interaction(RTI::RTIambassador *rti) {
+        unsubscribe_interaction( get_hla_class_name(), rti );
+    }
+
+    //-----------------------------------------------------
+    // END METHODS FOR PUBLISHING/SUBSCRIBING-TO THIS CLASS
+    //-----------------------------------------------------
+
+    /**
+     * Return true if "handle" is equal to the handle (RTI assigned) of this class
+     * (that is, the org.cpswt.hla.InteractionRoot interaction class).
+     *
+     * @param handle handle to compare to the value of the handle (RTI assigned) of
+     * this class (the org.cpswt.hla.InteractionRoot interaction class).
+     * @return "true" if "handle" matches the value of the handle of this class
+     * (that is, the org.cpswt.hla.InteractionRoot interaction class).
+     */
+    static bool match(int handle) {
+        return handle == get_class_handle();
+    }
+
+    //------------------------------
+    // PROPERTY MANIPULATION METHODS
+    //------------------------------
+
+    //------------------------------------
+    // END PROPERTY MANIPULATION METHODS
+    //------------------------------------
+
+    //--------------------------
+    // INSTANCE CREATION METHODS
+    //--------------------------
+public:
+    static SP create() {
+        return SP(new InteractionRoot());
+    }
+
+    static SP create_interaction() {
+        return SP(new InteractionRoot());
+    }
+
+    virtual SP createInteraction() {
+        return create_interaction();
+    }
+
+    static SP create(const RTIfedTime &rtiFedTime) {
+        return SP(new InteractionRoot(rtiFedTime));
+    }
+
+    static SP create_interaction(const RTIfedTime &rtiFedTime) {
+        return SP(new InteractionRoot(rtiFedTime));
+    }
+
+    virtual SP createInteraction(const RTIfedTime &rtiFedTime) {
+        return create_interaction(rtiFedTime);
+    }
+
+    static SP create(
+      const RTI::ParameterHandleValuePairSet &propertyMap
+    ) {
+        return SP(new InteractionRoot(propertyMap));
+    }
+
+    static SP create_interaction(
+      const RTI::ParameterHandleValuePairSet &propertyMap
+    ) {
+        return SP(new InteractionRoot(propertyMap));
+    }
+
+    virtual SP createInteraction(
+      const RTI::ParameterHandleValuePairSet &propertyMap
+    ) {
+        return create_interaction(propertyMap);
+    }
+
+    static SP create(
+      const RTI::ParameterHandleValuePairSet &propertyMap, const RTIfedTime &rtiFedTime
+    ) {
+        return SP(new InteractionRoot(propertyMap, rtiFedTime));
+    }
+
+    static SP create_interaction(
+      const RTI::ParameterHandleValuePairSet &propertyMap, const RTIfedTime &rtiFedTime
+    ) {
+        return SP(new InteractionRoot(propertyMap, rtiFedTime));
+    }
+
+    virtual SP createInteraction(
+      const RTI::ParameterHandleValuePairSet &propertyMap, const RTIfedTime &rtiFedTime) {
+        return create_interaction(propertyMap, rtiFedTime);
+    }
+
+    virtual SP cloneInteraction() {
+        return SP( new InteractionRoot( *this )  );
+    }
+
+    //------------------------------
+    // END INSTANCE CREATION METHODS
+    //------------------------------
+
+    //-------------------------
+    // END OF INCLUDED TEMPLATE
+    //-------------------------
+
+    //-------------
+    // TIME SET/GET
+    //-------------
+private:
+    double _time = -1;
+
+    /**
+     * Returns the timestamp for this interaction.  "receive order" interactions
+     * should have a timestamp of -1.
+     *
+     * @return timestamp for this interaction
+     */
+public:
+    double getTime() {
+        return _time;
+    }
+
+    /**
+     * Sets the timestamp of this interaction to "time".
+     *
+     * @param time new timestamp for this interaction
+     */
+    void setTime( double time ) {
+        _time = time;
+    }
+
+    /**
+     * Sets the timestamp of this interaction to "logicalTime".
+     *
+     * @param logicalTime new timestamp for this interaction
+     */
+    void setTime( const RTIfedTime &rtiFedTime ) override {
+        setTime( rtiFedTime.getTime() );
+    }
+
+    //-----------------
+    // END TIME SET/GET
+    //-----------------
+
+    //---------------------------------------------
+    // CLASS-AND-PROPERTY-NAME INITIAL-VALUE-SP MAP
+    //---------------------------------------------
+protected:
+    static ClassAndPropertyNameValueSPMap &get_class_and_property_name_initial_value_sp_map() {
+        static ClassAndPropertyNameValueSPMap classAndPropertyNameValueSPMap;
+        return classAndPropertyNameValueSPMap;
+    }
+
+    //-------------
+    // CONSTRUCTORS
+    //-------------
+    class NoInstanceInit { };
+    InteractionRoot(NoInstanceInit &noInstanceInit) : _uniqueId(generate_unique_id()) { }
+
+private:
+    void initializeProperties(const std::string &hlaClassName);
+
+    /**
+     * Creates a new InteractionRoot instance.
+     */
+    // THE CONSTRUCTORS IN THE ANALOGOUS POSITION TO THIS POSITION IN THE JavaMessagingRoot.jinja2 FILE ARE IN THE
+    // CppMessagingHeaderCommon.jinja2 FILE FOR C++ AS C++ DOES NOT SUPPORT INSTANCE-INITIALIZATION BLOCKS.
+    //
+public:
+
+    InteractionRoot() : _uniqueId(generate_unique_id()) {
+        initializeProperties(get_hla_class_name());
+    }
+
+    InteractionRoot( const RTIfedTime &rtiFedTime) : _uniqueId(generate_unique_id()) {
+        initializeProperties(get_hla_class_name());
+        setTime(rtiFedTime.getTime());
+    }
+
+    InteractionRoot(const RTI::ParameterHandleValuePairSet &propertyMap)
+      : _uniqueId(generate_unique_id()) {
+        initializeProperties(get_hla_class_name());
+        setParameters( propertyMap );
+    }
+
+    InteractionRoot(
+      const RTI::ParameterHandleValuePairSet &propertyMap,
+      const RTIfedTime &rtiFedTime
+    ) : _uniqueId(generate_unique_id()) {
+        initializeProperties(get_hla_class_name());
+        setParameters( propertyMap );
+        setTime(rtiFedTime.getTime());
+    }
+
+    InteractionRoot( const std::string &hlaClassName ) : _uniqueId(generate_unique_id()) {
+        initializeProperties(hlaClassName);
+    }
+
+    InteractionRoot( const std::string &hlaClassName, const RTIfedTime &rtiFedTime) : _uniqueId(generate_unique_id()) {
+        initializeProperties(hlaClassName);
+        setTime(rtiFedTime.getTime());
+    }
+
+    InteractionRoot(
+      const std::string &hlaClassName, const RTI::ParameterHandleValuePairSet &propertyMap
+    ) : _uniqueId(generate_unique_id()) {
+        initializeProperties(hlaClassName);
+        setParameters( propertyMap );
+    }
+
+    InteractionRoot(
+      const std::string &hlaClassName,
+      const RTI::ParameterHandleValuePairSet &propertyMap,
+      const RTIfedTime &rtiFedTime
+    ) : _uniqueId(generate_unique_id()) {
+        initializeProperties(hlaClassName);
+        setParameters( propertyMap );
+        setTime(rtiFedTime.getTime());
+    }
+
+    //-----------------
+    // END CONSTRUCTORS
+    //-----------------
+
+public:
+    void setParameters( const RTI::ParameterHandleValuePairSet &propertyMap );
+
+    template<typename T>
+    void setParameter(int propertyHandle, const T &value) {
+
+        IntegerClassAndPropertyNameSPMap::iterator hcmItr =
+          get_handle_class_and_property_name_sp_map().find(propertyHandle);
+
+        if (hcmItr == get_handle_class_and_property_name_sp_map().end()) {
+            BOOST_LOG_SEV(get_logger(), error) << "setParameter(int propertyHandle, "
+              << typeid(T).name() << " value): propertyHandle (" << propertyHandle << ") does not exist.";
+            return;
+        }
+
+        ClassAndPropertyName &classAndPropertyName = *hcmItr->second;
+
+        ClassAndPropertyNameValueSPMap::iterator cvmItr = _classAndPropertyNameValueSPMap.find(classAndPropertyName);
+        if (cvmItr == _classAndPropertyNameValueSPMap.end()) {
+            BOOST_LOG_SEV(get_logger(), error) << "setParameter(int propertyHandle, "
+            << typeid(T).name() << " value): propertyHandle (" << propertyHandle
+            << ") corresponds to property of name \"" << classAndPropertyName.getPropertyName()
+            << "\", which does not exist in class \"" << getInstanceHlaClassName() << "\" (it's defined in class \""
+            << classAndPropertyName.getClassName() << "\")";
+        }
+
+        Value &currentValue = *_classAndPropertyNameValueSPMap[*hcmItr->second];
+        if (!currentValue.setValue(value)) {
+            BOOST_LOG_SEV(get_logger(), error) << "setParameter(int propertyHandle, "
+              << typeid(T).name() << " value): \"value\" is incorrect type \"" << typeid(T).name()
+              << "\" for \"" << classAndPropertyName.getPropertyName() << "\" parameter, should be of type \""
+              << currentValue.getTypeName() << "\"";
+        }
+    }
+
+    void sendInteraction( RTI::RTIambassador *rti, double time );
+    void sendInteraction( RTI::RTIambassador *rti );
+
+    //---------------------------------------------------------------
+    // INSTANCE VERSIONS OF STATIC METHODS DEFINED IN DERIVED CLASSES
+    //---------------------------------------------------------------
+
+    /**
+     * Returns the simple name (last name in its fully-qualified dot-delimited name)
+     * of this instance's interaction class.
+     * Polymorphic equivalent of the get_simple_class_name static method.
+     *
+     * @return the simple name of this instance's interaction class
+     */
+    const std::string getSimpleClassName() const override {
+        return get_simple_class_name( getInstanceHlaClassName() );
+    }
+
+    /**
+     * Returns a sorted list containing the names of all of the non-hiddenparameters of an
+     * interaction class instance.
+     * The property names are paired with name of the hla class in which they are defined in a
+     * ClassAndPropertyName POJO.
+     * Polymorphic equivalent to get_parameter_names static method.
+     *
+     * @return sorted list containing the names of all of the parameters of an
+     * interaction class instance paired with name of the hla class in which they are defined in a
+     * ClassAndPropertyName POJO.
+     */
+    const ClassAndPropertyNameList getParameterNames() const override {
+        return get_parameter_names( getInstanceHlaClassName() );
+    }
+
+    /**
+     * Returns a sorted list containing the names of all of the parameters of an
+     * interaction class instance.
+     * The property names are paired with name of the hla class in which they are defined in a
+     * ClassAndPropertyName POJO.
+     * Polymorphic equivalent of get_all_parameter_names() static method.
+     *
+     * @return sorted list containing the names of all of the parameters of an
+     * interaction class instance paired with name of the hla class in which they are defined in a
+     * ClassAndPropertyName POJO.
+     */
+    const ClassAndPropertyNameList getAllParameterNames() const override {
+        return get_all_parameter_names( getInstanceHlaClassName() );
+    }
+
+    /**
+     * Returns the handle (RTI assigned) of this instance's interaction class.
+     * Polymorphic equivalent for get_class_handle static method.
+     *
+     * @return the handle (RTI assigned) if this instance's interaction class
+     */
+    int getClassHandle() const override {
+        return get_class_handle( getInstanceHlaClassName() );
+    }
+
+    int getParameterHandle(const std::string &propertyName) {
+        return get_parameter_handle( getInstanceHlaClassName(), propertyName );
+    }
+
+    /**
+     * Publishes the interaction class of this instance of the class for a federate.
+     * Polymorphic equalivalent of publish_interaction static method.
+     *
+     * @param rti handle to the Local RTI Component
+     */
+    void publishInteraction(RTI::RTIambassador *rti) {
+        publish_interaction(getInstanceHlaClassName(), rti);
+    }
+
+    /**
+     * Unpublishes the interaction class of this instance of this class for a federate.
+     * Polymorphic equivalent of unpublish_interaction static method.
+     *
+     * @param rti handle to the Local RTI Component
+     */
+    void unpublishInteraction(RTI::RTIambassador *rti) {
+        unpublish_interaction(getInstanceHlaClassName(), rti);
+    }
+
+    /**
+     * Subscribes a federate to the interaction class of this instance of this class.
+     * Polymorphic equivalent of subscribe_interaction static method.
+     *
+     * @param rti handle to the Local RTI Component
+     */
+    void subscribeInteraction(RTI::RTIambassador *rti) {
+        subscribe_interaction(getInstanceHlaClassName(), rti);
+    }
+
+    /**
+     * Unsubscribes a federate from the interaction class of this instance of this class.
+     *
+     * @param rti handle to the Local RTI Component
+     */
+    void unsubscribeInteraction(RTI::RTIambassador *rti) {
+        unsubscribe_interaction(getInstanceHlaClassName(), rti);
+    }
+
+    //-------------------------------------------------------------------
+    // END INSTANCE VERSIONS OF STATIC METHODS DEFINED IN DERIVED CLASSES
+    //-------------------------------------------------------------------
+
+    std::string toJson();
+
+    static SP fromJson(const std::string &jsonString);
+
+private:
+    static Json::Value &get_federation_json() {
+        static Json::Value federationJson;
+        return federationJson;
+    }
+
+    typedef std::map<std::string, ValueSP> TypeInitialValueSPMap;
+    static TypeInitialValueSPMap &get_type_initial_value_sp_map_aux() {
+        static TypeInitialValueSPMap typeInitialValueSPMap;
+
+        typeInitialValueSPMap[ "boolean" ] = ValueSP( new Value(false) );
+        typeInitialValueSPMap[ "byte" ] = ValueSP( new Value(static_cast<char>(0)) );
+        typeInitialValueSPMap[ "char" ] = ValueSP( new Value(static_cast<char>(0)) );
+        typeInitialValueSPMap[ "double" ] = ValueSP( new Value(static_cast<double>(0)) );
+        typeInitialValueSPMap[ "float" ] = ValueSP( new Value(static_cast<float>(0)) );
+        typeInitialValueSPMap[ "int" ] = ValueSP( new Value(0) );
+        typeInitialValueSPMap[ "long" ] = ValueSP( new Value(static_cast<long>(0)) );
+        typeInitialValueSPMap[ "short" ] = ValueSP( new Value(static_cast<short>(0)) );
+        typeInitialValueSPMap[ "String" ] = ValueSP( new Value(std::string("")) );
+
+        return typeInitialValueSPMap;
+    }
+
+    static TypeInitialValueSPMap &get_type_initial_value_sp_map() {
+        static TypeInitialValueSPMap &typeInitialValueSPMap = get_type_initial_value_sp_map_aux();
+        return typeInitialValueSPMap;
+    }
+
+public:
+    static void readFederationJson(const std::string &federationJsonFileString) {
+        std::ifstream inputJsonFileStream(federationJsonFileString);
+        readFederationJson(inputJsonFileStream);
+        inputJsonFileStream.close();
+    }
+
+    static void readFederationJson(std::istream &federationJsonInputStream) {
+        federationJsonInputStream >> get_federation_json();
+    }
+
+    static void readFederateDynamicMessageClasses( const std::string &dynamicMessageTypesJsonFileString ) {
+        std::ifstream dynamicMessageTypesInputFileStream( dynamicMessageTypesJsonFileString );
+        readFederateDynamicMessageClasses(dynamicMessageTypesInputFileStream);
+        dynamicMessageTypesInputFileStream.close();
+    }
+
+    static void readFederateDynamicMessageClasses(std::istream &dynamicMessagingTypesInputStream);
+
+    static void loadDynamicClassFederationData(
+      std::istream &federationJsonReader, std::istream &federateDynamicMessageClassesReader
+    ) {
+        readFederationJson(federationJsonReader);
+        readFederateDynamicMessageClasses(federateDynamicMessageClassesReader);
+    }
+
+    static void loadDynamicClassFederationData(
+      const std::string &federationJsonFileString, const std::string &dynamicMessageTypesJsonFileString
+    ) {
+        readFederationJson(federationJsonFileString);
+        readFederateDynamicMessageClasses(dynamicMessageTypesJsonFileString);
+    }
+};
+  } // NAMESPACE "hla"
+ } // NAMESPACE "cpswt"
+} // NAMESPACE "org"
+
+std::ostream &operator<<( std::ostream &os, const ::org::cpswt::hla::InteractionRoot &messaging );
+inline std::ostream &operator<<( std::ostream &os, ::org::cpswt::hla::InteractionRoot::SP messagingSP ) {
+    return os << *messagingSP;
+}
+
+#endif // _INTERACTION_ROOT

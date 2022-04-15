@@ -1,0 +1,62 @@
+{
+  "federateTypesAllowed": [
+    "OmnetFederate",
+    "Sender1",
+    "Sender2",
+    "Receiver1",
+    "Receiver3",
+    "Receiver2"
+  ],
+  "expectedFederates": [
+    {
+      "federateType": "OmnetFederate",
+      "count": 1
+    },
+    {
+      "federateType": "Sender1",
+      "count": 1
+    },
+    {
+      "federateType": "Sender2",
+      "count": 1
+    },
+    {
+      "federateType": "Receiver1",
+      "count": 1
+    },
+    {
+      "federateType": "Receiver3",
+      "count": 1
+    },
+    {
+      "federateType": "Receiver2",
+      "count": 1
+    }
+  ],
+  "lateJoinerFederates": [
+    {
+      "federateType": "OmnetFederate",
+      "count": 0
+    },
+    {
+      "federateType": "Sender1",
+      "count": 0
+    },
+    {
+      "federateType": "Sender2",
+      "count": 0
+    },
+    {
+      "federateType": "Receiver1",
+      "count": 0
+    },
+    {
+      "federateType": "Receiver3",
+      "count": 0
+    },
+    {
+      "federateType": "Receiver2",
+      "count": 0
+    }
+  ]
+}

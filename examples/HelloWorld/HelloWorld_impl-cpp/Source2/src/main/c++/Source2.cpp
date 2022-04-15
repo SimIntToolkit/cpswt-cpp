@@ -48,16 +48,17 @@ void Source2::execute( void ) {
 
 int main( int argc, char *argv[] ) {
 
-	std::cout << "Creating Source2 object" << std::endl;
-	Source2 source2( argc, argv );
-	std::cout << "Source2 created" << std::endl;
+    FederateConfigParser *parse_obj = new FederateConfigParser();
+    FederateConfig *fedconfigObj = parse_obj->parseArgs(argc, argv);
+    Source2 source2(fedconfigObj);
+    std::cout << "Source2 created";
 
-	std::cout << "Initializing Source2" << std::endl;
-	source2.initialize();
-	std::cout << "Source2 initialized" << std::endl;
+    std::cout << "Initializing Source2" << std::endl;
+    source2.initialize();
+    std::cout << "Source2 initialized" << std::endl;
 
-	std::cout << "Running Source2" << std::endl;
-	source2.run();
+    std::cout << "Running Source2" << std::endl;
+    source2.run();
 
-	return 0;
+    return 0;
 }

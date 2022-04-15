@@ -23,37 +23,40 @@
 
 void PingCounter2::initialize( void ) {
 
-	PingCounter2ATRCallback pc2ATRCb( *this );
-	putAdvanceTimeRequest(  _currentTime, pc2ATRCb );
+    PingCounter2ATRCallback pc2ATRCb( *this );
+    putAdvanceTimeRequest(  _currentTime, pc2ATRCb );
 
     readyToPopulate();
     readyToRun();
 }
 
 void PingCounter2::execute( void ) {
-	SynchronizedFederate::ObjectReflector objectReflector;
+    SynchronizedFederate::ObjectReflector objectReflector;
 
-	while(  !( objectReflector = getNextObjectReflector() ).isNull()  ) {
-		objectReflector.reflect();
-		boost::shared_ptr< PingCount > pingCountSP(   boost::static_pointer_cast< PingCount >( objectReflector.getObjectRootSP() )  );
-		std::cout << "Message from PingCounter2:  " << pingCountSP->get_SinkName() << " has received " <<
-		 pingCountSP->get_RunningCount() << " \"Ping\" interactions at time " << pingCountSP->getTime() << std::endl;
+    while(  !( objectReflector = getNextObjectReflector() ).isNull()  ) {
+        objectReflector.reflect();
+        boost::shared_ptr< PingCount > pingCountSP(   boost::static_pointer_cast< PingCount >( objectReflector.getObjectRootSP() )  );
+        std::cout << "Message from PingCounter2:  " << pingCountSP->get_SinkName() << " has received " <<
+         pingCountSP->get_RunningCount() << " \"Ping\" interactions at time " << pingCountSP->getTime() << std::endl;
     }
     
     _currentTime += 1;
 
-	PingCounter2ATRCallback pc2ATRCb( *this );
-	putAdvanceTimeRequest(  _currentTime, pc2ATRCb );
+    PingCounter2ATRCallback pc2ATRCb( *this );
+    putAdvanceTimeRequest(  _currentTime, pc2ATRCb );
 }
 
 int main( int argc, char *argv[] ) {
 
-	std::cout << "Statring PingCounter2";
-	PingCounter2 pingCounter2( argc, argv );
-	std::cout << "Created PingCounter2";
-	pingCounter2.initialize();
-	std::cout << "Initialized PingCounter2";
-	pingCounter2.run();
+    FederateConfigParser *parse_obj = new FederateConfigParser();
+    FederateConfig *fedconfigObj = parse_obj->parseArgs(argc, argv);
+    PingCounter2 pingCounter2(fedconfigObj);
+    std::cout << "PingCounter2 created";
 
-	return 0;
+    std::cout << "Created PingCounter2";
+    pingCounter2.initialize();
+    std::cout << "Initialized PingCounter2";
+    pingCounter2.run();
+
+    return 0;
 }
