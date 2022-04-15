@@ -1,4 +1,3 @@
-
 /*
  * Certain portions of this software are Copyright (C) 2006-present
  * Vanderbilt University, Institute for Software Integrated Systems.
@@ -27,12 +26,7 @@
  * DEALINGS IN THE SOFTWARE. THE AUTHORS OR COPYRIGHT HOLDERS SHALL NOT HAVE
  * ANY OBLIGATION TO PROVIDE MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS,
  * OR MODIFICATIONS.
- *
- * @author Himanshu Neema
- * @author Harmon Nine
  */
-
-
 
 #ifndef _org_cpswt_hla_InteractionRoot_p_C2WInteractionRoot_p_ActionBase_p_OmnetCommand_p_StartNodeAttack_CLASS
 #define _org_cpswt_hla_InteractionRoot_p_C2WInteractionRoot_p_ActionBase_p_OmnetCommand_p_StartNodeAttack_CLASS
