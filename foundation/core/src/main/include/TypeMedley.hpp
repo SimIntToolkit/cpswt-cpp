@@ -1,179 +1,297 @@
 /*
- * Copyright (c) 2008, Institute for Software Integrated Systems, Vanderbilt University
- * All rights reserved.
+ * Certain portions of this software are Copyright (C) 2006-present
+ * Vanderbilt University, Institute for Software Integrated Systems.
  *
- * Permission to use, copy, modify, and distribute this software and its
- * documentation for any purpose, without fee, and without written agreement is
- * hereby granted, provided that the above copyright notice, the following
- * two paragraphs and the author appear in all copies of this software.
+ * Certain portions of this software are contributed as a public service by
+ * The National Institute of Standards and Technology (NIST) and are not
+ * subject to U.S. Copyright.
  *
- * IN NO EVENT SHALL THE VANDERBILT UNIVERSITY BE LIABLE TO ANY PARTY FOR
- * DIRECT, INDIRECT, SPECIAL, INCIDENTAL, OR CONSEQUENTIAL DAMAGES ARISING OUT
- * OF THE USE OF THIS SOFTWARE AND ITS DOCUMENTATION, EVEN IF THE VANDERBILT
- * UNIVERSITY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * Permission is hereby granted, free of charge, to any person obtaining a
+ * copy of this software and associated documentation files (the "Software"),
+ * to deal in the Software without restriction, including without limitation
+ * the rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following conditions:
  *
- * THE VANDERBILT UNIVERSITY SPECIFICALLY DISCLAIMS ANY WARRANTIES,
- * INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
- * AND FITNESS FOR A PARTICULAR PURPOSE.  THE SOFTWARE PROVIDED HEREUNDER IS
- * ON AN "AS IS" BASIS, AND THE VANDERBILT UNIVERSITY HAS NO OBLIGATION TO
- * PROVIDE MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
+ * The above Vanderbilt University copyright notice, NIST contribution
+ * notice and this permission and disclaimer notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+ * DEALINGS IN THE SOFTWARE. THE AUTHORS OR COPYRIGHT HOLDERS SHALL NOT HAVE
+ * ANY OBLIGATION TO PROVIDE MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS,
+ * OR MODIFICATIONS.
  */
 
-#ifndef _TYPEMEDLEY
-#define _TYPEMEDLEY
-
-#include <typeinfo>
-#include <ctype.h>
+#ifndef _TYPEMEDLEY_HPP
+#define _TYPEMEDLEY_HPP
 
 #include <boost/lexical_cast.hpp>
-#include <boost/shared_ptr.hpp>
+#include <iostream>
+#include <regex>
+#include <utility>
 #include <boost/algorithm/string.hpp>
-
-class TMBase {
-public:
-	typedef boost::shared_ptr< TMBase > SP;
-
-protected:
-	template< typename TOTYPE, typename FROMTYPE, typename T = void >
-	class Converter {
-	public:
-		typedef TOTYPE ToType;
-		typedef FROMTYPE FromType;
-
-		static ToType get( const FromType &from ) {
-			return boost::lexical_cast< ToType >( from );
-		}
-	};
-
-	template< typename T >
-	class Converter< std::string, bool, T > {
-	public:
-		static std::string get( const bool &from ) {
-			return from ? "true" : "false";
-		}
-	};
-
-	template< typename T >
-	class Converter< bool, std::string, T > {
-	public:
-		static bool get( const std::string &from ) {
-			if ( from.empty() ) {
-				return false;
-			}
-
-			std::string modFrom(   ::boost::to_lower_copy(  ::boost::trim_copy( from )  )   );
-			if ( modFrom == "false" ) {
-				return false;
-			}
-
-			std::string::size_type pos = modFrom.find_first_not_of( "0" );
-			if ( pos == std::string::npos ) {
-				return true;
-			}
-			if ( modFrom[ pos ] != '.' ) {
-				return false;
-			}
-
-			pos = modFrom.find_first_not_of( "0", pos + 1 );
-			return pos == std::string::npos;
-		}
-	};
-
-public:
-
-#define CONVERSION_OPERATOR( x ) \
-	virtual operator x( void ) const = 0;
-
-	CONVERSION_OPERATOR( bool )
-	CONVERSION_OPERATOR( char )
-	CONVERSION_OPERATOR( short )
-	CONVERSION_OPERATOR( int )
-	CONVERSION_OPERATOR( long )
-	CONVERSION_OPERATOR( float )
-	CONVERSION_OPERATOR( double )
-	CONVERSION_OPERATOR( std::string )
-
-#undef CONVERSION_OPERATOR
-
-	virtual std::string getTypeName( void ) const = 0;
-
-};
-
-template< typename TYPE >
-class TMTemplate : public TMBase {
-public:
-	typedef TYPE Type;
-	typedef TMBase Super;
-
-private:
-	const Type _value;
-
-public:
-	TMTemplate( Type value ) : _value( value ) { }
-
-#define CONVERSION_OPERATOR( x ) \
-	virtual operator x( void ) const {\
-		return Super::Converter< x, Type >::get( _value );\
-	}
-
-	CONVERSION_OPERATOR( bool )
-	CONVERSION_OPERATOR( char )
-	CONVERSION_OPERATOR( short )
-	CONVERSION_OPERATOR( int )
-	CONVERSION_OPERATOR( long )
-	CONVERSION_OPERATOR( float )
-	CONVERSION_OPERATOR( double )
-	CONVERSION_OPERATOR( std::string )
-
-#undef CONVERSION_OPERATOR
-
-#define TYPE_NAME( x ) \
-	if (  typeid( x ) == typeid( Type )  ) {\
-		return #x;\
-	}
-
-	virtual std::string getTypeName( void ) const {
-		TYPE_NAME( bool )
-		TYPE_NAME( char )
-		TYPE_NAME( short )
-		TYPE_NAME( int )
-		TYPE_NAME( long )
-		TYPE_NAME( float )
-		TYPE_NAME( double )
-		TYPE_NAME( std::string )
-		return "unknown";
-	}
-
-#undef TYPE_NAME
-};
+#include <boost/shared_ptr.hpp>
+#include <map>
 
 class TypeMedley {
+public:
+    enum DataType { BOOLEAN, CHARACTER, SHORT, INTEGER, LONG, FLOAT, DOUBLE, STRING };
+    typedef boost::shared_ptr<TypeMedley> SP;
+
 private:
-	TMBase::SP _tmBaseSP;
+    static std::regex &get_double_regex() {
+        static std::regex doubleRegex("^[+-]?(?:\\.[0-9]+|[0-9]+(?:\\.[0-9]*)?)(?:e[+-][0-9]{1,3})?");
+        return doubleRegex;
+    }
+
+    static bool hasDoubleFormat(const std::string &value) {
+        return std::regex_match(value, get_double_regex());
+    }
+
+    static bool string_to_bool(const std::string &value);
+
+    template<typename T>
+    static std::string convert_to_string(const std::string &value) {
+        T tValue = hasDoubleFormat(value)
+                   ? static_cast<T>(boost::lexical_cast<double>(value))
+                   : static_cast<T>(value.empty());
+        return boost::lexical_cast<std::string>(tValue);
+    }
+
+    static const std::map<DataType, std::string> &get_enum_to_string_type_map_aux() {
+        static std::map<DataType, std::string> enumToStringTypeMap;
+
+        enumToStringTypeMap[BOOLEAN] = "bool";
+        enumToStringTypeMap[CHARACTER] = "char";
+        enumToStringTypeMap[SHORT] = "short";
+        enumToStringTypeMap[INTEGER] = "int";
+        enumToStringTypeMap[LONG] = "long";
+        enumToStringTypeMap[FLOAT] = "float";
+        enumToStringTypeMap[DOUBLE] = "double";
+        enumToStringTypeMap[STRING] = "std::string";
+
+        return enumToStringTypeMap;
+    }
+
+    static const std::map<DataType, std::string> &get_enum_to_string_type_map() {
+        static const std::map<DataType, std::string> &enumToStringTypeMap = get_enum_to_string_type_map_aux();
+
+        return enumToStringTypeMap;
+    }
+
+
+protected:
+    DataType _dataType;
+    std::string _value;
 
 public:
-	template< typename TYPE >
-	TypeMedley( const TYPE &value ) : _tmBaseSP(  new TMTemplate< TYPE >( value )  ) { }
+    explicit TypeMedley(bool value):
+      _dataType(BOOLEAN), _value(boost::lexical_cast<std::string>(value)) { }
 
-#define CONVERSION_OPERATOR( x ) \
-	virtual operator x( void ) const {\
-		return static_cast< x >( *_tmBaseSP );\
-	}
+    explicit TypeMedley(char value):
+      _dataType(CHARACTER), _value(boost::lexical_cast<std::string>(static_cast<int>(value))) { }
 
-	CONVERSION_OPERATOR( bool )
-	CONVERSION_OPERATOR( char )
-	CONVERSION_OPERATOR( short )
-	CONVERSION_OPERATOR( int )
-	CONVERSION_OPERATOR( long )
-	CONVERSION_OPERATOR( float )
-	CONVERSION_OPERATOR( double )
-	CONVERSION_OPERATOR( std::string )
+    explicit TypeMedley(short value):
+      _dataType(SHORT), _value(boost::lexical_cast<std::string>(value)) { }
 
-#undef CONVERSION_OPERATOR
+    explicit TypeMedley(int value):
+      _dataType(INTEGER), _value(boost::lexical_cast<std::string>(value)) { }
 
-	std::string getTypeName( void ) {
-		return _tmBaseSP->getTypeName();
-	}
+    explicit TypeMedley(long value):
+      _dataType(LONG), _value(boost::lexical_cast<std::string>(value)) { }
+
+    explicit TypeMedley(float value):
+      _dataType(FLOAT), _value(boost::lexical_cast<std::string>(value)) { }
+
+    explicit TypeMedley(double value):
+      _dataType(DOUBLE), _value(boost::lexical_cast<std::string>(value)) { }
+
+    explicit TypeMedley(std::string value):
+      _dataType(STRING), _value(std::move(value)) { }
+
+public:
+    DataType getDataType() const {
+        return _dataType;
+    }
+
+    const std::string &getTypeName() const {
+        return get_enum_to_string_type_map().find(_dataType)->second;
+    }
+
+    template<typename T>
+    bool setValue(T value) {
+        switch(_dataType) {
+            case BOOLEAN:
+                _value = boost::lexical_cast<std::string>(static_cast<bool>(value));
+                break;
+            case CHARACTER:
+                _value = boost::lexical_cast<std::string>(static_cast<char>(value));
+                break;
+            case SHORT:
+                _value = boost::lexical_cast<std::string>(static_cast<short>(value));
+                break;
+            case INTEGER:
+                _value = boost::lexical_cast<std::string>(static_cast<int>(value));
+                break;
+            case LONG:
+                _value = boost::lexical_cast<std::string>(static_cast<long>(value));
+                break;
+            case FLOAT:
+                _value = boost::lexical_cast<std::string>(static_cast<float>(value));
+                break;
+            case DOUBLE:
+                _value = boost::lexical_cast<std::string>(static_cast<double>(value));
+                break;
+            case STRING:
+                _value = boost::lexical_cast<std::string>(value);
+                break;
+        }
+        return true;
+    }
+
+    bool setValue(const TypeMedley &other) {
+        if (getDataType() == other.getDataType()) {
+            _value = other._value;
+            return true;
+        }
+
+        switch( other.getDataType() ) {
+            case BOOLEAN:
+                setValue( other.asBool() );
+                break;
+            case CHARACTER:
+                setValue( other.asChar() );
+                break;
+            case SHORT:
+                setValue( other.asShort() );
+                break;
+            case INTEGER:
+                setValue( other.asInt() );
+                break;
+            case LONG:
+                setValue( other.asLong() );
+                break;
+            case FLOAT:
+                setValue( other.asFloat() );
+                break;
+            case DOUBLE:
+                setValue( other.asDouble() );
+                break;
+            case STRING:
+                setValue( other.asString() );
+                break;
+            }
+    }
+
+    bool setValue(const std::string &value);
+
+    bool setValue(const char *cString) {
+        return setValue(std::string(cString));
+    }
+
+    bool asBool() const {
+        switch(_dataType) {
+            case CHARACTER:
+                return _value[0] != '0' && static_cast<char>(boost::lexical_cast<int>(_value)) != '0';
+            case STRING:
+                return string_to_bool(_value);
+            default:
+                return static_cast<bool>(boost::lexical_cast<double>(_value));
+        }
+    }
+
+    operator bool() const {
+        return asBool();
+    }
+
+    char asChar() const {
+        if (_dataType == STRING) {
+            return _value.empty() ? '\0' : _value[0];
+        }
+        return static_cast<char>(boost::lexical_cast<double>(_value));
+    }
+
+    operator char() const {
+         return asChar();
+    }
+
+    short asShort() const {
+        if (_dataType == STRING && !hasDoubleFormat(_value)) {
+            return static_cast<short>(_value.empty());
+        }
+        return static_cast<short>(boost::lexical_cast<double>(_value));
+    }
+
+    operator short() const {
+        return asShort();
+    }
+
+    int asInt() const {
+        if (_dataType == STRING && !hasDoubleFormat(_value)) {
+            return static_cast<int>(_value.empty());
+        }
+        return static_cast<int>(boost::lexical_cast<double>(_value));
+    }
+
+    operator int() const {
+        return asInt();
+    }
+
+    long asLong() const {
+        if (_dataType == STRING && !hasDoubleFormat(_value)) {
+            return static_cast<long>(_value.empty());
+        }
+        return static_cast<long>(boost::lexical_cast<double>(_value));
+    }
+
+    operator long() const {
+        return asLong();
+    }
+
+    float asFloat() const {
+        if (_dataType == STRING && !hasDoubleFormat(_value)) {
+            return static_cast<float>(_value.empty());
+        }
+        return static_cast<float>(boost::lexical_cast<double>(_value));
+    }
+
+    operator float() const {
+        return asFloat();
+    }
+
+    double asDouble() const {
+        if (_dataType == STRING && !hasDoubleFormat(_value)) {
+            return static_cast<double>(_value.empty());
+        }
+        return boost::lexical_cast<double>(_value);
+    }
+
+    operator double() const {
+        return asDouble();
+    }
+
+    std::string asString() const {
+        switch(_dataType) {
+            case BOOLEAN:
+                return boost::lexical_cast<int>(_value) ? "true" : "false";
+            case CHARACTER: {
+                char localChar = static_cast<char>(boost::lexical_cast<int>(_value));
+                return { &localChar, 1 };
+            }
+            default:
+                return _value;
+        }
+    }
+
+    operator std::string() const {
+        return asString();
+    }
 };
 
-#endif
+#endif // _TYPEMEDLEY_HPP

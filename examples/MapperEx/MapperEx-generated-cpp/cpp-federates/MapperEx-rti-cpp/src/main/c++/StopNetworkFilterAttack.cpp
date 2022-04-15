@@ -43,7 +43,7 @@ void StopNetworkFilterAttack::init( RTI::RTIambassador *rti ) {
 			
 			get_dstNetworkAddress_handle_var() = rti->getParameterHandle( "dstNetworkAddress", get_handle() );
 			get_srcNetworkAddress_handle_var() = rti->getParameterHandle( "srcNetworkAddress", get_handle() );
-			get_recordingNodeFullPath_handle_var() = rti->getParameterHandle( "recordingNodeFullPath", get_handle() );
+			get_nodeFullPath_handle_var() = rti->getParameterHandle( "nodeFullPath", get_handle() );
 			isNotInitialized = false;
 		} catch ( RTI::FederateNotExecutionMember & ) {
 			std::cerr << getInitErrorMessage() << "Federate Not Execution Member" << std::endl;
@@ -74,11 +74,11 @@ void StopNetworkFilterAttack::init( RTI::RTIambassador *rti ) {
 	getDatamemberTypeMap().insert( std::make_pair("srcNetworkAddress", "String") );
 	
 	
-	getDatamemberNameHandleMap().insert(  std::make_pair( "StopNetworkFilterAttack,recordingNodeFullPath", get_recordingNodeFullPath_handle() )  );
+	getDatamemberNameHandleMap().insert(  std::make_pair( "StopNetworkFilterAttack,nodeFullPath", get_nodeFullPath_handle() )  );
 	
-	getDatamemberHandleNameMap().insert(  std::make_pair( get_recordingNodeFullPath_handle(), "recordingNodeFullPath" )  );
+	getDatamemberHandleNameMap().insert(  std::make_pair( get_nodeFullPath_handle(), "nodeFullPath" )  );
 	
-	getDatamemberTypeMap().insert( std::make_pair("recordingNodeFullPath", "String") );
+	getDatamemberTypeMap().insert( std::make_pair("nodeFullPath", "String") );
 	
 
 }
@@ -218,12 +218,12 @@ bool StopNetworkFilterAttack::static_init( void ) {
 	
 	getDatamemberNames().push_back( "dstNetworkAddress" );
 	getDatamemberNames().push_back( "srcNetworkAddress" );
-	getDatamemberNames().push_back( "recordingNodeFullPath" );
+	getDatamemberNames().push_back( "nodeFullPath" );
 	
 	
 	getAllDatamemberNames().push_back( "dstNetworkAddress" );
 	getAllDatamemberNames().push_back( "srcNetworkAddress" );
-	getAllDatamemberNames().push_back( "recordingNodeFullPath" );
+	getAllDatamemberNames().push_back( "nodeFullPath" );
 
 
 
@@ -234,7 +234,7 @@ std::ostream &operator<<( std::ostream &os, StopNetworkFilterAttack::SP entitySP
 	return os << *entitySP;
 }
 std::ostream &operator<<( std::ostream &os, const StopNetworkFilterAttack &entity ) {
-	return os << "StopNetworkFilterAttack("  << "dstNetworkAddress:" << entity.get_dstNetworkAddress() << ", " << "srcNetworkAddress:" << entity.get_srcNetworkAddress() << ", " << "sourceFed:" << entity.get_sourceFed() << ", " << "uniqueCommandID:" << entity.get_uniqueCommandID() << ", " << "recordingNodeFullPath:" << entity.get_recordingNodeFullPath() << ", " << "originFed:" << entity.get_originFed() << ", " << "federateFilter:" << entity.get_federateFilter() << ", " << "actualLogicalGenerationTime:" << entity.get_actualLogicalGenerationTime()	<< ")";
+	return os << "StopNetworkFilterAttack("  << "dstNetworkAddress:" << entity.get_dstNetworkAddress() << ", " << "srcNetworkAddress:" << entity.get_srcNetworkAddress() << ", " << "sourceFed:" << entity.get_sourceFed() << ", " << "uniqueCommandID:" << entity.get_uniqueCommandID() << ", " << "nodeFullPath:" << entity.get_nodeFullPath() << ", " << "originFed:" << entity.get_originFed() << ", " << "federateFilter:" << entity.get_federateFilter() << ", " << "actualLogicalGenerationTime:" << entity.get_actualLogicalGenerationTime()	<< ")";
 }
 
 
@@ -255,8 +255,8 @@ StopNetworkFilterAttack::ParameterHandleValuePairSetSP StopNetworkFilterAttack::
 	stringConversion = static_cast< std::string >(  TypeMedley( get_srcNetworkAddress() )  );
 	datamembers->add( get_srcNetworkAddress_handle(), stringConversion.c_str(), stringConversion.size() );
 	
-	stringConversion = static_cast< std::string >(  TypeMedley( get_recordingNodeFullPath() )  );
-	datamembers->add( get_recordingNodeFullPath_handle(), stringConversion.c_str(), stringConversion.size() );
+	stringConversion = static_cast< std::string >(  TypeMedley( get_nodeFullPath() )  );
+	datamembers->add( get_nodeFullPath_handle(), stringConversion.c_str(), stringConversion.size() );
 	
 
 	return datamembers;
