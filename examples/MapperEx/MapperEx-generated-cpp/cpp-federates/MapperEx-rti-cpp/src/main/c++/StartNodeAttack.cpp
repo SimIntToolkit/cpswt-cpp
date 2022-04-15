@@ -41,7 +41,7 @@ void StartNodeAttack::init( RTI::RTIambassador *rti ) {
 		try {		
 			
 			
-			get_recordingNodeFullPath_handle_var() = rti->getParameterHandle( "recordingNodeFullPath", get_handle() );
+			get_nodeFullPath_handle_var() = rti->getParameterHandle( "nodeFullPath", get_handle() );
 			isNotInitialized = false;
 		} catch ( RTI::FederateNotExecutionMember & ) {
 			std::cerr << getInitErrorMessage() << "Federate Not Execution Member" << std::endl;
@@ -58,11 +58,11 @@ void StartNodeAttack::init( RTI::RTIambassador *rti ) {
 	}
 	
 	
-	getDatamemberNameHandleMap().insert(  std::make_pair( "StartNodeAttack,recordingNodeFullPath", get_recordingNodeFullPath_handle() )  );
+	getDatamemberNameHandleMap().insert(  std::make_pair( "StartNodeAttack,nodeFullPath", get_nodeFullPath_handle() )  );
 	
-	getDatamemberHandleNameMap().insert(  std::make_pair( get_recordingNodeFullPath_handle(), "recordingNodeFullPath" )  );
+	getDatamemberHandleNameMap().insert(  std::make_pair( get_nodeFullPath_handle(), "nodeFullPath" )  );
 	
-	getDatamemberTypeMap().insert( std::make_pair("recordingNodeFullPath", "String") );
+	getDatamemberTypeMap().insert( std::make_pair("nodeFullPath", "String") );
 	
 
 }
@@ -200,10 +200,10 @@ bool StartNodeAttack::static_init( void ) {
 	
 	
 	
-	getDatamemberNames().push_back( "recordingNodeFullPath" );
+	getDatamemberNames().push_back( "nodeFullPath" );
 	
 	
-	getAllDatamemberNames().push_back( "recordingNodeFullPath" );
+	getAllDatamemberNames().push_back( "nodeFullPath" );
 
 
 
@@ -214,7 +214,7 @@ std::ostream &operator<<( std::ostream &os, StartNodeAttack::SP entitySP ) {
 	return os << *entitySP;
 }
 std::ostream &operator<<( std::ostream &os, const StartNodeAttack &entity ) {
-	return os << "StartNodeAttack("  << "sourceFed:" << entity.get_sourceFed() << ", " << "uniqueCommandID:" << entity.get_uniqueCommandID() << ", " << "recordingNodeFullPath:" << entity.get_recordingNodeFullPath() << ", " << "originFed:" << entity.get_originFed() << ", " << "federateFilter:" << entity.get_federateFilter() << ", " << "actualLogicalGenerationTime:" << entity.get_actualLogicalGenerationTime()	<< ")";
+	return os << "StartNodeAttack("  << "sourceFed:" << entity.get_sourceFed() << ", " << "uniqueCommandID:" << entity.get_uniqueCommandID() << ", " << "nodeFullPath:" << entity.get_nodeFullPath() << ", " << "originFed:" << entity.get_originFed() << ", " << "federateFilter:" << entity.get_federateFilter() << ", " << "actualLogicalGenerationTime:" << entity.get_actualLogicalGenerationTime()	<< ")";
 }
 
 
@@ -229,8 +229,8 @@ StartNodeAttack::ParameterHandleValuePairSetSP StartNodeAttack::createDatamember
 
 	
 	
-	stringConversion = static_cast< std::string >(  TypeMedley( get_recordingNodeFullPath() )  );
-	datamembers->add( get_recordingNodeFullPath_handle(), stringConversion.c_str(), stringConversion.size() );
+	stringConversion = static_cast< std::string >(  TypeMedley( get_nodeFullPath() )  );
+	datamembers->add( get_nodeFullPath_handle(), stringConversion.c_str(), stringConversion.size() );
 	
 
 	return datamembers;

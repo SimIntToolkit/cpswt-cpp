@@ -1,0 +1,26 @@
+{
+  "federateTypesAllowed": [
+    "OmnetFederationTest",
+    "OmnetFederate"
+  ],
+  "expectedFederates": [
+    {
+      "federateType": "OmnetFederationTest",
+      "count": 1
+    },
+    {
+      "federateType": "OmnetFederate",
+      "count": 1
+    }
+  ],
+  "lateJoinerFederates": [
+    {
+      "federateType": "OmnetFederationTest",
+      "count": 0
+    },
+    {
+      "federateType": "OmnetFederate",
+      "count": 0
+    }
+  ]
+}

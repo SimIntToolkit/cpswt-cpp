@@ -1,0 +1,95 @@
+/*
+ * Certain portions of this software are Copyright (C) 2006-present
+ * Vanderbilt University, Institute for Software Integrated Systems.
+ *
+ * Certain portions of this software are contributed as a public service by
+ * The National Institute of Standards and Technology (NIST) and are not
+ * subject to U.S. Copyright.
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a
+ * copy of this software and associated documentation files (the "Software"),
+ * to deal in the Software without restriction, including without limitation
+ * the rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following conditions:
+ *
+ * The above Vanderbilt University copyright notice, NIST contribution
+ * notice and this permission and disclaimer notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+ * DEALINGS IN THE SOFTWARE. THE AUTHORS OR COPYRIGHT HOLDERS SHALL NOT HAVE
+ * ANY OBLIGATION TO PROVIDE MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS,
+ * OR MODIFICATIONS.
+ */
+
+#include "ObjectRoot_p/FederateObject.hpp"
+namespace org {
+ namespace cpswt {
+  namespace hla {
+   namespace ObjectRoot_p {
+
+bool FederateObject::static_init_var = FederateObject::static_init();
+
+bool FederateObject::static_init() {
+    BOOST_LOG_SEV(get_logger(), info) << "Class \"::org::cpswt::hla::ObjectRoot_p::FederateObject\" loaded.";
+
+    // ADD THIS CLASS TO THE _classNameSet DEFINED IN ObjectRoot
+    get_hla_class_name_set().insert(get_hla_class_name());
+
+    ObjectRoot::NoInstanceInit noInstanceInit;
+    SP instanceSP = SP( new FederateObject(noInstanceInit) );
+    get_hla_class_name_instance_sp_map()[get_hla_class_name()] = instanceSP;
+
+    ClassAndPropertyNameSetSP classAndPropertyNameSetSP( new ClassAndPropertyNameSet() );
+    classAndPropertyNameSetSP->emplace(
+        "ObjectRoot.FederateObject", "FederateHandle"
+    );
+
+    get_class_and_property_name_initial_value_sp_map()[ClassAndPropertyName( "ObjectRoot.FederateObject", "FederateHandle" )] =
+      ValueSP( new Value( static_cast<int>(0) ));
+    classAndPropertyNameSetSP->emplace(
+        "ObjectRoot.FederateObject", "FederateHost"
+    );
+
+    get_class_and_property_name_initial_value_sp_map()[ClassAndPropertyName( "ObjectRoot.FederateObject", "FederateHost" )] =
+      ValueSP( new Value( std::string("") ));
+    classAndPropertyNameSetSP->emplace(
+        "ObjectRoot.FederateObject", "FederateType"
+    );
+
+    get_class_and_property_name_initial_value_sp_map()[ClassAndPropertyName( "ObjectRoot.FederateObject", "FederateType" )] =
+      ValueSP( new Value( std::string("") ));
+
+    // ADD THIS CLASS'S _classAndPropertyNameSet TO _classNamePropertyNameSetMap DEFINED
+    // IN ObjectRoot
+    get_class_name_class_and_property_name_set_sp_map()[get_hla_class_name()] = classAndPropertyNameSetSP;
+
+    ClassAndPropertyNameSetSP allClassAndPropertyNameSetSP( new ClassAndPropertyNameSet() );
+
+    allClassAndPropertyNameSetSP->emplace(
+        "ObjectRoot.FederateObject", "FederateHandle"
+    );
+
+    allClassAndPropertyNameSetSP->emplace(
+        "ObjectRoot.FederateObject", "FederateHost"
+    );
+
+    allClassAndPropertyNameSetSP->emplace(
+        "ObjectRoot.FederateObject", "FederateType"
+    );// ADD THIS CLASS'S _allClassAndPropertyNameSet TO _classNameAllPropertyNameSetMap DEFINED
+    // IN ObjectRoot
+    get_class_name_all_class_and_property_name_set_sp_map()[get_hla_class_name()] = allClassAndPropertyNameSetSP;
+
+    return true;
+}
+
+   } // NAMESPACE "ObjectRoot_p"
+  } // NAMESPACE "hla"
+ } // NAMESPACE "cpswt"
+} // NAMESPACE "org"

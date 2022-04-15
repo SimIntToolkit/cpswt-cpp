@@ -1,24 +1,31 @@
 /*
- * Copyright (c) 2008, Institute for Software Integrated Systems, Vanderbilt University
- * All rights reserved.
+ * Certain portions of this software are Copyright (C) 2006-present
+ * Vanderbilt University, Institute for Software Integrated Systems.
  *
- * Permission to use, copy, modify, and distribute this software and its
- * documentation for any purpose, without fee, and without written agreement is
- * hereby granted, provided that the above copyright notice, the following
- * two paragraphs and the author appear in all copies of this software.
+ * Certain portions of this software are contributed as a public service by
+ * The National Institute of Standards and Technology (NIST) and are not
+ * subject to U.S. Copyright.
  *
- * IN NO EVENT SHALL THE VANDERBILT UNIVERSITY BE LIABLE TO ANY PARTY FOR
- * DIRECT, INDIRECT, SPECIAL, INCIDENTAL, OR CONSEQUENTIAL DAMAGES ARISING OUT
- * OF THE USE OF THIS SOFTWARE AND ITS DOCUMENTATION, EVEN IF THE VANDERBILT
- * UNIVERSITY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * Permission is hereby granted, free of charge, to any person obtaining a
+ * copy of this software and associated documentation files (the "Software"),
+ * to deal in the Software without restriction, including without limitation
+ * the rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following conditions:
  *
- * THE VANDERBILT UNIVERSITY SPECIFICALLY DISCLAIMS ANY WARRANTIES,
- * INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
- * AND FITNESS FOR A PARTICULAR PURPOSE.  THE SOFTWARE PROVIDED HEREUNDER IS
- * ON AN "AS IS" BASIS, AND THE VANDERBILT UNIVERSITY HAS NO OBLIGATION TO
- * PROVIDE MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
+ * The above Vanderbilt University copyright notice, NIST contribution
+ * notice and this permission and disclaimer notice shall be included in all
+ * copies or substantial portions of the Software.
  *
- * @author Harmon Nine
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+ * DEALINGS IN THE SOFTWARE. THE AUTHORS OR COPYRIGHT HOLDERS SHALL NOT HAVE
+ * ANY OBLIGATION TO PROVIDE MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS,
+ * OR MODIFICATIONS.
  */
 
 #include "SynchronizedFederate.hpp"
@@ -83,7 +90,7 @@ void SynchronizedFederate::joinFederation() {
 	// std::stringstream temp;  //temp as in temporary
 
    	// std::cout << "[" << federate_id << "] federate joining federation [" << federation_id << "] ... " << std::flush;
-	   std::cout << " federate joining federation ...." <<std::flush;
+	   std::cout << " federate joining federation ...." << std::flush;
 
 	//_federateId = federate_id; (old)
 	// _federationId = federation_id;
@@ -164,9 +171,11 @@ void SynchronizedFederate::joinFederation() {
 
 	std::cout << "done." << std::endl;
 
+    initializeDynamicMessaging(_federationJsonFileName, _federateDynamicMessagingClassesJsonFileName);
+
 	// Federate state interaction pubsub
-	FederateJoinInteraction::publish( getRTI() );
-	FederateResignInteraction::publish( getRTI() );
+	FederateJoinInteraction::publish_interaction( getRTI() );
+	FederateResignInteraction::publish_interaction( getRTI() );
 
 
 	FederateJoinInteraction::SP intJoin = FederateJoinInteraction::create();
@@ -176,8 +185,6 @@ void SynchronizedFederate::joinFederation() {
             // joinInteraction.setFederateType(this.federateType);
             // joinInteraction.setLateJoiner(this.isLateJoiner);
 
-	intJoin->set_sourceFed( getFederateId() );
-	intJoin->set_originFed( getFederateId() );
 	intJoin->set_FederateType( getFederateType() );
 	intJoin->set_FederateId( getFederateId() );
     intJoin->set_IsLateJoiner(get_IsLateJoiner());
@@ -185,8 +192,7 @@ void SynchronizedFederate::joinFederation() {
 	
     std::cout << "Sending Join interaction #-"  << std::endl;
 
-    intJoin->sendInteraction( getRTI(), _currentTime );
-
+    sendInteraction( intJoin, _currentTime );
 }
 
 void SynchronizedFederate::enableTimeConstrained( void ) throw( RTI::FederateNotExecutionMember ){
@@ -212,18 +218,14 @@ void SynchronizedFederate::enableTimeConstrained( void ) throw( RTI::FederateNot
 		}
 	}
 
-	try {
-		getRTI()->tick();
-	} catch( ... ) { }
+	tick();
 	while( _timeConstrainedNotEnabled ) {
 #ifdef _WIN32
 			Sleep( 500 );
 #else
 			usleep( 500000 );
 #endif
-		try {
-			getRTI()->tick();
-		} catch( ... ) { }
+		tick();
 	}
 }
 
@@ -256,14 +258,15 @@ void SynchronizedFederate::enableTimeRegulation( double time, double lookahead )
 		}
 	}
 
-	try { getRTI()->tick(); } catch( ... ) { }
+	//  INITIAL TICK
+	tick();
 	while( _timeRegulationNotEnabled ) {
 #ifdef _WIN32
 			Sleep( 500 );
 #else
 			usleep( 500000 );
 #endif
-		try { getRTI()->tick(); } catch( ... ) { }
+		tick();
 	}
 
 
@@ -306,14 +309,14 @@ throw( RTI::RTIinternalError, RTI::FederateNotExecutionMember ){
 			}
 		}
 
-		try { getRTI()->tick(); } catch( ... ) { }
+		tick();
 		while( !_timeRegulationNotEnabled ) {
 	#ifdef _WIN32
 				Sleep( 500 );
 	#else
 				usleep( 500000 );
 	#endif
-			try { getRTI()->tick(); } catch( ... ) { }
+			tick();
 		}
 
 	
@@ -358,14 +361,12 @@ void SynchronizedFederate::resignFederationExecution( RTI::ResignAction resignAc
     }
     
 	FederateResignInteraction::SP intResign = FederateResignInteraction::create();
-	intResign->set_sourceFed( getFederateId() );
-	intResign->set_originFed( getFederateId() );
 	intResign->set_FederateType( getFederateType() );
 	intResign->set_FederateId( getFederateId() );
     intResign->set_IsLateJoiner(get_IsLateJoiner());
 
 	std::cout << "Sending Resign interaction #-"  << std::endl;
-    intResign->sendInteraction( getRTI(), _currentTime );
+    sendInteraction( intResign, _currentTime );
 }
 
 /**
@@ -458,6 +459,7 @@ void SynchronizedFederate::achieveSynchronizationPoint( const std::string &label
 	bool synchronizationPointNotAccepted = true;
 	while( synchronizationPointNotAccepted ) {
 		try {
+		    std::cout << "Synchronizing on label \"" << label << "\"" << std::endl;
 			getRTI()->synchronizationPointAchieved( label.c_str() );
 			while(  _achievedSynchronizationPoints.find( label ) == _achievedSynchronizationPoints.end()  ) {
 #ifdef _WIN32
@@ -465,7 +467,7 @@ void SynchronizedFederate::achieveSynchronizationPoint( const std::string &label
 #else
 				usleep( 500000 );
 #endif
-				getRTI()->tick();
+				tick();
 			}
 			synchronizationPointNotAccepted = false;
 		} catch ( RTI::FederateNotExecutionMember &f ) {
@@ -475,7 +477,7 @@ void SynchronizedFederate::achieveSynchronizationPoint( const std::string &label
 				synchronizationPointNotAccepted = false;
 			} else {
 				try {
-					getRTI()->tick();
+					tick();
 				} catch ( RTI::RTIinternalError &r ) {
 					throw r;
 				} catch ( ... ) {
@@ -498,6 +500,7 @@ void SynchronizedFederate::achieveSynchronizationPoint( const std::string &label
 
 void SynchronizedFederate::run( void ) {
 
+    std::cout << "run called." << std::endl;
 	_currentTime = getCurrentTime();
 	if ( _currentTime < 0 ) return;
 
@@ -554,7 +557,7 @@ void SynchronizedFederate::advanceTime( double time ) {
 	}
 
 	while( getTimeAdvanceNotGranted() ) {
-		try { getRTI()->tick(); } catch ( ... ) { }
+		tick();
 #ifdef _WIN32
 		Sleep( 10 );
 #else
@@ -565,26 +568,26 @@ void SynchronizedFederate::advanceTime( double time ) {
 	_currentTime = time;
 }
 
-void SynchronizedFederate::createLog(
-		RTI::ObjectHandle theObject,
-		const RTI::AttributeHandleValuePairSet& theAttributes,
-		double time)
-{
-	if(ObjectRoot::getSubAttributeLogMap().empty()) return;
-	std::string objectName = ObjectRoot::getObject( theObject )->getClassName() ;
-	for(RTI::ULong i=0; i<theAttributes.size(); ++i)
-	{
-		std::string attribute = ObjectRoot::get_attribute_name(theAttributes.getHandle(i));
-		std::map<std::string, std::string>::iterator pos = ObjectRoot::getSubAttributeLogMap().find(attribute);
-		if(pos == ObjectRoot::getSubAttributeLogMap().end()) continue;
-		std::string loglevel = (*pos).second;
-		std::string id = objectName+"_"+attribute+"_sub_"+_federateId;
-		static RTI::ULong valueLength;
-		char* value = theAttributes.getValuePointer( i, valueLength);
-		std::string ptype="";
-		ObjectRoot::DatamemberTypeMap::iterator it = ObjectRoot::getDatamemberTypeMap().find( attribute );
-		if ( it != ObjectRoot::getDatamemberTypeMap().end() )
-			ptype = (*it).second;
-		_logger->addLog(id,attribute,std::string(value, valueLength),ptype,time,loglevel);
-	}
-}
+// void SynchronizedFederate::createLog(
+// 		RTI::ObjectHandle theObject,
+// 		const RTI::AttributeHandleValuePairSet& theAttributes,
+// 		double time)
+// {
+// 	if(ObjectRoot::getSubAttributeLogMap().empty()) return;
+// 	std::string objectName = ObjectRoot::getObject( theObject )->getClassName() ;
+// 	for(RTI::ULong i=0; i<theAttributes.size(); ++i)
+// 	{
+// 		std::string attribute = ObjectRoot::get_attribute_name(theAttributes.getHandle(i));
+// 		std::map<std::string, std::string>::iterator pos = ObjectRoot::getSubAttributeLogMap().find(attribute);
+// 		if(pos == ObjectRoot::getSubAttributeLogMap().end()) continue;
+// 		std::string loglevel = (*pos).second;
+// 		std::string id = objectName+"_"+attribute+"_sub_"+_federateId;
+// 		static RTI::ULong valueLength;
+// 		char* value = theAttributes.getValuePointer( i, valueLength);
+// 		std::string ptype="";
+// 		ObjectRoot::DatamemberTypeMap::iterator it = ObjectRoot::getDatamemberTypeMap().find( attribute );
+// 		if ( it != ObjectRoot::getDatamemberTypeMap().end() )
+// 			ptype = (*it).second;
+// 		_logger->addLog(id,attribute,std::string(value, valueLength),ptype,time,loglevel);
+// 	}
+// }
