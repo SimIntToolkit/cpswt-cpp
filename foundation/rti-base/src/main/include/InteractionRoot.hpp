@@ -164,6 +164,15 @@ public:
         return _instanceHlaClassName;
     }
 
+    bool isInstanceOfHlaClass( const std::string &hlaClassName ) {
+        return getInstanceHlaClassName() == hlaClassName;
+    }
+
+    bool isInstanceHlaClassDerivedFromHlaClass( const std::string &hlaClassName ) {
+        std::string prefix = hlaClassName + ".";
+        return isInstanceOfHlaClass( hlaClassName ) || getInstanceHlaClassName().substr(0, prefix.length()) == prefix;
+    }
+
 protected:
     void setInstanceHlaClassName(const std::string &instanceHlaClassName) {
         _instanceHlaClassName = instanceHlaClassName;
