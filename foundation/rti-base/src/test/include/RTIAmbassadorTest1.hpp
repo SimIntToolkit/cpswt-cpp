@@ -31,7 +31,7 @@
 #ifndef RTI_AMBASSADOR_TEST_1_HH
 #define RTI_AMBASSADOR_TEST_1_HH
 
-#include "RTIAmbassadorProxy.hh"
+#include "RTIAmbassadorProxy.hpp"
 
 #include <map>
 #include <set>

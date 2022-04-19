@@ -28,7 +28,7 @@
  * OR MODIFICATIONS.
  */
 
-#include "RTIAmbassadorProxy.hh"
+#include "RTIAmbassadorProxy.hpp"
 
 
 namespace RTIProxy {
