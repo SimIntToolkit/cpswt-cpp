@@ -56,72 +56,72 @@ const std::string SynchronizedFederate::ReadyToResignSynch( "readyToResign" );
 
 void SynchronizedFederate::createRTI( void ) {
 
-	bool rtiNotPresent = true;
-	
-	if ( SynchronizedFederate::FEDERATION_MANAGER_NAME.compare( getFederateId() ) != 0 ) {
+    bool rtiNotPresent = true;
+    
+    if ( SynchronizedFederate::FEDERATION_MANAGER_NAME.compare( getFederateId() ) != 0 ) {
         // Himanshu: This is a regular federate, wait 1 seconds for federation manager to initialize first
-	    std::cout << "Regular federate waiting 1 secs for Federation Manager to initialize" << std:: endl << std::flush;
+        std::cout << "Regular federate waiting 1 secs for Federation Manager to initialize" << std:: endl << std::flush;
 #ifdef _WIN32
             Sleep( 1000 );
 #else
             usleep( 1000000 );
 #endif
-	}
-	while( rtiNotPresent ) {
-		try {
-			std::cout << "acquiring connection to RTI ... " << std::flush;
-			_rti = new RTI::RTIambassador();
-			std::cout << "done." << std::endl;
+    }
+    while( rtiNotPresent ) {
+        try {
+            std::cout << "acquiring connection to RTI ... " << std::flush;
+            _rti = new RTI::RTIambassador();
+            std::cout << "done." << std::endl;
 
-			rtiNotPresent = false;
-		} catch ( RTI::RTIinternalError ) {
+            rtiNotPresent = false;
+        } catch ( RTI::RTIinternalError ) {
 #ifdef _WIN32
-			Sleep( 500 );
+            Sleep( 500 );
 #else
-			usleep( 500000 );
+            usleep( 500000 );
 #endif
-		}
-	}
+        }
+    }
 
 }
 
 // void SynchronizedFederate::joinFederation( const std::string &federation_id, const std::string &federate_id, bool ignoreLockFile ) {
 void SynchronizedFederate::joinFederation() {
-	// std::stringstream temp;  //temp as in temporary
+    // std::stringstream temp;  //temp as in temporary
 
-   	// std::cout << "[" << federate_id << "] federate joining federation [" << federation_id << "] ... " << std::flush;
-	   std::cout << " federate joining federation ...." << std::flush;
+    // std::cout << "[" << federate_id << "] federate joining federation [" << federation_id << "] ... " << std::flush;
+    std::cout << " federate joining federation ...." << std::flush;
 
-	//_federateId = federate_id; (old)
-	// _federationId = federation_id;
-	
-	// _FederateType = federate_id;
-	
+    //_federateId = federate_id; (old)
+    // _federationId = federation_id;
+    
+    // _FederateType = federate_id;
+    
     // int random_variable = std::rand();
 
-	// _federateId =_FederateType + std::string(random_variable);
+    // _federateId =_FederateType + std::string(random_variable);
 
-	//_federateId = _FederateType + std::to_string(random_variable);
-	//_federateId = concat FederateType+GUID
-
-
-
-	// temp<<_FederateType<<random_variable;
-	// _federateId=temp.str();      //str is temp as string
-
-	// _IsLateJoiner = false;
-
-	// federateType ==> federate_id(old) --> Source,Sink,PingCounter
-	// federateID => federateType+GUID
-
-	
-
-	bool federationNotPresent = true;
-	while( federationNotPresent ) {
-		try {
+    //_federateId = _FederateType + std::to_string(random_variable);
+    //_federateId = concat FederateType+GUID
 
 
-		    // if(!ignoreLockFile) {
+
+    // temp<<_FederateType<<random_variable;
+    // _federateId=temp.str();      //str is temp as string
+
+    // _IsLateJoiner = false;
+
+    // federateType ==> federate_id(old) --> Source,Sink,PingCounter
+    // federateID => federateType+GUID
+
+    
+
+    bool federationNotPresent = true;
+    while( federationNotPresent ) {
+        try {
+
+
+            // if(!ignoreLockFile) {
             //     int descriptor;
             //     int counter = 0;
             //     while(   (  descriptor = open( _lockFileName.c_str(), O_RDONLY | O_CREAT | O_EXCL, 0777 )  )  <  0   ) {
@@ -138,191 +138,187 @@ void SynchronizedFederate::joinFederation() {
             //         }
             //     }
             //     close( descriptor );
-		    // }
+            // }
 
-		    getRTI()->joinFederationExecution( this->_federateId.c_str(), this->_federationId.c_str(), this );
+            getRTI()->joinFederationExecution( this->_federateId.c_str(), this->_federationId.c_str(), this );
 
-		    // if(!ignoreLockFile) {
-		    //     remove( _lockFileName.c_str() );
-		    // }
+            // if(!ignoreLockFile) {
+            //     remove( _lockFileName.c_str() );
+            // }
 
-			federationNotPresent = false;
-		} catch ( RTI::FederateAlreadyExecutionMember & ) {
-			std::cout << "failed (already execution member)." << std::endl;
-			return;
-		} catch ( ... ) {
+            federationNotPresent = false;
+        } catch ( RTI::FederateAlreadyExecutionMember & ) {
+            std::cout << "failed (already execution member)." << std::endl;
+            return;
+        } catch ( ... ) {
 #ifdef _WIN32
-			Sleep( 500 );
+            Sleep( 500 );
 #else
-			usleep( 500000 );
+            usleep( 500000 );
 #endif
-		}
-	}
+        }
+    }
 
-	// IT APPEARS THERE IS A RACE CONDITION THAT OCCURS BETWEEN A SUCCESSFUL CALL TO "joinFederationExecution" AND "enableTimeConstrained"
-	// FOR THE RTI, AND, GENERALLY, THE LATTER IS CALLED IMMEDIATELY AFTER THE FORMER.
-	// IF THE LATTER IS CALLED TOO QUICKLY AFTER THE FORMER, A SEGFAULT OCCURS IN THE JVM'S JNI DUE TO A NULL POINTER.
-	// THE BELOW "WAITING PERIOD" SEEMS TO WORK-AROUND THIS PROBLEM.
+    // IT APPEARS THERE IS A RACE CONDITION THAT OCCURS BETWEEN A SUCCESSFUL CALL TO "joinFederationExecution" AND "enableTimeConstrained"
+    // FOR THE RTI, AND, GENERALLY, THE LATTER IS CALLED IMMEDIATELY AFTER THE FORMER.
+    // IF THE LATTER IS CALLED TOO QUICKLY AFTER THE FORMER, A SEGFAULT OCCURS IN THE JVM'S JNI DUE TO A NULL POINTER.
+    // THE BELOW "WAITING PERIOD" SEEMS TO WORK-AROUND THIS PROBLEM.
 #ifdef _WIN32
-	Sleep( 3000 );
+    Sleep( 3000 );
 #else
-	usleep( 3000000 );
+    usleep( 3000000 );
 #endif
 
-	std::cout << "done." << std::endl;
+    std::cout << "done." << std::endl;
 
     initializeDynamicMessaging(_federationJsonFileName, _federateDynamicMessagingClassesJsonFileName);
 
-	// Federate state interaction pubsub
-	FederateJoinInteraction::publish_interaction( getRTI() );
-	FederateResignInteraction::publish_interaction( getRTI() );
+    // Federate state interaction pubsub
+    FederateJoinInteraction::publish_interaction( getRTI() );
+    FederateResignInteraction::publish_interaction( getRTI() );
 
 
-	FederateJoinInteraction::SP intJoin = FederateJoinInteraction::create();
-            // joinInteraction.set_sourceFed(this.federateId);
-            // joinInteraction.set_originFed(this.federateId);
-            // joinInteraction.setFederateId(this.federateId);
-            // joinInteraction.setFederateType(this.federateType);
-            // joinInteraction.setLateJoiner(this.isLateJoiner);
+    FederateJoinInteraction::SP intJoin = FederateJoinInteraction::create();
+    // joinInteraction.set_sourceFed(this.federateId);
+    // joinInteraction.set_originFed(this.federateId);
+    // joinInteraction.setFederateId(this.federateId);
+    // joinInteraction.setFederateType(this.federateType);
+    // joinInteraction.setLateJoiner(this.isLateJoiner);
 
-	intJoin->set_FederateType( getFederateType() );
-	intJoin->set_FederateId( getFederateId() );
+    intJoin->set_FederateType( getFederateType() );
+    intJoin->set_FederateId( getFederateId() );
     intJoin->set_IsLateJoiner(get_IsLateJoiner());
 
-	
+    
     std::cout << "Sending Join interaction #-"  << std::endl;
 
     sendInteraction( intJoin, _currentTime );
 }
 
 void SynchronizedFederate::enableTimeConstrained( void ) throw( RTI::FederateNotExecutionMember ){
-	if ( !_timeConstrainedNotEnabled ) return;
+    if ( !_timeConstrainedNotEnabled ) return;
 
-	bool timeConstrainedEnabledNotCalled = true;
-	while( timeConstrainedEnabledNotCalled ) {
-		try {
-			getRTI()->enableTimeConstrained();
-			timeConstrainedEnabledNotCalled = false;
-		} catch ( RTI::TimeConstrainedAlreadyEnabled & ) {
-			return;
-		} catch ( RTI::EnableTimeConstrainedPending & ) {
-			timeConstrainedEnabledNotCalled = false;
-		} catch ( RTI::FederateNotExecutionMember &f ) {
-			throw f;
-		} catch ( ... ) {
+    bool timeConstrainedEnabledNotCalled = true;
+    while( timeConstrainedEnabledNotCalled ) {
+        try {
+            getRTI()->enableTimeConstrained();
+            timeConstrainedEnabledNotCalled = false;
+        } catch ( RTI::TimeConstrainedAlreadyEnabled & ) {
+            return;
+        } catch ( RTI::EnableTimeConstrainedPending & ) {
+            timeConstrainedEnabledNotCalled = false;
+        } catch ( RTI::FederateNotExecutionMember &f ) {
+            throw f;
+        } catch ( ... ) {
 #ifdef _WIN32
-			Sleep( 500 );
+            Sleep( 500 );
 #else
-			usleep( 500000 );
+            usleep( 500000 );
 #endif
-		}
-	}
+        }
+    }
 
-	tick();
-	while( _timeConstrainedNotEnabled ) {
+    tick();
+    while( _timeConstrainedNotEnabled ) {
 #ifdef _WIN32
-			Sleep( 500 );
+            Sleep( 500 );
 #else
-			usleep( 500000 );
+            usleep( 500000 );
 #endif
-		tick();
-	}
+        tick();
+    }
 }
 
 void SynchronizedFederate::enableTimeRegulation( double time, double lookahead )
-	throw( RTI::InvalidFederationTime, RTI::InvalidLookahead, RTI::FederateNotExecutionMember ) {
+    throw( RTI::InvalidFederationTime, RTI::InvalidLookahead, RTI::FederateNotExecutionMember ) {
 
-	if ( !_timeRegulationNotEnabled ) return;
+    if ( !_timeRegulationNotEnabled ) return;
 
-	bool timeRegulationEnabledNotCalled = true;
-	while( timeRegulationEnabledNotCalled ) {
-		try {
-			getRTI()->enableTimeRegulation(  RTIfedTime( time ), RTIfedTime( lookahead )  );
-			timeRegulationEnabledNotCalled = false;
-		} catch ( RTI::TimeRegulationAlreadyEnabled & ) {
-			return;
-		} catch ( RTI::EnableTimeRegulationPending & ) {
-			timeRegulationEnabledNotCalled = false;
-		} catch ( RTI::FederateNotExecutionMember &f ) {
-			throw f;
-		} catch ( RTI::InvalidFederationTime &i ) {
-			throw i;
-		} catch ( RTI::InvalidLookahead &i ) {
-			throw i;
-		} catch ( ... ) {
+    bool timeRegulationEnabledNotCalled = true;
+    while( timeRegulationEnabledNotCalled ) {
+        try {
+            getRTI()->enableTimeRegulation(  RTIfedTime( time ), RTIfedTime( lookahead )  );
+            timeRegulationEnabledNotCalled = false;
+        } catch ( RTI::TimeRegulationAlreadyEnabled & ) {
+            return;
+        } catch ( RTI::EnableTimeRegulationPending & ) {
+            timeRegulationEnabledNotCalled = false;
+        } catch ( RTI::FederateNotExecutionMember &f ) {
+            throw f;
+        } catch ( RTI::InvalidFederationTime &i ) {
+            throw i;
+        } catch ( RTI::InvalidLookahead &i ) {
+            throw i;
+        } catch ( ... ) {
 #ifdef _WIN32
-			Sleep( 500 );
+            Sleep( 500 );
 #else
-			usleep( 500000 );
+            usleep( 500000 );
 #endif
-		}
-	}
+        }
+    }
 
-	//  INITIAL TICK
-	tick();
-	while( _timeRegulationNotEnabled ) {
+    //  INITIAL TICK
+    tick();
+    while( _timeRegulationNotEnabled ) {
 #ifdef _WIN32
-			Sleep( 500 );
+            Sleep( 500 );
 #else
-			usleep( 500000 );
+            usleep( 500000 );
 #endif
-		tick();
-	}
+        tick();
+    }
 
 
-	setLookahead( lookahead );
+    setLookahead( lookahead );
 }
 
 
 void SynchronizedFederate::disableTimeRegulation()
 throw( RTI::RTIinternalError, RTI::FederateNotExecutionMember ){
 
-	if ( _timeRegulationNotEnabled ) return;
+    if ( _timeRegulationNotEnabled ) return;
 
-		bool timeRegulationDisabledNotCalled = true;
-		while( timeRegulationDisabledNotCalled ) {
-			try {
-				getRTI()->disableTimeRegulation();
-				_timeRegulationNotEnabled = true;
-				timeRegulationDisabledNotCalled = false;
-			} catch ( RTI::TimeRegulationWasNotEnabled & ) {
-				return;
-			} catch ( RTI::SaveInProgress & f) {
-				timeRegulationDisabledNotCalled = false;
-				//throw f;
-			} catch ( RTI::ConcurrentAccessAttempted & f) {
-				//throw f;
-				timeRegulationDisabledNotCalled = false;
-			} catch ( RTI::RestoreInProgress & f ) {
-				timeRegulationDisabledNotCalled = false;
-				//throw f;
-			} catch ( RTI::FederateNotExecutionMember &i ) {
-				throw i;
-			} catch ( RTI::RTIinternalError &i ) {
-				throw i;
-			} catch ( ... ) {
-	#ifdef _WIN32
-				Sleep( 500 );
-	#else
-				usleep( 500000 );
-	#endif
-			}
-		}
+        bool timeRegulationDisabledNotCalled = true;
+        while( timeRegulationDisabledNotCalled ) {
+            try {
+                getRTI()->disableTimeRegulation();
+                _timeRegulationNotEnabled = true;
+                timeRegulationDisabledNotCalled = false;
+            } catch ( RTI::TimeRegulationWasNotEnabled & ) {
+                return;
+            } catch ( RTI::SaveInProgress & f) {
+                timeRegulationDisabledNotCalled = false;
+                //throw f;
+            } catch ( RTI::ConcurrentAccessAttempted & f) {
+                //throw f;
+                timeRegulationDisabledNotCalled = false;
+            } catch ( RTI::RestoreInProgress & f ) {
+                timeRegulationDisabledNotCalled = false;
+                //throw f;
+            } catch ( RTI::FederateNotExecutionMember &i ) {
+                throw i;
+            } catch ( RTI::RTIinternalError &i ) {
+                throw i;
+            } catch ( ... ) {
+    #ifdef _WIN32
+                Sleep( 500 );
+    #else
+                usleep( 500000 );
+    #endif
+            }
+        }
 
-		tick();
-		while( !_timeRegulationNotEnabled ) {
-	#ifdef _WIN32
-				Sleep( 500 );
-	#else
-				usleep( 500000 );
-	#endif
-			tick();
-		}
-
-	
+        tick();
+        while( !_timeRegulationNotEnabled ) {
+    #ifdef _WIN32
+                Sleep( 500 );
+    #else
+                usleep( 500000 );
+    #endif
+            tick();
+        }
 }
-
-
 
 
 void SynchronizedFederate::resignFederationExecution( RTI::ResignAction resignAction ) {
@@ -332,40 +328,40 @@ void SynchronizedFederate::resignFederationExecution( RTI::ResignAction resignAc
         try {
             getRTI()->resignFederationExecution( resignAction );
             federationNotResigned = false;
-		} catch ( RTI::InvalidResignAction &i ) {
-			std::cerr << "WARNING:  Invalid resign action when attempting to resign federation.  Changing resign action to DELETE_OBJECTS_AND_RELEASE_ATTRIBUTES." << std::endl;
-			resignAction = RTI::DELETE_OBJECTS_AND_RELEASE_ATTRIBUTES;
-		} catch ( RTI::FederateNotExecutionMember f ) {
+        } catch ( RTI::InvalidResignAction &i ) {
+            std::cerr << "WARNING:  Invalid resign action when attempting to resign federation.  Changing resign action to DELETE_OBJECTS_AND_RELEASE_ATTRIBUTES." << std::endl;
+            resignAction = RTI::DELETE_OBJECTS_AND_RELEASE_ATTRIBUTES;
+        } catch ( RTI::FederateNotExecutionMember f ) {
             std::cerr << "WARNING:  While resigning federation:  federate not execution member." << std::endl;
             return;
-		} catch ( RTI::FederateOwnsAttributes f ) {
+        } catch ( RTI::FederateOwnsAttributes f ) {
             std::cerr << "WARNING:  While resigning federation:  federate owns attributes.  Releasing attributes." << std::endl;
-			resignAction = static_cast< RTI::ResignAction >(  static_cast< int >( resignAction ) | static_cast< int >( RTI::RELEASE_ATTRIBUTES )  );
+            resignAction = static_cast< RTI::ResignAction >(  static_cast< int >( resignAction ) | static_cast< int >( RTI::RELEASE_ATTRIBUTES )  );
         } catch ( ... ) {
-			if (resignAttempts == 10) {
-				std::cerr << "WARNING:  problem encountered while resigning federation execution:  retry" << std::endl;
-			}
+            if (resignAttempts == 10) {
+                std::cerr << "WARNING:  problem encountered while resigning federation execution:  retry" << std::endl;
+            }
 
-			if( resignAttempts-- < 1){
-			    std::cerr << "Resigned Failed. Exiting from the Federation" << std::endl;
+            if( resignAttempts-- < 1){
+                std::cerr << "Resigned Failed. Exiting from the Federation" << std::endl;
                 federationNotResigned = false;
-			} else {
+            } else {
 #ifdef _WIN32
-				Sleep( 500 );
+                Sleep( 500 );
 #else
-				usleep( 500000 );
+                usleep( 500000 );
 #endif
-				std::cerr << ".";
-			}
+                std::cerr << ".";
+            }
         }
     }
     
-	FederateResignInteraction::SP intResign = FederateResignInteraction::create();
-	intResign->set_FederateType( getFederateType() );
-	intResign->set_FederateId( getFederateId() );
+    FederateResignInteraction::SP intResign = FederateResignInteraction::create();
+    intResign->set_FederateType( getFederateType() );
+    intResign->set_FederateId( getFederateId() );
     intResign->set_IsLateJoiner(get_IsLateJoiner());
 
-	std::cout << "Sending Resign interaction #-"  << std::endl;
+    std::cout << "Sending Resign interaction #-"  << std::endl;
     sendInteraction( intResign, _currentTime );
 }
 
@@ -375,23 +371,23 @@ void SynchronizedFederate::resignFederationExecution( RTI::ResignAction resignAc
  * @return the current time for this federate
  */
 double SynchronizedFederate::getCurrentTime( void ) {
-	RTIfedTime fedTime;
+    RTIfedTime fedTime;
 
-	bool timeNotAcquired = true;
-	while( timeNotAcquired ) {
-		try {
-			getRTI()->queryFederateTime( fedTime );
-			timeNotAcquired = false;
-		} catch ( RTI::FederateNotExecutionMember & ) {
-			std::cerr << "SynchronizedFederate:  getCurrentTime:  ERROR:  Federate not execution member" << std::endl;
-		    return -1;
-		} catch ( ... ) {
-			std::cerr << "SynchronizedFederate:  getCurrentTime:  Exception caught:  " << std::endl;
-			return -1;
-		}
-	}
+    bool timeNotAcquired = true;
+    while( timeNotAcquired ) {
+        try {
+            getRTI()->queryFederateTime( fedTime );
+            timeNotAcquired = false;
+        } catch ( RTI::FederateNotExecutionMember & ) {
+            std::cerr << "SynchronizedFederate:  getCurrentTime:  ERROR:  Federate not execution member" << std::endl;
+            return -1;
+        } catch ( ... ) {
+            std::cerr << "SynchronizedFederate:  getCurrentTime:  Exception caught:  " << std::endl;
+            return -1;
+        }
+    }
 
-	return fedTime.getTime();
+    return fedTime.getTime();
 }
 
 /**
@@ -400,23 +396,23 @@ double SynchronizedFederate::getCurrentTime( void ) {
  * @return the current time for this federate
  */
 double SynchronizedFederate::getLBTS( void ) {
-	RTIfedTime lbtsTime;
+    RTIfedTime lbtsTime;
 
-	bool timeNotAcquired = true;
-	while( timeNotAcquired ) {
-		try {
-			getRTI()->queryLBTS( lbtsTime );
-			timeNotAcquired = false;
-		} catch ( RTI::FederateNotExecutionMember & ) {
-			std::cerr << "SynchronizedFederate:  getLBTS:  ERROR:  Federate not execution member" << std::endl;
-		    return -1;
-		} catch ( ... ) {
-			std::cerr << "SynchronizedFederate:  getLBTS:  Exception caught:  " << std::endl;
-			return -1;
-		}
-	}
+    bool timeNotAcquired = true;
+    while( timeNotAcquired ) {
+        try {
+            getRTI()->queryLBTS( lbtsTime );
+            timeNotAcquired = false;
+        } catch ( RTI::FederateNotExecutionMember & ) {
+            std::cerr << "SynchronizedFederate:  getLBTS:  ERROR:  Federate not execution member" << std::endl;
+            return -1;
+        } catch ( ... ) {
+            std::cerr << "SynchronizedFederate:  getLBTS:  Exception caught:  " << std::endl;
+            return -1;
+        }
+    }
 
-	return lbtsTime.getTime();
+    return lbtsTime.getTime();
 }
 
 /**
@@ -428,166 +424,166 @@ double SynchronizedFederate::getLBTS( void ) {
  * @return the timestamp to use for outgoing TSO interactions
  */
 double SynchronizedFederate::getMinTSOTimestamp( void ) {
-	RTIfedTime lbtsTime;
-	RTIfedTime fedTime;
+    RTIfedTime lbtsTime;
+    RTIfedTime fedTime;
 
-	bool timeNotAcquired = true;
-	while( timeNotAcquired ) {
-		try {
-			getRTI()->queryFederateTime( fedTime );
-			getRTI()->queryLBTS( lbtsTime );
-			timeNotAcquired = false;
-		} catch ( RTI::FederateNotExecutionMember & ) {
-			std::cerr << "SynchronizedFederate:  getMinTSOTimestamp:  ERROR:  Federate not execution member" << std::endl;
-		    return -1;
-		} catch ( ... ) {
-			std::cerr << "SynchronizedFederate:  getMinTSOTimestamp:  Exception caught:  " << std::endl;
-			return -1;
-		}
-	}
+    bool timeNotAcquired = true;
+    while( timeNotAcquired ) {
+        try {
+            getRTI()->queryFederateTime( fedTime );
+            getRTI()->queryLBTS( lbtsTime );
+            timeNotAcquired = false;
+        } catch ( RTI::FederateNotExecutionMember & ) {
+            std::cerr << "SynchronizedFederate:  getMinTSOTimestamp:  ERROR:  Federate not execution member" << std::endl;
+            return -1;
+        } catch ( ... ) {
+            std::cerr << "SynchronizedFederate:  getMinTSOTimestamp:  Exception caught:  " << std::endl;
+            return -1;
+        }
+    }
 
-	fedTime += getLookahead();
+    fedTime += getLookahead();
 
-	if(fedTime >= lbtsTime)
-		return fedTime.getTime();
-	else
-		return lbtsTime.getTime();
+    if(fedTime >= lbtsTime)
+        return fedTime.getTime();
+    else
+        return lbtsTime.getTime();
 }
 
 void SynchronizedFederate::achieveSynchronizationPoint( const std::string &label )
-		throw( RTI::FederateNotExecutionMember, RTI::RTIinternalError ) {
-	bool synchronizationPointNotAccepted = true;
-	while( synchronizationPointNotAccepted ) {
-		try {
-		    std::cout << "Synchronizing on label \"" << label << "\"" << std::endl;
-			getRTI()->synchronizationPointAchieved( label.c_str() );
-			while(  _achievedSynchronizationPoints.find( label ) == _achievedSynchronizationPoints.end()  ) {
+        throw( RTI::FederateNotExecutionMember, RTI::RTIinternalError ) {
+    bool synchronizationPointNotAccepted = true;
+    while( synchronizationPointNotAccepted ) {
+        try {
+            std::cout << "Synchronizing on label \"" << label << "\"" << std::endl;
+            getRTI()->synchronizationPointAchieved( label.c_str() );
+            while(  _achievedSynchronizationPoints.find( label ) == _achievedSynchronizationPoints.end()  ) {
 #ifdef _WIN32
-				Sleep( 500 );
+                Sleep( 500 );
 #else
-				usleep( 500000 );
+                usleep( 500000 );
 #endif
-				tick();
-			}
-			synchronizationPointNotAccepted = false;
-		} catch ( RTI::FederateNotExecutionMember &f ) {
-			throw f;
-		} catch ( RTI::SynchronizationPointLabelWasNotAnnounced & ) {
-			if (  _achievedSynchronizationPoints.find( label ) != _achievedSynchronizationPoints.end()  ) {
-				synchronizationPointNotAccepted = false;
-			} else {
-				try {
-					tick();
-				} catch ( RTI::RTIinternalError &r ) {
-					throw r;
-				} catch ( ... ) {
+                tick();
+            }
+            synchronizationPointNotAccepted = false;
+        } catch ( RTI::FederateNotExecutionMember &f ) {
+            throw f;
+        } catch ( RTI::SynchronizationPointLabelWasNotAnnounced & ) {
+            if (  _achievedSynchronizationPoints.find( label ) != _achievedSynchronizationPoints.end()  ) {
+                synchronizationPointNotAccepted = false;
+            } else {
+                try {
+                    tick();
+                } catch ( RTI::RTIinternalError &r ) {
+                    throw r;
+                } catch ( ... ) {
 #ifdef _WIN32
-					Sleep( 500 );
+                    Sleep( 500 );
 #else
-					usleep( 500000 );
+                    usleep( 500000 );
 #endif
-				}
-			}
-		} catch( ... ) {
+                }
+            }
+        } catch( ... ) {
 #ifdef _WIN32
-			Sleep( 500 );
+            Sleep( 500 );
 #else
-			usleep( 500000 );
+            usleep( 500000 );
 #endif
-		}
-	}
+        }
+    }
 }
 
 void SynchronizedFederate::run( void ) {
 
     std::cout << "run called." << std::endl;
-	_currentTime = getCurrentTime();
-	if ( _currentTime < 0 ) return;
+    _currentTime = getCurrentTime();
+    if ( _currentTime < 0 ) return;
 
-	double timeRequest = -1;
-	while( true ) {
-		AdvanceTimeRequest advanceTimeRequest = takeNextAdvanceTimeRequest();
-		if ( advanceTimeRequest.isNull() ) break;  // NO MORE ADVANCE TIME REQUESTS (REMEMBER, WE'RE SINGLE THREADED)
+    double timeRequest = -1;
+    while( true ) {
+        AdvanceTimeRequest advanceTimeRequest = takeNextAdvanceTimeRequest();
+        if ( advanceTimeRequest.isNull() ) break;  // NO MORE ADVANCE TIME REQUESTS (REMEMBER, WE'RE SINGLE THREADED)
 
-		timeRequest = advanceTimeRequest.getRequestedTime();
+        timeRequest = advanceTimeRequest.getRequestedTime();
 
-		advanceTime( timeRequest );
+        advanceTime( timeRequest );
 
-		advanceTimeRequest.getATRCallback().execute();
-	}
+        advanceTimeRequest.getATRCallback().execute();
+    }
 
-	noMoreATRs();
+    noMoreATRs();
 
-	while( getNextInteraction() != 0 ); // EMPTY THE QUEUE
+    while( getNextInteraction() != 0 ); // EMPTY THE QUEUE
 
-	// WAIT FOR SIMEND (?)
-	while( true ) {
-		timeRequest += _stepSize;
-		advanceTime( timeRequest );
-	}
+    // WAIT FOR SIMEND (?)
+    while( true ) {
+        timeRequest += _stepSize;
+        advanceTime( timeRequest );
+    }
 }
 
 void SynchronizedFederate::advanceTime( double time ) {
 
-	if ( getTimeAdvanceMode() != SF_TIME_ADVANCE_REQUEST_AVAILABLE && getTimeAdvanceMode() != SF_NEXT_EVENT_REQUEST_AVAILABLE &&  time <= _currentTime ) return;
+    if ( getTimeAdvanceMode() != SF_TIME_ADVANCE_REQUEST_AVAILABLE && getTimeAdvanceMode() != SF_NEXT_EVENT_REQUEST_AVAILABLE &&  time <= _currentTime ) return;
 
-	setTimeAdvanceNotGranted( true );
+    setTimeAdvanceNotGranted( true );
 
-	bool tarNotCalled = true;
-	while( tarNotCalled ) {
-		try {
-		    if ( getTimeAdvanceMode() == SF_TIME_ADVANCE_REQUEST ) {
-		        getRTI()->timeAdvanceRequest(  RTIfedTime( time )  );
-		    }
-		    else if ( getTimeAdvanceMode() == SF_TIME_ADVANCE_REQUEST_AVAILABLE ) {
+    bool tarNotCalled = true;
+    while( tarNotCalled ) {
+        try {
+            if ( getTimeAdvanceMode() == SF_TIME_ADVANCE_REQUEST ) {
+                getRTI()->timeAdvanceRequest(  RTIfedTime( time )  );
+            }
+            else if ( getTimeAdvanceMode() == SF_TIME_ADVANCE_REQUEST_AVAILABLE ) {
                 getRTI()->timeAdvanceRequestAvailable(  RTIfedTime( time )  );
-		    }
-		    else if ( getTimeAdvanceMode() == SF_NEXT_EVENT_REQUEST ) {
+            }
+            else if ( getTimeAdvanceMode() == SF_NEXT_EVENT_REQUEST ) {
                 getRTI()->nextEventRequest(  RTIfedTime( time )  );
-		    }
-		    else if ( getTimeAdvanceMode() == SF_NEXT_EVENT_REQUEST_AVAILABLE ) {
+            }
+            else if ( getTimeAdvanceMode() == SF_NEXT_EVENT_REQUEST_AVAILABLE ) {
                 getRTI()->nextEventRequestAvailable(  RTIfedTime( time )  );
-		    }
-			tarNotCalled = false;
-		} catch ( RTI::FederationTimeAlreadyPassed &f ) {
-			std::cerr << "Time already passed detected." << std::endl;
-			setTimeAdvanceNotGranted( false );
-			tarNotCalled = false;
-		} catch ( ... ) { }
-	}
+            }
+            tarNotCalled = false;
+        } catch ( RTI::FederationTimeAlreadyPassed &f ) {
+            std::cerr << "Time already passed detected." << std::endl;
+            setTimeAdvanceNotGranted( false );
+            tarNotCalled = false;
+        } catch ( ... ) { }
+    }
 
-	while( getTimeAdvanceNotGranted() ) {
-		tick();
+    while( getTimeAdvanceNotGranted() ) {
+        tick();
 #ifdef _WIN32
-		Sleep( 10 );
+        Sleep( 10 );
 #else
-		usleep( 10000 );
+        usleep( 10000 );
 #endif
-	}
+    }
 
-	_currentTime = time;
+    _currentTime = time;
 }
 
 // void SynchronizedFederate::createLog(
-// 		RTI::ObjectHandle theObject,
-// 		const RTI::AttributeHandleValuePairSet& theAttributes,
-// 		double time)
+//         RTI::ObjectHandle theObject,
+//         const RTI::AttributeHandleValuePairSet& theAttributes,
+//         double time)
 // {
-// 	if(ObjectRoot::getSubAttributeLogMap().empty()) return;
-// 	std::string objectName = ObjectRoot::getObject( theObject )->getClassName() ;
-// 	for(RTI::ULong i=0; i<theAttributes.size(); ++i)
-// 	{
-// 		std::string attribute = ObjectRoot::get_attribute_name(theAttributes.getHandle(i));
-// 		std::map<std::string, std::string>::iterator pos = ObjectRoot::getSubAttributeLogMap().find(attribute);
-// 		if(pos == ObjectRoot::getSubAttributeLogMap().end()) continue;
-// 		std::string loglevel = (*pos).second;
-// 		std::string id = objectName+"_"+attribute+"_sub_"+_federateId;
-// 		static RTI::ULong valueLength;
-// 		char* value = theAttributes.getValuePointer( i, valueLength);
-// 		std::string ptype="";
-// 		ObjectRoot::DatamemberTypeMap::iterator it = ObjectRoot::getDatamemberTypeMap().find( attribute );
-// 		if ( it != ObjectRoot::getDatamemberTypeMap().end() )
-// 			ptype = (*it).second;
-// 		_logger->addLog(id,attribute,std::string(value, valueLength),ptype,time,loglevel);
-// 	}
+//     if(ObjectRoot::getSubAttributeLogMap().empty()) return;
+//     std::string objectName = ObjectRoot::getObject( theObject )->getClassName() ;
+//     for(RTI::ULong i=0; i<theAttributes.size(); ++i)
+//     {
+//         std::string attribute = ObjectRoot::get_attribute_name(theAttributes.getHandle(i));
+//         std::map<std::string, std::string>::iterator pos = ObjectRoot::getSubAttributeLogMap().find(attribute);
+//         if(pos == ObjectRoot::getSubAttributeLogMap().end()) continue;
+//         std::string loglevel = (*pos).second;
+//         std::string id = objectName+"_"+attribute+"_sub_"+_federateId;
+//         static RTI::ULong valueLength;
+//         char* value = theAttributes.getValuePointer( i, valueLength);
+//         std::string ptype="";
+//         ObjectRoot::DatamemberTypeMap::iterator it = ObjectRoot::getDatamemberTypeMap().find( attribute );
+//         if ( it != ObjectRoot::getDatamemberTypeMap().end() )
+//             ptype = (*it).second;
+//         _logger->addLog(id,attribute,std::string(value, valueLength),ptype,time,loglevel);
+//     }
 // }

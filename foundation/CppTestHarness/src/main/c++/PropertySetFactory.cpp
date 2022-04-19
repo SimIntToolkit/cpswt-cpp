@@ -28,8 +28,8 @@
  * OR MODIFICATIONS.
  */
 
-#include "RTITest.hh"
-#include "AttributeHandleSetTest.hh"
+#include "RTIForTesting.hpp"
+#include "AttributeHandleSetForTesting.hpp"
 
 RTI::ParameterHandleValuePairSet *RTI::ParameterSetFactory::create(ULong count) throw (
   MemoryExhausted, ValueCountExceeded, HandleValuePairMaximumExceeded
