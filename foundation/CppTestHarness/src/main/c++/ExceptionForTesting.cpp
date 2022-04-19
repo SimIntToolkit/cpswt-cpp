@@ -28,7 +28,7 @@
  * OR MODIFICATIONS.
  */
 
-#include "RTITest.hh"
+#include "RTIForTesting.hpp"
 #include <cstring>
 
 
