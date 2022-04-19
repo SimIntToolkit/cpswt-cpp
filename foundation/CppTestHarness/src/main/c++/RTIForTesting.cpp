@@ -28,8 +28,8 @@
  * OR MODIFICATIONS.
  */
 
-#include "RTITest.hh"
-#include "RTIAmbassadorProxy.hh"
+#include "RTIForTesting.hpp"
+#include "RTIAmbassadorProxy.hpp"
 
 // 4.2
 void RTI::RTIambassador::createFederationExecution (
