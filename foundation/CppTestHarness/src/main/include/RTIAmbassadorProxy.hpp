@@ -31,7 +31,7 @@
 #ifndef RTI_TEST_PROXY_HH
 #define RTI_TEST_PROXY_HH
 
-#include "RTITest.hh"
+#include "RTIForTesting.hpp"
 
 namespace RTIProxy {
 
