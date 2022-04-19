@@ -32,7 +32,7 @@
 #define _ATTRIBUTE_HANDLE_SET_TEST
 
 #include <set>
-#include "RTITest.hh"
+#include "RTIForTesting.hpp"
 
 
 class AttributeHandleSetTest: public RTI::AttributeHandleSet {
