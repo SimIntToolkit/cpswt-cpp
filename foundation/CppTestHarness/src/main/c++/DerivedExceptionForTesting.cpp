@@ -28,7 +28,7 @@
  * OR MODIFICATIONS.
  */
 
-#include "RTITest.hh"
+#include "RTIForTesting.hpp"
 
 const char *RTI::ArrayIndexOutOfBounds::_ex = nullptr;
 const char *RTI::AsynchronousDeliveryAlreadyDisabled::_ex = nullptr;

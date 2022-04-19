@@ -33,7 +33,7 @@
 
 #define BOOST_LOG_DYN_LINK
 
-#include "RTIAmbassadorTest1.hh"
+#include "RTIAmbassadorTest1.hpp"
 
 #include <cppunit/extensions/HelperMacros.h>
 

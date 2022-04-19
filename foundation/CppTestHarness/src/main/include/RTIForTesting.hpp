@@ -47,8 +47,8 @@ class RTIAmbassadorProxy;
 class RTI {
 
 public:
-#include "baseTypes.hh"
-#include "RTItypes.hh"
+#include "baseTypes.hpp"
+#include "RTItypes.hpp"
 
     class FederateAmbassador;
 
@@ -1530,6 +1530,6 @@ public:
 
 }; // class RTI
 
-#include "fedtimeTest.hh"
+#include "fedtimeForTesting.hpp"
 
 #endif
