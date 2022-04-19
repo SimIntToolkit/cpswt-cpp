@@ -28,7 +28,7 @@
  * OR MODIFICATIONS.
  */
 
-#include "RTIAmbassadorTest1.hh"
+#include "RTIAmbassadorTest1.hpp"
 
 #include "InteractionRoot.hpp"
 #include "ObjectRoot.hpp"
