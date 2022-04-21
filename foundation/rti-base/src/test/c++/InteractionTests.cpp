@@ -584,4 +584,37 @@ void InteractionTests::valueTest() {
     CPPUNIT_ASSERT_DOUBLES_EQUAL(3.14, testDerived.getParameter("field5").asDouble(), 0.01);
 }
 
+void InteractionTests::messagingInstanceHlaClassTest() {
+    InteractionRoot interactionRoot( "InteractionRoot.C2WInteractionRoot.Simlog.HighPrio" );
+
+    CPPUNIT_ASSERT( interactionRoot.isInstanceOfHlaClass(
+            "InteractionRoot.C2WInteractionRoot.Simlog.HighPrio"
+    ));
+    CPPUNIT_ASSERT( interactionRoot.isInstanceHlaClassDerivedFromHlaClass(
+            "InteractionRoot.C2WInteractionRoot.Simlog.HighPrio"
+    ));
+    CPPUNIT_ASSERT( interactionRoot.isInstanceHlaClassDerivedFromHlaClass(
+            "InteractionRoot.C2WInteractionRoot.Simlog"
+    ));
+
+    CPPUNIT_ASSERT( !interactionRoot.isInstanceOfHlaClass(
+            "InteractionRoot.C2WInteractionRoot.Simlog"
+    ));
+    CPPUNIT_ASSERT( !interactionRoot.isInstanceHlaClassDerivedFromHlaClass(
+            "InteractionRoot.C2WInteractionRoot.SimulationControl"
+    ));
+
+    ObjectRoot objectRoot;
+
+    CPPUNIT_ASSERT( objectRoot.isInstanceOfHlaClass("ObjectRoot"));
+    CPPUNIT_ASSERT( objectRoot.isInstanceHlaClassDerivedFromHlaClass("ObjectRoot"));
+    CPPUNIT_ASSERT( !objectRoot.isInstanceHlaClassDerivedFromHlaClass("ObjectRoot.FederateObject"));
+    CPPUNIT_ASSERT( !objectRoot.isInstanceOfHlaClass("ObjectRoot.FederateObject"));
+
+    ObjectRoot federateObject("ObjectRoot.FederateObject");
+    CPPUNIT_ASSERT( !federateObject.isInstanceOfHlaClass("ObjectRoot"));
+    CPPUNIT_ASSERT( federateObject.isInstanceHlaClassDerivedFromHlaClass("ObjectRoot"));
+    CPPUNIT_ASSERT( federateObject.isInstanceHlaClassDerivedFromHlaClass("ObjectRoot.FederateObject"));
+    CPPUNIT_ASSERT( federateObject.isInstanceOfHlaClass("ObjectRoot.FederateObject"));
+}
 CPPUNIT_TEST_SUITE_REGISTRATION( InteractionTests );
