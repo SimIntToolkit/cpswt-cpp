@@ -246,9 +246,11 @@ ObjectRoot::PropertyHandleValuePairSetSP ObjectRoot::createPropertyHandleValuePa
       cvmCit != _classAndPropertyNameValueSPMap.end();
       ++cvmCit
     ) {
-        int handle = get_class_and_property_name_handle_map()[cvmCit->first];
-        std::string value = static_cast<std::string>(*cvmCit->second);
-        propertyHandleValuePairSet.add(handle, value.c_str(), value.size() + 1);
+        if (cvmCit->second->shouldBeUpdated(force)) {
+            int handle = get_class_and_property_name_handle_map()[cvmCit->first];
+            std::string value = cvmCit->second->getStringRepresentation();
+            propertyHandleValuePairSet.add(handle, value.c_str(), value.size() + 1);
+        }
     }
 
     return propertyHandleValuePairSetSP;
@@ -834,7 +836,7 @@ std::ostream &operator<<( std::ostream &os, const ::org::cpswt::hla::ObjectRoot 
     typedef ::org::cpswt::hla::ObjectRoot::ClassAndPropertyNameValueSPMap::const_iterator const_iterator;
     const ::org::cpswt::hla::ObjectRoot::ClassAndPropertyNameValueSPMap &classAndPropertyNameValueSPMap =
       messaging.getClassAndPropertyNameValueSPMap();
-    os << messaging.getCppClassName() << "(";
+    os << messaging.getHlaClassName() << "(";
     bool first = true;
     for(
       const_iterator cvmCit = classAndPropertyNameValueSPMap.begin() ;
@@ -847,14 +849,22 @@ std::ostream &operator<<( std::ostream &os, const ::org::cpswt::hla::ObjectRoot 
         os << static_cast<std::string>(cvmCit->first) << ": ";
         TypeMedley &value = *cvmCit->second;
         switch(value.getDataType()) {
-            case TypeMedley::BOOLEAN: os << static_cast<bool>(value);
-            case TypeMedley::CHARACTER: os << static_cast<char>(value);
-            case TypeMedley::SHORT: os << static_cast<short>(value);
-            case TypeMedley::INTEGER: os << static_cast<int>(value);
-            case TypeMedley::LONG: os << static_cast<long>(value);
-            case TypeMedley::FLOAT: os << static_cast<float>(value);
-            case TypeMedley::DOUBLE: os << static_cast<double>(value);
-            case TypeMedley::STRING: os << "\"" << static_cast<std::string>(value) << "\"";
+            case TypeMedley::DOUBLE: {
+                os << static_cast<double>(value);
+                break;
+            }
+            case TypeMedley::FLOAT: {
+                os << static_cast<float>(value);
+                break;
+            }
+            case TypeMedley::STRING: {
+                os << "\"" << static_cast<std::string>(value) << "\"";
+                break;
+            }
+            default: {
+                os << static_cast<std::string>(value);
+                break;
+            }
         }
     }
     return os << ")";
