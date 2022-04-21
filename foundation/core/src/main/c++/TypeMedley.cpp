@@ -40,10 +40,7 @@ bool TypeMedley::string_to_bool(const std::string &value) {
 
     std::string valueCopy(value);
     boost::algorithm::to_lower(valueCopy);
-    if (valueCopy == "false") {
-        return false;
-    }
-    return true;
+    return valueCopy == "true";
 }
 
 
@@ -54,8 +51,7 @@ bool TypeMedley::setValue(const std::string &value) {
                 _value = boost::lexical_cast<std::string>(string_to_bool(value));
                 break;
             case CHARACTER: {
-                char localChar = value.empty() ? '\0' : _value[0];
-                _value = std::string(&localChar, 1);
+                _value = convert_to_string<short>(value);
                 break;
             }
             case SHORT: {

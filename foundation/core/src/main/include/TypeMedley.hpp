@@ -131,7 +131,7 @@ public:
                 _value = boost::lexical_cast<std::string>(static_cast<bool>(value));
                 break;
             case CHARACTER:
-                _value = boost::lexical_cast<std::string>(static_cast<char>(value));
+                _value = boost::lexical_cast<std::string>(static_cast<short>(value));
                 break;
             case SHORT:
                 _value = boost::lexical_cast<std::string>(static_cast<short>(value));
@@ -196,14 +196,7 @@ public:
     }
 
     bool asBool() const {
-        switch(_dataType) {
-            case CHARACTER:
-                return _value[0] != '0' && static_cast<char>(boost::lexical_cast<int>(_value)) != '0';
-            case STRING:
-                return string_to_bool(_value);
-            default:
-                return static_cast<bool>(boost::lexical_cast<double>(_value));
-        }
+        return _dataType == STRING ? string_to_bool(_value) : static_cast<bool>(boost::lexical_cast<double>(_value));
     }
 
     operator bool() const {
@@ -211,8 +204,8 @@ public:
     }
 
     char asChar() const {
-        if (_dataType == STRING) {
-            return _value.empty() ? '\0' : _value[0];
+        if (_dataType == STRING && !hasDoubleFormat(_value)) {
+            return static_cast<char>(_value.empty());
         }
         return static_cast<char>(boost::lexical_cast<double>(_value));
     }
@@ -291,6 +284,10 @@ public:
 
     operator std::string() const {
         return asString();
+    }
+
+    std::string getStringRepresentation() const {
+        return _value;
     }
 };
 
