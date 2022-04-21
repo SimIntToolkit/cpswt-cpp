@@ -73,8 +73,7 @@ public:
     }
 
     explicit operator std::string() const {
-        static std::string stringValue(_className + getSeparatorChar() + _propertyName);
-        return stringValue;
+        return _className + getSeparatorChar() + _propertyName;
     }
 
     size_t hashCode() const {
