@@ -617,4 +617,25 @@ void InteractionTests::messagingInstanceHlaClassTest() {
     CPPUNIT_ASSERT( federateObject.isInstanceHlaClassDerivedFromHlaClass("ObjectRoot.FederateObject"));
     CPPUNIT_ASSERT( federateObject.isInstanceOfHlaClass("ObjectRoot.FederateObject"));
 }
+
+void InteractionTests::printInteractionTest() {
+    C2WInteractionRoot c2wInteractionRoot;
+    c2wInteractionRoot.updateFederateSequence( "Hello" );
+    c2wInteractionRoot.set_actualLogicalGenerationTime( 2.1 );
+    c2wInteractionRoot.set_federateFilter( "GoodBye" );
+
+    std::ostringstream testStream;
+
+    testStream << c2wInteractionRoot;
+
+    std::string expectedOutput =
+      std::string("InteractionRoot.C2WInteractionRoot(") +
+      "InteractionRoot.C2WInteractionRoot>actualLogicalGenerationTime: 2.1, " +
+      "InteractionRoot.C2WInteractionRoot>federateFilter: \"GoodBye\", " +
+      "InteractionRoot.C2WInteractionRoot>federateSequence: \"[ \"Hello\" ]\"" +
+      ")";
+
+    CPPUNIT_ASSERT_EQUAL(expectedOutput, testStream.str());
+}
+
 CPPUNIT_TEST_SUITE_REGISTRATION( InteractionTests );
