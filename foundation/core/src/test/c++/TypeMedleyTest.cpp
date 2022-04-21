@@ -153,7 +153,7 @@ void TypeMedleyTest::zeroCharTest() {
     CPPUNIT_ASSERT(typeMedley.getDataType() == TypeMedley::CHARACTER);
 
     const auto boolValue = static_cast<bool>(typeMedley);
-    CPPUNIT_ASSERT(!boolValue);
+    CPPUNIT_ASSERT(boolValue);
 
     const auto charValue = static_cast<char>(typeMedley);
     CPPUNIT_ASSERT_EQUAL('0', charValue);
@@ -273,7 +273,7 @@ void TypeMedleyTest::zeroStringTest() {
     CPPUNIT_ASSERT(!boolValue);
 
     const auto charValue = static_cast<char>(typeMedley);
-    CPPUNIT_ASSERT_EQUAL('0', charValue);
+    CPPUNIT_ASSERT_EQUAL('\0', charValue);
 
     const auto shortValue = static_cast<short>(typeMedley);
     CPPUNIT_ASSERT_EQUAL(static_cast<short>(0), shortValue);
@@ -302,7 +302,7 @@ void TypeMedleyTest::stringFloatWithExponentTest() {
     CPPUNIT_ASSERT(boolValue);
 
     const auto charValue = static_cast<char>(typeMedley);
-    CPPUNIT_ASSERT_EQUAL('5', charValue);
+    CPPUNIT_ASSERT_EQUAL('\5', charValue);
 
     const auto shortValue = static_cast<short>(typeMedley);
     CPPUNIT_ASSERT_EQUAL(static_cast<short>(5), shortValue);
@@ -328,10 +328,10 @@ void TypeMedleyTest::stringTest() {
     CPPUNIT_ASSERT(typeMedley.getDataType() == TypeMedley::STRING);
 
     const auto boolValue = static_cast<bool>(typeMedley);
-    CPPUNIT_ASSERT(boolValue);
+    CPPUNIT_ASSERT(!boolValue);
 
     const auto charValue = static_cast<char>(typeMedley);
-    CPPUNIT_ASSERT_EQUAL('0', charValue);
+    CPPUNIT_ASSERT_EQUAL('\0', charValue);
 
     const auto shortValue = static_cast<short>(typeMedley);
     CPPUNIT_ASSERT_EQUAL(static_cast<short>(0), shortValue);
