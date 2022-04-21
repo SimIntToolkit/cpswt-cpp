@@ -1,0 +1,7 @@
+{
+    "interactions": [
+        "InteractionRoot.C2WInteractionRoot.TestInteraction",
+        "InteractionRoot.C2WInteractionRoot.TestInteraction.Receiver"
+    ],
+    "objects": []
+}

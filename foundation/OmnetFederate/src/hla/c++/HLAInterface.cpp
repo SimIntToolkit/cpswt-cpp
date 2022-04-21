@@ -217,7 +217,7 @@ void HLAInterface::processInteractions( void ) {
     InteractionRoot::SP interactionRootSP;
     while(  ( interactionRootSP = getNextInteraction() ) != 0  ) {
 
-        // std::cerr << "Processing interaction of type \"" << interactionRootSP->getClassName() << "\"" << std::endl;
+        // std::cerr << "Processing interaction of type \"" << interactionRootSP->getInstanceHlaClassName() << "\"" << std::endl;
 
         int classHandle = interactionRootSP->getClassHandle();
 
@@ -350,7 +350,6 @@ void HLAInterface::processInteractions( void ) {
                     std::cerr << AttackCoordinator::getSingleton().listAppSpecProperties();
                     std::cerr << std::endl;
                 }
-                continue;
             }
 
             continue;
