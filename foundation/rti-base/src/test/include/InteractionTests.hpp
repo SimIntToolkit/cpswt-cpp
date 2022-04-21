@@ -77,6 +77,7 @@ private:
     CPPUNIT_TEST(dynamicMessagingTest);
     CPPUNIT_TEST(valueTest);
     CPPUNIT_TEST(messagingInstanceHlaClassTest);
+    CPPUNIT_TEST(printInteractionTest);
     CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -97,6 +98,7 @@ public:
     void dynamicMessagingTest();
     void valueTest();
     void messagingInstanceHlaClassTest();
+    void printInteractionTest();
 };
 
 #endif // _INTERACTION_TESTS
