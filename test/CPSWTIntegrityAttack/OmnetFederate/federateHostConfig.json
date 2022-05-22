@@ -1,0 +1,14 @@
+{
+    "Receiver": {
+        "AppIndex": 0,
+        "AppInterface": "eth",
+        "Host": "OmnetFederateTestNetwork.host2",
+        "HostApp": "BasicUdpAppWrapper"
+    },
+    "Sender": {
+        "AppIndex": 0,
+        "AppInterface": "eth",
+        "Host": "OmnetFederateTestNetwork.host1",
+        "HostApp": "BasicUdpAppWrapper"
+    }
+}

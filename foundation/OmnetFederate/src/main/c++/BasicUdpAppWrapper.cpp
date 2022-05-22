@@ -34,13 +34,15 @@
 
 #include <messages/InteractionMsg_m.h>
 
+#include <InteractionRoot_p/C2WInteractionRoot.hpp>
+
 #include <typeinfo>
 
 Define_Module(BasicUdpAppWrapper);
 
 
 using NetworkPacket = ::org::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::NetworkPacket;
-
+using C2WInteractionRoot = ::org::cpswt::hla::InteractionRoot_p::C2WInteractionRoot;
 
 void BasicUdpAppWrapper::recordInterfaceIPAddresses( void ) {
 
@@ -217,6 +219,11 @@ void BasicUdpAppWrapper::tweakIncoming( InteractionRoot &interactionRoot, Attack
       cvmCit != classAndPropertyValueSPMap.end() ;
       ++cvmCit
     ) {
+        const ClassAndPropertyName &classAndPropertyName = cvmCit->first;
+        if (classAndPropertyName.getClassName() == C2WInteractionRoot::get_hla_class_name()) {
+            continue;
+        }
+
         TypeMedley &value = *cvmCit->second;
 
         switch( value.getDataType() ) {
