@@ -166,7 +166,7 @@ InteractionRoot::PropertyHandleValuePairSetSP InteractionRoot::createPropertyHan
         const ClassAndPropertyName &classAndPropertyName(cvmCit->first);
         int handle = get_class_and_property_name_handle_map()[classAndPropertyName];
         std::string value = cvmCit->second->getStringRepresentation();
-        propertyHandleValuePairSet.add(handle, value.c_str(), value.size() + 1);
+        propertyHandleValuePairSet.add(handle, value.c_str(), value.size());
     }
 
     return propertyHandleValuePairSetSP;
