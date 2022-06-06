@@ -337,7 +337,7 @@ void InteractionRoot::setParameters( const RTI::ParameterHandleValuePairSet &pro
             ClassAndPropertyNameSP classAndPropertyNameSP =
               get_handle_class_and_property_name_sp_map()[ propertyMap.getHandle( ix ) ];
             _classAndPropertyNameValueSPMap.find(*classAndPropertyNameSP)->second->setValue(
-              std::string( value, valueLength )
+              std::string( value, valueLength - 1 )
             );
         } catch ( ... ) {
             BOOST_LOG_SEV(get_logger(), error) << "setParameters: Exception caught!";
