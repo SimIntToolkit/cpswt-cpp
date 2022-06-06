@@ -166,7 +166,7 @@ InteractionRoot::PropertyHandleValuePairSetSP InteractionRoot::createPropertyHan
         const ClassAndPropertyName &classAndPropertyName(cvmCit->first);
         int handle = get_class_and_property_name_handle_map()[classAndPropertyName];
         std::string value = cvmCit->second->getStringRepresentation();
-        propertyHandleValuePairSet.add(handle, value.c_str(), value.size() + 1);
+        propertyHandleValuePairSet.add(handle, value.c_str(), value.size());
     }
 
     return propertyHandleValuePairSetSP;
@@ -337,7 +337,7 @@ void InteractionRoot::setParameters( const RTI::ParameterHandleValuePairSet &pro
             ClassAndPropertyNameSP classAndPropertyNameSP =
               get_handle_class_and_property_name_sp_map()[ propertyMap.getHandle( ix ) ];
             _classAndPropertyNameValueSPMap.find(*classAndPropertyNameSP)->second->setValue(
-              std::string( value, valueLength - 1 )
+              std::string( value, valueLength )
             );
         } catch ( ... ) {
             BOOST_LOG_SEV(get_logger(), error) << "setParameters: Exception caught!";
