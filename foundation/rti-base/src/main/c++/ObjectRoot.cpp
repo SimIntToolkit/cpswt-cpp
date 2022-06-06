@@ -249,7 +249,7 @@ ObjectRoot::PropertyHandleValuePairSetSP ObjectRoot::createPropertyHandleValuePa
         if (cvmCit->second->shouldBeUpdated(force)) {
             int handle = get_class_and_property_name_handle_map()[cvmCit->first];
             std::string value = cvmCit->second->getStringRepresentation();
-            propertyHandleValuePairSet.add(handle, value.c_str(), value.size() + 1);
+            propertyHandleValuePairSet.add(handle, value.c_str(), value.size());
         }
     }
 
@@ -559,7 +559,7 @@ void ObjectRoot::setAttributes( const RTI::AttributeHandleValuePairSet &property
             ClassAndPropertyNameSP classAndPropertyNameSP =
               get_handle_class_and_property_name_sp_map()[ propertyMap.getHandle( ix ) ];
             _classAndPropertyNameValueSPMap.find(*classAndPropertyNameSP)->second->setValue(
-              std::string( value, valueLength - 1 )
+              std::string( value, valueLength )
             );
         } catch ( ... ) {
             BOOST_LOG_SEV(get_logger(), error) << "setParameters: Exception caught!";
