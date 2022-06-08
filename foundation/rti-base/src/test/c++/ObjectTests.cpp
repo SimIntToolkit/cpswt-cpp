@@ -65,7 +65,6 @@ void ObjectTests::init_1() {
 
 void ObjectTests::objectTest1() {
 
-std::cout << 1 << std::endl;
     // MAKE SURE ATTRIBUTES ARE PUBLISHED
     FederateObject::publish_FederateHandle_attribute();
     FederateObject::publish_FederateHost_attribute();
@@ -73,7 +72,6 @@ std::cout << 1 << std::endl;
     FederateObject::publish_object(get_rti_ambassador_1_ptr());  // NOT REALLY NEEDED FOR TESTING
 
     // CREATE FederateObject, GIVE ATTRIBUTES VALUES
-std::cout << 2 << std::endl;
     FederateObject federateObject1;
     federateObject1.set_FederateHandle(2);
     federateObject1.set_FederateHost("localhost");
@@ -83,7 +81,6 @@ std::cout << 2 << std::endl;
     federateObject1.registerObject(get_rti_ambassador_1_ptr());
 
     // CHECK MOST RTI VALUES
-std::cout << 3 << std::endl;
     CPPUNIT_ASSERT_EQUAL(static_cast<RTI::ObjectHandle>(0), get_rti_ambassador_test_1().getCurrentObjectHandle());
     CPPUNIT_ASSERT_EQUAL(
       static_cast<RTI::ObjectClassHandle>(FederateObject::get_class_handle()),
@@ -98,18 +95,15 @@ std::cout << 3 << std::endl;
     CPPUNIT_ASSERT(federateObjectSP2);
 
     // INITIALLY, SECOND INSTANCE SHOULD HAVE DEFAULT VALUES
-std::cout << 4 << std::endl;
     FederateObject &federateObject2 = *federateObjectSP2;
     CPPUNIT_ASSERT_EQUAL(0, federateObject2.get_FederateHandle());
     CPPUNIT_ASSERT_EQUAL(std::string(""), federateObject2.get_FederateHost());
     CPPUNIT_ASSERT_EQUAL(std::string(""), federateObject2.get_FederateType());
 
     // SEND OUT ATTRIBUTE VALUES OF FIRST INSTANCE TO MOCK RTI
-std::cout << 4.5 << std::endl;
     federateObject1.updateAttributeValues(get_rti_ambassador_1_ptr(), 5.0);
 
     // CHECK MOCK RTI VALUES
-std::cout << 5 << std::endl;
     RTIfedTime *currentRTIFedTimeImplPtr = get_rti_ambassador_test_1().getCurrentRTIFedTimeImplPtr();
     CPPUNIT_ASSERT(currentRTIFedTimeImplPtr);
     RTIfedTime &currentRTIFedTimeImpl1 = *currentRTIFedTimeImplPtr;
