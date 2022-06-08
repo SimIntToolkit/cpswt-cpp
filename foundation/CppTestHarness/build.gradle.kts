@@ -47,6 +47,16 @@ library {
     publicHeaders.from(file("src/main/include"))
 }
 
+tasks.withType(CppCompile::class.java).configureEach {
+    compilerArgs.addAll(toolChain.map { toolChain ->
+        when(toolChain) {
+            is Gcc, is Clang -> listOf("-Wno-deprecated")
+//            is VisualCpp -> listOf("/I $rtiHome/include/hla13")
+            else -> listOf()
+        }
+    })
+}
+
 publishing {
     publications {
         getByName<MavenPublication>("main") {
