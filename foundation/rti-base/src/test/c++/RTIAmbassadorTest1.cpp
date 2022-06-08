@@ -254,3 +254,42 @@ throw (
     const std::string &interactionName = get_class_handle_name_map().find(theInteraction)->second;
     get_subscribed_interaction_class_name_set_aux().insert(interactionName);
 }
+
+RTI::ObjectHandle RTIAmbassadorTest1::registerObjectInstance (
+  RTI::ObjectClassHandle theClass
+) throw (
+  RTI::ObjectClassNotDefined,
+  RTI::ObjectClassNotPublished,
+  RTI::FederateNotExecutionMember,
+  RTI::ConcurrentAccessAttempted,
+  RTI::SaveInProgress,
+  RTI::RestoreInProgress,
+  RTI::RTIinternalError
+) {
+    setCurrentClassHandle(theClass);
+    setCurrentObjectHandle();
+    return getCurrentClassHandle();
+}
+
+RTI::EventRetractionHandle RTIAmbassadorTest1::updateAttributeValues (
+  RTI::ObjectHandle                       theObject,
+  const RTI::AttributeHandleValuePairSet& theAttributes,
+  const RTI::FedTime&                     theTime,
+  const char                              *theTag
+) throw (
+  RTI::ObjectNotKnown,
+  RTI::AttributeNotDefined,
+  RTI::AttributeNotOwned,
+  RTI::InvalidFederationTime,
+  RTI::FederateNotExecutionMember,
+  RTI::ConcurrentAccessAttempted,
+  RTI::SaveInProgress,
+  RTI::RestoreInProgress,
+  RTI::RTIinternalError
+) {
+    setCurrentObjectHandle(theObject);
+    setCurrentAttributeHandleValuePairSet(theAttributes);
+    setCurrentRTIFedTime(theTime);
+
+    return RTI::EventRetractionHandle(); // DUMMY EventRestractionHandle
+}
