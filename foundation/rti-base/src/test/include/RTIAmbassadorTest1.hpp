@@ -141,6 +141,110 @@ public:
       RTI::RestoreInProgress,
       RTI::RTIinternalError
     ) override;
+
+private:
+    static RTI::ObjectClassHandle &getCurrentClassHandleAux() {
+        static RTI::ObjectClassHandle currentClassHandle = 0;
+        return currentClassHandle;
+    }
+
+    static RTI::ObjectHandle getUniqueObjectHandle() {
+        static RTI::ObjectHandle uniqueObjectHandle = 0;
+
+        return uniqueObjectHandle++;
+    }
+
+    static RTI::ObjectHandle &getCurrentObjectHandleAux() {
+        static RTI::ObjectHandle objectHandle = 0;
+        return objectHandle;
+    }
+
+    static RTI::AttributeHandleValuePairSet *&getCurrentAttributeHandleValuePairSetPtrAux() {
+        static RTI::AttributeHandleValuePairSet *attributeHandleValuePairSetPtr = RTI::AttributeSetFactory::create(0);
+        return attributeHandleValuePairSetPtr;
+    }
+
+public:
+    static void setCurrentClassHandle(RTI::ObjectClassHandle classHandle) {
+        getCurrentClassHandleAux() = classHandle;
+    }
+    static RTI::ObjectClassHandle getCurrentClassHandle() {
+        return getCurrentClassHandleAux();
+    }
+
+    static void setCurrentObjectHandle(RTI::ObjectHandle objectHandle) {
+        getCurrentObjectHandleAux() = objectHandle;
+    }
+    static void setCurrentObjectHandle() {
+        getCurrentObjectHandleAux() = getUniqueObjectHandle();
+    }
+    static RTI::ObjectHandle getCurrentObjectHandle() {
+        return getCurrentObjectHandleAux();
+    }
+
+    static RTI::AttributeHandleValuePairSet &getCurrentAttributeHandleValuePairSet() {
+        return *getCurrentAttributeHandleValuePairSetPtrAux();
+    }
+    static void setCurrentAttributeHandleValuePairSet(
+      const RTI::AttributeHandleValuePairSet &attributeHandleValuePairSet
+    ) {
+        delete getCurrentAttributeHandleValuePairSetPtrAux();
+        getCurrentAttributeHandleValuePairSetPtrAux() = RTI::AttributeSetFactory::create(
+          attributeHandleValuePairSet.size()
+        );
+        RTI::AttributeHandleValuePairSet &attributeHandleValuePairSetCopy =
+          *getCurrentAttributeHandleValuePairSetPtrAux();
+
+        RTI::ULong valueLength;
+        for(int ix = 0 ; ix < attributeHandleValuePairSet.size() ; ++ix) {
+            attributeHandleValuePairSetCopy.add(
+              attributeHandleValuePairSet.getHandle(ix),
+              attributeHandleValuePairSet.getValuePointer(ix, valueLength),
+              attributeHandleValuePairSet.getValueLength(ix)
+            );
+        }
+    }
+
+    static RTI::FedTime &getCurrentRTIFedTime() {
+        static RTIfedTime rtiFedTime;
+        return rtiFedTime;
+    }
+    static RTIfedTime *getCurrentRTIFedTimeImplPtr() {
+        return dynamic_cast<RTIfedTime *>(&getCurrentRTIFedTime());
+    }
+    static void setCurrentRTIFedTime(const RTI::FedTime &rtiFedTime) {
+        getCurrentRTIFedTime() = rtiFedTime;
+    }
+
+    virtual RTI::ObjectHandle registerObjectInstance (
+      RTI::ObjectClassHandle theClass
+    ) throw (
+      RTI::ObjectClassNotDefined,
+      RTI::ObjectClassNotPublished,
+      RTI::FederateNotExecutionMember,
+      RTI::ConcurrentAccessAttempted,
+      RTI::SaveInProgress,
+      RTI::RestoreInProgress,
+      RTI::RTIinternalError
+    ) override;
+
+    virtual RTI::EventRetractionHandle updateAttributeValues (
+      RTI::ObjectHandle                       theObject,
+      const RTI::AttributeHandleValuePairSet& theAttributes,
+      const RTI::FedTime&                     theTime,
+      const char                              *theTag
+    ) throw (
+      RTI::ObjectNotKnown,
+      RTI::AttributeNotDefined,
+      RTI::AttributeNotOwned,
+      RTI::InvalidFederationTime,
+      RTI::FederateNotExecutionMember,
+      RTI::ConcurrentAccessAttempted,
+      RTI::SaveInProgress,
+      RTI::RestoreInProgress,
+      RTI::RTIinternalError
+    ) override;
+
 };
 
 #endif  // RTI_AMBASSADOR_TEST_1_HH

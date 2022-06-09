@@ -28,24 +28,51 @@
  * OR MODIFICATIONS.
  */
 
-#include "RTIForTesting.hpp"
-#include "AttributeHandleSetForTesting.hpp"
-#include "AttributeHandleValuePairSetForTesting.hpp"
+#ifndef _INTERACTION_TESTS
+#define _INTERACTION_TESTS
 
-RTI::ParameterHandleValuePairSet *RTI::ParameterSetFactory::create(ULong count) throw (
-  MemoryExhausted, ValueCountExceeded, HandleValuePairMaximumExceeded
-) {
-    return nullptr;
-}
+#define BOOST_LOG_DYN_LINK
 
-RTI::AttributeHandleValuePairSet *RTI::AttributeSetFactory::create(ULong count) throw (
-  MemoryExhausted, ValueCountExceeded, HandleValuePairMaximumExceeded
-) {
-    return new AttributeHandleValuePairSetForTesting(count);
-}
+#include "RTIAmbassadorTest1.hpp"
 
-RTI::AttributeHandleSet* RTI::AttributeHandleSetFactory::create(ULong count) throw (
-  MemoryExhausted, ValueCountExceeded
-) {
-    return new AttributeHandleSetTest();
-}
+#include <cppunit/extensions/HelperMacros.h>
+
+#include <boost/log/core.hpp>
+#include <boost/log/sinks/sync_frontend.hpp>
+#include <boost/log/sinks/text_ostream_backend.hpp>
+
+namespace logging = boost::log;
+namespace sinks = boost::log::sinks;
+
+class ObjectTests: public CppUnit::TestCase {
+
+public:
+    typedef sinks::synchronous_sink< sinks::text_ostream_backend > text_sink;
+
+private:
+    static RTIAmbassadorTest1 &get_rti_ambassador_test_1() {
+        static RTIAmbassadorTest1 rtiAmbassadorTest1;
+        return rtiAmbassadorTest1;
+    }
+    static RTI::RTIambassador *get_rti_ambassador_1_ptr();
+
+    static bool &get_is_initialized() {
+        static bool isInitialized = false;
+        return isInitialized;
+    }
+
+    static void init_1();
+
+    CPPUNIT_TEST_SUITE( ObjectTests );
+    CPPUNIT_TEST(objectTest1);
+    CPPUNIT_TEST_SUITE_END();
+
+public:
+    ObjectTests() : CppUnit::TestCase() {
+        init_1();
+    }
+
+    void objectTest1();
+};
+
+#endif // _INTERACTION_TESTS
