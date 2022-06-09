@@ -250,6 +250,7 @@ ObjectRoot::PropertyHandleValuePairSetSP ObjectRoot::createPropertyHandleValuePa
             int handle = get_class_and_property_name_handle_map()[cvmCit->first];
             std::string value = cvmCit->second->getStringRepresentation();
             propertyHandleValuePairSet.add(handle, value.c_str(), value.size());
+            cvmCit->second->setHasBeenUpdated();
         }
     }
 
