@@ -1,0 +1,35 @@
+{
+  "federateTypesAllowed": [
+    "OmnetFederate",
+    "Sender",
+    "Receiver"
+  ],
+  "expectedFederates": [
+    {
+      "federateType": "OmnetFederate",
+      "count": 1
+    },
+    {
+      "federateType": "Sender",
+      "count": 1
+    },
+    {
+      "federateType": "Receiver",
+      "count": 1
+    }
+  ],
+  "lateJoinerFederates": [
+    {
+      "federateType": "OmnetFederate",
+      "count": 0
+    },
+    {
+      "federateType": "Sender",
+      "count": 0
+    },
+    {
+      "federateType": "Receiver",
+      "count": 0
+    }
+  ]
+}
