@@ -296,19 +296,19 @@ protected:
     //------------------------------------------------------
 public:
     static const ClassAndPropertyNameList get_all_parameter_names(const std::string &hlaClassName) {
-       StringClassAndPropertyNameSetSPMap::iterator scmItr =
-         get_class_name_all_class_and_property_name_set_sp_map().find(hlaClassName);
+        StringClassAndPropertyNameSetSPMap::iterator scmItr =
+          get_class_name_all_class_and_property_name_set_sp_map().find(hlaClassName);
 
-       const ClassAndPropertyNameSet &classAndPropertyNameSet =
-         scmItr == get_class_name_all_class_and_property_name_set_sp_map().end() ?
-           *ClassAndPropertyNameSetSP(new ClassAndPropertyNameSet()) : *scmItr->second;
+        const ClassAndPropertyNameSet &classAndPropertyNameSet =
+          scmItr == get_class_name_all_class_and_property_name_set_sp_map().end() ?
+            *ClassAndPropertyNameSetSP(new ClassAndPropertyNameSet()) : *scmItr->second;
 
-       ClassAndPropertyNameList classAndPropertyNameList(
-         classAndPropertyNameSet.begin(), classAndPropertyNameSet.end()
-       );
+        ClassAndPropertyNameList classAndPropertyNameList(
+          classAndPropertyNameSet.begin(), classAndPropertyNameSet.end()
+        );
 
-       classAndPropertyNameList.sort();
-       return classAndPropertyNameList;
+        classAndPropertyNameList.sort();
+        return classAndPropertyNameList;
     }
 
     //-------------------------------------------
@@ -614,6 +614,18 @@ public:
         static std::string emptyString;
         ClassAndPropertyNameSP classAndPropertyNameSP = get_class_and_parameter_name(propertyHandle);
         return classAndPropertyNameSP ? classAndPropertyNameSP->getPropertyName() : emptyString;
+    }
+
+    static int get_num_parameters(const std::string &hlaClassName) {
+        StringClassAndPropertyNameSetSPMap::iterator scmItr =
+          get_class_name_all_class_and_property_name_set_sp_map().find(hlaClassName);
+
+        return scmItr == get_class_name_all_class_and_property_name_set_sp_map().end() ?
+          -1 : scmItr->second->size();
+    }
+
+    int getNumParameters() {
+        return get_class_name_all_class_and_property_name_set_sp_map()[getInstanceHlaClassName()]->size();
     }
 
     /**
@@ -1004,6 +1016,10 @@ public:
      */
     static bool match(int handle) {
         return handle == get_class_handle();
+    }
+
+    static int get_num_parameters() {
+        return get_class_name_all_class_and_property_name_set_sp_map()[get_hla_class_name()]->size();
     }
 
     //------------------------------
