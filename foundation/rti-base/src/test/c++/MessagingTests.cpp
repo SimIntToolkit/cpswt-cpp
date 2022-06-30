@@ -28,7 +28,7 @@
  * OR MODIFICATIONS.
  */
 
-#include "InteractionTests.hpp"
+#include "MessagingTests.hpp"
 
 #include "InteractionRoot.hpp"
 #include "InteractionRoot_p/C2WInteractionRoot.hpp"
@@ -91,7 +91,7 @@ std::ostream &operator<<(std::ostream &os, const ClassAndPropertyNameList &class
     return os;
 }
 
-void InteractionTests::interaction_root_dynamic_init() {
+void MessagingTests::interaction_root_dynamic_init() {
     const std::string federationJson =
             std::string("{\n") +
             "    \"interactions\": {\n" +
@@ -150,13 +150,13 @@ void InteractionTests::interaction_root_dynamic_init() {
     InteractionRoot::loadDynamicClassFederationData(federationJsonInputStream, dynamicMessagingTypesInputStream);
 }
 
-RTI::RTIambassador *InteractionTests::get_rti_ambassador_1_ptr() {
+RTI::RTIambassador *MessagingTests::get_rti_ambassador_1_ptr() {
     static RTIAmbassadorTest1 rtiAmbassadorTest1;
     static RTI::RTIambassador rtiAmbassador(&rtiAmbassadorTest1);
     return &rtiAmbassador;
 }
 
-void InteractionTests::init_1() {
+void MessagingTests::init_1() {
     if (get_is_initialized()) {
         return;
     }
@@ -169,11 +169,11 @@ void InteractionTests::init_1() {
     std::cout << "DONE" << std::endl;
 }
 
-void InteractionTests::setUp() {
+void MessagingTests::setUp() {
     RTIAmbassadorTest1::clearPubSub();
 }
 
-void InteractionTests::messagingNamesTest() {
+void MessagingTests::interactionClassNamesTest() {
 
     std::set<std::string> expectedInteractionClassNameSet;
     expectedInteractionClassNameSet.insert("InteractionRoot");
@@ -196,7 +196,9 @@ void InteractionTests::messagingNamesTest() {
 
     const std::set<std::string> &actualInteractionClassNameSet = InteractionRoot::get_interaction_hla_class_name_set();
     CPPUNIT_ASSERT_EQUAL(expectedInteractionClassNameSet, actualInteractionClassNameSet);
+}
 
+void MessagingTests::objectClassNamesTest() {
     std::set<std::string> expectedObjectClassNameSet;
     expectedObjectClassNameSet.insert("ObjectRoot");
     expectedObjectClassNameSet.insert("ObjectRoot.FederateObject");
@@ -205,88 +207,167 @@ void InteractionTests::messagingNamesTest() {
     CPPUNIT_ASSERT(expectedObjectClassNameSet == actualObjectClassNameSet);
 }
 
-void InteractionTests::classHandleTest() {
+void MessagingTests::interactionClassHandleTest() {
+
+    InteractionRoot::SP interactionRootSP;
+
+    // InteractionRoot
+    RTI::InteractionClassHandle interactionRootClassHandle =
+      RTIAmbassadorTest1::get_class_name_handle_map().find("InteractionRoot")->second;
     CPPUNIT_ASSERT_EQUAL(
-            RTIAmbassadorTest1::get_class_name_handle_map().find("InteractionRoot")->second,
-            static_cast<RTI::InteractionClassHandle>(InteractionRoot::get_class_handle())
+            interactionRootClassHandle, static_cast<RTI::InteractionClassHandle>(InteractionRoot::get_class_handle())
+    );
+    interactionRootSP = InteractionRoot::create_interaction();
+    CPPUNIT_ASSERT_EQUAL(
+            interactionRootClassHandle, static_cast<RTI::InteractionClassHandle>(interactionRootSP->getClassHandle())
     );
     CPPUNIT_ASSERT_EQUAL(
-            RTIAmbassadorTest1::get_class_name_handle_map().find("InteractionRoot.C2WInteractionRoot")->second,
-            static_cast<RTI::InteractionClassHandle>(C2WInteractionRoot::get_class_handle())
-    );
-    CPPUNIT_ASSERT_EQUAL(
-            RTIAmbassadorTest1::get_class_name_handle_map().find("InteractionRoot.C2WInteractionRoot.SimLog")->second,
-            static_cast<RTI::InteractionClassHandle>(SimLog::get_class_handle())
-    );
-    CPPUNIT_ASSERT_EQUAL(
-            RTIAmbassadorTest1::get_class_name_handle_map().find(
-              "InteractionRoot.C2WInteractionRoot.SimLog.HighPrio"
-            )->second,
-            static_cast<RTI::InteractionClassHandle>(HighPrio::get_class_handle())
-    );
-    CPPUNIT_ASSERT_EQUAL(
-            RTIAmbassadorTest1::get_class_name_handle_map().find(
-              "InteractionRoot.C2WInteractionRoot.SimulationControl"
-            )->second,
-            static_cast<RTI::InteractionClassHandle>(SimulationControl::get_class_handle())
-    );
-    CPPUNIT_ASSERT_EQUAL(
-            RTIAmbassadorTest1::get_class_name_handle_map().find(
-              "InteractionRoot.C2WInteractionRoot.SimulationControl.SimEnd"
-            )->second,
-            static_cast<RTI::InteractionClassHandle>(SimEnd::get_class_handle())
+            interactionRootClassHandle,
+            static_cast<RTI::InteractionClassHandle>(InteractionRoot::get_class_handle("InteractionRoot"))
     );
 
+    // C2WInteractionRoot
+    RTI::InteractionClassHandle c2wInteractionRootClassHandle =
+            RTIAmbassadorTest1::get_class_name_handle_map().find("InteractionRoot.C2WInteractionRoot")->second;
     CPPUNIT_ASSERT_EQUAL(
-            RTIAmbassadorTest1::get_class_name_handle_map().find("InteractionRoot")->second,
-            static_cast<RTI::InteractionClassHandle>(
-              InteractionRoot::get_class_handle("InteractionRoot")
-            )
+            c2wInteractionRootClassHandle,
+            static_cast<RTI::InteractionClassHandle>(C2WInteractionRoot::get_class_handle())
+    );
+    interactionRootSP = C2WInteractionRoot::create_interaction();
+    CPPUNIT_ASSERT_EQUAL(
+            c2wInteractionRootClassHandle, static_cast<RTI::InteractionClassHandle>(interactionRootSP->getClassHandle())
     );
     CPPUNIT_ASSERT_EQUAL(
-            RTIAmbassadorTest1::get_class_name_handle_map().find("InteractionRoot.C2WInteractionRoot")->second,
+            c2wInteractionRootClassHandle,
             static_cast<RTI::InteractionClassHandle>(
               InteractionRoot::get_class_handle("InteractionRoot.C2WInteractionRoot")
             )
     );
+
+    // SimLog
+    RTI::InteractionClassHandle simLogClassHandle =
+            RTIAmbassadorTest1::get_class_name_handle_map().find("InteractionRoot.C2WInteractionRoot.SimLog")->second;
     CPPUNIT_ASSERT_EQUAL(
-            RTIAmbassadorTest1::get_class_name_handle_map().find("InteractionRoot.C2WInteractionRoot.SimLog")->second,
+            simLogClassHandle,
+            static_cast<RTI::InteractionClassHandle>(SimLog::get_class_handle())
+    );
+    interactionRootSP = SimLog::create_interaction();
+    CPPUNIT_ASSERT_EQUAL(
+            simLogClassHandle, static_cast<RTI::InteractionClassHandle>(interactionRootSP->getClassHandle())
+    );
+    CPPUNIT_ASSERT_EQUAL(
+            simLogClassHandle,
             static_cast<RTI::InteractionClassHandle>(
               InteractionRoot::get_class_handle("InteractionRoot.C2WInteractionRoot.SimLog")
             )
     );
-    CPPUNIT_ASSERT_EQUAL(
+
+    // HighPrio
+    RTI::InteractionClassHandle highPrioClassHandle =
             RTIAmbassadorTest1::get_class_name_handle_map().find(
               "InteractionRoot.C2WInteractionRoot.SimLog.HighPrio"
-            )->second,
+            )->second;
+    CPPUNIT_ASSERT_EQUAL(
+            highPrioClassHandle, static_cast<RTI::InteractionClassHandle>(HighPrio::get_class_handle())
+    );
+    interactionRootSP = HighPrio::create_interaction();
+    CPPUNIT_ASSERT_EQUAL(
+            highPrioClassHandle, static_cast<RTI::InteractionClassHandle>(interactionRootSP->getClassHandle())
+    );
+    CPPUNIT_ASSERT_EQUAL(
+            highPrioClassHandle, 
             static_cast<RTI::InteractionClassHandle>(
               InteractionRoot::get_class_handle("InteractionRoot.C2WInteractionRoot.SimLog.HighPrio")
             )
     );
-    CPPUNIT_ASSERT_EQUAL(
+
+    // SimulationControl
+    RTI::InteractionClassHandle simulationControlClassHandle =
             RTIAmbassadorTest1::get_class_name_handle_map().find(
               "InteractionRoot.C2WInteractionRoot.SimulationControl"
-            )->second,
+            )->second;
+    CPPUNIT_ASSERT_EQUAL(
+            simulationControlClassHandle,
+            static_cast<RTI::InteractionClassHandle>(SimulationControl::get_class_handle())
+    );
+    interactionRootSP = SimulationControl::create_interaction();
+    CPPUNIT_ASSERT_EQUAL(
+            simulationControlClassHandle, static_cast<RTI::InteractionClassHandle>(interactionRootSP->getClassHandle())
+    );
+    CPPUNIT_ASSERT_EQUAL(
+            simulationControlClassHandle,
             static_cast<RTI::InteractionClassHandle>(
               InteractionRoot::get_class_handle("InteractionRoot.C2WInteractionRoot.SimulationControl")
             )
     );
+
+    // SimEnd
+    RTI::InteractionClassHandle simEndClassHandle = RTIAmbassadorTest1::get_class_name_handle_map().find(
+      "InteractionRoot.C2WInteractionRoot.SimulationControl.SimEnd"
+    )->second;
     CPPUNIT_ASSERT_EQUAL(
-            RTIAmbassadorTest1::get_class_name_handle_map().find(
-              "InteractionRoot.C2WInteractionRoot.SimulationControl.SimEnd"
-            )->second,
+            simEndClassHandle, static_cast<RTI::InteractionClassHandle>(SimEnd::get_class_handle())
+    );
+    interactionRootSP = SimEnd::create_interaction();
+    CPPUNIT_ASSERT_EQUAL(
+            simEndClassHandle, static_cast<RTI::InteractionClassHandle>(interactionRootSP->getClassHandle())
+    );
+    CPPUNIT_ASSERT_EQUAL(
+            simEndClassHandle,
             static_cast<RTI::InteractionClassHandle>(
               InteractionRoot::get_class_handle("InteractionRoot.C2WInteractionRoot.SimulationControl.SimEnd")
             )
     );
 }
+void MessagingTests::objectClassHandleTest() {
 
-void InteractionTests::parameterNamesTest() {
+    ObjectRoot::SP objectRootSP;
+
+    // ObjectRoot
+    RTI::ObjectClassHandle objectRootClassHandle =
+      RTIAmbassadorTest1::get_class_name_handle_map().find("ObjectRoot")->second;
+    CPPUNIT_ASSERT_EQUAL(
+            objectRootClassHandle, static_cast<RTI::ObjectClassHandle>(ObjectRoot::get_class_handle())
+    );
+    objectRootSP = ObjectRoot::create_object();
+    CPPUNIT_ASSERT_EQUAL(
+            objectRootClassHandle, static_cast<RTI::ObjectClassHandle>(objectRootSP->getClassHandle())
+    );
+    CPPUNIT_ASSERT_EQUAL(
+            objectRootClassHandle,
+            static_cast<RTI::ObjectClassHandle>(ObjectRoot::get_class_handle("ObjectRoot"))
+    );
+
+    // FederateObject
+    RTI::ObjectClassHandle federateObjectClassHandle =
+            RTIAmbassadorTest1::get_class_name_handle_map().find("ObjectRoot.FederateObject")->second;
+    CPPUNIT_ASSERT_EQUAL(
+            federateObjectClassHandle,
+            static_cast<RTI::ObjectClassHandle>(FederateObject::get_class_handle())
+    );
+    objectRootSP = FederateObject::create_object();
+    CPPUNIT_ASSERT_EQUAL(
+            federateObjectClassHandle, static_cast<RTI::ObjectClassHandle>(objectRootSP->getClassHandle())
+    );
+    CPPUNIT_ASSERT_EQUAL(
+            federateObjectClassHandle,
+            static_cast<RTI::ObjectClassHandle>(
+              ObjectRoot::get_class_handle("ObjectRoot.FederateObject")
+            )
+    );
+}
+
+void MessagingTests::interactionParameterNamesTest() {
+
+    InteractionRoot::SP interactionRootSP;
 
     // TEST InteractionRoot get_parameter_names()
     ClassAndPropertyNameList expectedInteractionRootParameterList;
 
+    interactionRootSP = InteractionRoot::create();
+
     CPPUNIT_ASSERT_EQUAL(expectedInteractionRootParameterList, InteractionRoot::get_parameter_names());
+    CPPUNIT_ASSERT_EQUAL(expectedInteractionRootParameterList, interactionRootSP->getParameterNames());
     CPPUNIT_ASSERT_EQUAL(
             expectedInteractionRootParameterList,
             InteractionRoot::get_parameter_names("InteractionRoot")
@@ -296,6 +377,7 @@ void InteractionTests::parameterNamesTest() {
     ClassAndPropertyNameList expectedInteractionRootAllParameterList(expectedInteractionRootParameterList);
 
     CPPUNIT_ASSERT_EQUAL(expectedInteractionRootAllParameterList, InteractionRoot::get_all_parameter_names());
+    CPPUNIT_ASSERT_EQUAL(expectedInteractionRootAllParameterList, interactionRootSP->getAllParameterNames());
     CPPUNIT_ASSERT_EQUAL(
             expectedInteractionRootAllParameterList,
             InteractionRoot::get_all_parameter_names("InteractionRoot")
@@ -315,7 +397,10 @@ void InteractionTests::parameterNamesTest() {
     );
     expectedC2WInteractionRootParameterList.sort();
 
+    interactionRootSP = C2WInteractionRoot::create();
+    
     CPPUNIT_ASSERT_EQUAL(expectedC2WInteractionRootParameterList, C2WInteractionRoot::get_parameter_names());
+    CPPUNIT_ASSERT_EQUAL(expectedC2WInteractionRootParameterList, interactionRootSP->getParameterNames());
     CPPUNIT_ASSERT_EQUAL(
             expectedC2WInteractionRootParameterList,
             InteractionRoot::get_parameter_names("InteractionRoot.C2WInteractionRoot")
@@ -332,6 +417,7 @@ void InteractionTests::parameterNamesTest() {
     expectedC2WInteractionRootAllParameterList.sort();
 
     CPPUNIT_ASSERT_EQUAL(expectedC2WInteractionRootAllParameterList, C2WInteractionRoot::get_all_parameter_names());
+    CPPUNIT_ASSERT_EQUAL(expectedC2WInteractionRootAllParameterList, interactionRootSP->getAllParameterNames());
     CPPUNIT_ASSERT_EQUAL(
             expectedC2WInteractionRootAllParameterList,
             InteractionRoot::get_all_parameter_names("InteractionRoot.C2WInteractionRoot")
@@ -351,7 +437,10 @@ void InteractionTests::parameterNamesTest() {
     );
     expectedSimLogParameterList.sort();
 
+    interactionRootSP = SimLog::create();
+
     CPPUNIT_ASSERT_EQUAL(expectedSimLogParameterList, SimLog::get_parameter_names());
+    CPPUNIT_ASSERT_EQUAL(expectedSimLogParameterList, interactionRootSP->getParameterNames());
     CPPUNIT_ASSERT_EQUAL(
             expectedSimLogParameterList,
             InteractionRoot::get_parameter_names("InteractionRoot.C2WInteractionRoot.SimLog")
@@ -368,6 +457,7 @@ void InteractionTests::parameterNamesTest() {
     expectedSimLogAllParameterList.sort();
 
     CPPUNIT_ASSERT_EQUAL(expectedSimLogAllParameterList, SimLog::get_all_parameter_names());
+    CPPUNIT_ASSERT_EQUAL(expectedSimLogAllParameterList, interactionRootSP->getAllParameterNames());
     CPPUNIT_ASSERT_EQUAL(
             expectedSimLogAllParameterList,
             InteractionRoot::get_all_parameter_names("InteractionRoot.C2WInteractionRoot.SimLog")
@@ -377,7 +467,10 @@ void InteractionTests::parameterNamesTest() {
     // TEST InteractionRoot.C2WInteractionRoot.SimLog get_parameter_names()
     ClassAndPropertyNameList expectedHighPrioParameterList;
 
+    interactionRootSP = HighPrio::create();
+
     CPPUNIT_ASSERT_EQUAL(expectedHighPrioParameterList, HighPrio::get_parameter_names());
+    CPPUNIT_ASSERT_EQUAL(expectedHighPrioParameterList, interactionRootSP->getParameterNames());
     CPPUNIT_ASSERT_EQUAL(
             expectedHighPrioParameterList,
             InteractionRoot::get_parameter_names("InteractionRoot.C2WInteractionRoot.SimLog.HighPrio")
@@ -394,47 +487,158 @@ void InteractionTests::parameterNamesTest() {
     expectedHighPrioAllParameterList.sort();
 
     CPPUNIT_ASSERT_EQUAL(expectedHighPrioAllParameterList, HighPrio::get_all_parameter_names());
+    CPPUNIT_ASSERT_EQUAL(expectedHighPrioAllParameterList, interactionRootSP->getAllParameterNames());
     CPPUNIT_ASSERT_EQUAL(
             expectedHighPrioAllParameterList,
             InteractionRoot::get_all_parameter_names("InteractionRoot.C2WInteractionRoot.SimLog.HighPrio")
     );
+
+    CPPUNIT_ASSERT_EQUAL(6, HighPrio::get_num_parameters());
+    CPPUNIT_ASSERT_EQUAL(6, interactionRootSP->getNumParameters());
+    CPPUNIT_ASSERT_EQUAL(6, InteractionRoot::get_num_parameters(
+            "InteractionRoot.C2WInteractionRoot.SimLog.HighPrio"
+    ));
 }
 
-void InteractionTests::propertyHandleTest() {
+void MessagingTests::objectAttributeNamesTest() {
+
+    ObjectRoot::SP objectRootSP;
+
+    // TEST ObjectRoot get_attribute_names()
+    ClassAndPropertyNameList expectedObjectRootAttributeList;
+
+    objectRootSP = ObjectRoot::create();
+
+    CPPUNIT_ASSERT_EQUAL(expectedObjectRootAttributeList, ObjectRoot::get_attribute_names());
+    CPPUNIT_ASSERT_EQUAL(expectedObjectRootAttributeList, objectRootSP->getAttributeNames());
+    CPPUNIT_ASSERT_EQUAL(
+            expectedObjectRootAttributeList,
+            ObjectRoot::get_attribute_names("ObjectRoot")
+    );
+
+    // TEST ObjectRoot get_all_attribute_names()
+    ClassAndPropertyNameList expectedObjectRootAllAttributeList(expectedObjectRootAttributeList);
+
+    CPPUNIT_ASSERT_EQUAL(expectedObjectRootAllAttributeList, ObjectRoot::get_all_attribute_names());
+    CPPUNIT_ASSERT_EQUAL(expectedObjectRootAllAttributeList, objectRootSP->getAllAttributeNames());
+    CPPUNIT_ASSERT_EQUAL(
+            expectedObjectRootAllAttributeList,
+            ObjectRoot::get_all_attribute_names("ObjectRoot")
+    );
+
+
+    // TEST ObjectRoot.FederateObject get_attribute_names()
+    ClassAndPropertyNameList expectedFederateObjectAttributeList;
+    expectedFederateObjectAttributeList.emplace_back(
+            FederateObject::get_hla_class_name(), "FederateHandle"
+    );
+    expectedFederateObjectAttributeList.emplace_back(
+            FederateObject::get_hla_class_name(), "FederateHost"
+    );
+    expectedFederateObjectAttributeList.emplace_back(
+            FederateObject::get_hla_class_name(), "FederateType"
+    );
+    expectedFederateObjectAttributeList.sort();
+
+    objectRootSP = FederateObject::create();
+
+    CPPUNIT_ASSERT_EQUAL(expectedFederateObjectAttributeList, FederateObject::get_attribute_names());
+    CPPUNIT_ASSERT_EQUAL(expectedFederateObjectAttributeList, objectRootSP->getAttributeNames());
+    CPPUNIT_ASSERT_EQUAL(
+            expectedFederateObjectAttributeList,
+            ObjectRoot::get_attribute_names("ObjectRoot.FederateObject")
+    );
+
+    // TEST ObjectRoot.FederateObject get_all_attribute_names()
+    ClassAndPropertyNameList expectedFederateObjectAllAttributeList(expectedObjectRootAllAttributeList);
+    expectedFederateObjectAllAttributeList.insert(
+            expectedFederateObjectAllAttributeList.end(),
+            expectedFederateObjectAttributeList.begin(),
+            expectedFederateObjectAttributeList.end()
+    );
+    expectedFederateObjectAllAttributeList.sort();
+
+    CPPUNIT_ASSERT_EQUAL(expectedFederateObjectAllAttributeList, FederateObject::get_all_attribute_names());
+    CPPUNIT_ASSERT_EQUAL(expectedFederateObjectAllAttributeList, objectRootSP->getAllAttributeNames());
+    CPPUNIT_ASSERT_EQUAL(
+            expectedFederateObjectAllAttributeList,
+            ObjectRoot::get_all_attribute_names("ObjectRoot.FederateObject")
+    );
+
+    CPPUNIT_ASSERT_EQUAL(3, FederateObject::get_num_attributes());
+    CPPUNIT_ASSERT_EQUAL(3, objectRootSP->getNumAttributes());
+    CPPUNIT_ASSERT_EQUAL(3, ObjectRoot::get_num_attributes("ObjectRoot.FederateObject"));
+}
+
+void MessagingTests::interactionParameterHandleTest() {
+
+    InteractionRoot::SP interactionRootSP;
+
     int expectedValue = RTIAmbassadorTest1::get_interaction_class_and_property_name_handle_map().find(
             ClassAndPropertyName("InteractionRoot.C2WInteractionRoot", "federateSequence")
     )->second;
 
-    CPPUNIT_ASSERT_EQUAL(expectedValue, HighPrio::get_parameter_handle("federateSequence"));
-    CPPUNIT_ASSERT_EQUAL(expectedValue, SimLog::get_parameter_handle("federateSequence"));
     CPPUNIT_ASSERT_EQUAL(expectedValue, C2WInteractionRoot::get_parameter_handle("federateSequence"));
+    interactionRootSP = C2WInteractionRoot::create_interaction();
+    CPPUNIT_ASSERT_EQUAL(expectedValue, interactionRootSP->getParameterHandle("federateSequence"));
+    CPPUNIT_ASSERT_EQUAL(expectedValue, InteractionRoot::get_parameter_handle(
+            "InteractionRoot.C2WInteractionRoot", "federateSequence"
+    ));
+
+    CPPUNIT_ASSERT_EQUAL(expectedValue, SimLog::get_parameter_handle("federateSequence"));
+    interactionRootSP = SimLog::create_interaction();
+    CPPUNIT_ASSERT_EQUAL(expectedValue, interactionRootSP->getParameterHandle("federateSequence"));
+    CPPUNIT_ASSERT_EQUAL(expectedValue, InteractionRoot::get_parameter_handle(
+            "InteractionRoot.C2WInteractionRoot.SimLog", "federateSequence"
+    ));
+
+    CPPUNIT_ASSERT_EQUAL(expectedValue, HighPrio::get_parameter_handle("federateSequence"));
+    interactionRootSP = HighPrio::create_interaction();
+    CPPUNIT_ASSERT_EQUAL(expectedValue, interactionRootSP->getParameterHandle("federateSequence"));
+    CPPUNIT_ASSERT_EQUAL(expectedValue, InteractionRoot::get_parameter_handle(
+            "InteractionRoot.C2WInteractionRoot.SimLog.HighPrio", "federateSequence"
+    ));
 
     expectedValue = RTIAmbassadorTest1::get_interaction_class_and_property_name_handle_map().find(
             ClassAndPropertyName("InteractionRoot.C2WInteractionRoot.SimLog", "FedName")
     )->second;
 
-    CPPUNIT_ASSERT_EQUAL(expectedValue, HighPrio::get_parameter_handle("FedName"));
     CPPUNIT_ASSERT_EQUAL(expectedValue, SimLog::get_parameter_handle("FedName"));
-
-    expectedValue = RTIAmbassadorTest1::get_interaction_class_and_property_name_handle_map().find(
-            ClassAndPropertyName("InteractionRoot.C2WInteractionRoot.SimLog", "FedName")
-    )->second;
+    interactionRootSP = SimLog::create_interaction();
+    CPPUNIT_ASSERT_EQUAL(expectedValue, interactionRootSP->getParameterHandle("FedName"));
+    CPPUNIT_ASSERT_EQUAL(expectedValue, InteractionRoot::get_parameter_handle(
+            "InteractionRoot.C2WInteractionRoot.SimLog", "FedName"
+    ));
 
     CPPUNIT_ASSERT_EQUAL(expectedValue, HighPrio::get_parameter_handle("FedName"));
-    CPPUNIT_ASSERT_EQUAL(expectedValue, SimLog::get_parameter_handle("FedName"));
+    interactionRootSP = HighPrio::create_interaction();
+    CPPUNIT_ASSERT_EQUAL(expectedValue, interactionRootSP->getParameterHandle("FedName"));
+    CPPUNIT_ASSERT_EQUAL(expectedValue, InteractionRoot::get_parameter_handle(
+            "InteractionRoot.C2WInteractionRoot.SimLog.HighPrio", "FedName"
+    ));
+}
 
-    expectedValue = RTIAmbassadorTest1::get_object_class_and_property_name_handle_map().find(
+void MessagingTests::objectAttributeHandleTest() {
+
+    ObjectRoot::SP objectRootSP;
+
+    int expectedValue = RTIAmbassadorTest1::get_object_class_and_property_name_handle_map().find(
             ClassAndPropertyName("ObjectRoot.FederateObject", "FederateHost")
     )->second;
 
     CPPUNIT_ASSERT_EQUAL(expectedValue, FederateObject::get_attribute_handle("FederateHost"));
+    objectRootSP = FederateObject::create_object();
+    CPPUNIT_ASSERT_EQUAL(expectedValue, objectRootSP->getAttributeHandle("FederateHost"));
+    CPPUNIT_ASSERT_EQUAL(expectedValue, ObjectRoot::get_attribute_handle(
+            "ObjectRoot.FederateObject", "FederateHost"
+    ));
 }
 
 BOOST_LOG_ATTRIBUTE_KEYWORD(messagingClassName, "MessagingClassName", std::string);
 BOOST_LOG_ATTRIBUTE_KEYWORD(severity, "Severity", logging::trivial::severity_level);
 BOOST_LOG_ATTRIBUTE_KEYWORD(timestamp, "TimeStamp", boost::posix_time::ptime);
 
-void InteractionTests::basicLogTest() {
+void MessagingTests::basicLogTest() {
 
     boost::shared_ptr< text_sink > stringSink = boost::make_shared< text_sink >();
     boost::shared_ptr< std::ostringstream > ostringstreamSP = boost::make_shared< std::ostringstream >();
@@ -487,7 +691,7 @@ std::string createJsonArrayString(const std::string &value) {
     return stringOutputStream.str();
 }
 
-void InteractionTests::dynamicMessagingTest() {
+void MessagingTests::dynamicMessagingTest() {
     InteractionRoot dynamicSimLogInteraction(SimLog::get_hla_class_name());
     InteractionRoot *dynamicSimLogInteractionPtr = &dynamicSimLogInteraction;
 
@@ -561,7 +765,7 @@ void InteractionTests::dynamicMessagingTest() {
     CPPUNIT_ASSERT_DOUBLES_EQUAL(doubleValue4, simLogInteraction.get_Time(), 0.01);
 }
 
-void InteractionTests::valueTest() {
+void MessagingTests::valueTest() {
 
     InteractionRoot testBase("InteractionRoot.TestBase");
     testBase.setParameter("field1", "value1");
@@ -584,7 +788,7 @@ void InteractionTests::valueTest() {
     CPPUNIT_ASSERT_DOUBLES_EQUAL(3.14, testDerived.getParameter("field5").asDouble(), 0.01);
 }
 
-void InteractionTests::messagingInstanceHlaClassTest() {
+void MessagingTests::messagingInstanceHlaClassTest() {
     InteractionRoot interactionRoot( "InteractionRoot.C2WInteractionRoot.Simlog.HighPrio" );
 
     CPPUNIT_ASSERT( interactionRoot.isInstanceOfHlaClass(
@@ -618,7 +822,7 @@ void InteractionTests::messagingInstanceHlaClassTest() {
     CPPUNIT_ASSERT( federateObject.isInstanceOfHlaClass("ObjectRoot.FederateObject"));
 }
 
-void InteractionTests::printInteractionTest() {
+void MessagingTests::printInteractionTest() {
     C2WInteractionRoot c2wInteractionRoot;
     c2wInteractionRoot.updateFederateSequence( "Hello" );
     c2wInteractionRoot.set_actualLogicalGenerationTime( 2.1 );
@@ -638,4 +842,4 @@ void InteractionTests::printInteractionTest() {
     CPPUNIT_ASSERT_EQUAL(expectedOutput, testStream.str());
 }
 
-CPPUNIT_TEST_SUITE_REGISTRATION( InteractionTests );
+CPPUNIT_TEST_SUITE_REGISTRATION( MessagingTests );
