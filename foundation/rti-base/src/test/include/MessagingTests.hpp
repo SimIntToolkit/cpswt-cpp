@@ -44,7 +44,7 @@
 namespace logging = boost::log;
 namespace sinks = boost::log::sinks;
 
-class InteractionTests: public CppUnit::TestCase {
+class MessagingTests: public CppUnit::TestCase {
 
 public:
     typedef sinks::synchronous_sink< sinks::text_ostream_backend > text_sink;
@@ -68,11 +68,15 @@ private:
     // nullSink IS MEANT TO DISPOSE OF DEFAULT SINK, SO DEFAULT LOGGING BEHAVIOR IS ESSENTIALLY NO SINK.
     boost::shared_ptr< text_sink > nullSink;
 
-    CPPUNIT_TEST_SUITE( InteractionTests );
-    CPPUNIT_TEST(messagingNamesTest);
-    CPPUNIT_TEST(classHandleTest);
-    CPPUNIT_TEST(parameterNamesTest);
-    CPPUNIT_TEST(propertyHandleTest);
+    CPPUNIT_TEST_SUITE( MessagingTests );
+    CPPUNIT_TEST(interactionClassNamesTest);
+    CPPUNIT_TEST(objectClassNamesTest);
+    CPPUNIT_TEST(interactionClassHandleTest);
+    CPPUNIT_TEST(objectClassHandleTest);
+    CPPUNIT_TEST(interactionParameterNamesTest);
+    CPPUNIT_TEST(objectAttributeNamesTest);
+    CPPUNIT_TEST(interactionParameterHandleTest);
+    CPPUNIT_TEST(objectAttributeHandleTest);
     CPPUNIT_TEST(basicLogTest);
     CPPUNIT_TEST(dynamicMessagingTest);
     CPPUNIT_TEST(valueTest);
@@ -81,7 +85,7 @@ private:
     CPPUNIT_TEST_SUITE_END();
 
 public:
-    InteractionTests() : CppUnit::TestCase() {
+    MessagingTests() : CppUnit::TestCase() {
         init_1();
         nullSink = boost::make_shared< text_sink >();
         nullSink->set_filter(&null_filter);
@@ -90,10 +94,14 @@ public:
 
     void setUp() override;
 
-    void messagingNamesTest();
-    void classHandleTest();
-    void parameterNamesTest();
-    void propertyHandleTest();
+    void interactionClassNamesTest();
+    void objectClassNamesTest();
+    void interactionClassHandleTest();
+    void objectClassHandleTest();
+    void interactionParameterNamesTest();
+    void objectAttributeNamesTest();
+    void interactionParameterHandleTest();
+    void objectAttributeHandleTest();
     void basicLogTest();
     void dynamicMessagingTest();
     void valueTest();
