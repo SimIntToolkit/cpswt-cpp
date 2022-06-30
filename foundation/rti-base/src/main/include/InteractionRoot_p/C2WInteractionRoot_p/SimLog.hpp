@@ -268,6 +268,10 @@ public:
         return handle == get_class_handle();
     }
 
+    static int get_num_parameters() {
+        return get_class_name_all_class_and_property_name_set_sp_map()[get_hla_class_name()]->size();
+    }
+
     //------------------------------
     // PROPERTY MANIPULATION METHODS
     //------------------------------
