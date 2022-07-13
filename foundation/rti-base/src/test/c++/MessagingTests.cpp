@@ -678,10 +678,7 @@ void MessagingTests::basicLogTest() {
     }
 }
 
-std::string createJsonArrayString(const std::string &value) {
-    Json::Value jsonArray(Json::arrayValue);
-    jsonArray.append( value );
-
+std::string jsonToString(const Json::Value jsonArray) {
     Json::StreamWriterBuilder streamWriterBuilder;
     streamWriterBuilder["commentStyle"] = "None";
     std::unique_ptr<Json::StreamWriter> streamWriterUPtr(streamWriterBuilder.newStreamWriter());
@@ -689,6 +686,13 @@ std::string createJsonArrayString(const std::string &value) {
     streamWriterUPtr->write(jsonArray, &stringOutputStream);
 
     return stringOutputStream.str();
+}
+
+std::string createJsonArrayString(const std::string &value) {
+    Json::Value jsonArray(Json::arrayValue);
+    jsonArray.append( value );
+
+    return jsonToString(jsonArray);
 }
 
 void MessagingTests::dynamicMessagingTest() {
@@ -755,13 +759,14 @@ void MessagingTests::dynamicMessagingTest() {
     std::string string4("string4");
     double doubleValue4(17.3);
 
+    // federateSequence SHOULD NOT BE UPDATED (CAN ONLY UPDATE ONCE PER INTERACTION)
     simLogInteraction.updateFederateSequence(string4);
     simLogInteraction.set_Time(doubleValue4);
 
-    CPPUNIT_ASSERT_EQUAL(string4, C2WInteractionRoot::get_source_federate_id(simLogInteraction));
+    CPPUNIT_ASSERT_EQUAL(string3, C2WInteractionRoot::get_source_federate_id(simLogInteraction));
     CPPUNIT_ASSERT_DOUBLES_EQUAL(doubleValue4, simLogInteraction.getParameter("Time").asDouble(), 0.01);
 
-    CPPUNIT_ASSERT_EQUAL(string4, simLogInteraction.getSourceFederateId());
+    CPPUNIT_ASSERT_EQUAL(string3, simLogInteraction.getSourceFederateId());
     CPPUNIT_ASSERT_DOUBLES_EQUAL(doubleValue4, simLogInteraction.get_Time(), 0.01);
 }
 
@@ -820,6 +825,86 @@ void MessagingTests::messagingInstanceHlaClassTest() {
     CPPUNIT_ASSERT( federateObject.isInstanceHlaClassDerivedFromHlaClass("ObjectRoot"));
     CPPUNIT_ASSERT( federateObject.isInstanceHlaClassDerivedFromHlaClass("ObjectRoot.FederateObject"));
     CPPUNIT_ASSERT( federateObject.isInstanceOfHlaClass("ObjectRoot.FederateObject"));
+}
+
+void MessagingTests::federateSequenceTest() {
+
+    // CHECK federateSequence THAT STARTS OUT EMPTY
+    InteractionRoot interactionRoot1("InteractionRoot.C2WInteractionRoot.SimLog");
+
+    std::string federateName1("federateName1");
+
+    // ADD federateName1 TO federateSequence
+    C2WInteractionRoot::update_federate_sequence(interactionRoot1, federateName1);
+
+    // MAKE SURE IT'S THERE
+    C2WInteractionRoot::StringList federateSequenceList1 =
+      C2WInteractionRoot::get_federate_sequence_list(interactionRoot1);
+
+    CPPUNIT_ASSERT_EQUAL(1, static_cast<int>(federateSequenceList1.size()));
+    CPPUNIT_ASSERT_EQUAL(federateName1, federateSequenceList1.front());
+
+    // ADD IT AGAIN
+    C2WInteractionRoot::update_federate_sequence(interactionRoot1, federateName1);
+
+    // MAKE SURE federateSequence IS UNCHANGED
+    C2WInteractionRoot::StringList federateSequenceList2 =
+      C2WInteractionRoot::get_federate_sequence_list(interactionRoot1);
+
+    CPPUNIT_ASSERT_EQUAL(1, static_cast<int>(federateSequenceList2.size()));
+    CPPUNIT_ASSERT_EQUAL(federateName1, federateSequenceList2.front());
+
+
+    // CHECK federateSequence THAT STARTS OUT NON-EMPTY
+    InteractionRoot interactionRoot2("InteractionRoot.C2WInteractionRoot.SimLog");
+
+    C2WInteractionRoot::StringList federateNameList;
+    federateNameList.push_back("federateName2");
+    federateNameList.push_back("federateName3");
+
+    Json::Value jsonArray(Json::arrayValue);
+    for(
+      C2WInteractionRoot::StringList::const_iterator stlCit = federateNameList.begin() ;
+      stlCit != federateNameList.end() ;
+      ++stlCit
+    ) {
+        jsonArray.append( *stlCit );
+    }
+
+    interactionRoot2.setParameter("federateSequence", jsonToString(jsonArray));
+
+    // ADD federateName1 TO federateSequence
+    C2WInteractionRoot::update_federate_sequence(interactionRoot2, federateName1);
+
+    // MAKE SURE IT'S THERE
+    C2WInteractionRoot::StringList federateSequenceList3 =
+      C2WInteractionRoot::get_federate_sequence_list(interactionRoot2);
+    federateNameList.push_back(federateName1);
+
+    CPPUNIT_ASSERT_EQUAL(federateNameList.size(), federateSequenceList3.size());
+    C2WInteractionRoot::StringList::const_iterator fnlCit = federateNameList.begin();
+    C2WInteractionRoot::StringList::const_iterator fl3Cit = federateSequenceList3.begin();
+    while( fnlCit != federateNameList.end() ) {
+        CPPUNIT_ASSERT_EQUAL(*fnlCit, *fl3Cit);
+        ++fnlCit;
+        ++fl3Cit;
+    }
+
+    // ADD IT AGAIN
+    C2WInteractionRoot::update_federate_sequence(interactionRoot2, federateName1);
+
+    // MAKE SURE federateSequence IS UNCHANGED
+    C2WInteractionRoot::StringList federateSequenceList4 =
+      C2WInteractionRoot::get_federate_sequence_list(interactionRoot2);
+
+    CPPUNIT_ASSERT_EQUAL(federateNameList.size(), federateSequenceList3.size());
+    fnlCit = federateNameList.begin();
+    fl3Cit = federateSequenceList3.begin();
+    while( fnlCit != federateNameList.end() ) {
+        CPPUNIT_ASSERT_EQUAL(*fnlCit, *fl3Cit);
+        ++fnlCit;
+        ++fl3Cit;
+    }
 }
 
 void MessagingTests::printInteractionTest() {
