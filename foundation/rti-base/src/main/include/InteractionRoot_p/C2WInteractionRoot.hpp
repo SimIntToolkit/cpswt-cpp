@@ -36,8 +36,6 @@
 
 #include <list>
 
-#include <boost/regex.hpp>
-
 #include <boost/unordered_set.hpp>
 
 
@@ -422,16 +420,7 @@ public:
     // END INSTANCE CREATION METHODS
     //------------------------------
 private:
-    static boost::regex &get_federate_sequence_regex() {
-        static boost::regex federateSequenceRegex(
-          "\\s*\\[(?:\\s*\"(?:[^\"]|(?:\\\\)*\\\")+\",)*\\s*\"(?:[^\"]|(?:\\\\)*\\\")+\"\\s*\\]\\s*"
-        );
-        return federateSequenceRegex;
-    }
-
-    static bool is_federate_sequence(const std::string &federateSequence) {
-        return boost::regex_match( federateSequence, get_federate_sequence_regex() );
-    }
+    static bool is_federate_sequence(const std::string &federateSequence);
 
     static void update_federate_sequence_aux(::org::cpswt::hla::InteractionRoot &interactionRoot, const std::string &federateId);
     static StringList get_federate_sequence_list_aux(const ::org::cpswt::hla::InteractionRoot &interactionRoot);
