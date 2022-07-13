@@ -34,9 +34,33 @@ namespace org {
   namespace hla {
    namespace InteractionRoot_p {
 
+bool C2WInteractionRoot::is_federate_sequence(const std::string &federateSequence) {
+    Json::Value jsonArray(Json::arrayValue);
+
+    std::istringstream jsonInputStream( federateSequence );
+    try {
+        jsonInputStream >> jsonArray;
+    } catch(...) {
+        return false;
+    }
+
+    int jsonArrayLength = jsonArray.size();
+    for(int ix = 0 ; ix < jsonArrayLength ; ++ix) {
+        if (!jsonArray[ix].isString()) {
+            return false;
+        }
+    }
+    return true;
+}
+
 void C2WInteractionRoot::update_federate_sequence_aux(
   ::org::cpswt::hla::InteractionRoot &interactionRoot, const std::string &federateId
 ) {
+    if (::org::cpswt::hla::InteractionRoot::get_federate_appended_to_federate_sequence(interactionRoot)) {
+        return;
+    }
+    ::org::cpswt::hla::InteractionRoot::set_federate_appended_to_federate_sequence(interactionRoot);
+
     std::string federateSequence = interactionRoot.getParameter("federateSequence").asString();
 
     Json::Value jsonArray(Json::arrayValue);
@@ -105,7 +129,7 @@ bool C2WInteractionRoot::static_init() {
     );
 
     get_class_and_property_name_initial_value_sp_map()[ClassAndPropertyName( "InteractionRoot.C2WInteractionRoot", "federateSequence" )] =
-      ValueSP( new Value( std::string("") ));
+      ValueSP( new Value( std::string("[]") ));
 
     // ADD THIS CLASS'S _classAndPropertyNameSet TO _classNamePropertyNameSetMap DEFINED
     // IN InteractionRoot

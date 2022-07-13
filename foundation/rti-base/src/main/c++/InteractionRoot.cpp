@@ -309,6 +309,7 @@ void InteractionRoot::unsubscribe_interaction(const std::string &hlaClassName, R
 }
 
 void InteractionRoot::initializeProperties(const std::string &hlaClassName) {
+    federateAppendedToFederateSequence = false;
     setInstanceHlaClassName(hlaClassName);
     if (get_hla_class_name_set().find(hlaClassName) == get_hla_class_name_set().end()) {
         BOOST_LOG_SEV(get_logger(), error)
@@ -572,7 +573,10 @@ void InteractionRoot::readFederateDynamicMessageClasses(std::istream &dynamicMes
             if (!typeDataMap["Hidden"].asBool()) {
                 const std::string propertyTypeString = typeDataMap["ParameterType"].asString();
                 get_class_and_property_name_initial_value_sp_map()[classAndPropertyName] =
-                  ValueSP( new Value(*get_type_initial_value_sp_map()[propertyTypeString]) );
+                  ValueSP( new Value(
+                    hlaClassName == "InteractionRoot.C2WInteractionRoot" && propertyName == "federateSequence" ?
+                      std::string("[]") : *get_type_initial_value_sp_map()[propertyTypeString]
+                  ) );
             }
         }
 

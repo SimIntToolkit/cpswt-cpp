@@ -178,6 +178,17 @@ protected:
         _instanceHlaClassName = instanceHlaClassName;
     }
 
+    // FOR INTERACTIONS DERIVED FROM InteractionRoot.C2WInteractionRoot
+    bool federateAppendedToFederateSequence;
+
+    static void set_federate_appended_to_federate_sequence(InteractionRoot &interactionRoot) {
+        interactionRoot.federateAppendedToFederateSequence = true;
+    }
+
+    static bool get_federate_appended_to_federate_sequence(const InteractionRoot &interactionRoot) {
+        return interactionRoot.federateAppendedToFederateSequence;
+    }
+
 public:
     static std::string get_simple_class_name(const std::string &hlaClassName) {
         size_t position = hlaClassName.find_last_of('.');
