@@ -82,6 +82,7 @@ private:
     CPPUNIT_TEST(valueTest);
     CPPUNIT_TEST(messagingInstanceHlaClassTest);
     CPPUNIT_TEST(federateSequenceTest);
+    CPPUNIT_TEST(attributePubSubTest);
     CPPUNIT_TEST(printInteractionTest);
     CPPUNIT_TEST_SUITE_END();
 
@@ -108,6 +109,7 @@ public:
     void valueTest();
     void messagingInstanceHlaClassTest();
     void federateSequenceTest();
+    void attributePubSubTest();
     void printInteractionTest();
 };
 

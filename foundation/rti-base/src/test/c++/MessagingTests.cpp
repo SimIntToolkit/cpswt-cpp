@@ -38,6 +38,8 @@
 #include "InteractionRoot_p/C2WInteractionRoot_p/SimulationControl_p/SimEnd.hpp"
 #include "ObjectRoot.hpp"
 #include "ObjectRoot_p/FederateObject.hpp"
+#include "ObjectRoot_p/BaseObjectClass.hpp"
+#include "ObjectRoot_p/BaseObjectClass_p/DerivedObjectClass.hpp"
 
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <boost/log/expressions.hpp>
@@ -58,6 +60,7 @@ using HighPrio = ::org::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::Sim
 using SimulationControl = ::org::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::SimulationControl;
 using SimEnd = ::org::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::SimulationControl_p::SimEnd;
 using FederateObject = ::org::cpswt::hla::ObjectRoot_p::FederateObject;
+using DerivedObjectClass = ::org::cpswt::hla::ObjectRoot_p::BaseObjectClass_p::DerivedObjectClass;
 
 typedef std::set<std::string> StringSet;
 typedef std::list<std::string> StringList;
@@ -202,6 +205,8 @@ void MessagingTests::objectClassNamesTest() {
     std::set<std::string> expectedObjectClassNameSet;
     expectedObjectClassNameSet.insert("ObjectRoot");
     expectedObjectClassNameSet.insert("ObjectRoot.FederateObject");
+    expectedObjectClassNameSet.insert("ObjectRoot.BaseObjectClass");
+    expectedObjectClassNameSet.insert("ObjectRoot.BaseObjectClass.DerivedObjectClass");
 
     const std::set<std::string> &actualObjectClassNameSet = ObjectRoot::get_object_hla_class_name_set();
     CPPUNIT_ASSERT(expectedObjectClassNameSet == actualObjectClassNameSet);
@@ -905,6 +910,129 @@ void MessagingTests::federateSequenceTest() {
         ++fnlCit;
         ++fl3Cit;
     }
+}
+
+void compareClassAndPropertyNameSets(
+  const ClassAndPropertyNameSet &expectedClassAndPropertyNameSet,
+  const ClassAndPropertyNameSet &actualClassAndPropertyNameSet
+) {
+    ClassAndPropertyNameList expectedClassAndPropertyNameList(
+        expectedClassAndPropertyNameSet.begin(), expectedClassAndPropertyNameSet.end()
+    );
+    expectedClassAndPropertyNameList.sort();
+
+    ClassAndPropertyNameList actualClassAndPropertyNameList(
+        actualClassAndPropertyNameSet.begin(), actualClassAndPropertyNameSet.end()
+    );
+    actualClassAndPropertyNameList.sort();
+
+    CPPUNIT_ASSERT_EQUAL(expectedClassAndPropertyNameList.size(), actualClassAndPropertyNameList.size());
+
+    ClassAndPropertyNameList::const_iterator eclCit = expectedClassAndPropertyNameList.begin();
+    ClassAndPropertyNameList::const_iterator aclCit = actualClassAndPropertyNameList.begin();
+
+    while(eclCit != expectedClassAndPropertyNameList.end()) {
+        CPPUNIT_ASSERT_EQUAL(*eclCit, *aclCit);
+        ++eclCit;
+        ++aclCit;
+    }
+}
+
+void MessagingTests::attributePubSubTest() {
+
+    // PUBLISH
+    ClassAndPropertyNameSet expectedPublishedClassAndPropertyNameSet;
+
+    expectedPublishedClassAndPropertyNameSet.emplace(
+            "ObjectRoot.BaseObjectClass.DerivedObjectClass", "int_attribute1"
+    );
+    expectedPublishedClassAndPropertyNameSet.emplace(
+            "ObjectRoot.BaseObjectClass.DerivedObjectClass", "int_attribute2"
+    );
+    expectedPublishedClassAndPropertyNameSet.emplace(
+            "ObjectRoot.BaseObjectClass.DerivedObjectClass", "string_attribute2"
+    );
+    expectedPublishedClassAndPropertyNameSet.emplace(
+            "ObjectRoot.BaseObjectClass", "int_attribute1"
+    );
+    expectedPublishedClassAndPropertyNameSet.emplace(
+            "ObjectRoot.BaseObjectClass", "string_attribute1"
+    );
+
+    DerivedObjectClass::publish_int_attribute1_attribute();
+    DerivedObjectClass::publish_int_attribute2_attribute();
+    DerivedObjectClass::publish_attribute("ObjectRoot.BaseObjectClass", "int_attribute1");
+    DerivedObjectClass::publish_string_attribute1_attribute();
+    DerivedObjectClass::publish_string_attribute2_attribute();
+
+    ObjectRoot::ClassAndPropertyNameSetSP actualPublishedClassAndPropertyNameSetSP =
+            DerivedObjectClass::get_published_attribute_name_set_sp();
+
+    compareClassAndPropertyNameSets(
+      expectedPublishedClassAndPropertyNameSet, *actualPublishedClassAndPropertyNameSetSP
+    );
+
+    // UNPUBLISH
+    DerivedObjectClass::unpublish_int_attribute1_attribute();
+    DerivedObjectClass::unpublish_attribute("ObjectRoot.BaseObjectClass", "int_attribute1");
+
+    expectedPublishedClassAndPropertyNameSet.erase( ClassAndPropertyName(
+            "ObjectRoot.BaseObjectClass.DerivedObjectClass", "int_attribute1"
+    ));
+    expectedPublishedClassAndPropertyNameSet.erase( ClassAndPropertyName(
+            "ObjectRoot.BaseObjectClass", "int_attribute1"
+    ));
+
+    compareClassAndPropertyNameSets(
+      expectedPublishedClassAndPropertyNameSet, *actualPublishedClassAndPropertyNameSetSP
+    );
+
+    // SUBSCRIBE
+    ClassAndPropertyNameSet expectedSubscribedClassAndPropertyNameSet;
+
+    expectedSubscribedClassAndPropertyNameSet.emplace(
+            "ObjectRoot.BaseObjectClass.DerivedObjectClass", "int_attribute1"
+    );
+    expectedSubscribedClassAndPropertyNameSet.emplace(
+            "ObjectRoot.BaseObjectClass.DerivedObjectClass", "int_attribute2"
+    );
+    expectedSubscribedClassAndPropertyNameSet.emplace(
+            "ObjectRoot.BaseObjectClass.DerivedObjectClass", "string_attribute2"
+    );
+    expectedSubscribedClassAndPropertyNameSet.emplace(
+            "ObjectRoot.BaseObjectClass", "int_attribute1"
+    );
+    expectedSubscribedClassAndPropertyNameSet.emplace(
+            "ObjectRoot.BaseObjectClass", "string_attribute1"
+    );
+
+    DerivedObjectClass::subscribe_int_attribute1_attribute();
+    DerivedObjectClass::subscribe_int_attribute2_attribute();
+    DerivedObjectClass::subscribe_attribute("ObjectRoot.BaseObjectClass", "int_attribute1");
+    DerivedObjectClass::subscribe_string_attribute1_attribute();
+    DerivedObjectClass::subscribe_string_attribute2_attribute();
+
+    ObjectRoot::ClassAndPropertyNameSetSP actualSubscribedClassAndPropertyNameSetSP =
+            DerivedObjectClass::get_subscribed_attribute_name_set_sp();
+
+    compareClassAndPropertyNameSets(
+      expectedSubscribedClassAndPropertyNameSet, *actualSubscribedClassAndPropertyNameSetSP
+    );
+
+    // UNSUBSCRIBE
+    DerivedObjectClass::unsubscribe_int_attribute1_attribute();
+    DerivedObjectClass::unsubscribe_attribute("ObjectRoot.BaseObjectClass", "int_attribute1");
+
+    expectedSubscribedClassAndPropertyNameSet.erase( ClassAndPropertyName(
+            "ObjectRoot.BaseObjectClass.DerivedObjectClass", "int_attribute1"
+    ));
+    expectedSubscribedClassAndPropertyNameSet.erase( ClassAndPropertyName(
+            "ObjectRoot.BaseObjectClass", "int_attribute1"
+    ));
+
+    compareClassAndPropertyNameSets(
+      expectedSubscribedClassAndPropertyNameSet, *actualSubscribedClassAndPropertyNameSetSP
+    );
 }
 
 void MessagingTests::printInteractionTest() {
