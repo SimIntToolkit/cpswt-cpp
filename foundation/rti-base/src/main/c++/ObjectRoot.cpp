@@ -157,34 +157,45 @@ void ObjectRoot::init(RTI::RTIambassador *rtiAmbassador) {
     }
 }
 
-void ObjectRoot::get_class_pub_sub_class_and_property_name_sp(
+void ObjectRoot::pub_sub_class_and_property_name(
   const StringClassAndPropertyNameSetSPMap &stringClassAndPropertyNameSetSPMap,
   const std::string &hlaClassName,
+  const std::string &attributeClassName,
   const std::string &attributeName,
   bool publish,
   bool insert
 ) {
+
+    std::string prefix = insert ? "" : "un";
+    std::string pubsub = publish ? "publish" : "subscribe";
+    std::string operationName = prefix + pubsub;
+    std::string basePrefix = attributeClassName + ".";
+
     StringClassAndPropertyNameSetSPMap::const_iterator samItr =
       stringClassAndPropertyNameSetSPMap.find( hlaClassName );
     if ( samItr == stringClassAndPropertyNameSetSPMap.end() ) {
-
-        std::string prefix = insert ? "" : "un";
-        std::string pubsub = publish ? "publish" : "subscribe";
-
-        BOOST_LOG_SEV(get_logger(), error) << "Could not " << prefix << pubsub
+        BOOST_LOG_SEV(get_logger(), error) << "Could not " << operationName
           << " \"" << attributeName << "\" attribute of object class \"" << hlaClassName
           << "\": class does not exist";
 
         return;
     }
 
-    ClassAndPropertyNameSP classAndPropertyNameSP = findProperty(hlaClassName, attributeName);
+    if (
+      hlaClassName != attributeClassName &&
+      (hlaClassName.size() < attributeClassName.size() || hlaClassName.substr(0, basePrefix.length()) != basePrefix)
+    ) {
+        BOOST_LOG_SEV(get_logger(), error) << operationName << "_attribute( \""
+          << hlaClassName << "\", \"" << attributeClassName << "\", \"" << attributeName
+          << "\"): the \"" << hlaClassName << "\" class cannot subscribe to attribute of a class (\""
+          << attributeClassName << "\") that is out of its inheritance hierarchy.";
+        return;
+    }
+
+    ClassAndPropertyNameSP classAndPropertyNameSP = findProperty(attributeClassName, attributeName);
     if (!classAndPropertyNameSP) {
 
-        std::string prefix = insert ? "" : "un";
-        std::string pubsub = publish ? "publish" : "subscribe";
-
-        BOOST_LOG_SEV(get_logger(), error) << "Could not " << prefix << pubsub
+        BOOST_LOG_SEV(get_logger(), error) << "Could not " << operationName
           << " \"" << attributeName << "\" attribute of object class \"" << hlaClassName
           << "\": \"" << attributeName << "\" attribute does not exist in the \""
           << hlaClassName << "\" class or any of its base classes";

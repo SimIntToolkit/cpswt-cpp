@@ -593,25 +593,40 @@ public:
     }
 
 private:
-    static void get_class_pub_sub_class_and_property_name_sp(
+    static void pub_sub_class_and_property_name(
       const StringClassAndPropertyNameSetSPMap &stringClassAndPropertyNameSetSPMap,
       const std::string &hlaClassName,
+      const std::string &attributeClassName,
       const std::string &attributeName,
       bool publish,
       bool insert
     );
 
 public:
-    static void publish_attribute( const std::string &hlaClassName, const std::string &attributeName ) {
-        get_class_pub_sub_class_and_property_name_sp(
-          get_class_name_published_class_and_property_name_set_sp_map(), hlaClassName, attributeName, true, true
+    static void publish_attribute(
+      const std::string &hlaClassName, const std::string &attributeClassName, const std::string &attributeName
+    ) {
+        pub_sub_class_and_property_name(
+          get_class_name_published_class_and_property_name_set_sp_map(),
+          hlaClassName, attributeClassName, attributeName, true, true
         );
     }
 
-    static void unpublish_attribute( const std::string &hlaClassName, const std::string &attributeName ) {
-        get_class_pub_sub_class_and_property_name_sp(
-          get_class_name_published_class_and_property_name_set_sp_map(), hlaClassName, attributeName, true, false
+    static void publish_attribute(const std::string &hlaClassName, const std::string &attributeName) {
+        publish_attribute(hlaClassName, hlaClassName, attributeName);
+    }
+
+    static void unpublish_attribute(
+      const std::string &hlaClassName, const std::string &attributeClassName, const std::string &attributeName
+    ) {
+        pub_sub_class_and_property_name(
+          get_class_name_published_class_and_property_name_set_sp_map(),
+          hlaClassName, attributeClassName, attributeName, true, false
         );
+    }
+
+    static void unpublish_attribute(const std::string &hlaClassName, const std::string &attributeName) {
+        unpublish_attribute(hlaClassName, hlaClassName, attributeName);
     }
 
     //--------------------------------------------
@@ -642,16 +657,30 @@ public:
           ? classAndPropertyNameSetSP : scmCit->second;
     }
 
-    static void subscribe_attribute( const std::string &hlaClassName, const std::string &attributeName ) {
-        get_class_pub_sub_class_and_property_name_sp(
-          get_class_name_subscribed_class_and_property_name_set_sp_map(), hlaClassName, attributeName, false, true
+    static void subscribe_attribute(
+      const std::string &hlaClassName, const std::string &attributeClassName, const std::string &attributeName
+    ) {
+        pub_sub_class_and_property_name(
+          get_class_name_subscribed_class_and_property_name_set_sp_map(),
+          hlaClassName, attributeClassName, attributeName, false, true
         );
     }
 
-    static void unsubscribe_attribute( const std::string &hlaClassName, const std::string &attributeName ) {
-        get_class_pub_sub_class_and_property_name_sp(
-          get_class_name_subscribed_class_and_property_name_set_sp_map(), hlaClassName, attributeName, false, false
+    static void subscribe_attribute(const std::string &hlaClassName, const std::string &attributeName) {
+        subscribe_attribute(hlaClassName, hlaClassName, attributeName);
+    }
+
+    static void unsubscribe_attribute(
+      const std::string &hlaClassName, const std::string &attributeClassName, const std::string &attributeName
+    ) {
+        pub_sub_class_and_property_name(
+          get_class_name_subscribed_class_and_property_name_set_sp_map(),
+          hlaClassName, attributeClassName, attributeName, false, false
         );
+    }
+
+    static void unsubscribe_attribute(const std::string &hlaClassName, const std::string &attributeName) {
+        unsubscribe_attribute(hlaClassName, hlaClassName, attributeName);
     }
 
     //---------------------------------------------
