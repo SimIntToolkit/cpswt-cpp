@@ -91,6 +91,8 @@ private:
 
     std::string _federationJsonFileName;
     std::string _federateDynamicMessagingClassesJsonFileName;
+    std::string _rejectSourceFederateIdJsonFileName;
+
     bool _IsLateJoiner;
 
 
@@ -171,6 +173,8 @@ protected:
         this->_FederateType = fedconfig->federateType;
         this->_federationJsonFileName = fedconfig->federationJsonFileName;
         this->_federateDynamicMessagingClassesJsonFileName = fedconfig->federateDynamicMessagingClassesJsonFileName;
+        this->_rejectSourceFederateIdJsonFileName = fedconfig->rejectSourceFederateIdJsonFileName;
+
 
         setStepSize(fedconfig->stepSize);
 
@@ -229,15 +233,44 @@ protected:
     }
 
     void initializeDynamicMessaging(
-      const std::string &federationJsonFileName, const std::string &federateDynamicMessagingClassesJsonFileName
+      std::istream &federationJsonInputStream,
+      std::istream &federateDynamicMessagingClassesJsonInputStream,
+      std::istream &rejectSourceFederateIdJsonInputStream
+    ) {
+        initializeDynamicMessaging(federationJsonInputStream, federateDynamicMessagingClassesJsonInputStream);
+        C2WInteractionRoot::readRejectSourceFederateIdData(rejectSourceFederateIdJsonInputStream);
+    }
+
+    void initializeDynamicMessaging(
+      const std::string &federationJsonFileName,
+      const std::string &federateDynamicMessagingClassesJsonFileName,
+      const std::string &rejectSourceFederateIdJsonFileName
     ) {
         if (federationJsonFileName.empty() || federateDynamicMessagingClassesJsonFileName.empty()) {
             initializeMessaging();
             return;
         }
+
         std::ifstream federationJsonInputStream(federationJsonFileName);
         std::ifstream federateDynamicMessagingClassJsonInputStream(federateDynamicMessagingClassesJsonFileName);
-        initializeDynamicMessaging(federationJsonInputStream, federateDynamicMessagingClassJsonInputStream);
+
+        if (rejectSourceFederateIdJsonFileName.empty()) {
+            initializeDynamicMessaging(
+              federationJsonInputStream,
+              federateDynamicMessagingClassJsonInputStream
+            );
+        } else {
+            std::ifstream rejectSourceFederateIdJsonInputStream(rejectSourceFederateIdJsonFileName);
+            initializeDynamicMessaging(
+              federationJsonInputStream,
+              federateDynamicMessagingClassJsonInputStream,
+              rejectSourceFederateIdJsonInputStream
+            );
+            rejectSourceFederateIdJsonInputStream.close();
+        }
+
+        federationJsonInputStream.close();
+        federateDynamicMessagingClassJsonInputStream.close();
     }
 
     // void joinFederation( const std::string &federation_id, const std::string &federate_id, bool ignoreLockFile = true );
@@ -298,6 +331,12 @@ protected:
       const std::string &federateDynamicMessagingClassesJsonFileName
     ) {
         _federateDynamicMessagingClassesJsonFileName = federateDynamicMessagingClassesJsonFileName;
+    }
+
+    void setRejectSourceFederateIdJsonFileName(
+      const std::string &rejectSourceFederateIdJsonFileName
+    ) {
+        _rejectSourceFederateIdJsonFileName = rejectSourceFederateIdJsonFileName;
     }
 
     bool get_IsLateJoiner( void ) const { return _IsLateJoiner; }
@@ -516,7 +555,10 @@ public:
      throw ( RTI::InteractionClassNotKnown, RTI::InteractionParameterNotKnown, RTI::InvalidFederationTime, RTI::FederateInternalError) {
         if ( getMoreATRs() ) {
             InteractionRoot::SP interactionRootSP = InteractionRoot::create_interaction( theInteraction, theParameters, theTime );
-            if ( !unmatchingFedFilterProvided(interactionRootSP) ) {
+            if (
+              !C2WInteractionRoot::is_reject_source_federate_id(interactionRootSP) &&
+              !unmatchingFedFilterProvided(interactionRootSP)
+            ) {
                 RTIfedTime rtitime(theTime);
                 double ltime = rtitime.getTime();
                 handleIfSimEnd(interactionRootSP, ltime);
@@ -534,7 +576,10 @@ public:
      throw ( RTI::InteractionClassNotKnown, RTI::InteractionParameterNotKnown, RTI::FederateInternalError) {
         if ( getMoreATRs() ) {
             InteractionRoot::SP interactionRootSP = InteractionRoot::create_interaction( theInteraction, theParameters );
-            if ( !unmatchingFedFilterProvided(interactionRootSP) ) {
+            if (
+              !C2WInteractionRoot::is_reject_source_federate_id(interactionRootSP) &&
+              !unmatchingFedFilterProvided(interactionRootSP)
+            ) {
 
                 // Himanshu: We normally use only TSO updates, so this shouldn't be
                 // called, but due to an RTI bug, it seemingly is getting called. So,
