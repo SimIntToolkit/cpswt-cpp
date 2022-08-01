@@ -171,7 +171,9 @@ void SynchronizedFederate::joinFederation() {
 
     std::cout << "done." << std::endl;
 
-    initializeDynamicMessaging(_federationJsonFileName, _federateDynamicMessagingClassesJsonFileName);
+    initializeDynamicMessaging(
+      _federationJsonFileName, _federateDynamicMessagingClassesJsonFileName, _rejectSourceFederateIdJsonFileName
+    );
 
     // Federate state interaction pubsub
     FederateJoinInteraction::publish_interaction( getRTI() );

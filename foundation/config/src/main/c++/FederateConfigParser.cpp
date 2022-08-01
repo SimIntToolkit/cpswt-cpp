@@ -82,7 +82,6 @@ void FederateConfigParser::parseJson(std::string configFileName, FederateConfig 
     }
     try {
         obj->federationId = iroot.get<std::string>("federationId");
-
     } catch (pt::ptree_error &e) {
         std::cerr << e.what() << std::endl;
     }
@@ -114,6 +113,13 @@ void FederateConfigParser::parseJson(std::string configFileName, FederateConfig 
     } catch (pt::ptree_error &e) {
         std::cerr << e.what() << std::endl;
     }
+    try {
+        obj->rejectSourceFederateIdJsonFileName = iroot.get<std::string>(
+          "rejectSourceFederateIdJsonFileName"
+        );
+    } catch (pt::ptree_error &e) {
+        std::cerr << e.what() << std::endl;
+    }
 
 }
 
@@ -121,18 +127,43 @@ FederateConfig* FederateConfigParser::parseArgs(const int argc, char *argv[]) {
     po::options_description desc("Allowed options");
     desc.add_options()
             ("help,h", "Help screen")
-            ("configFile", po::value<std::string>()->implicit_value("configfile.json"),
-             "This is the config file.json for federate configuration")
-            ("federateType", po::value<std::string>()->implicit_value("unknownFederateType"),
-             "Type of the Federate, eg: source, sink,pingcounter")
-            ("federationId", po::value<std::string>()->implicit_value("unknownFederationName"),
-             "Current Federation Name")
-            ("isLateJoiner", po::value<std::string>()->implicit_value("false"),
-             "Whether the federate is LateJoiner? default: false")
+            (
+              "configFile",
+              po::value<std::string>()->implicit_value("configfile.json"),
+              "This is the config file.json for federate configuration"
+            )
+            (
+              "federateType",
+              po::value<std::string>()->implicit_value("unknownFederateType"),
+              "Type of the Federate, eg: source, sink,pingcounter"
+            )
+            (
+              "federationId",
+              po::value<std::string>()->implicit_value("unknownFederationName"),
+              "Current Federation Name"
+            )
+            (
+              "isLateJoiner",
+              po::value<std::string>()->implicit_value("false"),
+              "Whether the federate is LateJoiner? default: false"
+            )
             ("lookAhead", po::value<double>()->implicit_value(0.0), "Lookahead values, default 0.0")
             ("stepSize", po::value<double>()->implicit_value(1.0), "Simulation step size, default:1.0")
-            ("federationJsonFileName", po::value<std::string>()->implicit_value(""), "Path of file containing all messaging information for this federation, default:\"\"")
-            ("federateDynamicMessagingClassesJsonFileName", po::value<std::string>()->implicit_value(""), "Path of file containing list of dynamic messaging classes for this federate, default:\"\"");
+            (
+              "federationJsonFileName",
+              po::value<std::string>()->implicit_value(""),
+              "Path of file containing all messaging information for this federation, default:\"\""
+            )
+            (
+              "federateDynamicMessagingClassesJsonFileName",
+              po::value<std::string>()->implicit_value(""),
+              "Path of file containing list of dynamic messaging classes for this federate, default:\"\""
+            )
+            (
+              "rejectSourceFederateIdJsonFileName",
+              po::value<std::string>()->implicit_value(""),
+              "Path of file containing map of dynamic interaction classes to lists of source federate ids that cause an instance of each interaction to be rejected, default:\"\""
+            );
 
     po::variables_map vm;
 
