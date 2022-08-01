@@ -99,6 +99,53 @@ C2WInteractionRoot::StringList C2WInteractionRoot::get_federate_sequence_list_au
     return retval;
 }
 
+void C2WInteractionRoot::add_reject_source_federate_id(const std::string &hlaClassName, const std::string &federateId) {
+    std::string prefix = std::string("InteractionRoot.C2WInteractionRoot") + ".";
+    if (
+      hlaClassName == "InteractionRoot.C2WInteractionRoot" ||
+      (
+        hlaClassName.substr(0, prefix.size()) == prefix &&
+        get_hla_class_name_set().find(hlaClassName) != get_hla_class_name_set().end()
+      )
+    ) {
+        if (
+          get_hla_class_name_to_reject_source_federate_id_set_sp_map().find(hlaClassName) ==
+          get_hla_class_name_to_reject_source_federate_id_set_sp_map().end()
+        ) {
+            get_hla_class_name_to_reject_source_federate_id_set_sp_map().emplace(
+              hlaClassName, StringSetSP( new StringSet() )
+            );
+        }
+        get_hla_class_name_to_reject_source_federate_id_set_sp_map()[hlaClassName]->insert(federateId);
+    }
+}
+
+bool C2WInteractionRoot::is_reject_source_federate_id(
+  const std::string &hlaClassName, const std::string &federateId
+) {
+    if (
+      get_hla_class_name_to_reject_source_federate_id_set_sp_map().find(hlaClassName) ==
+      get_hla_class_name_to_reject_source_federate_id_set_sp_map().end()
+    ) {
+        return false;
+    }
+
+    StringSet &rejectSourceFederateIdSet =
+      *get_hla_class_name_to_reject_source_federate_id_set_sp_map()[hlaClassName];
+    return rejectSourceFederateIdSet.find(federateId) != rejectSourceFederateIdSet.end();
+}
+
+void C2WInteractionRoot::remove_reject_source_federate_id(
+  const std::string &hlaClassName, const std::string &federateId
+) {
+    if (
+      get_hla_class_name_to_reject_source_federate_id_set_sp_map().find(hlaClassName) !=
+      get_hla_class_name_to_reject_source_federate_id_set_sp_map().end()
+    ) {
+        get_hla_class_name_to_reject_source_federate_id_set_sp_map()[hlaClassName]->erase(federateId);
+    }
+}
+
 bool C2WInteractionRoot::static_init_var = C2WInteractionRoot::static_init();
 
 bool C2WInteractionRoot::static_init() {

@@ -351,6 +351,22 @@ public:
     // END INSTANCE CREATION METHODS
     //------------------------------
 
+    using ::org::cpswt::hla::InteractionRoot_p::C2WInteractionRoot::add_reject_source_federate_id;
+    using ::org::cpswt::hla::InteractionRoot_p::C2WInteractionRoot::is_reject_source_federate_id;
+    using ::org::cpswt::hla::InteractionRoot_p::C2WInteractionRoot::remove_reject_source_federate_id;
+
+    static void add_reject_source_federate_id(const std::string &federateId) {
+        add_reject_source_federate_id(get_hla_class_name(), federateId);
+    }
+
+    static bool is_reject_source_federate_id(const std::string &federateId) {
+        return is_reject_source_federate_id(get_hla_class_name(), federateId);
+    }
+
+    static void remove_reject_source_federate_id(const std::string &federateId) {
+        remove_reject_source_federate_id(get_hla_class_name(), federateId);
+    }
+
     //-------------
     // CONSTRUCTORS
     //-------------
