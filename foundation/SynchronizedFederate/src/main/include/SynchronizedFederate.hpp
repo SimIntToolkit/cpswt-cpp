@@ -555,7 +555,10 @@ public:
      throw ( RTI::InteractionClassNotKnown, RTI::InteractionParameterNotKnown, RTI::InvalidFederationTime, RTI::FederateInternalError) {
         if ( getMoreATRs() ) {
             InteractionRoot::SP interactionRootSP = InteractionRoot::create_interaction( theInteraction, theParameters, theTime );
-            if ( !unmatchingFedFilterProvided(interactionRootSP) ) {
+            if (
+              !C2WInteractionRoot::is_reject_source_federate_id(interactionRootSP) &&
+              !unmatchingFedFilterProvided(interactionRootSP)
+            ) {
                 RTIfedTime rtitime(theTime);
                 double ltime = rtitime.getTime();
                 handleIfSimEnd(interactionRootSP, ltime);
