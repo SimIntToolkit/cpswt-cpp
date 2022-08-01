@@ -84,6 +84,7 @@ private:
     CPPUNIT_TEST(federateSequenceTest);
     CPPUNIT_TEST(attributePubSubTest);
     CPPUNIT_TEST(printInteractionTest);
+    CPPUNIT_TEST(rejectSourceFederateIdTest);
     CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -111,6 +112,7 @@ public:
     void federateSequenceTest();
     void attributePubSubTest();
     void printInteractionTest();
+    void rejectSourceFederateIdTest();
 };
 
 #endif // _INTERACTION_TESTS

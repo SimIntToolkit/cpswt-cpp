@@ -936,6 +936,7 @@ void HLAInterface::initialize(int stage) {
 
         setFederationJsonFileName( par( "federation_json_file_name" ).stringValue() );
         setFederateDynamicMessagingClassesJsonFileName( par( "dynamic_messaging_classes_json_file_name" ).stringValue() );
+        setRejectSourceFederateIdJsonFileName( par( "reject_source_federate_id_json_file_name").stringValue() );
 
         std::string federateHostConfigJsonFileName = par( "federate_host_config_json_file_name" ).stringValue();
 

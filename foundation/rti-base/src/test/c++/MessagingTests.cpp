@@ -1055,4 +1055,60 @@ void MessagingTests::printInteractionTest() {
     CPPUNIT_ASSERT_EQUAL(expectedOutput, testStream.str());
 }
 
+void MessagingTests::rejectSourceFederateIdTest() {
+
+    const std::string interactionRootHlaClassName( InteractionRoot::get_hla_class_name() );
+    C2WInteractionRoot::add_reject_source_federate_id(interactionRootHlaClassName, "foobar");
+    CPPUNIT_ASSERT(!C2WInteractionRoot::is_reject_source_federate_id(interactionRootHlaClassName, "foobar"));
+
+    HighPrio highPrio1;
+    HighPrio::add_reject_source_federate_id("foo");
+    highPrio1.addRejectSourceFederateId("bar");
+
+
+    Json::Value jsonArray(Json::arrayValue);
+
+    jsonArray.append("foo");
+    highPrio1.set_federateSequence(jsonToString(jsonArray));
+    CPPUNIT_ASSERT(highPrio1.isRejectSourceFederateId());
+    CPPUNIT_ASSERT(HighPrio::is_reject_source_federate_id(highPrio1));
+
+    jsonArray.append("boz");
+    highPrio1.set_federateSequence(jsonToString(jsonArray));
+    CPPUNIT_ASSERT(!highPrio1.isRejectSourceFederateId());
+    CPPUNIT_ASSERT(!HighPrio::is_reject_source_federate_id(highPrio1));
+
+    jsonArray.append("bar");
+    highPrio1.set_federateSequence(jsonToString(jsonArray));
+    CPPUNIT_ASSERT(highPrio1.isRejectSourceFederateId());
+    CPPUNIT_ASSERT(HighPrio::is_reject_source_federate_id(highPrio1));
+
+    highPrio1.removeRejectSourceFederateId("bar");
+    CPPUNIT_ASSERT(!highPrio1.isRejectSourceFederateId());
+    CPPUNIT_ASSERT(!HighPrio::is_reject_source_federate_id(highPrio1));
+
+
+    const std::string highPrioHlaClassName = HighPrio::get_hla_class_name();
+    InteractionRoot highPrio2(highPrioHlaClassName);
+    C2WInteractionRoot::add_reject_source_federate_id(highPrioHlaClassName, "foo");
+    C2WInteractionRoot::add_reject_source_federate_id(highPrioHlaClassName, "bar");
+
+    jsonArray.clear();
+
+    jsonArray.append("foo");
+    highPrio2.setParameter("federateSequence", jsonToString(jsonArray));
+    CPPUNIT_ASSERT(C2WInteractionRoot::is_reject_source_federate_id(highPrio2));
+
+    jsonArray.append("boz");
+    highPrio2.setParameter("federateSequence", jsonToString(jsonArray));
+    CPPUNIT_ASSERT(!C2WInteractionRoot::is_reject_source_federate_id(highPrio2));
+
+    jsonArray.append("bar");
+    highPrio2.setParameter("federateSequence", jsonToString(jsonArray));
+    CPPUNIT_ASSERT(C2WInteractionRoot::is_reject_source_federate_id(highPrio2));
+
+    C2WInteractionRoot::remove_reject_source_federate_id(highPrioHlaClassName, "bar");
+    CPPUNIT_ASSERT(!C2WInteractionRoot::is_reject_source_federate_id(highPrio2));
+}
+
 CPPUNIT_TEST_SUITE_REGISTRATION( MessagingTests );
