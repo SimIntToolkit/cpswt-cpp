@@ -102,6 +102,7 @@ public:
     typedef std::map<int, std::string> IntegerStringMap;
     typedef std::map<std::string, int> StringIntegerMap;
     typedef std::map<std::string, bool> StringBooleanMap;
+    typedef std::map<std::string, std::set<std::string>> StringStringSetMap;
 
     typedef RTI::AttributeHandleSet AttributeHandleSet;
     typedef boost::shared_ptr<AttributeHandleSet> AttributeHandleSetSP;
@@ -150,12 +151,42 @@ private:
         return get_is_initialized_aux();
     }
 
-    static void set_is_initialized(bool isInitialized) {
-        get_is_initialized_aux() = isInitialized;
+    static void set_is_initialized() {
+        get_is_initialized_aux() = true;
+    }
+
+    static StringBooleanMap &get_hla_class_name_is_initialized_map() {
+        static StringBooleanMap hlaClassNameIsInitializedMap;
+        return hlaClassNameIsInitializedMap;
+    }
+
+    static bool get_hla_class_name_is_initialized(const std::string &hlaClassName) {
+        StringBooleanMap::const_iterator sbmCit = get_hla_class_name_is_initialized_map().find(hlaClassName);
+        return sbmCit == get_hla_class_name_is_initialized_map().end() ? false : sbmCit->second;
+    }
+
+    static void set_hla_class_name_is_initialized(const std::string &hlaClassName) {
+        get_hla_class_name_is_initialized_map()[hlaClassName] = true;
     }
 
 public:
-    static void init(RTI::RTIambassador *rtiAmbassador);
+    static void init(const std::string &hlaClassName, RTI::RTIambassador *rtiAmbassador);
+
+    static void init(RTI::RTIambassador *rtiAmbassador) {
+        if (get_is_initialized()) {
+            return;
+        }
+        set_is_initialized();
+
+        //-------------------------------------------------------------------------
+        // hlaClassNameSet (get_hla_class_name_set()) IS POPULATED BY
+        // - STATIC INITIALIZATION BLOCKS IN THE DERIVED INTERACTION/OBJECT CLASSES
+        // - THE DYNAMIC-MESSAGE-CLASSES FILE
+        //-------------------------------------------------------------------------
+        for(const std::string &hlaClassName: get_hla_class_name_set()) {
+            init(hlaClassName, rtiAmbassador);
+        }
+    }
 
 private:
     std::string _instanceHlaClassName;
@@ -488,9 +519,13 @@ private:
     static bool get_is_published_aux(const std::string &hlaClassName, bool default_value) {
         StringBooleanMap::const_iterator sbmCit = get_class_name_publish_status_map().find(hlaClassName);
         if (sbmCit == get_class_name_publish_status_map().end()) {
-            BOOST_LOG_SEV(get_logger(), error) << "could not get publish status for hla class \"" << hlaClassName
-              << "\":  class does not exist";
-            return default_value;
+//            readFederateDynamicMessageClass(hlaClassName);
+//            sbmCit = get_class_name_publish_status_map().find(hlaClassName);
+//            if (sbmCit == get_class_name_publish_status_map().end()) {
+                BOOST_LOG_SEV(get_logger(), error) << "could not get publish status for hla class \"" << hlaClassName
+                  << "\":  class does not exist";
+                return default_value;
+//            }
         }
         return sbmCit->second;
     }
@@ -500,9 +535,15 @@ public:
         return get_is_published_aux(hlaClassName, false);
     }
 
+    bool getIsPublished() {
+        return get_is_published(getInstanceHlaClassName());
+    }
+
 private:
     static void set_is_published(const std::string &hlaClassName, bool publishStatus) {
+
         StringBooleanMap::iterator sbmItr = get_class_name_publish_status_map().find(hlaClassName);
+        readFederateDynamicMessageClass(hlaClassName);
         if (sbmItr == get_class_name_publish_status_map().end()) {
             BOOST_LOG_SEV(get_logger(), error) << "could not set publish status for hla class \"" << hlaClassName
               << "\":  class does not exist";
@@ -546,6 +587,10 @@ public:
         return get_is_subscribed_aux(hlaClassName, false);
     }
 
+    bool getIsSubscribed() {
+        return get_is_subscribed(getInstanceHlaClassName());
+    }
+
 private:
     static void set_is_subscribed(const std::string &hlaClassName, bool subscribeStatus) {
         StringBooleanMap::iterator sbmItr = get_class_name_subscribe_status_map().find(hlaClassName);
@@ -561,6 +606,57 @@ private:
     //------------------------------------
     // END CLASS-NAME SUBSCRIBE-STATUS MAP
     //------------------------------------
+
+    //-------------------------------------
+    // CLASS-NAME SOFT-SUBSCRIBE-STATUS MAP
+    //
+    // POPULATED BY:
+    // - init(RTIambassador) ABOVE
+    //-------------------------------------
+private:
+    static StringBooleanMap &get_class_name_soft_subscribe_status_map() {
+        static StringBooleanMap classNameSoftSubscribeStatusMap;
+        return classNameSoftSubscribeStatusMap;
+    }
+
+    //-------------------------------------------------
+    // METHODS THAT USE CLASS-NAME SUBSCRIBE-STATUS MAP
+    //-------------------------------------------------
+    static bool get_is_soft_subscribed_aux(const std::string &hlaClassName, bool default_value) {
+        StringBooleanMap::const_iterator sbmCit = get_class_name_soft_subscribe_status_map().find(hlaClassName);
+        if (sbmCit == get_class_name_soft_subscribe_status_map().end()) {
+            BOOST_LOG_SEV(get_logger(), error) << "could not get soft subscribe status for hla class \""
+              << hlaClassName << "\":  class does not exist";
+            return default_value;
+        }
+        return sbmCit->second;
+    }
+
+public:
+    static bool get_is_soft_subscribed(const std::string &hlaClassName) {
+        return get_is_soft_subscribed_aux(hlaClassName, false);
+    }
+
+    bool getIsSoftSubscribed() {
+        return get_is_soft_subscribed(getInstanceHlaClassName());
+    }
+
+private:
+    static void set_is_soft_subscribed(const std::string &hlaClassName, bool softSubscribeStatus) {
+        StringBooleanMap::iterator sbmItr = get_class_name_soft_subscribe_status_map().find(hlaClassName);
+        if (sbmItr == get_class_name_soft_subscribe_status_map().end()) {
+            BOOST_LOG_SEV(get_logger(), error) << "could not set soft subscribe status for hla class \""
+              << hlaClassName << "\":  class does not exist";
+            return;
+        }
+
+        sbmItr->second = softSubscribeStatus;
+    }
+
+    //-----------------------------------------
+    // END CLASS-NAME SOFT-SUBSCRIBE-STATUS MAP
+    //-----------------------------------------
+
     //----------------------------------------
     // CLASS-NAME PUBLISHED-ATTRIBUTE-NAME SET
     //
@@ -822,6 +918,16 @@ protected:
 public:
     static void subscribe_object(const std::string &hlaClassName, RTI::RTIambassador *rti);
 
+    static void soft_subscribe_object(const std::string &hlaClassName, RTI::RTIambassador *rti) {
+        if (!loadDynamicHlaClass(hlaClassName, rti)) {
+            BOOST_LOG_SEV(get_logger(), warning) << "soft_subscribe_object(\"" <<
+              hlaClassName << "\"):  no such class";
+            return;
+        }
+
+        set_is_soft_subscribed(hlaClassName, true);
+    }
+
     static const AttributeHandleSetSP &get_subscribed_attribute_handle_set_sp(const std::string &hlaClassName) {
         static AttributeHandleSetSP attributeHandleSetSP( RTI::AttributeHandleSetFactory::create(0) );
 
@@ -836,10 +942,19 @@ public:
     // END CLASS-NAME SUBSCRIBED-ATTRIBUTE-HANDLE-SET MAP
     //---------------------------------------------------
 
-public:
     static void unpublish_object(const std::string &hlaClassName, RTI::RTIambassador *rti);
 
     static void unsubscribe_object(const std::string &hlaClassName, RTI::RTIambassador *rti);
+
+    static void soft_unsubscribe_object(const std::string &hlaClassName, RTI::RTIambassador *rti) {
+        if (!loadDynamicHlaClass(hlaClassName, rti)) {
+            BOOST_LOG_SEV(get_logger(), warning) << "soft_subscribe_object(\"" <<
+              hlaClassName << "\"):  no such class";
+            return;
+        }
+
+        set_is_soft_subscribed(hlaClassName, false);
+    }
 
     //--------------
     // OBJECT HANDLE
@@ -1324,6 +1439,10 @@ public:
         publish_object( get_hla_class_name(), rti );
     }
 
+    static bool get_is_published() {
+        return get_is_published(get_hla_class_name());
+    }
+
     /**
      * Unpublishes the org.cpswt.hla.ObjectRoot object class for a federate.
      *
@@ -1343,6 +1462,18 @@ public:
         subscribe_object( get_hla_class_name(), rti );
     }
 
+    static bool get_is_subscribed() {
+        return get_is_subscribed(get_hla_class_name());
+    }
+
+    static void soft_subscribe_object(RTI::RTIambassador *rti) {
+        soft_subscribe_object(get_hla_class_name(), rti);
+    }
+
+    static bool get_is_soft_subscribed() {
+        return get_is_soft_subscribed(get_hla_class_name());
+    }
+
     /**
      * Unsubscribes a federate from the org.cpswt.hla.ObjectRoot object class.
      *
@@ -1352,12 +1483,28 @@ public:
         unsubscribe_object( get_hla_class_name(), rti );
     }
 
+    static void soft_unsubscribe_object(RTI::RTIambassador *rti) {
+        soft_unsubscribe_object(get_hla_class_name(), rti);
+    }
+
     static ClassAndPropertyNameSetSP get_published_attribute_name_set_sp() {
         return get_class_name_published_class_and_property_name_set_sp_map()[get_hla_class_name()];
     }
 
     static ClassAndPropertyNameSetSP get_subscribed_attribute_name_set_sp() {
         return get_class_name_subscribed_class_and_property_name_set_sp_map()[get_hla_class_name()];
+    }
+
+    static void add_federate_name_soft_publish(const std::string &networkFederateName) {
+        add_federate_name_soft_publish(get_hla_class_name(), networkFederateName);
+    }
+
+    static void remove_federate_name_soft_publish(const std::string &networkFederateName) {
+        remove_federate_name_soft_publish(get_hla_class_name(), networkFederateName);
+    }
+
+    std::set<std::string> getFederateNameSoftPublishSet() {
+        return get_federate_name_soft_publish_set(get_hla_class_name());
     }
 
     //-----------------------------------------------------
@@ -1744,6 +1891,15 @@ public:
         unsubscribe_object(getInstanceHlaClassName(), rti);
     }
 
+    void softSubscribeObject(RTI::RTIambassador *rti) {
+        soft_subscribe_object(getInstanceHlaClassName(), rti);
+    }
+
+    void softUnsubscribeObject(RTI::RTIambassador *rti) {
+        soft_unsubscribe_object(getInstanceHlaClassName(), rti);
+    }
+
+
     //-------------------------------------------------------------------
     // END INSTANCE VERSIONS OF STATIC METHODS DEFINED IN DERIVED CLASSES
     //-------------------------------------------------------------------
@@ -1751,6 +1907,35 @@ public:
     std::string toJson();
 
     static void fromJson(const std::string &jsonString);
+
+private:
+    static StringStringSetMap &get_hla_class_name_to_federate_name_soft_publish_set_map() {
+        static StringStringSetMap hlaClassNameToFederateNameSoftPublishSetMap;
+        return hlaClassNameToFederateNameSoftPublishSetMap;
+    }
+
+public:
+    static void add_federate_name_soft_publish(const std::string &hlaClassName, const std::string &federateName);
+
+    void addFederateNameSoftPublish(const std::string &federateName) {
+        add_federate_name_soft_publish(getInstanceHlaClassName(), federateName);
+    }
+
+    static void remove_federate_name_soft_publish(const std::string &hlaClassName, const std::string &federateName);
+
+    void removeFederateNameSoftPublish(const std::string &federateName) {
+        remove_federate_name_soft_publish(getInstanceHlaClassName(), federateName);
+    }
+
+    std::set<std::string> get_federate_name_soft_publish_set(const std::string &hlaClassName) {
+        return get_hla_class_name_to_federate_name_soft_publish_set_map().find(hlaClassName) ==
+          get_hla_class_name_to_federate_name_soft_publish_set_map().end() ?
+            std::set<std::string>() : get_hla_class_name_to_federate_name_soft_publish_set_map()[hlaClassName];
+    }
+
+    std::set<std::string> getFederateNameSoftPublishSet(const std::string &hlaClassName) {
+        return get_federate_name_soft_publish_set(getInstanceHlaClassName());
+    }
 
 private:
     static Json::Value &get_federation_json() {
@@ -1799,6 +1984,14 @@ public:
 
     static void readFederateDynamicMessageClasses(std::istream &dynamicMessagingTypesInputStream);
 
+    static void readFederateDynamicMessageClasses(const StringSet &dynamicHlaClassNameSet) {
+        for(const std::string &hlaClassName: dynamicHlaClassNameSet) {
+            readFederateDynamicMessageClass(hlaClassName);
+        }
+    }
+
+    static void readFederateDynamicMessageClass(const std::string &dynamicHlaClassName);
+
     static void loadDynamicClassFederationData(
       std::istream &federationJsonReader, std::istream &federateDynamicMessageClassesReader
     ) {
@@ -1811,6 +2004,18 @@ public:
     ) {
         readFederationJson(federationJsonFileString);
         readFederateDynamicMessageClasses(dynamicMessageTypesJsonFileString);
+    }
+
+private:
+    static bool loadDynamicHlaClass(const std::string &hlaClassName, RTI::RTIambassador *rti) {
+        if (get_hla_class_name_set().find(hlaClassName) == get_hla_class_name_set().end()) {
+            readFederateDynamicMessageClass(hlaClassName);
+            if (get_hla_class_name_set().find(hlaClassName) == get_hla_class_name_set().end()) {
+                return false;
+            }
+            init(hlaClassName, rti);
+        }
+        return true;
     }
 };
   } // NAMESPACE "hla"

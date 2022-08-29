@@ -39,6 +39,9 @@
 #include <string>
 #include <set>
 #include <map>
+#include <algorithm>
+
+#include <iostream>
 
 #include "NullFederateAmbassador.hh"
 #include "RTI.hh"
@@ -46,6 +49,7 @@
 #include "InteractionRoot.hpp"
 #include "ObjectRoot.hpp"
 #include "InteractionRoot_p/C2WInteractionRoot_p/SimulationControl_p/SimEnd.hpp"
+#include "InteractionRoot_p/C2WInteractionRoot_p/EmbeddedMessaging.hpp"
 
 #include "InteractionRoot_p/C2WInteractionRoot_p/FederateResignInteraction.hpp"
 #include "InteractionRoot_p/C2WInteractionRoot_p/FederateJoinInteraction.hpp"
@@ -71,6 +75,7 @@ public:
     using ObjectRoot = ::org::cpswt::hla::ObjectRoot;
     using InteractionRoot = ::org::cpswt::hla::InteractionRoot;
     using C2WInteractionRoot = ::org::cpswt::hla::InteractionRoot_p::C2WInteractionRoot;
+    using EmbeddedMessaging = ::org::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::EmbeddedMessaging;
     using SimEnd = ::org::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::SimulationControl_p::SimEnd;
     using FederateJoinInteraction = ::org::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::FederateJoinInteraction;
     using FederateResignInteraction = ::org::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::FederateResignInteraction;
@@ -276,9 +281,63 @@ protected:
     // void joinFederation( const std::string &federation_id, const std::string &federate_id, bool ignoreLockFile = true );
     void joinFederation();
 
+    void sendInteraction(InteractionRoot &interactionRoot, const StringSet &federateNameSet, double time) {
+
+        if (!interactionRoot.isInstanceHlaClassDerivedFromHlaClass(EmbeddedMessaging::get_hla_class_name())) {
+
+            std::string interactionJson = interactionRoot.toJson();
+
+            for (
+              StringSet::const_iterator sstCit = federateNameSet.begin() ; sstCit != federateNameSet.end() ; ++sstCit
+            ) {
+                const std::string &federateName = *sstCit;
+                const std::string embeddedMessagingHlaClassName =
+                  EmbeddedMessaging::get_hla_class_name() + "." + federateName;
+                InteractionRoot::SP embeddedMessagingForNetworkFederateSP(
+                  new InteractionRoot(embeddedMessagingHlaClassName)
+                );
+                if (interactionRoot.isInstanceHlaClassDerivedFromHlaClass(C2WInteractionRoot::get_hla_class_name())) {
+                    embeddedMessagingForNetworkFederateSP->setParameter(
+                            "federateSequence",
+                            interactionRoot.getParameter("federateSequence")
+                    );
+                    embeddedMessagingForNetworkFederateSP->setFederateAppendedToFederateSequence(true);
+                }
+                embeddedMessagingForNetworkFederateSP->setParameter(
+                        "hlaClassName", interactionRoot.getInstanceHlaClassName()
+                );
+                embeddedMessagingForNetworkFederateSP->setParameter("messagingJson", interactionJson);
+
+                if (time >= 0) {
+                    sendInteraction(embeddedMessagingForNetworkFederateSP, time);
+                } else {
+                    sendInteraction(embeddedMessagingForNetworkFederateSP);
+                }
+            }
+        }
+    }
+
+    void sendInteraction(InteractionRoot::SP interactionRootSP, const StringSet &federateNameSet, double time) {
+        sendInteraction(*interactionRootSP, federateNameSet, time);
+    }
+
+    void sendInteraction(InteractionRoot &interactionRoot, const std::string &federateName, double time) {
+        std::set<std::string> stringSet;
+        stringSet.emplace(federateName);
+        sendInteraction(interactionRoot, stringSet, time);
+    }
+
+    void sendInteraction(InteractionRoot::SP interactionRootSP, const std::string &federateName, double time) {
+        sendInteraction(*interactionRootSP, federateName, time);
+    }
+
     void sendInteraction( InteractionRoot &interactionRoot, double time ) {
         C2WInteractionRoot::update_federate_sequence(interactionRoot, getFederateType());
-        interactionRoot.sendInteraction(getRTI(), time);
+
+        if (interactionRoot.getIsPublished()) {
+            interactionRoot.sendInteraction(getRTI(), time);
+        }
+        sendInteraction(interactionRoot, interactionRoot.getFederateNameSoftPublishSet(), time);
     }
 
     void sendInteraction( InteractionRoot::SP interactionRootSP, double time ) {
@@ -287,11 +346,25 @@ protected:
 
     void sendInteraction(InteractionRoot &interactionRoot) {
         C2WInteractionRoot::update_federate_sequence(interactionRoot, getFederateType());
-        interactionRoot.sendInteraction(getRTI());
+
+        if (interactionRoot.getIsPublished()) {
+            interactionRoot.sendInteraction(getRTI());
+        }
+        sendInteraction(interactionRoot, interactionRoot.getFederateNameSoftPublishSet(), -1);
     }
 
     void sendInteraction( InteractionRoot::SP interactionRootSP ) {
         sendInteraction(*interactionRootSP);
+    }
+
+    void sendInteraction(InteractionRoot &interactionRoot, const std::string &federateName) {
+        std::set<std::string> stringSet;
+        stringSet.emplace(federateName);
+        sendInteraction(interactionRoot, stringSet, -1);
+    }
+
+    void sendInteraction(InteractionRoot::SP interactionRootSP, const std::string &federateName) {
+        sendInteraction(*interactionRootSP, federateName);
     }
 
     void setFederateId(const std::string &federateId) {
@@ -546,26 +619,27 @@ public:
     }
 
     virtual void receiveInteraction(
-     RTI::InteractionClassHandle theInteraction,
-     const RTI::ParameterHandleValuePairSet& theParameters,
-     const RTI::FedTime& theTime,
-     const char *theTag,
-     RTI::EventRetractionHandle theHandle
-    )
-     throw ( RTI::InteractionClassNotKnown, RTI::InteractionParameterNotKnown, RTI::InvalidFederationTime, RTI::FederateInternalError) {
+      RTI::InteractionClassHandle theInteraction,
+      const RTI::ParameterHandleValuePairSet& theParameters,
+      const RTI::FedTime& theTime,
+      const char *theTag,
+      RTI::EventRetractionHandle theHandle
+    ) throw (
+      RTI::InteractionClassNotKnown,
+      RTI::InteractionParameterNotKnown,
+      RTI::InvalidFederationTime,
+      RTI::FederateInternalError
+    ) {
         if ( getMoreATRs() ) {
+            RTIfedTime rtitime(theTime);
+            double ltime = rtitime.getTime();
+
+std::cerr << "Received interaction with time" << std::endl;
             InteractionRoot::SP interactionRootSP = InteractionRoot::create_interaction( theInteraction, theParameters, theTime );
-            if (
-              !C2WInteractionRoot::is_reject_source_federate_id(interactionRootSP) &&
-              !unmatchingFedFilterProvided(interactionRootSP)
-            ) {
-                RTIfedTime rtitime(theTime);
-                double ltime = rtitime.getTime();
-                handleIfSimEnd(interactionRootSP, ltime);
-                addInteraction( interactionRootSP );
-//                 interactionRootSP->createLog( ltime, false );
-            }
+            receiveInteractionAux(interactionRootSP, ltime);
+//          interactionRootSP->createLog( ltime, false );
         }
+
     }
 
     virtual void receiveInteraction(
@@ -575,27 +649,47 @@ public:
     )
      throw ( RTI::InteractionClassNotKnown, RTI::InteractionParameterNotKnown, RTI::FederateInternalError) {
         if ( getMoreATRs() ) {
-            InteractionRoot::SP interactionRootSP = InteractionRoot::create_interaction( theInteraction, theParameters );
-            if (
-              !C2WInteractionRoot::is_reject_source_federate_id(interactionRootSP) &&
-              !unmatchingFedFilterProvided(interactionRootSP)
-            ) {
 
-                // Himanshu: We normally use only TSO updates, so this shouldn't be
-                // called, but due to an RTI bug, it seemingly is getting called. So,
-                // for now, use the federate's current time or LBTS whichever is greater
-                // as the timestamp
-                double assumedTimestamp = 0;
-                if( getLBTS() >= getCurrentTime() ) {
-                    assumedTimestamp = getLBTS();
-                } else {
-                    assumedTimestamp = getCurrentTime();
-                }
-                RTIfedTime rtitime( assumedTimestamp );
-                handleIfSimEnd(interactionRootSP, assumedTimestamp);
-                addInteraction( interactionRootSP );
-//                 interactionRootSP->createLog( assumedTimestamp, false );
+            // Himanshu: We normally use only TSO updates, so this shouldn't be
+            // called, but due to an RTI bug, it seemingly is getting called. So,
+            // for now, use the federate's current time or LBTS whichever is greater
+            // as the timestamp
+            double assumedTimestamp = std::max(getLBTS(), getCurrentTime());
+
+            InteractionRoot::SP interactionRootSP = InteractionRoot::create_interaction(theInteraction, theParameters);
+            receiveInteractionAux(interactionRootSP, assumedTimestamp);
+//          interactionRootSP->createLog( assumedTimestamp, false );
+        }
+    }
+
+private:
+    void receiveEmbeddedInteraction(EmbeddedMessaging::SP embeddedMessagingSP, double timestamp) {
+        std::string hlaClassName = embeddedMessagingSP->get_hlaClassName();
+        if (!InteractionRoot::get_is_soft_subscribed(hlaClassName)) {
+            return;
+        }
+
+        InteractionRoot::SP embeddedInteractionSP =
+                InteractionRoot::fromJson(embeddedMessagingSP->get_messagingJson());
+        receiveInteractionAux(embeddedInteractionSP, timestamp);
+    }
+
+    void receiveInteractionAux(
+      InteractionRoot::SP interactionRootSP, double timestamp
+    )
+     throw ( RTI::InteractionClassNotKnown, RTI::InteractionParameterNotKnown, RTI::FederateInternalError) {
+        if (
+          !C2WInteractionRoot::is_reject_source_federate_id(interactionRootSP) &&
+          !unmatchingFedFilterProvided(interactionRootSP)
+        ) {
+            if (interactionRootSP->isInstanceHlaClassDerivedFromHlaClass(EmbeddedMessaging::get_hla_class_name())) {
+                receiveEmbeddedInteraction(boost::static_pointer_cast<EmbeddedMessaging>(interactionRootSP), timestamp);
+                return;
             }
+
+            handleIfSimEnd(interactionRootSP, timestamp);
+            addInteraction( interactionRootSP );
+//             interactionRootSP->createLog( assumedTimestamp, false );
         }
     }
 
@@ -619,13 +713,17 @@ protected:
         exit(0);
     }
 
-    void handleIfSimEnd(InteractionRoot::SP interactionRootSP, double timestamp) {
-        int classHandle = interactionRootSP->getClassHandle();
+    void handleIfSimEnd(InteractionRoot &interactionRoot, double timestamp) {
+        int classHandle = interactionRoot.getClassHandle();
         if(  SimEnd::match( classHandle )  ) {
             std::cout << getFederateId() << ": SimEnd interaction received, exiting..." << std::endl;
 //             interactionRootSP->createLog( timestamp, false );
             finalizeAndTerminate();
         }
+    }
+
+    void handleIfSimEnd(InteractionRoot::SP interactionRootSP, double timestamp) {
+        handleIfSimEnd(*interactionRootSP, timestamp);
     }
 
 public:
