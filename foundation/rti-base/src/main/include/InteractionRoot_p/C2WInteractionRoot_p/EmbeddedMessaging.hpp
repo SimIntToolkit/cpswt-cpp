@@ -28,8 +28,8 @@
  * OR MODIFICATIONS.
  */
 
-#ifndef _org_cpswt_hla_InteractionRoot_p_C2WInteractionRoot_p_FederateJoinInteraction_CLASS
-#define _org_cpswt_hla_InteractionRoot_p_C2WInteractionRoot_p_FederateJoinInteraction_CLASS
+#ifndef _org_cpswt_hla_InteractionRoot_p_C2WInteractionRoot_p_EmbeddedMessaging_CLASS
+#define _org_cpswt_hla_InteractionRoot_p_C2WInteractionRoot_p_EmbeddedMessaging_CLASS
 
 #include "InteractionRoot_p/C2WInteractionRoot.hpp"
 #include "C2WException.hpp"
@@ -43,17 +43,17 @@ namespace org {
    namespace InteractionRoot_p {
     namespace C2WInteractionRoot_p {
 
-class FederateJoinInteraction : public ::org::cpswt::hla::InteractionRoot_p::C2WInteractionRoot {
+class EmbeddedMessaging : public ::org::cpswt::hla::InteractionRoot_p::C2WInteractionRoot {
 public:
 //    using ::org::cpswt::hla::InteractionRoot;
     typedef ::org::cpswt::hla::InteractionRoot_p::C2WInteractionRoot Super;
-    typedef boost::shared_ptr< FederateJoinInteraction > SP;
+    typedef boost::shared_ptr< EmbeddedMessaging > SP;
 
 private:
     static severity_logger &get_logger_aux() {
         static severity_logger logger;
         logger.add_attribute("MessagingClassName", attrs::constant< std::string >(
-          "InteractionRoot.C2WInteractionRoot.FederateJoinInteraction"
+          "InteractionRoot.C2WInteractionRoot.EmbeddedMessaging"
         ));
 
         logging::add_common_attributes();
@@ -72,7 +72,7 @@ public:
     // ----------------------------------------------------------------------------
 
     /**
-     * Returns the fully-qualified (dot-delimited) name of the ::org::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::FederateJoinInteraction interaction class.
+     * Returns the fully-qualified (dot-delimited) name of the ::org::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::EmbeddedMessaging interaction class.
      * Note: As this is a static method, it is NOT polymorphic, and so, if called on
      * a reference will return the name of the class pertaining to the reference,
      * rather than the name of the class for the instance referred to by the reference.
@@ -81,7 +81,7 @@ public:
      * @return the fully-qualified Java class name for this interaction class
      */
     static const std::string &get_cpp_class_name() {
-        static const std::string cppClassName("::org::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::FederateJoinInteraction");
+        static const std::string cppClassName("::org::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::EmbeddedMessaging");
         return cppClassName;
     }
 
@@ -97,7 +97,7 @@ public:
 
     /**
      * Returns the simple name (the last name in the dot-delimited fully-qualified
-     * class name) of the org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.FederateJoinInteraction interaction class.
+     * class name) of the org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.EmbeddedMessaging interaction class.
      *
      * @return the name of this interaction class
      */
@@ -107,7 +107,7 @@ public:
 
     /**
      * Returns the fully-qualified (dot-delimited) hla class name of the
-     * InteractionRoot.C2WInteractionRoot.FederateJoinInteraction interaction class.
+     * InteractionRoot.C2WInteractionRoot.EmbeddedMessaging interaction class.
      * Note: As this is a static method, it is NOT polymorphic, and so, if called on
      * a reference will return the federation name of the class pertaining to the reference,
      * rather than the name of the class for the instance referred to by the reference.
@@ -116,7 +116,7 @@ public:
      * @return the fully-qualified federation (HLA) class name for this interaction class
      */
     static const std::string &get_hla_class_name() {
-        static const std::string hlaClassName("InteractionRoot.C2WInteractionRoot.FederateJoinInteraction");
+        static const std::string hlaClassName("InteractionRoot.C2WInteractionRoot.EmbeddedMessaging");
         return hlaClassName;
     }
 
@@ -132,7 +132,7 @@ public:
 
     /**
      * Returns a sorted list containing the names of all of the non-hidden parameters in the
-     * org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.FederateJoinInteraction interaction class.
+     * org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.EmbeddedMessaging interaction class.
      * The property names are paired with name of the hla class in which they are defined in a
      * ClassAndPropertyName POJO.
      * Note: As this is a static method, it is NOT polymorphic, and so, if called on
@@ -150,7 +150,7 @@ public:
 
     /**
      * Returns a sorted list containing the names of all of the parameters in the
-     * org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.FederateJoinInteraction interaction class.
+     * org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.EmbeddedMessaging interaction class.
      * The property names are paired with name of the hla class in which they are defined in a
      * ClassAndPropertyName POJO.
      * Note: As this is a static method, it is NOT polymorphic, and so, if called on
@@ -182,7 +182,7 @@ public:
     // THIS CODE IS STATIC BECAUSE IT IS CLASS-DEPENDENT AND NOT INSTANCE-DEPENDENT
     // ----------------------------------------------------------------------------
     /**
-     * Returns the handle (RTI assigned) of the org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.FederateJoinInteraction interaction class.
+     * Returns the handle (RTI assigned) of the org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.EmbeddedMessaging interaction class.
      * Note: As this is a static method, it is NOT polymorphic, and so, if called on
      * a reference will return the handle of the class pertaining to the reference,
      * rather than the handle of the class for the instance referred to by the reference.
@@ -196,7 +196,7 @@ public:
 
     /**
      * Returns the handle of an parameter (RTI assigned) of
-     * this interaction class (i.e. "org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.FederateJoinInteraction") given the parameter's name.
+     * this interaction class (i.e. "org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.EmbeddedMessaging") given the parameter's name.
      *
      * @param propertyName name of parameter
      * @return the handle (RTI assigned) of the parameter "propertyName" of interaction class "hlaClassName"
@@ -215,7 +215,7 @@ public:
     //-------------------------------------------------
 
     /**
-     * Publishes the org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.FederateJoinInteraction interaction class for a federate.
+     * Publishes the org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.EmbeddedMessaging interaction class for a federate.
      *
      * @param rti handle to the Local RTI Component
      */
@@ -228,7 +228,7 @@ public:
     }
 
     /**
-     * Unpublishes the org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.FederateJoinInteraction interaction class for a federate.
+     * Unpublishes the org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.EmbeddedMessaging interaction class for a federate.
      *
      * @param rti handle to the Local RTI Component, usu. obtained through the
      *            {@link SynchronizedFederate#getLRC()} call
@@ -238,7 +238,7 @@ public:
     }
 
 /**
- * Subscribes a federate to the org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.FederateJoinInteraction interaction class.
+ * Subscribes a federate to the org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.EmbeddedMessaging interaction class.
  *
  * @param rti handle to the Local RTI Component
  */
@@ -259,7 +259,7 @@ public:
     }
 
     /**
-     * Unsubscribes a federate from the org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.FederateJoinInteraction interaction class.
+     * Unsubscribes a federate from the org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.EmbeddedMessaging interaction class.
      *
      * @param rti handle to the Local RTI Component
      */
@@ -289,12 +289,12 @@ public:
 
     /**
      * Return true if "handle" is equal to the handle (RTI assigned) of this class
-     * (that is, the org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.FederateJoinInteraction interaction class).
+     * (that is, the org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.EmbeddedMessaging interaction class).
      *
      * @param handle handle to compare to the value of the handle (RTI assigned) of
-     * this class (the org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.FederateJoinInteraction interaction class).
+     * this class (the org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.EmbeddedMessaging interaction class).
      * @return "true" if "handle" matches the value of the handle of this class
-     * (that is, the org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.FederateJoinInteraction interaction class).
+     * (that is, the org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.EmbeddedMessaging interaction class).
      */
     static bool match(int handle) {
         return handle == get_class_handle();
@@ -310,68 +310,46 @@ public:
 
 
     /**
-     * Set the value of the "FederateId" parameter to "value" for this parameter.
+     * Set the value of the "hlaClassName" parameter to "value" for this parameter.
      *
-     * @param value the new value for the "FederateId" parameter
+     * @param value the new value for the "hlaClassName" parameter
      */
-    void set_FederateId(const std::string & newValue) {
-        ClassAndPropertyName key(get_hla_class_name(), "FederateId");
+    void set_hlaClassName(const std::string & newValue) {
+        ClassAndPropertyName key(get_hla_class_name(), "hlaClassName");
         Value &value(*_classAndPropertyNameValueSPMap[key]);
         value.setValue(newValue);
     }
 
     /**
-     * Returns the value of the "FederateId" parameter of this interaction.
+     * Returns the value of the "hlaClassName" parameter of this interaction.
      *
-     * @return the value of the "FederateId" parameter
+     * @return the value of the "hlaClassName" parameter
      */
-    std::string get_FederateId() {
-        ClassAndPropertyName key(get_hla_class_name(), "FederateId");
+    std::string get_hlaClassName() {
+        ClassAndPropertyName key(get_hla_class_name(), "hlaClassName");
         return static_cast<std::string>(*_classAndPropertyNameValueSPMap[key]);
     }
 
 
     /**
-     * Set the value of the "FederateType" parameter to "value" for this parameter.
+     * Set the value of the "messagingJson" parameter to "value" for this parameter.
      *
-     * @param value the new value for the "FederateType" parameter
+     * @param value the new value for the "messagingJson" parameter
      */
-    void set_FederateType(const std::string & newValue) {
-        ClassAndPropertyName key(get_hla_class_name(), "FederateType");
+    void set_messagingJson(const std::string & newValue) {
+        ClassAndPropertyName key(get_hla_class_name(), "messagingJson");
         Value &value(*_classAndPropertyNameValueSPMap[key]);
         value.setValue(newValue);
     }
 
     /**
-     * Returns the value of the "FederateType" parameter of this interaction.
+     * Returns the value of the "messagingJson" parameter of this interaction.
      *
-     * @return the value of the "FederateType" parameter
+     * @return the value of the "messagingJson" parameter
      */
-    std::string get_FederateType() {
-        ClassAndPropertyName key(get_hla_class_name(), "FederateType");
+    std::string get_messagingJson() {
+        ClassAndPropertyName key(get_hla_class_name(), "messagingJson");
         return static_cast<std::string>(*_classAndPropertyNameValueSPMap[key]);
-    }
-
-
-    /**
-     * Set the value of the "IsLateJoiner" parameter to "value" for this parameter.
-     *
-     * @param value the new value for the "IsLateJoiner" parameter
-     */
-    void set_IsLateJoiner(bool newValue) {
-        ClassAndPropertyName key(get_hla_class_name(), "IsLateJoiner");
-        Value &value(*_classAndPropertyNameValueSPMap[key]);
-        value.setValue(newValue);
-    }
-
-    /**
-     * Returns the value of the "IsLateJoiner" parameter of this interaction.
-     *
-     * @return the value of the "IsLateJoiner" parameter
-     */
-    bool get_IsLateJoiner() {
-        ClassAndPropertyName key(get_hla_class_name(), "IsLateJoiner");
-        return static_cast<bool>(*_classAndPropertyNameValueSPMap[key]);
     }
 
     //------------------------------------
@@ -383,11 +361,11 @@ public:
     //--------------------------
 public:
     static SP create() {
-        return SP(new FederateJoinInteraction());
+        return SP(new EmbeddedMessaging());
     }
 
     static InteractionRoot::SP create_interaction() {
-        return SP(new FederateJoinInteraction());
+        return SP(new EmbeddedMessaging());
     }
 
     virtual InteractionRoot::SP createInteraction() {
@@ -395,11 +373,11 @@ public:
     }
 
     static SP create(const RTIfedTime &rtiFedTime) {
-        return SP(new FederateJoinInteraction(rtiFedTime));
+        return SP(new EmbeddedMessaging(rtiFedTime));
     }
 
     static InteractionRoot::SP create_interaction(const RTIfedTime &rtiFedTime) {
-        return SP(new FederateJoinInteraction(rtiFedTime));
+        return SP(new EmbeddedMessaging(rtiFedTime));
     }
 
     virtual InteractionRoot::SP createInteraction(const RTIfedTime &rtiFedTime) {
@@ -409,13 +387,13 @@ public:
     static SP create(
       const RTI::ParameterHandleValuePairSet &propertyMap
     ) {
-        return SP(new FederateJoinInteraction(propertyMap));
+        return SP(new EmbeddedMessaging(propertyMap));
     }
 
     static InteractionRoot::SP create_interaction(
       const RTI::ParameterHandleValuePairSet &propertyMap
     ) {
-        return SP(new FederateJoinInteraction(propertyMap));
+        return SP(new EmbeddedMessaging(propertyMap));
     }
 
     virtual InteractionRoot::SP createInteraction(
@@ -427,13 +405,13 @@ public:
     static SP create(
       const RTI::ParameterHandleValuePairSet &propertyMap, const RTIfedTime &rtiFedTime
     ) {
-        return SP(new FederateJoinInteraction(propertyMap, rtiFedTime));
+        return SP(new EmbeddedMessaging(propertyMap, rtiFedTime));
     }
 
     static InteractionRoot::SP create_interaction(
       const RTI::ParameterHandleValuePairSet &propertyMap, const RTIfedTime &rtiFedTime
     ) {
-        return SP(new FederateJoinInteraction(propertyMap, rtiFedTime));
+        return SP(new EmbeddedMessaging(propertyMap, rtiFedTime));
     }
 
     virtual InteractionRoot::SP createInteraction(
@@ -442,7 +420,7 @@ public:
     }
 
     virtual InteractionRoot::SP cloneInteraction() {
-        return InteractionRoot::SP( new FederateJoinInteraction( *this )  );
+        return InteractionRoot::SP( new EmbeddedMessaging( *this )  );
     }
 
     //------------------------------
@@ -469,27 +447,27 @@ public:
     // CONSTRUCTORS
     //-------------
 public:
-    FederateJoinInteraction() : Super( get_hla_class_name() ) { }
+    EmbeddedMessaging() : Super( get_hla_class_name() ) { }
 
-    FederateJoinInteraction( const PropertyHandleValuePairSet &propertyMap ) : Super( get_hla_class_name(), propertyMap ) { }
+    EmbeddedMessaging( const PropertyHandleValuePairSet &propertyMap ) : Super( get_hla_class_name(), propertyMap ) { }
 
-    FederateJoinInteraction( const RTIfedTime &rtiFedTime ) : Super( get_hla_class_name(), rtiFedTime ) { }
+    EmbeddedMessaging( const RTIfedTime &rtiFedTime ) : Super( get_hla_class_name(), rtiFedTime ) { }
 
-    FederateJoinInteraction(const PropertyHandleValuePairSet &propertyMap, const RTIfedTime &rtiFedTime) :
+    EmbeddedMessaging(const PropertyHandleValuePairSet &propertyMap, const RTIfedTime &rtiFedTime) :
        Super( get_hla_class_name(), propertyMap, rtiFedTime ) { }
 
 protected:
-    FederateJoinInteraction(InteractionRoot::NoInstanceInit &noInstanceInit) : Super(noInstanceInit) { }
+    EmbeddedMessaging(InteractionRoot::NoInstanceInit &noInstanceInit) : Super(noInstanceInit) { }
 
-    FederateJoinInteraction( const std::string &hlaClassName ) : Super( hlaClassName ) { }
+    EmbeddedMessaging( const std::string &hlaClassName ) : Super( hlaClassName ) { }
 
-    FederateJoinInteraction( const std::string &hlaClassName, const PropertyHandleValuePairSet &propertyMap ) :
+    EmbeddedMessaging( const std::string &hlaClassName, const PropertyHandleValuePairSet &propertyMap ) :
       Super( hlaClassName, propertyMap ) { }
 
-    FederateJoinInteraction( const std::string &hlaClassName, const RTIfedTime &rtiFedTime ) :
+    EmbeddedMessaging( const std::string &hlaClassName, const RTIfedTime &rtiFedTime ) :
       Super( hlaClassName, rtiFedTime ) { }
 
-    FederateJoinInteraction(
+    EmbeddedMessaging(
       const std::string &hlaClassName, const PropertyHandleValuePairSet &propertyMap, const RTIfedTime &rtiFedTime
     ) : Super( hlaClassName, propertyMap, rtiFedTime ) { }
 
@@ -500,8 +478,8 @@ protected:
  } // NAMESPACE "cpswt"
 } // NAMESPACE "org"
 
-inline std::ostream &operator<<( std::ostream &os, ::org::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::FederateJoinInteraction::SP messagingSP ) {
+inline std::ostream &operator<<( std::ostream &os, ::org::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::EmbeddedMessaging::SP messagingSP ) {
     return os << *messagingSP;
 }
 
-#endif // _org_cpswt_hla_InteractionRoot_p_C2WInteractionRoot_p_FederateJoinInteraction_CLASS
+#endif // _org_cpswt_hla_InteractionRoot_p_C2WInteractionRoot_p_EmbeddedMessaging_CLASS

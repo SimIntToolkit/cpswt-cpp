@@ -101,16 +101,16 @@ private:
     void initializeFederateHostConfigMap(const std::string &federateHostConfigJsonFileName);
 
 	struct MessagingInfo {
-	    std::string _publishedFullHlaClassName;
+	    std::string _publishFederateName;
 	    int _payloadSize;
 
-	    MessagingInfo(const std::string &publishedFullHlaClassName, int payloadSize) {
-	        _publishedFullHlaClassName = publishedFullHlaClassName;
+	    MessagingInfo(const std::string &publishFederateName, int payloadSize) {
+	        _publishFederateName = publishFederateName;
 	        _payloadSize = payloadSize;
 	    }
 
-	    const std::string &getPublishedFullHlaClassName() const {
-	        return _publishedFullHlaClassName;
+	    const std::string &getPublishFederateName() const {
+	        return _publishFederateName;
 	    }
 
 	    int getPayloadSize() const {
