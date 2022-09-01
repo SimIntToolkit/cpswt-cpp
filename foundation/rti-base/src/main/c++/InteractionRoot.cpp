@@ -459,10 +459,9 @@ void InteractionRoot::sendInteraction( RTI::RTIambassador *rti ) {
 std::string InteractionRoot::toJson() {
     Json::Value topLevelJSONObject(Json::objectValue);
     topLevelJSONObject["messaging_type"] = "interaction";
-    topLevelJSONObject["messaging_name"] = getHlaClassName();
+    topLevelJSONObject["messaging_name"] = getInstanceHlaClassName();
 
     Json::Value propertyJSONObject(Json::objectValue);
-    topLevelJSONObject["properties"] = propertyJSONObject;
     for(
       ClassAndPropertyNameValueSPMap::iterator cvmItr = _classAndPropertyNameValueSPMap.begin() ;
       cvmItr != _classAndPropertyNameValueSPMap.end() ;
@@ -486,11 +485,18 @@ std::string InteractionRoot::toJson() {
             case(TypeMedley::LONG):
                 propertyJSONObject[key] = static_cast<Json::Value::Int64>(static_cast<long>(value));
                 break;
+            case(TypeMedley::FLOAT):
+                propertyJSONObject[key] = static_cast<float>(value);
+                break;
+            case(TypeMedley::DOUBLE):
+                propertyJSONObject[key] = static_cast<double>(value);
+                break;
             case(TypeMedley::STRING):
                 propertyJSONObject[key] = static_cast<std::string>(value);
                 break;
         }
     }
+    topLevelJSONObject["properties"] = propertyJSONObject;
     Json::StreamWriterBuilder streamWriterBuilder;
     streamWriterBuilder["commentStyle"] = "None";
     streamWriterBuilder["indentation"] = "    ";
@@ -530,11 +536,18 @@ InteractionRoot::SP InteractionRoot::fromJson(const std::string &jsonString) {
                   propertyJSONObject[memberName].asBool()
                 );
                 break;
-            case TypeMedley::CHARACTER:
-                (*otherClassAndPropertyNameValueSPMap[classAndPropertyName]).setValue(
-                  static_cast<char>(propertyJSONObject[memberName].asInt())
-                );
+            case TypeMedley::CHARACTER: {
+                Json::Value value = propertyJSONObject[memberName];
+                int intValue = 0;
+                if (value.isString()) {
+                    std::string stringValue(value.asString());
+                    intValue = stringValue.size() > 0 ? stringValue[0] : 0;
+                } else {
+                    intValue = value.isNumeric() ? value.asInt() : 0;
+                }
+                (*otherClassAndPropertyNameValueSPMap[classAndPropertyName]).setValue(static_cast<char>(intValue));
                 break;
+            }
             case TypeMedley::SHORT:
                 (*otherClassAndPropertyNameValueSPMap[classAndPropertyName]).setValue(
                   static_cast<short>(propertyJSONObject[memberName].asInt())
@@ -548,6 +561,16 @@ InteractionRoot::SP InteractionRoot::fromJson(const std::string &jsonString) {
             case TypeMedley::LONG:
                 (*otherClassAndPropertyNameValueSPMap[classAndPropertyName]).setValue(
                   static_cast<long>(propertyJSONObject[memberName].asInt64())
+                );
+                break;
+            case TypeMedley::FLOAT:
+                (*otherClassAndPropertyNameValueSPMap[classAndPropertyName]).setValue(
+                  static_cast<long>(propertyJSONObject[memberName].asFloat())
+                );
+                break;
+            case TypeMedley::DOUBLE:
+                (*otherClassAndPropertyNameValueSPMap[classAndPropertyName]).setValue(
+                  static_cast<long>(propertyJSONObject[memberName].asDouble())
                 );
                 break;
             case TypeMedley::STRING:
@@ -656,8 +679,10 @@ void InteractionRoot::readFederateDynamicMessageClass(const std::string &hlaClas
                 const std::string propertyTypeString = typeDataMap["ParameterType"].asString();
                 get_class_and_property_name_initial_value_sp_map()[classAndPropertyName] =
                   ValueSP( new Value(
+                    // NOTE:  Value CONSTRUCTOR NEEDED TO KEEP VALUE OF
+                    // *get_type_initial_value_sp_map()[propertyTypeString] FROM BEING CAST TO A STRING
                     localHlaClassName == "InteractionRoot.C2WInteractionRoot" && propertyName == "federateSequence" ?
-                      std::string("[]") : *get_type_initial_value_sp_map()[propertyTypeString]
+                      Value(std::string("[]")) : *get_type_initial_value_sp_map()[propertyTypeString]
                   ) );
             }
         }
@@ -697,7 +722,7 @@ std::ostream &operator<<( std::ostream &os, const ::org::cpswt::hla::Interaction
     typedef ::org::cpswt::hla::InteractionRoot::ClassAndPropertyNameValueSPMap::const_iterator const_iterator;
     const ::org::cpswt::hla::InteractionRoot::ClassAndPropertyNameValueSPMap &classAndPropertyNameValueSPMap =
       messaging.getClassAndPropertyNameValueSPMap();
-    os << messaging.getHlaClassName() << "(";
+    os << messaging.getInstanceHlaClassName() << "(";
     bool first = true;
     for(
       const_iterator cvmCit = classAndPropertyNameValueSPMap.begin() ;

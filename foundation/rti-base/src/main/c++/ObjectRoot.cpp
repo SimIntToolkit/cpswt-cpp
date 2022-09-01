@@ -693,7 +693,6 @@ std::string ObjectRoot::toJson() {
     topLevelJSONObject["object_handle"] = getObjectHandle();
 
     Json::Value propertyJSONObject(Json::objectValue);
-    topLevelJSONObject["properties"] = propertyJSONObject;
     for(
       ClassAndPropertyNameValueSPMap::iterator cvmItr = _classAndPropertyNameValueSPMap.begin() ;
       cvmItr != _classAndPropertyNameValueSPMap.end() ;
@@ -717,11 +716,18 @@ std::string ObjectRoot::toJson() {
             case(TypeMedley::LONG):
                 propertyJSONObject[key] = static_cast<Json::Value::Int64>(static_cast<long>(value));
                 break;
+            case(TypeMedley::FLOAT):
+                propertyJSONObject[key] = static_cast<float>(value);
+                break;
+            case(TypeMedley::DOUBLE):
+                propertyJSONObject[key] = static_cast<double>(value);
+                break;
             case(TypeMedley::STRING):
                 propertyJSONObject[key] = static_cast<std::string>(value);
                 break;
         }
     }
+    topLevelJSONObject["properties"] = propertyJSONObject;
 
     Json::StreamWriterBuilder streamWriterBuilder;
     streamWriterBuilder["commandStyle"] = "None";
@@ -769,11 +775,18 @@ void ObjectRoot::fromJson(const std::string &jsonString) {
                   propertyJSONObject[memberName].asBool()
                 );
                 break;
-            case TypeMedley::CHARACTER:
-                (*classAndPropertyNameValueSPMap[classAndPropertyName]).setValue(
-                  static_cast<char>(propertyJSONObject[memberName].asInt())
-                );
+            case TypeMedley::CHARACTER: {
+                Json::Value value = propertyJSONObject[memberName];
+                int intValue = 0;
+                if (value.isString()) {
+                    std::string stringValue = value.asString();
+                    intValue = stringValue.size() > 0 ? stringValue[0] : 0;
+                } else {
+                    intValue = value.isNumeric() ? value.asInt() : 0;
+                }
+                (*classAndPropertyNameValueSPMap[classAndPropertyName]).setValue(static_cast<char>(intValue));
                 break;
+            }
             case TypeMedley::SHORT:
                 (*classAndPropertyNameValueSPMap[classAndPropertyName]).setValue(
                   static_cast<short>(propertyJSONObject[memberName].asInt())
@@ -787,6 +800,16 @@ void ObjectRoot::fromJson(const std::string &jsonString) {
             case TypeMedley::LONG:
                 (*classAndPropertyNameValueSPMap[classAndPropertyName]).setValue(
                   static_cast<long>(propertyJSONObject[memberName].asInt64())
+                );
+                break;
+            case TypeMedley::FLOAT:
+                (*classAndPropertyNameValueSPMap[classAndPropertyName]).setValue(
+                  static_cast<long>(propertyJSONObject[memberName].asFloat())
+                );
+                break;
+            case TypeMedley::DOUBLE:
+                (*classAndPropertyNameValueSPMap[classAndPropertyName]).setValue(
+                  static_cast<long>(propertyJSONObject[memberName].asDouble())
                 );
                 break;
             case TypeMedley::STRING:
@@ -931,7 +954,7 @@ std::ostream &operator<<( std::ostream &os, const ::org::cpswt::hla::ObjectRoot 
     typedef ::org::cpswt::hla::ObjectRoot::ClassAndPropertyNameValueSPMap::const_iterator const_iterator;
     const ::org::cpswt::hla::ObjectRoot::ClassAndPropertyNameValueSPMap &classAndPropertyNameValueSPMap =
       messaging.getClassAndPropertyNameValueSPMap();
-    os << messaging.getHlaClassName() << "(";
+    os << messaging.getInstanceHlaClassName() << "(";
     bool first = true;
     for(
       const_iterator cvmCit = classAndPropertyNameValueSPMap.begin() ;

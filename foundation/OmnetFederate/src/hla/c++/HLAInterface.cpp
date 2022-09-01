@@ -153,7 +153,7 @@ void HLAInterface::initializeFederateSequenceToMessagingInfoMap(const std::strin
 
         std::string receivingFullHlaClassName( fsmCit.key().asString() );
 
-//        _dynamicSubscribeFullHlaClassNameSet.insert( receivingFullHlaClassName );
+        _dynamicSoftSubscribeFullHlaClassNameSet.insert( receivingFullHlaClassName );
 
         Json::Value federateSequenceMessagingInfoArray = federate_sequence_to_messaging_info_json[ receivingFullHlaClassName ];
 
@@ -1023,14 +1023,16 @@ void HLAInterface::setup() {
 
     InteractionRoot::subscribe_interaction(EmbeddedMessaging::get_hla_class_name() + "." + getFederateType(), getRTI());
 
-std::cerr << "Subscribed to \"" << (EmbeddedMessaging::get_hla_class_name() + "." + getFederateType()) << "\"" << std::endl;
-
     for(const std::string &dynamicPublishHlaClassName: _dynamicPublishFullHlaClassNameSet) {
         InteractionRoot::publish_interaction(dynamicPublishHlaClassName, getRTI() );
     }
 
     for(const std::string &dynamicSubscribeHlaClassName: _dynamicSubscribeFullHlaClassNameSet) {
         InteractionRoot::subscribe_interaction(dynamicSubscribeHlaClassName, getRTI() );
+    }
+
+    for(const std::string &dynamicSoftSubscribeHlaClassName: _dynamicSoftSubscribeFullHlaClassNameSet) {
+        InteractionRoot::soft_subscribe_interaction(dynamicSoftSubscribeHlaClassName, getRTI() );
     }
 
     SubscribedInteractionFilter::get_singleton().initialize();

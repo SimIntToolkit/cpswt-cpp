@@ -126,6 +126,7 @@ private:
 
 	StringSet _dynamicPublishFullHlaClassNameSet;
     StringSet _dynamicSubscribeFullHlaClassNameSet;
+    StringSet _dynamicSoftSubscribeFullHlaClassNameSet;
 
 	MessagingFederateSequenceMessagingInfoVectorMap _messagingFederateSequenceMessagingInfoVectorMap;
 
