@@ -1102,34 +1102,6 @@ public:
 
     void requestUpdate( RTI::RTIambassador *rti );
 
-    //-----------------------------------------------------------------------------------------------------------
-    // PROPERTY-CLASS-NAME AND PROPERTY-VALUE-SP DATA CLASS
-    // THIS CLASS IS USED ESPECIALLY FOR THE BENEFIT OF THE SET METHOD BELOW.  WHEN A VALUE IS RETRIEVED FROM THE
-    // classPropertyNameValueMap USING A GET METHOD, IT IS PAIRED WITH THE NAME OF THE CLASS IN WHICH THE
-    // PROPERTY IS DEFINED. IN THIS WAY, THE SET METHOD CAN PLACE THE NEW VALUE FOR THE PROPERTY USING THE
-    // CORRECT (CLASS-NAME, PROPERTY-NAME) KEY.
-    //-----------------------------------------------------------------------------------------------------------
- protected:
-    class PropertyClassNameAndValue {
-    private:
-        const std::string hlaClassName;
-        const ValueSP valueSP;
-
-    public:
-        PropertyClassNameAndValue(const std::string &hlaClassName, const ValueSP &localValueSP) :
-         hlaClassName(hlaClassName), valueSP(localValueSP) {}
-
-        const std::string &getClassName() const {
-            return hlaClassName;
-        }
-
-        const ValueSP &getValueSP() const {
-            return valueSP;
-        }
-    };
-
-    typedef boost::shared_ptr<PropertyClassNameAndValue> PropertyClassNameAndValueSP;
-
     //----------------------------------------------
     // CLASS-AND-PROPERTY-NAME PROPERTY-VALUE-SP MAP
     //----------------------------------------------
@@ -1148,22 +1120,21 @@ public:
     void setAttribute(
       const std::string &hlaClassName, const std::string &propertyName, const T &value
     ) {
-        PropertyClassNameAndValueSP propertyClassNameAndValueSP =
-          getAttributeAux(hlaClassName, propertyName);
+        ClassAndPropertyNameSP classAndPropertyNameSP = findProperty(hlaClassName, propertyName);
 
-        if (!propertyClassNameAndValueSP) {
-            BOOST_LOG_SEV(get_logger(), error) << "setAttribute(\"" << propertyName << "\", "
-              << typeid(T).name() << " value): could not find \"" << propertyName
-              << "\" attribute in class \"" << getInstanceHlaClassName() << "\" or any of its superclasses.";
+        if (!classAndPropertyNameSP) {
+            BOOST_LOG_SEV(get_logger(), error) << "setAttribute(\"" << hlaClassName << "\", "
+              << "\"" << propertyName << "\", " << typeid(T).name() << " value): could not find \"" << propertyName
+              << "\" attribute in class \"" << hlaClassName << "\" or any of its superclasses.";
             return;
         }
 
-        Value &currentValue = *propertyClassNameAndValueSP->getValueSP();
+        Value &currentValue = *_classAndPropertyNameValueSPMap[*classAndPropertyNameSP];
 
         if (!currentValue.setValue(value)) {
             BOOST_LOG_SEV(get_logger(), error) << "setAttribute(\"" << propertyName << "\", "
               << typeid(T).name() << " value): \"value\" is incorrect type \"" << typeid(T).name()
-              << "\" for \"" << propertyName << "\" parameter, should be of type \""
+              << "\" for \"" << propertyName << "\" attribute, should be of type \""
               << currentValue.getTypeName() << "\"";
         }
     }
@@ -1185,29 +1156,9 @@ public:
         setAttribute(getInstanceHlaClassName(), propertyName, value);
     }
 
-private:
-    PropertyClassNameAndValueSP getAttributeAux(
-      const std::string &hlaClassName, const std::string &propertyName
-    ) const {
-        ClassAndPropertyNameSP classAndPropertyNameSP = findProperty(hlaClassName, propertyName);
-        if (classAndPropertyNameSP) {
-            ClassAndPropertyNameValueSPMap::const_iterator cvmCit =
-              _classAndPropertyNameValueSPMap.find(*classAndPropertyNameSP);
-            if (cvmCit == _classAndPropertyNameValueSPMap.end()) {
-                return PropertyClassNameAndValueSP();
-            }
-            ValueSP valueSP = cvmCit->second;
-            return PropertyClassNameAndValueSP(
-              new PropertyClassNameAndValue(classAndPropertyNameSP->getClassName(), valueSP)
-            );
-        }
-
-        return PropertyClassNameAndValueSP();
-    }
-
 public:
     bool hasAttribute(const std::string &hlaClassName, const std::string &propertyName) {
-        return static_cast<bool>(getAttributeAux(hlaClassName, propertyName));
+        return static_cast<bool>(findProperty(hlaClassName, propertyName));
     }
 
     bool hasAttribute(const std::string &propertyName) {
@@ -1219,10 +1170,9 @@ public:
     ) const override {
         static Value value(0);
 
-        PropertyClassNameAndValueSP propertyClassNameAndValueSP =
-          getAttributeAux(hlaClassName, propertyName);
+        ClassAndPropertyNameSP classAndPropertyNameSP = findProperty(hlaClassName, propertyName);
 
-        return propertyClassNameAndValueSP ? *propertyClassNameAndValueSP->getValueSP() : value;
+        return classAndPropertyNameSP ? *(_classAndPropertyNameValueSPMap.find(*classAndPropertyNameSP)->second) : value;
     }
 
     const Value &getAttribute(const ClassAndPropertyName &classAndPropertyName) {
@@ -1760,7 +1710,7 @@ public:
         if (!currentValue.setValue(value)) {
             BOOST_LOG_SEV(get_logger(), error) << "setAttribute(int propertyHandle, "
               << typeid(T).name() << " value): \"value\" is incorrect type \"" << typeid(T).name()
-              << "\" for \"" << classAndPropertyName.getPropertyName() << "\" parameter, should be of type \""
+              << "\" for \"" << classAndPropertyName.getPropertyName() << "\" attribute, should be of type \""
               << currentValue.getTypeName() << "\"";
         }
     }
