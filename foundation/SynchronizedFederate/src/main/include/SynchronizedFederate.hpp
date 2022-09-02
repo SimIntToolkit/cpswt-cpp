@@ -671,6 +671,8 @@ private:
 
         InteractionRoot::SP embeddedInteractionSP =
                 InteractionRoot::fromJson(embeddedMessagingSP->get_messagingJson());
+        embeddedInteractionSP->setTime(embeddedMessagingSP->getTime());
+
         receiveInteractionAux(embeddedInteractionSP, timestamp);
     }
 
