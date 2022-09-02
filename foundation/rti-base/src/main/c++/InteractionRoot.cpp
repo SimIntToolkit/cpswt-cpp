@@ -565,12 +565,12 @@ InteractionRoot::SP InteractionRoot::fromJson(const std::string &jsonString) {
                 break;
             case TypeMedley::FLOAT:
                 (*otherClassAndPropertyNameValueSPMap[classAndPropertyName]).setValue(
-                  static_cast<long>(propertyJSONObject[memberName].asFloat())
+                  propertyJSONObject[memberName].asFloat()
                 );
                 break;
             case TypeMedley::DOUBLE:
                 (*otherClassAndPropertyNameValueSPMap[classAndPropertyName]).setValue(
-                  static_cast<long>(propertyJSONObject[memberName].asDouble())
+                  propertyJSONObject[memberName].asDouble()
                 );
                 break;
             case TypeMedley::STRING:
