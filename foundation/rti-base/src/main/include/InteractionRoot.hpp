@@ -778,34 +778,6 @@ public:
         set_is_soft_subscribed(hlaClassName, false);
     }
 
-    //-----------------------------------------------------------------------------------------------------------
-    // PROPERTY-CLASS-NAME AND PROPERTY-VALUE-SP DATA CLASS
-    // THIS CLASS IS USED ESPECIALLY FOR THE BENEFIT OF THE SET METHOD BELOW.  WHEN A VALUE IS RETRIEVED FROM THE
-    // classPropertyNameValueMap USING A GET METHOD, IT IS PAIRED WITH THE NAME OF THE CLASS IN WHICH THE
-    // PROPERTY IS DEFINED. IN THIS WAY, THE SET METHOD CAN PLACE THE NEW VALUE FOR THE PROPERTY USING THE
-    // CORRECT (CLASS-NAME, PROPERTY-NAME) KEY.
-    //-----------------------------------------------------------------------------------------------------------
- protected:
-    class PropertyClassNameAndValue {
-    private:
-        const std::string hlaClassName;
-        const ValueSP valueSP;
-
-    public:
-        PropertyClassNameAndValue(const std::string &hlaClassName, const ValueSP &localValueSP) :
-         hlaClassName(hlaClassName), valueSP(localValueSP) {}
-
-        const std::string &getClassName() const {
-            return hlaClassName;
-        }
-
-        const ValueSP &getValueSP() const {
-            return valueSP;
-        }
-    };
-
-    typedef boost::shared_ptr<PropertyClassNameAndValue> PropertyClassNameAndValueSP;
-
     //----------------------------------------------
     // CLASS-AND-PROPERTY-NAME PROPERTY-VALUE-SP MAP
     //----------------------------------------------
@@ -824,17 +796,16 @@ public:
     void setParameter(
       const std::string &hlaClassName, const std::string &propertyName, const T &value
     ) {
-        PropertyClassNameAndValueSP propertyClassNameAndValueSP =
-          getParameterAux(hlaClassName, propertyName);
+        ClassAndPropertyNameSP classAndPropertyNameSP = findProperty(hlaClassName, propertyName);
 
-        if (!propertyClassNameAndValueSP) {
-            BOOST_LOG_SEV(get_logger(), error) << "setParameter(\"" << propertyName << "\", "
-              << typeid(T).name() << " value): could not find \"" << propertyName
-              << "\" parameter in class \"" << getInstanceHlaClassName() << "\" or any of its superclasses.";
+        if (!classAndPropertyNameSP) {
+            BOOST_LOG_SEV(get_logger(), error) << "setParameter(\"" << hlaClassName << "\", "
+              << "\"" << propertyName << "\", " << typeid(T).name() << " value): could not find \"" << propertyName
+              << "\" parameter in class \"" << hlaClassName << "\" or any of its superclasses.";
             return;
         }
 
-        Value &currentValue = *propertyClassNameAndValueSP->getValueSP();
+        Value &currentValue = *_classAndPropertyNameValueSPMap[*classAndPropertyNameSP];
 
         if (!currentValue.setValue(value)) {
             BOOST_LOG_SEV(get_logger(), error) << "setParameter(\"" << propertyName << "\", "
@@ -861,29 +832,9 @@ public:
         setParameter(getInstanceHlaClassName(), propertyName, value);
     }
 
-private:
-    PropertyClassNameAndValueSP getParameterAux(
-      const std::string &hlaClassName, const std::string &propertyName
-    ) const {
-        ClassAndPropertyNameSP classAndPropertyNameSP = findProperty(hlaClassName, propertyName);
-        if (classAndPropertyNameSP) {
-            ClassAndPropertyNameValueSPMap::const_iterator cvmCit =
-              _classAndPropertyNameValueSPMap.find(*classAndPropertyNameSP);
-            if (cvmCit == _classAndPropertyNameValueSPMap.end()) {
-                return PropertyClassNameAndValueSP();
-            }
-            ValueSP valueSP = cvmCit->second;
-            return PropertyClassNameAndValueSP(
-              new PropertyClassNameAndValue(classAndPropertyNameSP->getClassName(), valueSP)
-            );
-        }
-
-        return PropertyClassNameAndValueSP();
-    }
-
 public:
     bool hasParameter(const std::string &hlaClassName, const std::string &propertyName) {
-        return static_cast<bool>(getParameterAux(hlaClassName, propertyName));
+        return static_cast<bool>(findProperty(hlaClassName, propertyName));
     }
 
     bool hasParameter(const std::string &propertyName) {
@@ -895,10 +846,9 @@ public:
     ) const override {
         static Value value(0);
 
-        PropertyClassNameAndValueSP propertyClassNameAndValueSP =
-          getParameterAux(hlaClassName, propertyName);
+        ClassAndPropertyNameSP classAndPropertyNameSP = findProperty(hlaClassName, propertyName);
 
-        return propertyClassNameAndValueSP ? *propertyClassNameAndValueSP->getValueSP() : value;
+        return classAndPropertyNameSP ? *(_classAndPropertyNameValueSPMap.find(*classAndPropertyNameSP)->second) : value;
     }
 
     const Value &getParameter(const ClassAndPropertyName &classAndPropertyName) {
