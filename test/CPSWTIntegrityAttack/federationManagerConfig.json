@@ -1,9 +1,0 @@
-{
-    "experimentConfig"  : "experimentConfig.json",
-    "federationId"      : "CPSWTIntegrityAttack",
-    "federationEndTime" : 0,
-    "fedFile"           : "CPSWTIntegrityAttack.fed",
-    "lookAhead"         : 0.01,
-    "stepSize"          : 0.1,
-    "realTimeMode"      : false
-}
