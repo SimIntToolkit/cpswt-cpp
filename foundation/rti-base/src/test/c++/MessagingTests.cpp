@@ -182,6 +182,7 @@ void MessagingTests::interactionClassNamesTest() {
     expectedInteractionClassNameSet.insert("InteractionRoot");
     expectedInteractionClassNameSet.insert("InteractionRoot.C2WInteractionRoot");
     expectedInteractionClassNameSet.insert("InteractionRoot.C2WInteractionRoot.ActionBase");
+    expectedInteractionClassNameSet.insert("InteractionRoot.C2WInteractionRoot.EmbeddedMessaging");
     expectedInteractionClassNameSet.insert("InteractionRoot.C2WInteractionRoot.FederateJoinInteraction");
     expectedInteractionClassNameSet.insert("InteractionRoot.C2WInteractionRoot.FederateResignInteraction");
     expectedInteractionClassNameSet.insert("InteractionRoot.C2WInteractionRoot.OutcomeBase");
