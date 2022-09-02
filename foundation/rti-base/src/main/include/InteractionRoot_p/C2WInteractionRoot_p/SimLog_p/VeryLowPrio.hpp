@@ -224,6 +224,10 @@ public:
         InteractionRoot::publish_interaction( get_hla_class_name(), rti );
     }
 
+    static bool get_is_published() {
+        return InteractionRoot::get_is_published(get_hla_class_name());
+    }
+
     /**
      * Unpublishes the org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.SimLog_p.VeryLowPrio interaction class for a federate.
      *
@@ -243,6 +247,18 @@ public:
         InteractionRoot::subscribe_interaction( get_hla_class_name(), rti );
     }
 
+    static bool get_is_subscribed() {
+        return InteractionRoot::get_is_subscribed(get_hla_class_name());
+    }
+
+    static void soft_subscribe_interaction(RTI::RTIambassador *rti) {
+        InteractionRoot::soft_subscribe_interaction(get_hla_class_name(), rti);
+    }
+
+    static bool get_is_soft_subscribed() {
+        return InteractionRoot::get_is_soft_subscribed(get_hla_class_name());
+    }
+
     /**
      * Unsubscribes a federate from the org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.SimLog_p.VeryLowPrio interaction class.
      *
@@ -250,6 +266,22 @@ public:
      */
     static void unsubscribe_interaction(RTI::RTIambassador *rti) {
         InteractionRoot::unsubscribe_interaction( get_hla_class_name(), rti );
+    }
+
+    static void soft_unsubscribe_interaction(RTI::RTIambassador *rti) {
+        InteractionRoot::soft_unsubscribe_interaction(get_hla_class_name(), rti);
+    }
+
+    static void add_federate_name_soft_publish(const std::string &networkFederateName) {
+        InteractionRoot::add_federate_name_soft_publish(get_hla_class_name(), networkFederateName);
+    }
+
+    static void remove_federate_name_soft_publish(const std::string &networkFederateName) {
+        InteractionRoot::remove_federate_name_soft_publish(get_hla_class_name(), networkFederateName);
+    }
+
+    std::set<std::string> getFederateNameSoftPublishSet() {
+        return InteractionRoot::get_federate_name_soft_publish_set(get_hla_class_name());
     }
 
     //-----------------------------------------------------

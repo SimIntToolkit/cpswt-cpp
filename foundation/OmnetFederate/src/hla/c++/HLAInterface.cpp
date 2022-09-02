@@ -57,6 +57,7 @@ using CommandExecutionStatus = ::org::cpswt::hla::InteractionRoot_p::C2WInteract
 //using C2WInteractionRoot = ::org::cpswt::hla::InteractionRoot_p::C2WInteractionRoot;
 
 using NetworkPacket = ::org::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::NetworkPacket;
+using EmbeddedMessaging = ::org::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::EmbeddedMessaging;
 
 using OmnetCommand = ::org::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::OmnetCommand;
 
@@ -152,7 +153,7 @@ void HLAInterface::initializeFederateSequenceToMessagingInfoMap(const std::strin
 
         std::string receivingFullHlaClassName( fsmCit.key().asString() );
 
-        _dynamicSubscribeFullHlaClassNameSet.insert( receivingFullHlaClassName );
+        _dynamicSoftSubscribeFullHlaClassNameSet.insert( receivingFullHlaClassName );
 
         Json::Value federateSequenceMessagingInfoArray = federate_sequence_to_messaging_info_json[ receivingFullHlaClassName ];
 
@@ -176,10 +177,12 @@ void HLAInterface::initializeFederateSequenceToMessagingInfoMap(const std::strin
 
                 Json::Value messaging_info_json = messaging_info_json_array[ jx ];
 
-                std::string sendingFullHlaClassName( messaging_info_json[ "full_hla_class_name" ].asString() );
-                _dynamicPublishFullHlaClassNameSet.insert( sendingFullHlaClassName );
+                std::string publishFederateName( messaging_info_json[ "full_hla_class_name" ].asString() );
+                _dynamicPublishFullHlaClassNameSet.insert(
+                  EmbeddedMessaging::get_hla_class_name() + "." + publishFederateName
+                );
 
-                MessagingInfo messagingInfo( sendingFullHlaClassName, messaging_info_json[ "payload_size" ].asInt() );
+                MessagingInfo messagingInfo( publishFederateName, messaging_info_json[ "payload_size" ].asInt() );
 
                 messagingInfoVector.push_back( messagingInfo );
             }
@@ -209,6 +212,7 @@ void HLAInterface::populateInteractionMsg(InteractionMsg &interactionMsg, const 
         interactionMsg.setReceiverHostApp( federateHostConfig.hostApp.c_str() );
         interactionMsg.setReceiverAppIndex( federateHostConfig.appIndex );
         interactionMsg.setReceiverAppInterface( federateHostConfig.appInterface.c_str() );
+        interactionMsg.setReceiverFederateName( receivingFederateName.c_str() );
     }
 }
 
@@ -217,12 +221,14 @@ void HLAInterface::processInteractions( void ) {
     InteractionRoot::SP interactionRootSP;
     while(  ( interactionRootSP = getNextInteraction() ) != 0  ) {
 
-        // std::cerr << "Processing interaction of type \"" << interactionRootSP->getInstanceHlaClassName() << "\"" << std::endl;
+        std::cerr << "Processing interaction of type \"" << interactionRootSP->getInstanceHlaClassName() << "\"" << std::endl;
 
         int classHandle = interactionRootSP->getClassHandle();
 
         // IS INTERACTION ONE THAT MIGHT BE PROPAGATED THROUGH THE SIMULATED NETWORK?
         if ( interactionRootSP->isDynamicInstance() ) {
+
+//            std::cerr << "Interaction \"" << interactionRootSP->getInstanceHlaClassName() << "\" is dynamic" << std::endl;
 
             // GET FULL HLA CLASS NAME OF INTERACTION
             std::string instanceHlaClassName = interactionRootSP->getInstanceHlaClassName();
@@ -304,35 +310,23 @@ void HLAInterface::processInteractions( void ) {
 
                 const MessagingInfo &messagingInfo( *mivCit );
 
-                std::string publishedFullHlaClassName( messagingInfo.getPublishedFullHlaClassName() );
-
-                size_t position = publishedFullHlaClassName.find_last_of(".");
-                std::string receivingFederateName(  publishedFullHlaClassName.substr( position + 1 )  );
+                std::string publishFederateName( messagingInfo.getPublishFederateName() );
 
                 // MAKE SURE THERE IS A HOST FOR THE RECEIVING FEDERATE
-                FederateNameToHostConfigMap::const_iterator fhmCit = _federateNameToHostConfigMap.find(receivingFederateName);
+                FederateNameToHostConfigMap::const_iterator fhmCit = _federateNameToHostConfigMap.find(publishFederateName);
                 if ( fhmCit == _federateNameToHostConfigMap.end() ) {
-                    std::cerr << "Name of receiving federate \"" << receivingFederateName << "\" not found in federate-host-config table: skipping ..." << std::endl;
+                    std::cerr << "Name of receiving federate \"" << publishFederateName << "\" not found in federate-host-config table: skipping ..." << std::endl;
                     continue;
-                }
-
-                InteractionRoot::SP sendInteractionRootSP(  new InteractionRoot( publishedFullHlaClassName )  );
-
-                // COPY PARAMETER VALUES
-                ClassAndPropertyNameList classAndPropertyNameList = interactionRootSP->getAllParameterNames();
-                for( ClassAndPropertyNameList::const_iterator cplCit = classAndPropertyNameList.begin() ; cplCit != classAndPropertyNameList.end() ; ++cplCit ) {
-                    InteractionRoot::Value value = interactionRootSP->getParameter( *cplCit );
-                    sendInteractionRootSP->setParameter( *cplCit, value);
                 }
 
                 InteractionMsg *interactionMsgPtr = new InteractionMsg( getInteractionMessageLabel().c_str() );
                 interactionMsgPtr->setToHLA( true );
                 interactionMsgPtr->setMessageNo( AttackCoordinator::getUniqueNo() );
                 interactionMsgPtr->setTimestamp( interactionRootSP->getTime() );
-                interactionMsgPtr->setInteractionRootSP( sendInteractionRootSP );
+                interactionMsgPtr->setInteractionRootSP( interactionRootSP );
                 interactionMsgPtr->setByteLength( messagingInfo.getPayloadSize() );
 
-                populateInteractionMsg( *interactionMsgPtr, sendingFederateName, receivingFederateName );
+                populateInteractionMsg( *interactionMsgPtr, sendingFederateName, publishFederateName );
 
                 auto c_packetChunk = inet::makeShared<inet::cPacketChunk>(interactionMsgPtr);
                 inet::Packet *packet = new inet::Packet(getInteractionMessageLabel().c_str(), c_packetChunk);
@@ -1027,12 +1021,18 @@ void HLAInterface::setup() {
     StartNetworkIPFirewall::subscribe_interaction( getRTI() );
     StopNetworkIPFirewall::subscribe_interaction( getRTI() );
 
+    InteractionRoot::subscribe_interaction(EmbeddedMessaging::get_hla_class_name() + "." + getFederateType(), getRTI());
+
     for(const std::string &dynamicPublishHlaClassName: _dynamicPublishFullHlaClassNameSet) {
         InteractionRoot::publish_interaction(dynamicPublishHlaClassName, getRTI() );
     }
 
     for(const std::string &dynamicSubscribeHlaClassName: _dynamicSubscribeFullHlaClassNameSet) {
         InteractionRoot::subscribe_interaction(dynamicSubscribeHlaClassName, getRTI() );
+    }
+
+    for(const std::string &dynamicSoftSubscribeHlaClassName: _dynamicSoftSubscribeFullHlaClassNameSet) {
+        InteractionRoot::soft_subscribe_interaction(dynamicSoftSubscribeHlaClassName, getRTI() );
     }
 
     SubscribedInteractionFilter::get_singleton().initialize();
@@ -1138,7 +1138,8 @@ void HLAInterface::handleMessage( omnetpp::cMessage* msg ) {
         InteractionMsg *interactionMsg = dynamic_cast< InteractionMsg * >( c_packetPtr );
 
         InteractionRoot::SP interactionRootSP = interactionMsg->getInteractionRootSP();
-        sendInteraction(interactionRootSP, getCurrentTime() + getLookahead());
+        std::string receivingFederateName(interactionMsg->getReceiverFederateName());
+        sendInteraction(interactionRootSP, receivingFederateName, getCurrentTime() + getLookahead());
         // std::cerr << "Sending interaction with timestamp " << boost::lexical_cast< std::string >( timestamp ) << std::endl;
 //    } else if ( msgKind == OBJECT ) {
 //        ObjectMsg *objectMsgPtr = static_cast< ObjectMsg * >( msg );

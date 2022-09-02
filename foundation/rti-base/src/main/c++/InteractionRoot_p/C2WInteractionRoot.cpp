@@ -56,10 +56,10 @@ bool C2WInteractionRoot::is_federate_sequence(const std::string &federateSequenc
 void C2WInteractionRoot::update_federate_sequence_aux(
   ::org::cpswt::hla::InteractionRoot &interactionRoot, const std::string &federateId
 ) {
-    if (::org::cpswt::hla::InteractionRoot::get_federate_appended_to_federate_sequence(interactionRoot)) {
+    if (interactionRoot.getFederateAppendedToFederateSequence()) {
         return;
     }
-    ::org::cpswt::hla::InteractionRoot::set_federate_appended_to_federate_sequence(interactionRoot);
+    interactionRoot.setFederateAppendedToFederateSequence(true);
 
     std::string federateSequence = interactionRoot.getParameter("federateSequence").asString();
 

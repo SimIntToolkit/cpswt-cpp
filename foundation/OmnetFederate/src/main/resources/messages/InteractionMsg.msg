@@ -53,4 +53,5 @@ message InteractionMsg extends cPacket {
     string receiverHostApp;
     int receiverAppIndex;
     string receiverAppInterface;
+    string receiverFederateName;
 }
