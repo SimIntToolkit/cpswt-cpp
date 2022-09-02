@@ -39,25 +39,25 @@ namespace org {
 
 bool InteractionRoot::static_init_var = InteractionRoot::static_init();
 
-void InteractionRoot::init(RTI::RTIambassador *rtiAmbassador) {
-    if (get_is_initialized()) {
-        return;
-    }
-    set_is_initialized(true);
+void InteractionRoot::init(const std::string &hlaClassName, RTI::RTIambassador *rtiAmbassador) {
 
-    //-------------------------------------------------------------------------
-    // hlaClassNameSet (get_hla_class_name_set()) IS POPULATED BY
-    // - STATIC INITIALIZATION BLOCKS IN THE DERIVED INTERACTION/OBJECT CLASSES
-    // - THE DYNAMIC-MESSAGE-CLASSES FILE
-    //-------------------------------------------------------------------------
-    for(const std::string &hlaClassName: get_hla_class_name_set()) {
+    std::list<std::string> hlaClassNameComponents;
+    boost::algorithm::split(hlaClassNameComponents, hlaClassName, boost::is_any_of("."));
+    while(!hlaClassNameComponents.empty()) {
+        const std::string localHlaClassName( boost::algorithm::join(hlaClassNameComponents, ".") );
+        hlaClassNameComponents.pop_back();
 
-        if (get_hla_class_name_instance_sp_map().find(hlaClassName) == get_hla_class_name_instance_sp_map().end()) {
-            get_dynamic_hla_class_name_set_aux().insert(hlaClassName);
+        if (get_hla_class_name_is_initialized(localHlaClassName)) {
+            continue;
+        }
+        set_hla_class_name_is_initialized(localHlaClassName);
+
+        if (get_hla_class_name_instance_sp_map().find(localHlaClassName) == get_hla_class_name_instance_sp_map().end()) {
+            get_dynamic_hla_class_name_set_aux().insert(localHlaClassName);
         }
 
         //----------------------------------------------------
-        // GET HANDLE FOR hlaClassName TO INITIALIZE
+        // GET HANDLE FOR localHlaClassName TO INITIALIZE
         // - _classNameHandleMap (get_class_name_handle_map())
         // - _classHandleNameMap (get_class_handle_name_map())
         //----------------------------------------------------
@@ -65,9 +65,9 @@ void InteractionRoot::init(RTI::RTIambassador *rtiAmbassador) {
         int classHandle = 0;
         while(isNotInitialized) {
             try {
-                classHandle = rtiAmbassador->getInteractionClassHandle(hlaClassName.c_str());
-                get_class_name_handle_map()[hlaClassName] = classHandle;
-                get_class_handle_name_map()[classHandle] = hlaClassName;
+                classHandle = rtiAmbassador->getInteractionClassHandle(localHlaClassName.c_str());
+                get_class_name_handle_map()[localHlaClassName] = classHandle;
+                get_class_handle_name_map()[classHandle] = localHlaClassName;
                 isNotInitialized = false;
             } catch (RTI::FederateNotExecutionMember e) {
                 BOOST_LOG_SEV(get_logger(), error) << "could not initialize: federate not execution member";
@@ -84,15 +84,15 @@ void InteractionRoot::init(RTI::RTIambassador *rtiAmbassador) {
 
         //------------------------------------------------------------------------------------
         // _classAndPropertyNameSetSPMap (get_class_name_class_and_property_name_set_sp_map())
-        // MAPS hlaClassName TO THE PROPERTIES (PARAMETERS OR ATTRIBUTES)
-        // DEFINED *DIRECTLY* IN THE hlaClassName CLASS
+        // MAPS localHlaClassName TO THE PROPERTIES (PARAMETERS OR ATTRIBUTES)
+        // DEFINED *DIRECTLY* IN THE localHlaClassName CLASS
         //
         // GET HANDLE FOR THESE PROPERTIES TO INITIALIZE
         // - _classAndPropertyNameHandleMap (get_class_and_property_name_handle_map())
         // - _handleClassAndPropertyNameMap (get_handle_class_and_property_name_sp_map())
         //------------------------------------------------------------------------------------
         ClassAndPropertyNameSet &classAndPropertyNameSet =
-          *get_class_name_class_and_property_name_set_sp_map()[hlaClassName];
+          *get_class_name_class_and_property_name_set_sp_map()[localHlaClassName];
         for(const ClassAndPropertyName &classAndPropertyName: classAndPropertyNameSet) {
             isNotInitialized = true;
             while(isNotInitialized) {
@@ -126,8 +126,9 @@ void InteractionRoot::init(RTI::RTIambassador *rtiAmbassador) {
         //-------------------------------------------------------
         // INITIALIZE ALL CLASSES TO NOT-PUBLISHED NOT-SUBSCRIBED
         //-------------------------------------------------------
-        get_class_name_publish_status_map()[hlaClassName] = false;
-        get_class_name_subscribe_status_map()[hlaClassName] = false;
+        get_class_name_publish_status_map()[localHlaClassName] = false;
+        get_class_name_subscribe_status_map()[localHlaClassName] = false;
+        get_class_name_soft_subscribe_status_map()[localHlaClassName] = false;
     }
 }
 
@@ -188,6 +189,12 @@ const InteractionRoot::Value &InteractionRoot::getParameter( int propertyHandle 
 
 void InteractionRoot::publish_interaction(const std::string &hlaClassName, RTI::RTIambassador *rti) {
 
+    if (!loadDynamicHlaClass(hlaClassName, rti)) {
+        BOOST_LOG_SEV(get_logger(), warning) << "publish_interaction(\"" << hlaClassName << "\"):  " <<
+          "no such class";
+        return;
+    }
+
     if (get_is_published_aux(hlaClassName, true)) {
         return;
     }
@@ -217,6 +224,12 @@ void InteractionRoot::publish_interaction(const std::string &hlaClassName, RTI::
 
 void InteractionRoot::subscribe_interaction(const std::string &hlaClassName, RTI::RTIambassador *rti) {
 
+    if (!loadDynamicHlaClass(hlaClassName, rti)) {
+        BOOST_LOG_SEV(get_logger(), warning) << "subscribe_interaction(\"" << hlaClassName << "\"):  " <<
+          "no such class";
+        return;
+    }
+
     if (get_is_subscribed_aux(hlaClassName, true)) {
         return;
     }
@@ -245,6 +258,12 @@ void InteractionRoot::subscribe_interaction(const std::string &hlaClassName, RTI
 }
 
 void InteractionRoot::unpublish_interaction(const std::string &hlaClassName, RTI::RTIambassador *rti) {
+
+    if (!loadDynamicHlaClass(hlaClassName, rti)) {
+        BOOST_LOG_SEV(get_logger(), warning) << "unpublish_interaction(\"" << hlaClassName << "\"):  " <<
+          "no such class";
+        return;
+    }
 
     if (!get_is_published_aux(hlaClassName, false)) {
         return;
@@ -277,6 +296,12 @@ void InteractionRoot::unpublish_interaction(const std::string &hlaClassName, RTI
 }
 
 void InteractionRoot::unsubscribe_interaction(const std::string &hlaClassName, RTI::RTIambassador *rti) {
+
+    if (!loadDynamicHlaClass(hlaClassName, rti)) {
+        BOOST_LOG_SEV(get_logger(), warning) << "unsubscribe_interaction(\"" << hlaClassName << "\"):  " <<
+          "no such class";
+        return;
+    }
 
     if (!get_is_subscribed_aux(hlaClassName, false)) {
         return;
@@ -434,10 +459,9 @@ void InteractionRoot::sendInteraction( RTI::RTIambassador *rti ) {
 std::string InteractionRoot::toJson() {
     Json::Value topLevelJSONObject(Json::objectValue);
     topLevelJSONObject["messaging_type"] = "interaction";
-    topLevelJSONObject["messaging_name"] = getHlaClassName();
+    topLevelJSONObject["messaging_name"] = getInstanceHlaClassName();
 
     Json::Value propertyJSONObject(Json::objectValue);
-    topLevelJSONObject["properties"] = propertyJSONObject;
     for(
       ClassAndPropertyNameValueSPMap::iterator cvmItr = _classAndPropertyNameValueSPMap.begin() ;
       cvmItr != _classAndPropertyNameValueSPMap.end() ;
@@ -461,11 +485,18 @@ std::string InteractionRoot::toJson() {
             case(TypeMedley::LONG):
                 propertyJSONObject[key] = static_cast<Json::Value::Int64>(static_cast<long>(value));
                 break;
+            case(TypeMedley::FLOAT):
+                propertyJSONObject[key] = static_cast<float>(value);
+                break;
+            case(TypeMedley::DOUBLE):
+                propertyJSONObject[key] = static_cast<double>(value);
+                break;
             case(TypeMedley::STRING):
                 propertyJSONObject[key] = static_cast<std::string>(value);
                 break;
         }
     }
+    topLevelJSONObject["properties"] = propertyJSONObject;
     Json::StreamWriterBuilder streamWriterBuilder;
     streamWriterBuilder["commentStyle"] = "None";
     streamWriterBuilder["indentation"] = "    ";
@@ -505,11 +536,18 @@ InteractionRoot::SP InteractionRoot::fromJson(const std::string &jsonString) {
                   propertyJSONObject[memberName].asBool()
                 );
                 break;
-            case TypeMedley::CHARACTER:
-                (*otherClassAndPropertyNameValueSPMap[classAndPropertyName]).setValue(
-                  static_cast<char>(propertyJSONObject[memberName].asInt())
-                );
+            case TypeMedley::CHARACTER: {
+                Json::Value value = propertyJSONObject[memberName];
+                int intValue = 0;
+                if (value.isString()) {
+                    std::string stringValue(value.asString());
+                    intValue = stringValue.size() > 0 ? stringValue[0] : 0;
+                } else {
+                    intValue = value.isNumeric() ? value.asInt() : 0;
+                }
+                (*otherClassAndPropertyNameValueSPMap[classAndPropertyName]).setValue(static_cast<char>(intValue));
                 break;
+            }
             case TypeMedley::SHORT:
                 (*otherClassAndPropertyNameValueSPMap[classAndPropertyName]).setValue(
                   static_cast<short>(propertyJSONObject[memberName].asInt())
@@ -525,6 +563,16 @@ InteractionRoot::SP InteractionRoot::fromJson(const std::string &jsonString) {
                   static_cast<long>(propertyJSONObject[memberName].asInt64())
                 );
                 break;
+            case TypeMedley::FLOAT:
+                (*otherClassAndPropertyNameValueSPMap[classAndPropertyName]).setValue(
+                  propertyJSONObject[memberName].asFloat()
+                );
+                break;
+            case TypeMedley::DOUBLE:
+                (*otherClassAndPropertyNameValueSPMap[classAndPropertyName]).setValue(
+                  propertyJSONObject[memberName].asDouble()
+                );
+                break;
             case TypeMedley::STRING:
                 (*otherClassAndPropertyNameValueSPMap[classAndPropertyName]).setValue(
                   propertyJSONObject[memberName].asString()
@@ -536,37 +584,94 @@ InteractionRoot::SP InteractionRoot::fromJson(const std::string &jsonString) {
     return interactionRootSP;
 }
 
+void InteractionRoot::add_federate_name_soft_publish(
+  const std::string &hlaClassName, const std::string &federateName
+) {
+    if (get_hla_class_name_set().find(hlaClassName) == get_hla_class_name_set().end()) {
+        BOOST_LOG_SEV(get_logger(), warning) << "add_federate_name_soft_publish(\"" << hlaClassName << "\", \""
+          << federateName << "\") -- no such interaction class \"" << hlaClassName << "\"";
+        return;
+    }
+
+    if (
+      get_hla_class_name_to_federate_name_soft_publish_set_map().find(hlaClassName) ==
+        get_hla_class_name_to_federate_name_soft_publish_set_map().end()
+    ) {
+        get_hla_class_name_to_federate_name_soft_publish_set_map().emplace(hlaClassName, std::set<std::string>());
+    }
+    get_hla_class_name_to_federate_name_soft_publish_set_map()[hlaClassName].insert(federateName);
+}
+
+void InteractionRoot::remove_federate_name_soft_publish(
+  const std::string &hlaClassName, const std::string &federateName
+) {
+    if (
+      get_hla_class_name_to_federate_name_soft_publish_set_map().find(hlaClassName) !=
+        get_hla_class_name_to_federate_name_soft_publish_set_map().end()
+    ) {
+        std::set<std::string> &federateNameSoftPublishSet =
+          get_hla_class_name_to_federate_name_soft_publish_set_map()[hlaClassName];
+        federateNameSoftPublishSet.erase(federateName);
+        if (federateNameSoftPublishSet.empty()) {
+            get_hla_class_name_to_federate_name_soft_publish_set_map().erase(hlaClassName);
+        }
+    }
+}
+
 void InteractionRoot::readFederateDynamicMessageClasses(std::istream &dynamicMessagingTypesInputStream) {
 
     Json::Value dynamicMessageTypes;
     dynamicMessagingTypesInputStream >> dynamicMessageTypes;
 
+    Json::Value dynamicHlaClassNames = dynamicMessageTypes["interactions"];
+
+    std::set<std::string> dynamicHlaClassNameSet;
+    for(Json::Value hlaClassNameJsonValue: dynamicHlaClassNames) {
+        std::string hlaClassName = hlaClassNameJsonValue.asString();
+        dynamicHlaClassNameSet.insert(hlaClassName);
+    }
+
+    readFederateDynamicMessageClasses(dynamicHlaClassNameSet);
+}
+
+void InteractionRoot::readFederateDynamicMessageClass(const std::string &hlaClassName) {
+
+    if (get_federation_json().isNull()) {
+        BOOST_LOG_SEV(get_logger(), warning) << "readFederateDynamicMessageClasses:  no federation messaging loaded.";
+        return;
+    }
+
     Json::Value federationMessaging = get_federation_json()["interactions"];
 
     std::unordered_set< std::string > localHlaClassNameSet;
 
-    Json::Value dynamicHlaClassNames = dynamicMessageTypes["interactions"];
-    for(Json::Value hlaClassNameJsonValue: dynamicHlaClassNames) {
-        std::string hlaClassName = hlaClassNameJsonValue.asString();
-        std::list<std::string> hlaClassNameComponents;
-        boost::algorithm::split(hlaClassNameComponents, hlaClassName, boost::is_any_of("."));
-        while(!hlaClassNameComponents.empty()) {
-            const std::string localHlaClassName( boost::algorithm::join(hlaClassNameComponents, ".") );
+    std::list<std::string> hlaClassNameComponents;
+    boost::algorithm::split(hlaClassNameComponents, hlaClassName, boost::is_any_of("."));
+    while(!hlaClassNameComponents.empty()) {
+        const std::string localHlaClassName( boost::algorithm::join(hlaClassNameComponents, ".") );
+        hlaClassNameComponents.pop_back();
+
+        if (get_hla_class_name_set().find(localHlaClassName) != get_hla_class_name_set().end()) {
+            break;
+        }
+        if (federationMessaging.isMember(localHlaClassName)) {
             localHlaClassNameSet.insert(localHlaClassName);
-            hlaClassNameComponents.pop_back();
+        } else {
+            BOOST_LOG_SEV(get_logger(), warning) << "readFederateDynamicMessageClasses:  could not load hla " <<
+              "class \"" << localHlaClassName << "\":  no definition exists.";
         }
     }
 
-    for(const std::string &hlaClassName: localHlaClassNameSet) {
+    for(const std::string &localHlaClassName: localHlaClassNameSet) {
 
-        get_hla_class_name_set().insert(hlaClassName);
+        get_hla_class_name_set().insert(localHlaClassName);
 
         ClassAndPropertyNameSetSP classAndPropertyNameSetSP( new ClassAndPropertyNameSet() );
         ClassAndPropertyNameSet &classAndPropertyNameSet(*classAndPropertyNameSetSP);
 
-        Json::Value messagingPropertyDataMap = federationMessaging[hlaClassName];
+        Json::Value messagingPropertyDataMap = federationMessaging[localHlaClassName];
         for(const std::string &propertyName: messagingPropertyDataMap.getMemberNames()) {
-            ClassAndPropertyName classAndPropertyName(hlaClassName, propertyName);
+            ClassAndPropertyName classAndPropertyName(localHlaClassName, propertyName);
             classAndPropertyNameSet.insert(classAndPropertyName);
 
             Json::Value typeDataMap = messagingPropertyDataMap[propertyName];
@@ -574,33 +679,36 @@ void InteractionRoot::readFederateDynamicMessageClasses(std::istream &dynamicMes
                 const std::string propertyTypeString = typeDataMap["ParameterType"].asString();
                 get_class_and_property_name_initial_value_sp_map()[classAndPropertyName] =
                   ValueSP( new Value(
-                    hlaClassName == "InteractionRoot.C2WInteractionRoot" && propertyName == "federateSequence" ?
-                      std::string("[]") : *get_type_initial_value_sp_map()[propertyTypeString]
+                    // NOTE:  Value CONSTRUCTOR NEEDED TO KEEP VALUE OF
+                    // *get_type_initial_value_sp_map()[propertyTypeString] FROM BEING CAST TO A STRING
+                    localHlaClassName == "InteractionRoot.C2WInteractionRoot" && propertyName == "federateSequence" ?
+                      Value(std::string("[]")) : *get_type_initial_value_sp_map()[propertyTypeString]
                   ) );
             }
         }
 
-        get_class_name_class_and_property_name_set_sp_map()[hlaClassName] = classAndPropertyNameSetSP;
+        get_class_name_class_and_property_name_set_sp_map()[localHlaClassName] = classAndPropertyNameSetSP;
     }
 
-    for(const std::string &hlaClassName: localHlaClassNameSet) {
+    for(const std::string &localHlaClassName: localHlaClassNameSet) {
 
         ClassAndPropertyNameSetSP allClassAndPropertyNameSetSP( new ClassAndPropertyNameSet() );
         ClassAndPropertyNameSet &allClassAndPropertyNameSet(*allClassAndPropertyNameSetSP);
 
         std::list<std::string> hlaClassNameComponents;
-        boost::algorithm::split(hlaClassNameComponents, hlaClassName, boost::is_any_of("."));
+        boost::algorithm::split(hlaClassNameComponents, localHlaClassName, boost::is_any_of("."));
         while(!hlaClassNameComponents.empty()) {
             const std::string localHlaClassName( boost::algorithm::join(hlaClassNameComponents, ".") );
+            hlaClassNameComponents.pop_back();
+
             ClassAndPropertyNameSet &localClassAndPropertyNameSet =
               *get_class_name_class_and_property_name_set_sp_map()[localHlaClassName];
             allClassAndPropertyNameSet.insert(
               localClassAndPropertyNameSet.begin(), localClassAndPropertyNameSet.end()
             );
-            hlaClassNameComponents.pop_back();
         }
 
-        get_class_name_all_class_and_property_name_set_sp_map()[hlaClassName] = allClassAndPropertyNameSetSP;
+        get_class_name_all_class_and_property_name_set_sp_map()[localHlaClassName] = allClassAndPropertyNameSetSP;
     }
 }
 
@@ -614,7 +722,7 @@ std::ostream &operator<<( std::ostream &os, const ::org::cpswt::hla::Interaction
     typedef ::org::cpswt::hla::InteractionRoot::ClassAndPropertyNameValueSPMap::const_iterator const_iterator;
     const ::org::cpswt::hla::InteractionRoot::ClassAndPropertyNameValueSPMap &classAndPropertyNameValueSPMap =
       messaging.getClassAndPropertyNameValueSPMap();
-    os << messaging.getHlaClassName() << "(";
+    os << messaging.getInstanceHlaClassName() << "(";
     bool first = true;
     for(
       const_iterator cvmCit = classAndPropertyNameValueSPMap.begin() ;
