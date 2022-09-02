@@ -228,7 +228,7 @@ void HLAInterface::processInteractions( void ) {
         // IS INTERACTION ONE THAT MIGHT BE PROPAGATED THROUGH THE SIMULATED NETWORK?
         if ( interactionRootSP->isDynamicInstance() ) {
 
-            std::cerr << "Interaction \"" << interactionRootSP->getInstanceHlaClassName() << "\" is dynamic" << std::endl;
+//            std::cerr << "Interaction \"" << interactionRootSP->getInstanceHlaClassName() << "\" is dynamic" << std::endl;
 
             // GET FULL HLA CLASS NAME OF INTERACTION
             std::string instanceHlaClassName = interactionRootSP->getInstanceHlaClassName();
