@@ -186,7 +186,7 @@ public:
             case STRING:
                 setValue( other.asString() );
                 break;
-            }
+        }
     }
 
     bool setValue(const std::string &value);

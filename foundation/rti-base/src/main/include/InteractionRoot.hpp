@@ -527,13 +527,9 @@ private:
     static bool get_is_published_aux(const std::string &hlaClassName, bool default_value) {
         StringBooleanMap::const_iterator sbmCit = get_class_name_publish_status_map().find(hlaClassName);
         if (sbmCit == get_class_name_publish_status_map().end()) {
-//            readFederateDynamicMessageClass(hlaClassName);
-//            sbmCit = get_class_name_publish_status_map().find(hlaClassName);
-//            if (sbmCit == get_class_name_publish_status_map().end()) {
-                BOOST_LOG_SEV(get_logger(), error) << "could not get publish status for hla class \"" << hlaClassName
-                  << "\":  class does not exist";
-                return default_value;
-//            }
+            BOOST_LOG_SEV(get_logger(), error) << "could not get publish status for hla class \"" << hlaClassName
+              << "\":  class does not exist";
+            return default_value;
         }
         return sbmCit->second;
     }
