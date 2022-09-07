@@ -158,6 +158,31 @@ void ObjectRoot::init(const std::string &hlaClassName, RTI::RTIambassador *rtiAm
     }
 }
 
+ObjectRoot::ClassAndPropertyNameValueSPMap ObjectRoot::getClassAndPropertyNameValueSPMap(
+  const RTI::AttributeHandleValuePairSet &propertyMap
+) {
+    ClassAndPropertyNameValueSPMap classAndPropertyNameValueSPMap;
+
+    RTI::ULong valueLength;
+
+    int size = propertyMap.size();
+    for( int ix = 0 ; ix < size ; ++ix ) {
+        try {
+            int handle = propertyMap.getHandle(ix);
+            char *value = propertyMap.getValuePointer( ix, valueLength );
+            ClassAndPropertyNameSP classAndPropertyNameSP =
+              get_handle_class_and_property_name_sp_map()[ propertyMap.getHandle( ix ) ];
+            ValueSP initialValueSP = get_class_and_property_name_initial_value_sp_map()[*classAndPropertyNameSP];
+            ValueSP newValueSP = ValueSP(new Value(*initialValueSP));
+            newValueSP->setValue(std::string(value, valueLength));
+            classAndPropertyNameValueSPMap[*classAndPropertyNameSP] = newValueSP;
+        } catch (...) {
+            BOOST_LOG_SEV(get_logger(), error) << "getClassAndPropertyNameValueSPMap: Exception caught!";
+        }
+    }
+    return classAndPropertyNameValueSPMap;
+}
+
 void ObjectRoot::pub_sub_class_and_property_name(
   const StringClassAndPropertyNameSetSPMap &stringClassAndPropertyNameSetSPMap,
   const std::string &hlaClassName,
@@ -700,31 +725,33 @@ std::string ObjectRoot::toJson() {
     ) {
         const std::string key(cvmItr->first);
         Attribute &value = *cvmItr->second;
-        switch(value.getDataType()) {
-            case(TypeMedley::BOOLEAN):
-                propertyJSONObject[key] = static_cast<bool>(value);
-                break;
-            case(TypeMedley::CHARACTER):
-                propertyJSONObject[key] = static_cast<char>(value);
-                break;
-            case(TypeMedley::SHORT):
-                propertyJSONObject[key] = static_cast<short>(value);
-                break;
-            case(TypeMedley::INTEGER):
-                propertyJSONObject[key] = static_cast<int>(value);
-                break;
-            case(TypeMedley::LONG):
-                propertyJSONObject[key] = static_cast<Json::Value::Int64>(static_cast<long>(value));
-                break;
-            case(TypeMedley::FLOAT):
-                propertyJSONObject[key] = static_cast<float>(value);
-                break;
-            case(TypeMedley::DOUBLE):
-                propertyJSONObject[key] = static_cast<double>(value);
-                break;
-            case(TypeMedley::STRING):
-                propertyJSONObject[key] = static_cast<std::string>(value);
-                break;
+        if (value.shouldBeUpdated(false)) {
+            switch(value.getDataType()) {
+                case(TypeMedley::BOOLEAN):
+                    propertyJSONObject[key] = static_cast<bool>(value);
+                    break;
+                case(TypeMedley::CHARACTER):
+                    propertyJSONObject[key] = static_cast<char>(value);
+                    break;
+                case(TypeMedley::SHORT):
+                    propertyJSONObject[key] = static_cast<short>(value);
+                    break;
+                case(TypeMedley::INTEGER):
+                    propertyJSONObject[key] = static_cast<int>(value);
+                    break;
+                case(TypeMedley::LONG):
+                    propertyJSONObject[key] = static_cast<Json::Value::Int64>(static_cast<long>(value));
+                    break;
+                case(TypeMedley::FLOAT):
+                    propertyJSONObject[key] = static_cast<float>(value);
+                    break;
+                case(TypeMedley::DOUBLE):
+                    propertyJSONObject[key] = static_cast<double>(value);
+                    break;
+                case(TypeMedley::STRING):
+                    propertyJSONObject[key] = static_cast<std::string>(value);
+                    break;
+            }
         }
     }
     topLevelJSONObject["properties"] = propertyJSONObject;
@@ -738,7 +765,7 @@ std::string ObjectRoot::toJson() {
     return stringOutputStream.str();
 }
 
-void ObjectRoot::fromJson(const std::string &jsonString) {
+ObjectRoot::ObjectReflector::SP ObjectRoot::fromJson(const std::string &jsonString) {
     std::istringstream jsonInputStream(jsonString);
 
     Json::Value topLevelJSONObject;
@@ -746,16 +773,15 @@ void ObjectRoot::fromJson(const std::string &jsonString) {
 
     int objectHandle = topLevelJSONObject["object_handle"].asInt();
     ObjectHandleInstanceSPMap::iterator oimItr = get_object_handle_instance_sp_map().find(objectHandle);
-    if (oimItr != get_object_handle_instance_sp_map().end()) {
+    if (oimItr == get_object_handle_instance_sp_map().end()) {
         BOOST_LOG_SEV(get_logger(), error) << "fromJson:  no registered object exists with received object-handle ("
           << objectHandle << ")";
-        return;
+        return ObjectReflector::SP(new ObjectReflector());
     }
 
     SP objectRootSP = oimItr->second;
-    ClassAndPropertyNameValueSPMap &classAndPropertyNameValueSPMap(
-      objectRootSP->_classAndPropertyNameValueSPMap
-    );
+    ClassAndPropertyNameValueSPMap classAndPropertyNameValueSPMap;
+
     const Json::Value &propertyJSONObject(topLevelJSONObject["properties"]);
     ClassAndPropertyNameSet &subscribedAttributeNameSet = *objectRootSP->getSubscribedClassAndPropertyNameSetSP();
 
@@ -768,6 +794,9 @@ void ObjectRoot::fromJson(const std::string &jsonString) {
             // LOG ERROR
             continue;
         }
+
+        Value &initialValue = *get_class_and_property_name_initial_value_sp_map().find(classAndPropertyName)->second;
+        classAndPropertyNameValueSPMap[classAndPropertyName] = ValueSP(new Value(initialValue));
 
         switch(classAndPropertyNameValueSPMap[classAndPropertyName]->getDataType()) {
             case TypeMedley::BOOLEAN:
@@ -819,6 +848,8 @@ void ObjectRoot::fromJson(const std::string &jsonString) {
                 break;
         }
     }
+
+    return ObjectReflector::SP(new ObjectReflector(objectHandle, classAndPropertyNameValueSPMap));
 }
 
 void ObjectRoot::add_federate_name_soft_publish(

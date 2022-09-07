@@ -28,12 +28,12 @@
  * OR MODIFICATIONS.
  */
 
-#ifndef _OBJECT_TESTS
-#define _OBJECT_TESTS
+#ifndef _JSON_TESTS
+#define _JSON_TESTS
 
 #define BOOST_LOG_DYN_LINK
 
-#include "Initialization.hpp"
+#include "RTIAmbassadorTest1.hpp"
 
 #include <cppunit/extensions/HelperMacros.h>
 
@@ -44,20 +44,22 @@
 namespace logging = boost::log;
 namespace sinks = boost::log::sinks;
 
-class ObjectTests: public CppUnit::TestCase {
+class JsonTests: public CppUnit::TestCase {
 
 public:
     typedef sinks::synchronous_sink< sinks::text_ostream_backend > text_sink;
 
 private:
-    CPPUNIT_TEST_SUITE( ObjectTests );
-    CPPUNIT_TEST(objectTest1);
+    CPPUNIT_TEST_SUITE( JsonTests );
+    CPPUNIT_TEST(interactionJsonTest);
+    CPPUNIT_TEST(objectJsonTest);
     CPPUNIT_TEST_SUITE_END();
 
 public:
-    ObjectTests();
+    JsonTests();
 
-    void objectTest1();
+    void interactionJsonTest();
+    void objectJsonTest();
 };
 
-#endif // _OBJECT_TESTS
+#endif // _JSON_TESTS

@@ -73,6 +73,8 @@ class SynchronizedFederate : public NullFederateAmbassador {
 
 public:
     using ObjectRoot = ::org::cpswt::hla::ObjectRoot;
+    using ObjectReflector = ObjectRoot::ObjectReflector;
+    using ObjectReflectorComparator = ObjectRoot::ObjectReflectorComparator;
     using InteractionRoot = ::org::cpswt::hla::InteractionRoot;
     using C2WInteractionRoot = ::org::cpswt::hla::InteractionRoot_p::C2WInteractionRoot;
     using EmbeddedMessaging = ::org::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::EmbeddedMessaging;
@@ -740,72 +742,7 @@ public:
 //        const RTI::ParameterHandleValuePairSet& theParameters,
 //        double time=0);
 
-    class ObjectReflector {
-    private:
-        RTI::ObjectHandle _objectHandle;
-        RTI::AttributeHandleValuePairSet *_theAttributes;
-        double _time;
-
-        void init( const RTI::AttributeHandleValuePairSet &theAttributes ) {
-            for(RTI::ULong ix = 0 ; ix < theAttributes.size() ; (void)++ix ) {
-                RTI::ULong valueLength = theAttributes.getValueLength( ix );
-                _theAttributes->add( theAttributes.getHandle( ix ), theAttributes.getValuePointer( ix, valueLength ), theAttributes.getValueLength( ix )  );
-            }
-        }
-
-    public:
-        ObjectReflector( void ) : _theAttributes( (RTI::AttributeHandleValuePairSet *)0 ) { }
-
-        ObjectReflector(
-         RTI::ObjectHandle objectHandle,
-         const RTI::AttributeHandleValuePairSet& theAttributes
-        ) : _objectHandle( objectHandle ), _theAttributes(  RTI::AttributeSetFactory::create( theAttributes.size() )  ), _time( -1 ) {
-            init( theAttributes );
-        }
-
-        ObjectReflector(
-         RTI::ObjectHandle objectHandle,
-         const RTI::AttributeHandleValuePairSet& theAttributes,
-         double time
-        ) : _objectHandle( objectHandle ), _theAttributes(  RTI::AttributeSetFactory::create( theAttributes.size() )  ), _time( time ) {
-            init( theAttributes );
-        }
-
-        ObjectReflector(
-         RTI::ObjectHandle objectHandle,
-         const RTI::AttributeHandleValuePairSet& theAttributes,
-         const RTI::FedTime &fedTime
-        ) : _objectHandle( objectHandle ), _theAttributes(  RTI::AttributeSetFactory::create( theAttributes.size() )  ), _time(  RTIfedTime( fedTime ).getTime()  ) {
-            init( theAttributes );
-        }
-
-        ~ObjectReflector() {
-            delete _theAttributes;
-        }
-
-        void reflect() const {
-            if ( _theAttributes == 0 ) {
-                std::cerr << "WARNING:  attempt to reflect null ObjectReflector" << std::endl;
-                return;
-            }
-            if ( _time < 0 ) ObjectRoot::reflect( _objectHandle, *_theAttributes );
-            else  ObjectRoot::reflect( _objectHandle, *_theAttributes, _time );
-        }
-
-        ObjectRoot::SP getObjectRootSP() const { return ObjectRoot::get_object( _objectHandle ); }
-        double getTime() const { return _time; }
-
-        bool isNull( void ) const { return _theAttributes == 0; }
-    };
-
 private:
-    class ObjectReflectorComparator {
-    public:
-        bool operator()( const ObjectReflector &objectReflector1, const ObjectReflector &objectReflector2 ) {
-            return objectReflector1.getTime() < objectReflector2.getTime();
-        }
-    };
-
     typedef std::multiset< ObjectReflector, ObjectReflectorComparator > ObjectReflectorQueue;
     static ObjectReflectorQueue &getObjectReflectorQueue( void ) {
         static ObjectReflectorQueue objectReflectorQueue;
