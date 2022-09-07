@@ -30,6 +30,8 @@
 
 #include "MessagingTests.hpp"
 
+#include "Initialization.hpp"
+
 #include "InteractionRoot.hpp"
 #include "InteractionRoot_p/C2WInteractionRoot.hpp"
 #include "InteractionRoot_p/C2WInteractionRoot_p/SimLog.hpp"
@@ -68,6 +70,13 @@ typedef std::list<std::string> StringList;
 namespace expr = boost::log::expressions;
 namespace attrs = boost::log::attributes;
 
+MessagingTests::MessagingTests() : CppUnit::TestCase() {
+    Initialization::init_1();
+    nullSink = boost::make_shared< text_sink >();
+    nullSink->set_filter(&null_filter);
+    logging::core::get()->add_sink(nullSink);
+}
+
 template<typename COLLECTION>
 void printCollection(std::ostream &os, const COLLECTION &collection) {
     os << "[";
@@ -92,84 +101,6 @@ std::ostream &operator<<(std::ostream &os, const ClassAndPropertyNameList &class
     os << "ClassAndPropertyNameList";
     printCollection(os, classAndPropertyNameList);
     return os;
-}
-
-void MessagingTests::interaction_root_dynamic_init() {
-    const std::string federationJson =
-            std::string("{\n") +
-            "    \"interactions\": {\n" +
-            "        \"InteractionRoot\": {},\n" +
-            "        \"InteractionRoot.TestBase\": {\n" +
-            "             \"field1\": {\n" +
-            "                 \"Hidden\": false,\n" +
-            "                 \"ParameterType\": \"String\"\n" +
-            "             },\n" +
-            "             \"field2\": {\n" +
-            "                 \"Hidden\": false,\n" +
-            "                 \"ParameterType\": \"int\"\n" +
-            "             }\n" +
-            "        },\n" +
-            "        \"InteractionRoot.TestBase.TestDerived\": {\n" +
-            "             \"field3\": {\n" +
-            "                 \"Hidden\": false,\n" +
-            "                 \"ParameterType\": \"boolean\"\n" +
-            "             },\n" +
-            "             \"field4\": {\n" +
-            "                 \"Hidden\": false,\n" +
-            "                 \"ParameterType\": \"long\"\n" +
-            "             },\n" +
-            "             \"field5\": {\n" +
-            "                 \"Hidden\": false,\n" +
-            "                 \"ParameterType\": \"double\"\n" +
-            "             }\n" +
-            "        },\n" +
-            "        \"InteractionRoot.OtherClass\": {\n" +
-            "             \"field1\": {\n" +
-            "                 \"Hidden\": false,\n" +
-            "                 \"ParameterType\": \"boolean\"\n" +
-            "             },\n" +
-            "             \"field2\": {\n" +
-            "                 \"Hidden\": false,\n" +
-            "                 \"ParameterType\": \"long\"\n" +
-            "             },\n" +
-            "             \"field3\": {\n" +
-            "                 \"Hidden\": false,\n" +
-            "                 \"ParameterType\": \"double\"\n" +
-            "             }\n" +
-            "        }\n" +
-            "    }\n" +
-            "}\n";
-
-    const std::string dynamicMessageTypes =
-            std::string("{\n") +
-            "    \"interactions\": [\n" +
-            "        \"InteractionRoot.TestBase\",\n" +
-            "        \"InteractionRoot.TestBase.TestDerived\"\n" +
-            "    ]\n" +
-            "}\n";
-
-    std::istringstream federationJsonInputStream(federationJson);
-    std::istringstream dynamicMessagingTypesInputStream(dynamicMessageTypes);
-    InteractionRoot::loadDynamicClassFederationData(federationJsonInputStream, dynamicMessagingTypesInputStream);
-}
-
-RTI::RTIambassador *MessagingTests::get_rti_ambassador_1_ptr() {
-    static RTIAmbassadorTest1 rtiAmbassadorTest1;
-    static RTI::RTIambassador rtiAmbassador(&rtiAmbassadorTest1);
-    return &rtiAmbassador;
-}
-
-void MessagingTests::init_1() {
-    if (get_is_initialized()) {
-        return;
-    }
-    get_is_initialized() = true;
-
-    std::cout << "INITIALIZING ... " << std::flush;
-    interaction_root_dynamic_init();
-    InteractionRoot::init(get_rti_ambassador_1_ptr());
-    ObjectRoot::init(get_rti_ambassador_1_ptr());
-    std::cout << "DONE" << std::endl;
 }
 
 void MessagingTests::setUp() {

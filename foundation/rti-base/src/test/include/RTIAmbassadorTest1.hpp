@@ -46,6 +46,16 @@ public:
     typedef std::map<ClassAndPropertyName, int> ClassAndPropertyNameHandleMap;
     typedef std::set<std::string> StringSet;
 
+    static RTIAmbassadorTest1 &get_rti_ambassador_test_1() {
+        static RTIAmbassadorTest1 rtiAmbassadorTest1;
+        return rtiAmbassadorTest1;
+    }
+
+    static RTI::RTIambassador *get_rti_ambassador_1_ptr() {
+        static RTI::RTIambassador rtiAmbassador(&get_rti_ambassador_test_1());
+        return &rtiAmbassador;
+    }
+
 private:
     static const ClassNameHandleMap &get_class_name_handle_map_aux();
     static const ClassHandleNameMap &get_class_handle_name_map_aux();
