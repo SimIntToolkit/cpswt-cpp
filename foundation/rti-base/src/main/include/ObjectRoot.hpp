@@ -102,7 +102,9 @@ public:
     typedef std::map<int, std::string> IntegerStringMap;
     typedef std::map<std::string, int> StringIntegerMap;
     typedef std::map<std::string, bool> StringBooleanMap;
-    typedef std::map<std::string, std::set<std::string>> StringStringSetMap;
+    
+    typedef boost::shared_ptr<StringSet> StringSetSP;
+    typedef std::map<std::string, StringSetSP> StringStringSetSPMap;
 
     typedef RTI::AttributeHandleSet AttributeHandleSet;
     typedef boost::shared_ptr<AttributeHandleSet> AttributeHandleSetSP;
@@ -118,6 +120,9 @@ public:
     typedef std::map< std::string, PubsubFunctionPtr > ClassNamePubSubMap;
     typedef std::map< std::string, std::string> PropertyTypeMap;typedef std::map< std::string, AttributeHandleSetSP > StringAttributesHandleSetSPMap;
     typedef std::unordered_map< int, SP > ObjectHandleInstanceSPMap;
+    typedef std::set<int> IntegerSet;
+    typedef boost::shared_ptr<IntegerSet> IntegerSetSP;
+    typedef std::map<std::string, IntegerSetSP> StringIntegerSetSPMap;
 
 protected:
     static void defaultSleep() {
@@ -228,27 +233,41 @@ public:
 
     private:
         RTI::ObjectHandle _objectHandle;
+        std::string _hlaClassName;
+        std::string _federateSequence;
         ClassAndPropertyNameValueSPMap _classAndPropertyNameValueSPMap;
         double _time;
 
+        void initHlaClassName() {
+            ObjectRoot::SP objectRootSP = get_object( _objectHandle );
+            if (objectRootSP) {
+                _hlaClassName = objectRootSP->getInstanceHlaClassName();
+            }
+        }
+
     public:
-        ObjectReflector() : _objectHandle(0), _time(-1) { }
+//        ObjectReflector() : _objectHandle(0), _time(-1), _federateSequence("[]") { }
 
         ObjectReflector(
-         RTI::ObjectHandle objectHandle,
-         const ClassAndPropertyNameValueSPMap &classAndPropertyNameValueSPMap
+         RTI::ObjectHandle objectHandle, const ClassAndPropertyNameValueSPMap &classAndPropertyNameValueSPMap
         ) :
          _objectHandle(objectHandle),
+         _federateSequence("[]"),
          _classAndPropertyNameValueSPMap( classAndPropertyNameValueSPMap ),
-         _time(-1) {}
+         _time(-1) {
+            initHlaClassName();
+        }
 
         ObjectReflector(
          RTI::ObjectHandle objectHandle,
          const RTI::AttributeHandleValuePairSet& theAttributes
         ) :
          _objectHandle(objectHandle),
-         _classAndPropertyNameValueSPMap(getClassAndPropertyNameValueSPMap(theAttributes)),
-         _time(-1) {}
+         _federateSequence("[]"),
+         _classAndPropertyNameValueSPMap(ObjectRoot::getClassAndPropertyNameValueSPMap(theAttributes)),
+         _time(-1) {
+            initHlaClassName();
+        }
 
 
         ObjectReflector(
@@ -257,8 +276,11 @@ public:
          double time
         ) :
          _objectHandle( objectHandle ),
+         _federateSequence("[]"),
          _classAndPropertyNameValueSPMap( classAndPropertyNameValueSPMap ),
-         _time( time ) {}
+         _time( time ) {
+            initHlaClassName();
+        }
 
         ObjectReflector(
          RTI::ObjectHandle objectHandle,
@@ -266,8 +288,11 @@ public:
          double time
         ) :
          _objectHandle( objectHandle ),
-         _classAndPropertyNameValueSPMap(getClassAndPropertyNameValueSPMap(theAttributes)),
-         _time( time ) {}
+         _federateSequence("[]"),
+         _classAndPropertyNameValueSPMap(ObjectRoot::getClassAndPropertyNameValueSPMap(theAttributes)),
+         _time( time ) {
+            initHlaClassName();
+        }
 
 
         ObjectReflector(
@@ -276,8 +301,11 @@ public:
          const RTI::FedTime &fedTime
         ) :
          _objectHandle( objectHandle ),
+         _federateSequence("[]"),
          _classAndPropertyNameValueSPMap( classAndPropertyNameValueSPMap ),
-         _time(  RTIfedTime( fedTime ).getTime()  ) {}
+         _time(  RTIfedTime( fedTime ).getTime()  ) {
+            initHlaClassName();
+        }
 
         ObjectReflector(
          RTI::ObjectHandle objectHandle,
@@ -285,22 +313,52 @@ public:
          const RTI::FedTime &fedTime
         ) :
          _objectHandle( objectHandle ),
-         _classAndPropertyNameValueSPMap(getClassAndPropertyNameValueSPMap(theAttributes)),
-          _time(  RTIfedTime( fedTime ).getTime()  ) {}
+         _federateSequence("[]"),
+         _classAndPropertyNameValueSPMap(ObjectRoot::getClassAndPropertyNameValueSPMap(theAttributes)),
+          _time(  RTIfedTime( fedTime ).getTime()  ) {
+            initHlaClassName();
+         }
 
         void reflect() const {
             if ( _time < 0 ) ObjectRoot::reflect( _objectHandle, _classAndPropertyNameValueSPMap );
             else  ObjectRoot::reflect( _objectHandle, _classAndPropertyNameValueSPMap, _time );
         }
 
-        ObjectRoot::SP getObjectRootSP() const { return ObjectRoot::get_object( _objectHandle ); }
-        double getTime() const { return _time; }
+        const ClassAndPropertyNameValueSPMap &getClassAndPropertyNameValueSPMap() const {
+            return _classAndPropertyNameValueSPMap;
+        }
+
+        RTI::ObjectHandle getObjectHandle() const {
+            return _objectHandle;
+        }
+
+        const std::string &getHlaClassName() const {
+            return _hlaClassName;
+        }
+
+        void setFederateSequence(const std::string &federateSequence) {
+            _federateSequence = federateSequence;
+        }
+
+        const std::string &getFederateSequence() const {
+            return _federateSequence;
+        }
+
+        std::string toJson() const;
+
+        ObjectRoot::SP getObjectRootSP() const {
+            return ObjectRoot::get_object( _objectHandle );
+        }
+
+        double getTime() const {
+            return _time;
+        }
     };
 
-    class ObjectReflectorComparator {
+    class ObjectReflectorSPComparator {
     public:
-        bool operator()( const ObjectReflector &objectReflector1, const ObjectReflector &objectReflector2 ) {
-            return objectReflector1.getTime() < objectReflector2.getTime();
+        bool operator()(const ObjectReflector::SP &objectReflectorSP1, const ObjectReflector::SP &objectReflectorSP2) {
+            return objectReflectorSP1->getTime() < objectReflectorSP2->getTime();
         }
     };
 
@@ -764,7 +822,7 @@ public:
     static const ClassAndPropertyNameSetSP &get_published_class_and_property_name_set_sp(
       const std::string &hlaClassName
     ) {
-        static ClassAndPropertyNameSetSP classAndPropertyNameSetSP;
+        static ClassAndPropertyNameSetSP classAndPropertyNameSetSP( new ClassAndPropertyNameSet() );
         StringClassAndPropertyNameSetSPMap::const_iterator scmCit =
           get_class_name_published_class_and_property_name_set_sp_map().find( hlaClassName );
 
@@ -829,7 +887,7 @@ public:
     static const ClassAndPropertyNameSetSP &get_subscribed_class_and_property_name_set_sp(
       const std::string &hlaClassName
     ) {
-        static ClassAndPropertyNameSetSP classAndPropertyNameSetSP;
+        static ClassAndPropertyNameSetSP classAndPropertyNameSetSP( new ClassAndPropertyNameSet() );
         StringClassAndPropertyNameSetSPMap::const_iterator scmCit =
           get_class_name_subscribed_class_and_property_name_set_sp_map().find( hlaClassName );
 
@@ -1568,16 +1626,40 @@ public:
         return get_class_name_subscribed_class_and_property_name_set_sp_map()[get_hla_class_name()];
     }
 
+    static void add_object_update_embedded_only_id(int id) {
+        add_object_update_embedded_only_id(get_hla_class_name(), id);
+    }
+
+    static void remove_object_update_embedded_only_id(int id) {
+        remove_object_update_embedded_only_id(get_hla_class_name(), id);
+    }
+
+    static const IntegerSetSP &get_object_update_embedded_only_id_set_sp() {
+        return get_object_update_embedded_only_id_set_sp(get_hla_class_name());
+    }
+
+    static bool get_is_object_update_embedded_only_id(int id) {
+        return get_is_object_update_embedded_only_id(get_hla_class_name(), id);
+    }
+
+    static void add_federate_name_soft_publish_direct(const std::string &federateName) {
+        add_federate_name_soft_publish_direct(get_hla_class_name(), federateName);
+    }
+
+    static void remove_federate_name_soft_publish_direct(const std::string &federateName) {
+        remove_federate_name_soft_publish_direct(get_hla_class_name(), federateName);
+    }
+
+    static const StringSetSP &get_federate_name_soft_publish_direct_set() {
+        return get_federate_name_soft_publish_direct_set_sp(get_hla_class_name());
+    }
+
     static void add_federate_name_soft_publish(const std::string &networkFederateName) {
         add_federate_name_soft_publish(get_hla_class_name(), networkFederateName);
     }
 
     static void remove_federate_name_soft_publish(const std::string &networkFederateName) {
         remove_federate_name_soft_publish(get_hla_class_name(), networkFederateName);
-    }
-
-    std::set<std::string> getFederateNameSoftPublishSet() {
-        return get_federate_name_soft_publish_set(get_hla_class_name());
     }
 
     //-----------------------------------------------------
@@ -1982,8 +2064,62 @@ public:
     static ObjectReflector::SP fromJson(const std::string &jsonString);
 
 private:
-    static StringStringSetMap &get_hla_class_name_to_federate_name_soft_publish_set_map() {
-        static StringStringSetMap hlaClassNameToFederateNameSoftPublishSetMap;
+    static StringIntegerSetSPMap &get_hla_class_name_object_update_embedded_only_id_set_sp_map() {
+        static StringIntegerSetSPMap hlaClassNameObjectUpdateEmbeddedOnlyIdSetSPMap;
+        return hlaClassNameObjectUpdateEmbeddedOnlyIdSetSPMap;
+    }
+
+public:
+    static void add_object_update_embedded_only_id(const std::string &hlaClassName, int id);
+
+    static void remove_object_update_embedded_only_id(const std::string &hlaClassName, int id);
+
+    static const IntegerSetSP &get_object_update_embedded_only_id_set_sp(const std::string &hlaClassName) {
+        static IntegerSetSP defaultIntegerSetSP( new IntegerSet() );
+        StringIntegerSetSPMap::const_iterator simCit =
+          get_hla_class_name_object_update_embedded_only_id_set_sp_map().find(hlaClassName);
+        return simCit == get_hla_class_name_object_update_embedded_only_id_set_sp_map().end() ?
+            defaultIntegerSetSP : simCit->second;
+    }
+
+    static bool get_is_object_update_embedded_only_id(const std::string &hlaClassName, int id) {
+        const IntegerSet &integerSet = *get_object_update_embedded_only_id_set_sp(hlaClassName);
+        return integerSet.find(id) != integerSet.end();
+    }
+
+    static bool get_is_object_update_embedded_only_id(int classId, int id) {
+        IntegerStringMap::const_iterator ismCit = get_class_handle_name_map().find(classId);
+        return ismCit == get_class_handle_name_map().end() ?
+          false : get_is_object_update_embedded_only_id(ismCit->second, id);
+    }
+
+private:
+    static StringStringSetSPMap &get_hla_class_name_to_federate_name_soft_publish_direct_set_sp_map() {
+        static StringStringSetSPMap hlaClassNameToFederateNameSoftPublishDirectSetMap;
+        return hlaClassNameToFederateNameSoftPublishDirectSetMap;
+    }
+
+public:
+    static void add_federate_name_soft_publish_direct(const std::string &hlaClassName, const std::string &federateName);
+
+    static void remove_federate_name_soft_publish_direct(
+      const std::string &hlaClassName, const std::string &federateName
+    );
+
+    static const StringSetSP &get_federate_name_soft_publish_direct_set_sp(const std::string &hlaClassName) {
+        static StringSetSP defaultStringSetSP ( new StringSet() );
+        return get_hla_class_name_to_federate_name_soft_publish_direct_set_sp_map().find(hlaClassName) ==
+          get_hla_class_name_to_federate_name_soft_publish_direct_set_sp_map().end() ?
+            defaultStringSetSP : get_hla_class_name_to_federate_name_soft_publish_direct_set_sp_map()[hlaClassName];
+    }
+
+    const StringSetSP &getFederateNameSoftPublishDirectSetSP() {
+        return get_federate_name_soft_publish_direct_set_sp(getInstanceHlaClassName());
+    }
+
+private:
+    static StringStringSetSPMap &get_hla_class_name_to_federate_name_soft_publish_set_sp_map() {
+        static StringStringSetSPMap hlaClassNameToFederateNameSoftPublishSetMap;
         return hlaClassNameToFederateNameSoftPublishSetMap;
     }
 
@@ -2000,14 +2136,15 @@ public:
         remove_federate_name_soft_publish(getInstanceHlaClassName(), federateName);
     }
 
-    std::set<std::string> get_federate_name_soft_publish_set(const std::string &hlaClassName) {
-        return get_hla_class_name_to_federate_name_soft_publish_set_map().find(hlaClassName) ==
-          get_hla_class_name_to_federate_name_soft_publish_set_map().end() ?
-            std::set<std::string>() : get_hla_class_name_to_federate_name_soft_publish_set_map()[hlaClassName];
+    const StringSetSP &get_federate_name_soft_publish_set_sp(const std::string &hlaClassName) {
+        static StringSetSP defaultStringSetSP( new StringSet() );
+        return get_hla_class_name_to_federate_name_soft_publish_set_sp_map().find(hlaClassName) ==
+          get_hla_class_name_to_federate_name_soft_publish_set_sp_map().end() ?
+            defaultStringSetSP : get_hla_class_name_to_federate_name_soft_publish_set_sp_map()[hlaClassName];
     }
 
-    std::set<std::string> getFederateNameSoftPublishSet(const std::string &hlaClassName) {
-        return get_federate_name_soft_publish_set(getInstanceHlaClassName());
+    const StringSetSP &getFederateNameSoftPublishSetSP() {
+        return get_federate_name_soft_publish_set_sp(getInstanceHlaClassName());
     }
 
 private:
@@ -2098,6 +2235,13 @@ private:
 std::ostream &operator<<( std::ostream &os, const ::org::cpswt::hla::ObjectRoot &messaging );
 inline std::ostream &operator<<( std::ostream &os, ::org::cpswt::hla::ObjectRoot::SP messagingSP ) {
     return os << *messagingSP;
+}
+
+std::ostream &operator<<( std::ostream &os, const ::org::cpswt::hla::ObjectRoot::ObjectReflector &objectReflector );
+inline std::ostream &operator<<(
+  std::ostream &os, ::org::cpswt::hla::ObjectRoot::ObjectReflector::SP objectReflectorSP
+) {
+    return os << *objectReflectorSP;
 }
 
 #endif // _OBJECT_ROOT

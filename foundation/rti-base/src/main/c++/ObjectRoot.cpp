@@ -183,6 +183,60 @@ ObjectRoot::ClassAndPropertyNameValueSPMap ObjectRoot::getClassAndPropertyNameVa
     return classAndPropertyNameValueSPMap;
 }
 
+std::string ObjectRoot::ObjectReflector::toJson() const {
+    Json::Value topLevelJSONObject(Json::objectValue);
+    topLevelJSONObject["messaging_type"] = "object";
+    topLevelJSONObject["messaging_name"] = _hlaClassName;
+    topLevelJSONObject["object_handle"] = static_cast<Json::Value::UInt64>(_objectHandle);
+    topLevelJSONObject["federateSequence"] = _federateSequence;
+
+
+    Json::Value propertyJSONObject(Json::objectValue);
+    for(
+      ClassAndPropertyNameValueSPMap::const_iterator cvmCit = _classAndPropertyNameValueSPMap.begin() ;
+      cvmCit != _classAndPropertyNameValueSPMap.end() ;
+      ++cvmCit
+    ) {
+        const std::string key(cvmCit->first);
+        TypeMedley &value = *cvmCit->second;
+        switch(value.getDataType()) {
+            case(TypeMedley::BOOLEAN):
+                propertyJSONObject[key] = static_cast<bool>(value);
+                break;
+            case(TypeMedley::CHARACTER):
+                propertyJSONObject[key] = static_cast<char>(value);
+                break;
+            case(TypeMedley::SHORT):
+                propertyJSONObject[key] = static_cast<short>(value);
+                break;
+            case(TypeMedley::INTEGER):
+                propertyJSONObject[key] = static_cast<int>(value);
+                break;
+            case(TypeMedley::LONG):
+                propertyJSONObject[key] = static_cast<Json::Value::Int64>(static_cast<long>(value));
+                break;
+            case(TypeMedley::FLOAT):
+                propertyJSONObject[key] = static_cast<float>(value);
+                break;
+            case(TypeMedley::DOUBLE):
+                propertyJSONObject[key] = static_cast<double>(value);
+                break;
+            case(TypeMedley::STRING):
+                propertyJSONObject[key] = static_cast<std::string>(value);
+                break;
+        }
+    }
+    topLevelJSONObject["properties"] = propertyJSONObject;
+
+    Json::StreamWriterBuilder streamWriterBuilder;
+    streamWriterBuilder["commandStyle"] = "None";
+    streamWriterBuilder["indentation"] = "    ";
+    std::unique_ptr<Json::StreamWriter> streamWriterUPtr(streamWriterBuilder.newStreamWriter());
+    std::ostringstream stringOutputStream;
+    streamWriterUPtr->write(topLevelJSONObject, &stringOutputStream);
+    return stringOutputStream.str();
+}
+
 void ObjectRoot::pub_sub_class_and_property_name(
   const StringClassAndPropertyNameSetSPMap &stringClassAndPropertyNameSetSPMap,
   const std::string &hlaClassName,
@@ -714,8 +768,10 @@ void ObjectRoot::updateAttributeValues( RTI::RTIambassador *rti, bool force ) {
 
 std::string ObjectRoot::toJson() {
     Json::Value topLevelJSONObject(Json::objectValue);
-    topLevelJSONObject["messaging_type"] = "interaction";
+    topLevelJSONObject["messaging_type"] = "object";
+    topLevelJSONObject["messaging_name"] = getInstanceHlaClassName();
     topLevelJSONObject["object_handle"] = getObjectHandle();
+    topLevelJSONObject["federateSequence"] = "[]";
 
     Json::Value propertyJSONObject(Json::objectValue);
     for(
@@ -772,18 +828,20 @@ ObjectRoot::ObjectReflector::SP ObjectRoot::fromJson(const std::string &jsonStri
     jsonInputStream >> topLevelJSONObject;
 
     int objectHandle = topLevelJSONObject["object_handle"].asInt();
-    ObjectHandleInstanceSPMap::iterator oimItr = get_object_handle_instance_sp_map().find(objectHandle);
-    if (oimItr == get_object_handle_instance_sp_map().end()) {
-        BOOST_LOG_SEV(get_logger(), error) << "fromJson:  no registered object exists with received object-handle ("
-          << objectHandle << ")";
-        return ObjectReflector::SP(new ObjectReflector());
-    }
+    std::string className = topLevelJSONObject["messaging_name"].asString();
+    std::string federateSequence = topLevelJSONObject["federateSequence"].asString();
 
-    SP objectRootSP = oimItr->second;
+    StringClassAndPropertyNameSetSPMap::const_iterator scmItr =
+      get_class_name_subscribed_class_and_property_name_set_sp_map().find( className );
+    if (scmItr == get_class_name_subscribed_class_and_property_name_set_sp_map().end()) {
+        BOOST_LOG_SEV(get_logger(), error) << "fromJson:  no class \"" << className << "\" is defined";
+        return ObjectReflector::SP();
+    }
+    ClassAndPropertyNameSet &subscribedAttributeNameSet = *scmItr->second;
+
     ClassAndPropertyNameValueSPMap classAndPropertyNameValueSPMap;
 
     const Json::Value &propertyJSONObject(topLevelJSONObject["properties"]);
-    ClassAndPropertyNameSet &subscribedAttributeNameSet = *objectRootSP->getSubscribedClassAndPropertyNameSetSP();
 
     Json::Value::Members members(propertyJSONObject.getMemberNames());
     for(Json::Value::Members::const_iterator mbrCit = members.begin() ; mbrCit != members.end() ; ++mbrCit) {
@@ -849,7 +907,83 @@ ObjectRoot::ObjectReflector::SP ObjectRoot::fromJson(const std::string &jsonStri
         }
     }
 
-    return ObjectReflector::SP(new ObjectReflector(objectHandle, classAndPropertyNameValueSPMap));
+    ObjectReflector::SP objectReflectorSP(new ObjectReflector(objectHandle, classAndPropertyNameValueSPMap));
+    objectReflectorSP->setFederateSequence(federateSequence);
+    return objectReflectorSP;
+}
+
+void ObjectRoot::add_object_update_embedded_only_id(const std::string &hlaClassName, int id) {
+
+   if (get_hla_class_name_set().find(hlaClassName) == get_hla_class_name_set().end()) {
+        BOOST_LOG_SEV(get_logger(), warning) << "add_object_update_embedded_only_id(\""
+          << hlaClassName << ", " << id << ") -- no such object class \""
+          << hlaClassName << "\"";
+        return;
+    }
+
+    StringIntegerSetSPMap::iterator simItr =
+      get_hla_class_name_object_update_embedded_only_id_set_sp_map().find(hlaClassName);
+    if (simItr == get_hla_class_name_object_update_embedded_only_id_set_sp_map().end()) {
+        simItr = get_hla_class_name_object_update_embedded_only_id_set_sp_map().emplace(
+          hlaClassName, IntegerSetSP(new IntegerSet())
+          ).first;
+    }
+
+    IntegerSet &integerSet = *simItr->second;
+    integerSet.insert(id);
+}
+
+void ObjectRoot::remove_object_update_embedded_only_id(const std::string &hlaClassName, int id) {
+
+    StringIntegerSetSPMap::iterator simItr =
+      get_hla_class_name_object_update_embedded_only_id_set_sp_map().find(hlaClassName);
+    if (simItr == get_hla_class_name_object_update_embedded_only_id_set_sp_map().end()) {
+        return;
+    }
+
+    IntegerSet &integerSet = *simItr->second;
+
+    integerSet.erase(id);
+    if (integerSet.empty()) {
+        get_hla_class_name_object_update_embedded_only_id_set_sp_map().erase(hlaClassName);
+    }
+}
+
+void ObjectRoot::add_federate_name_soft_publish_direct(
+  const std::string &hlaClassName, const std::string &federateName
+) {
+   if (get_hla_class_name_set().find(hlaClassName) == get_hla_class_name_set().end()) {
+        BOOST_LOG_SEV(get_logger(), warning) << "add_federate_name_soft_publish_direct(\"" << hlaClassName
+          << ", \"" << federateName << "\") -- no such object class \"" << hlaClassName << "\"";
+        return;
+    }
+
+    StringStringSetSPMap::iterator ssmItr =
+      get_hla_class_name_to_federate_name_soft_publish_direct_set_sp_map().find(hlaClassName);
+    if (ssmItr == get_hla_class_name_to_federate_name_soft_publish_direct_set_sp_map().end()) {
+        ssmItr = get_hla_class_name_to_federate_name_soft_publish_direct_set_sp_map().emplace(
+          hlaClassName, StringSetSP(new StringSet())
+        ).first;
+    }
+    StringSet &stringSet = *ssmItr->second;
+    stringSet.insert(federateName);
+}
+
+void ObjectRoot::remove_federate_name_soft_publish_direct(
+  const std::string &hlaClassName, const std::string &federateName
+) {
+    StringStringSetSPMap::iterator ssmItr =
+      get_hla_class_name_to_federate_name_soft_publish_direct_set_sp_map().find(hlaClassName);
+
+    if (ssmItr != get_hla_class_name_to_federate_name_soft_publish_direct_set_sp_map().end()) {
+        return;
+    }
+
+    StringSet &stringSet = *ssmItr->second;
+    stringSet.erase(federateName);
+    if (stringSet.empty()) {
+        get_hla_class_name_to_federate_name_soft_publish_direct_set_sp_map().erase(federateName);
+    }
 }
 
 void ObjectRoot::add_federate_name_soft_publish(
@@ -862,26 +996,28 @@ void ObjectRoot::add_federate_name_soft_publish(
     }
 
     if (
-      get_hla_class_name_to_federate_name_soft_publish_set_map().find(hlaClassName) ==
-        get_hla_class_name_to_federate_name_soft_publish_set_map().end()
+      get_hla_class_name_to_federate_name_soft_publish_set_sp_map().find(hlaClassName) ==
+        get_hla_class_name_to_federate_name_soft_publish_set_sp_map().end()
     ) {
-        get_hla_class_name_to_federate_name_soft_publish_set_map().emplace(hlaClassName, std::set<std::string>());
+        get_hla_class_name_to_federate_name_soft_publish_set_sp_map().emplace(
+          hlaClassName, StringSetSP(new StringSet())
+        );
     }
-    get_hla_class_name_to_federate_name_soft_publish_set_map()[hlaClassName].insert(federateName);
+    get_hla_class_name_to_federate_name_soft_publish_set_sp_map()[hlaClassName]->insert(federateName);
 }
 
 void ObjectRoot::remove_federate_name_soft_publish(
   const std::string &hlaClassName, const std::string &federateName
 ) {
     if (
-      get_hla_class_name_to_federate_name_soft_publish_set_map().find(hlaClassName) !=
-        get_hla_class_name_to_federate_name_soft_publish_set_map().end()
+      get_hla_class_name_to_federate_name_soft_publish_set_sp_map().find(hlaClassName) !=
+        get_hla_class_name_to_federate_name_soft_publish_set_sp_map().end()
     ) {
         std::set<std::string> &federateNameSoftPublishSet =
-          get_hla_class_name_to_federate_name_soft_publish_set_map()[hlaClassName];
+          *get_hla_class_name_to_federate_name_soft_publish_set_sp_map()[hlaClassName];
         federateNameSoftPublishSet.erase(federateName);
         if (federateNameSoftPublishSet.empty()) {
-            get_hla_class_name_to_federate_name_soft_publish_set_map().erase(hlaClassName);
+            get_hla_class_name_to_federate_name_soft_publish_set_sp_map().erase(hlaClassName);
         }
     }
 }
@@ -986,6 +1122,46 @@ std::ostream &operator<<( std::ostream &os, const ::org::cpswt::hla::ObjectRoot 
     const ::org::cpswt::hla::ObjectRoot::ClassAndPropertyNameValueSPMap &classAndPropertyNameValueSPMap =
       messaging.getClassAndPropertyNameValueSPMap();
     os << messaging.getInstanceHlaClassName() << "(";
+    bool first = true;
+    for(
+      const_iterator cvmCit = classAndPropertyNameValueSPMap.begin() ;
+      cvmCit != classAndPropertyNameValueSPMap.end() ;
+      ++cvmCit
+    ) {
+        if (first) first = false;
+        else os << ", " ;
+
+        os << static_cast<std::string>(cvmCit->first) << ": ";
+        TypeMedley &value = *cvmCit->second;
+        switch(value.getDataType()) {
+            case TypeMedley::DOUBLE: {
+                os << static_cast<double>(value);
+                break;
+            }
+            case TypeMedley::FLOAT: {
+                os << static_cast<float>(value);
+                break;
+            }
+            case TypeMedley::STRING: {
+                os << "\"" << static_cast<std::string>(value) << "\"";
+                break;
+            }
+            default: {
+                os << static_cast<std::string>(value);
+                break;
+            }
+        }
+    }
+    return os << ")";
+}
+
+std::ostream &operator<<( std::ostream &os, const ::org::cpswt::hla::ObjectRoot::ObjectReflector &objectReflector ) {
+
+    typedef ::org::cpswt::hla::ObjectRoot::ClassAndPropertyNameValueSPMap::const_iterator const_iterator;
+    const ::org::cpswt::hla::ObjectRoot::ClassAndPropertyNameValueSPMap &classAndPropertyNameValueSPMap =
+      objectReflector.getClassAndPropertyNameValueSPMap();
+    os << "[" << objectReflector.getHlaClassName() << "," << objectReflector.getObjectHandle() << ","
+      << "" << objectReflector.getFederateSequence() << "](";
     bool first = true;
     for(
       const_iterator cvmCit = classAndPropertyNameValueSPMap.begin() ;
