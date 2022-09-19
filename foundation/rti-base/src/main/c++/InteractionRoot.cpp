@@ -594,26 +594,28 @@ void InteractionRoot::add_federate_name_soft_publish(
     }
 
     if (
-      get_hla_class_name_to_federate_name_soft_publish_set_map().find(hlaClassName) ==
-        get_hla_class_name_to_federate_name_soft_publish_set_map().end()
+      get_hla_class_name_to_federate_name_soft_publish_set_sp_map().find(hlaClassName) ==
+        get_hla_class_name_to_federate_name_soft_publish_set_sp_map().end()
     ) {
-        get_hla_class_name_to_federate_name_soft_publish_set_map().emplace(hlaClassName, std::set<std::string>());
+        get_hla_class_name_to_federate_name_soft_publish_set_sp_map().emplace(
+          hlaClassName, StringSetSP(new StringSet())
+        );
     }
-    get_hla_class_name_to_federate_name_soft_publish_set_map()[hlaClassName].insert(federateName);
+    get_hla_class_name_to_federate_name_soft_publish_set_sp_map()[hlaClassName]->insert(federateName);
 }
 
 void InteractionRoot::remove_federate_name_soft_publish(
   const std::string &hlaClassName, const std::string &federateName
 ) {
     if (
-      get_hla_class_name_to_federate_name_soft_publish_set_map().find(hlaClassName) !=
-        get_hla_class_name_to_federate_name_soft_publish_set_map().end()
+      get_hla_class_name_to_federate_name_soft_publish_set_sp_map().find(hlaClassName) !=
+        get_hla_class_name_to_federate_name_soft_publish_set_sp_map().end()
     ) {
         std::set<std::string> &federateNameSoftPublishSet =
-          get_hla_class_name_to_federate_name_soft_publish_set_map()[hlaClassName];
+          *get_hla_class_name_to_federate_name_soft_publish_set_sp_map()[hlaClassName];
         federateNameSoftPublishSet.erase(federateName);
         if (federateNameSoftPublishSet.empty()) {
-            get_hla_class_name_to_federate_name_soft_publish_set_map().erase(hlaClassName);
+            get_hla_class_name_to_federate_name_soft_publish_set_sp_map().erase(hlaClassName);
         }
     }
 }
