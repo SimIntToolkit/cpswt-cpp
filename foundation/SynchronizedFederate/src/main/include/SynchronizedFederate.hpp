@@ -43,6 +43,14 @@
 
 #include <iostream>
 
+#define BOOST_LOG_DYN_LINK
+
+#include <boost/log/expressions/keyword.hpp>
+#include <boost/log/trivial.hpp>
+#include <boost/log/sources/severity_logger.hpp>
+#include <boost/log/attributes.hpp>
+#include <boost/log/utility/setup/common_attributes.hpp>
+
 #include "NullFederateAmbassador.hh"
 #include "RTI.hh"
 #include "fedtime.hh"
@@ -68,13 +76,20 @@
 #include <unistd.h>
 #endif
 
+namespace logging = boost::log;
+namespace logging_source = boost::log::sources;
+namespace attrs = boost::log::attributes;
+
+using namespace logging::trivial;
 
 class SynchronizedFederate : public NullFederateAmbassador {
 
 public:
+    typedef logging_source::severity_logger< severity_level > severity_logger;
+
     using ObjectRoot = ::org::cpswt::hla::ObjectRoot;
     using ObjectReflector = ObjectRoot::ObjectReflector;
-    using ObjectReflectorComparator = ObjectRoot::ObjectReflectorComparator;
+    using ObjectReflectorSPComparator = ObjectRoot::ObjectReflectorSPComparator;
     using InteractionRoot = ::org::cpswt::hla::InteractionRoot;
     using C2WInteractionRoot = ::org::cpswt::hla::InteractionRoot_p::C2WInteractionRoot;
     using EmbeddedMessaging = ::org::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::EmbeddedMessaging;
@@ -84,7 +99,6 @@ public:
 
     static const std::string FEDERATION_MANAGER_NAME;
     enum TimeAdvanceMode { SF_TIME_ADVANCE_REQUEST, SF_NEXT_EVENT_REQUEST, SF_TIME_ADVANCE_REQUEST_AVAILABLE, SF_NEXT_EVENT_REQUEST_AVAILABLE };
-
 
 private:
     RTI::RTIambassador *_rti;
@@ -102,15 +116,14 @@ private:
 
     bool _IsLateJoiner;
 
-
-
 public:
     static const std::string ReadyToPopulateSynch;
     static const std::string ReadyToRunSynch;
     static const std::string ReadyToResignSynch;
 
 private:
-    typedef std::set< std::string > StringSet;
+    typedef boost::shared_ptr<StringSet> StringSetSP;
+
     StringSet _achievedSynchronizationPoints;
 
     bool _timeConstrainedNotEnabled;
@@ -123,7 +136,18 @@ private:
     double _stepSize;
     TimeAdvanceMode _timeAdvanceMode;
 
+    static severity_logger &get_logger_aux() {
+        static severity_logger logger;
+        logging::add_common_attributes();
+        return logger;
+    }
+
 public:
+    static severity_logger &get_logger() {
+        static severity_logger &logger = get_logger_aux();
+        return logger;
+    }
+
     void setStepSize(double stepSize) {
         _stepSize = stepSize;
     }
@@ -283,54 +307,12 @@ protected:
     // void joinFederation( const std::string &federation_id, const std::string &federate_id, bool ignoreLockFile = true );
     void joinFederation();
 
-    void sendInteraction(InteractionRoot &interactionRoot, const StringSet &federateNameSet, double time) {
-
-        if (!interactionRoot.isInstanceHlaClassDerivedFromHlaClass(EmbeddedMessaging::get_hla_class_name())) {
-
-            std::string interactionJson = interactionRoot.toJson();
-
-            for (
-              StringSet::const_iterator sstCit = federateNameSet.begin() ; sstCit != federateNameSet.end() ; ++sstCit
-            ) {
-                const std::string &federateName = *sstCit;
-                const std::string embeddedMessagingHlaClassName =
-                  EmbeddedMessaging::get_hla_class_name() + "." + federateName;
-                InteractionRoot::SP embeddedMessagingForNetworkFederateSP(
-                  new InteractionRoot(embeddedMessagingHlaClassName)
-                );
-                if (interactionRoot.isInstanceHlaClassDerivedFromHlaClass(C2WInteractionRoot::get_hla_class_name())) {
-                    embeddedMessagingForNetworkFederateSP->setParameter(
-                            "federateSequence",
-                            interactionRoot.getParameter("federateSequence")
-                    );
-                    embeddedMessagingForNetworkFederateSP->setFederateAppendedToFederateSequence(true);
-                }
-                embeddedMessagingForNetworkFederateSP->setParameter(
-                        "hlaClassName", interactionRoot.getInstanceHlaClassName()
-                );
-                embeddedMessagingForNetworkFederateSP->setParameter("messagingJson", interactionJson);
-
-                if (time >= 0) {
-                    sendInteraction(embeddedMessagingForNetworkFederateSP, time);
-                } else {
-                    sendInteraction(embeddedMessagingForNetworkFederateSP);
-                }
-            }
-        }
-    }
-
-    void sendInteraction(InteractionRoot::SP interactionRootSP, const StringSet &federateNameSet, double time) {
-        sendInteraction(*interactionRootSP, federateNameSet, time);
-    }
+    void sendInteraction(InteractionRoot &interactionRoot, const StringSet &federateNameSet, double time);
 
     void sendInteraction(InteractionRoot &interactionRoot, const std::string &federateName, double time) {
         std::set<std::string> stringSet;
         stringSet.emplace(federateName);
         sendInteraction(interactionRoot, stringSet, time);
-    }
-
-    void sendInteraction(InteractionRoot::SP interactionRootSP, const std::string &federateName, double time) {
-        sendInteraction(*interactionRootSP, federateName, time);
     }
 
     void sendInteraction( InteractionRoot &interactionRoot, double time ) {
@@ -339,11 +321,8 @@ protected:
         if (interactionRoot.getIsPublished()) {
             interactionRoot.sendInteraction(getRTI(), time);
         }
-        sendInteraction(interactionRoot, interactionRoot.getFederateNameSoftPublishSet(), time);
-    }
-
-    void sendInteraction( InteractionRoot::SP interactionRootSP, double time ) {
-        sendInteraction(*interactionRootSP, time);
+std::cout << "Checking for embedded sendInteraction for " << interactionRoot.getInstanceHlaClassName() << std::endl;
+        sendInteraction(interactionRoot, *interactionRoot.getFederateNameSoftPublishSetSP(), time);
     }
 
     void sendInteraction(InteractionRoot &interactionRoot) {
@@ -352,11 +331,7 @@ protected:
         if (interactionRoot.getIsPublished()) {
             interactionRoot.sendInteraction(getRTI());
         }
-        sendInteraction(interactionRoot, interactionRoot.getFederateNameSoftPublishSet(), -1);
-    }
-
-    void sendInteraction( InteractionRoot::SP interactionRootSP ) {
-        sendInteraction(*interactionRootSP);
+        sendInteraction(interactionRoot, *interactionRoot.getFederateNameSoftPublishSetSP(), -1);
     }
 
     void sendInteraction(InteractionRoot &interactionRoot, const std::string &federateName) {
@@ -365,8 +340,66 @@ protected:
         sendInteraction(interactionRoot, stringSet, -1);
     }
 
-    void sendInteraction(InteractionRoot::SP interactionRootSP, const std::string &federateName) {
-        sendInteraction(*interactionRootSP, federateName);
+    void registerObject(ObjectRoot &objectRoot);
+
+    void sendInteraction(
+      const std::string &objectReflectorJson,
+      const std::string &hlaClassName,
+      const std::string &federateSequence,
+      const StringSet &federateNameSet,
+      double time
+    );
+
+    void sendInteraction(ObjectReflector &objectReflector, const StringSet &federateNameSet, double time) {
+        sendInteraction(
+          objectReflector.toJson(),
+          objectReflector.getHlaClassName(),
+          objectReflector.getFederateSequence(),
+          federateNameSet,
+          time
+        );
+    }
+
+    void sendInteraction(ObjectRoot &objectRoot, const StringSet &federateNameSet, double time) {
+        sendInteraction(
+          objectRoot.toJson(), objectRoot.getInstanceHlaClassName(), std::string("[]"), federateNameSet, time
+        );
+    }
+
+    void sendInteraction(ObjectReflector &objectReflector, const std::string &federateName, double time) {
+        StringSet stringSet;
+        stringSet.emplace(federateName);
+        sendInteraction(objectReflector, stringSet, time);
+    }
+
+    void sendInteraction(ObjectRoot &objectRoot, const std::string &federateName, double time) {
+        StringSet stringSet;
+        stringSet.emplace(federateName);
+        sendInteraction(objectRoot, stringSet, time);
+    }
+
+    void sendInteraction(ObjectReflector &objectReflector, const std::string &federateName) {
+        std::set<std::string> stringSet;
+        stringSet.emplace(federateName);
+        sendInteraction(objectReflector, stringSet, -1);
+    }
+
+    void sendInteraction(ObjectRoot &objectRoot, const std::string &federateName) {
+        std::set<std::string> stringSet;
+        stringSet.emplace(federateName);
+        sendInteraction(objectRoot, stringSet, -1);
+    }
+
+    void updateAttributeValues(ObjectRoot &objectRoot, double time, bool force) {
+        objectRoot.updateAttributeValues(getRTI(), time, force);
+
+        sendInteraction(objectRoot, *objectRoot.getFederateNameSoftPublishSetSP(), time);
+    }
+
+    void updateAttributeValues(ObjectRoot &objectRoot, bool force) {
+        objectRoot.updateAttributeValues(getRTI(), force);
+
+        sendInteraction(objectRoot, *objectRoot.getFederateNameSoftPublishSetSP(), -1);
     }
 
     void setFederateId(const std::string &federateId) {
@@ -665,18 +698,7 @@ std::cerr << "Received interaction with time" << std::endl;
     }
 
 private:
-    void receiveEmbeddedInteraction(EmbeddedMessaging::SP embeddedMessagingSP, double timestamp) {
-        std::string hlaClassName = embeddedMessagingSP->get_hlaClassName();
-        if (!InteractionRoot::get_is_soft_subscribed(hlaClassName)) {
-            return;
-        }
-
-        InteractionRoot::SP embeddedInteractionSP =
-                InteractionRoot::fromJson(embeddedMessagingSP->get_messagingJson());
-        embeddedInteractionSP->setTime(embeddedMessagingSP->getTime());
-
-        receiveInteractionAux(embeddedInteractionSP, timestamp);
-    }
+    void receiveEmbeddedInteraction(EmbeddedMessaging::SP embeddedMessagingSP, double timestamp);
 
     void receiveInteractionAux(
       InteractionRoot::SP interactionRootSP, double timestamp
@@ -743,31 +765,31 @@ public:
 //        double time=0);
 
 private:
-    typedef std::multiset< ObjectReflector, ObjectReflectorComparator > ObjectReflectorQueue;
-    static ObjectReflectorQueue &getObjectReflectorQueue( void ) {
-        static ObjectReflectorQueue objectReflectorQueue;
-        return objectReflectorQueue;
+    typedef std::multiset< ObjectReflector::SP, ObjectReflectorSPComparator > ObjectReflectorSPQueue;
+    static ObjectReflectorSPQueue &getObjectReflectorSPQueue( void ) {
+        static ObjectReflectorSPQueue objectReflectorSPQueue;
+        return objectReflectorSPQueue;
     }
 
 public:
-    static void addObjectReflector( const ObjectReflector &objectReflector ) {
-        getObjectReflectorQueue().insert( objectReflector );
+    static void addObjectReflectorSP( const ObjectReflector::SP &objectReflectorSP ) {
+        getObjectReflectorSPQueue().insert( objectReflectorSP );
     }
 
-    static void addObjectReflector( int objectHandle, const RTI::AttributeHandleValuePairSet& theAttributes ) {
-        addObjectReflector(  ObjectReflector( objectHandle, theAttributes )  );
+    static void addObjectReflectorSP( int objectHandle, const RTI::AttributeHandleValuePairSet& theAttributes ) {
+        addObjectReflectorSP(ObjectReflector::SP(new ObjectReflector(objectHandle, theAttributes)));
     }
-    static void addObjectReflector( int objectHandle, const RTI::AttributeHandleValuePairSet& theAttributes, const RTI::FedTime &theTime ) {
-        addObjectReflector(  ObjectReflector( objectHandle, theAttributes, theTime )  );
+    static void addObjectReflectorSP( int objectHandle, const RTI::AttributeHandleValuePairSet& theAttributes, const RTI::FedTime &theTime ) {
+        addObjectReflectorSP(ObjectReflector::SP(new ObjectReflector( objectHandle, theAttributes, theTime)));
     }
 
-    static ObjectReflector getNextObjectReflector( void ) {
-        if ( getObjectReflectorQueue().empty() ) return ObjectReflector();
+    static ObjectReflector::SP getNextObjectReflectorSP( void ) {
+        if ( getObjectReflectorSPQueue().empty() ) return ObjectReflector::SP();
 
-        ObjectReflectorQueue::iterator orqItr = getObjectReflectorQueue().begin();
-        ObjectReflector objectReflector = *orqItr;
-        getObjectReflectorQueue().erase( orqItr );
-        return objectReflector;
+        ObjectReflectorSPQueue::iterator orqItr = getObjectReflectorSPQueue().begin();
+        ObjectReflector::SP objectReflectorSP = *orqItr;
+        getObjectReflectorSPQueue().erase( orqItr );
+        return objectReflectorSP;
     }
 
 
@@ -778,7 +800,7 @@ public:
 
     virtual void reflectAttributeValues( RTI::ObjectHandle theObject, const RTI::AttributeHandleValuePairSet& theAttributes, const char *theTag )
      throw ( RTI::ObjectNotKnown, RTI::AttributeNotKnown, RTI::FederateOwnsAttributes, RTI::FederateInternalError ) {
-        addObjectReflector( theObject, theAttributes );
+        addObjectReflectorSP( theObject, theAttributes );
 //        createLog(theObject, theAttributes);
     }
 
@@ -790,7 +812,7 @@ public:
      RTI::EventRetractionHandle theHandle
     )
      throw ( RTI::ObjectNotKnown, RTI::AttributeNotKnown, RTI::FederateOwnsAttributes, RTI::InvalidFederationTime, RTI::FederateInternalError ) {
-        addObjectReflector( theObject, theAttributes, theTime );
+        addObjectReflectorSP( theObject, theAttributes, theTime );
         RTIfedTime rtitime(theTime);
         double ltime = rtitime.getTime();
 //        createLog(theObject, theAttributes, ltime);

@@ -36,7 +36,7 @@
 
 #include <inet/networklayer/ipv4/Ipv4InterfaceData.h>
 
-#include "InteractionMsg_m.h"
+#include "HlaMsg_m.h"
 
 #include "FilterAttackMsg_m.h"
 #include "NodeAttackMsg_m.h"
@@ -289,10 +289,10 @@ void CPSWTIpv4::handleMessageWhenUp(omnetpp::cMessage *msg) {
         auto c_packetChunkPtr = packet->peekAtFront<inet::cPacketChunk>();
         inet::cPacket *c_packetPtr = c_packetChunkPtr->getPacket();
 
-        InteractionMsg *interactionMsg = dynamic_cast< InteractionMsg * >( c_packetPtr );
+        HlaMsg *hlaMsg = dynamic_cast< HlaMsg * >( c_packetPtr );
 
-        if (interactionMsg != 0) {
-            interactionMsg->setMessageNo(AttackCoordinator::getUniqueNo());
+        if (hlaMsg != 0) {
+            hlaMsg->setMessageNo(AttackCoordinator::getUniqueNo());
         }
         Super::routeUnicastPacket(packet);
 

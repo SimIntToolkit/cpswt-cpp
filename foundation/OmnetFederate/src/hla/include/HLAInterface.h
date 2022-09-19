@@ -41,9 +41,7 @@
 #include <SynchronizedFederate.hpp>
 #include <AttackCoordinator.h>
 
-#include <messages/InteractionMsg_m.h>
-
-#include <messages/ObjectMsg_m.h>
+#include <messages/HlaMsg_m.h>
 
 #include <inet/common/INETDefs.h>
 
@@ -65,9 +63,9 @@ public:
 	//
 
 public:
-	static const std::string &getInteractionMessageLabel(void) {
-	    static std::string interactionMessageLabel("Interaction+Msg");
-	    return interactionMessageLabel;
+	static const std::string &getHlaMessageLabel() {
+	    static std::string hlaMessageLabel("Hla+Msg");
+	    return hlaMessageLabel;
 	}
 
 private:
@@ -75,8 +73,8 @@ private:
 
 	inet::cMessage *_keepAliveMsg;
 	inet::cMessage *_readyToRunMsg;
-	inet::cMessage *_interactionArrivalMsg;
-	bool _noInteractionArrivalFlag;
+	inet::cMessage *_hlaArrivalMsg;
+	bool _noHlaArrivalFlag;
 
     struct FederateHostConfig {
         std::string host;
@@ -132,7 +130,7 @@ private:
 
     void initializeFederateSequenceToMessagingInfoMap(const std::string &federateSequenceToMessagingInfoJsonFileName);
 
-	static HLAInterface *&getHLAInterfacePtr( void ) {
+	static HLAInterface *&getHLAInterfacePtr() {
 		static HLAInterface *hlaInterfacePtr = 0;
 		return hlaInterfacePtr;
 	}
@@ -147,19 +145,28 @@ private:
 
 
 public:
-	static HLAInterface *get_InstancePtr( void ) { return getHLAInterfacePtr(); }
+	static HLAInterface *get_InstancePtr() { return getHLAInterfacePtr(); }
 
-	HLAInterface( void );
-	virtual ~HLAInterface( void ) throw();
+	HLAInterface();
+	virtual ~HLAInterface() throw();
 
 	//
 	// SYNCHRONIZED-FEDERATE METHODS
 	//
-	void populateInteractionMsg(InteractionMsg &interactionMsg, const std::string &sendingFederateName, const std::string &receivingFederateName);
+	void populateHlaMsg(HlaMsg &hlaMsg, const std::string &sendingFederateName, const std::string &receivingFederateName);
 
-    void processInteractions( void );
+    void processMessaging(
+        const std::string &hlaClassName,
+        const StringList &federateSequenceList,
+        const InteractionRoot::SP &interactionRootSP,
+        const ObjectReflector::SP &objectReflectorSP
+    );
+
+    void processInteractions();
+
+    void processObjectReflectors();
     
-    void interactionArrival( void );
+    void hlaArrival();
 
 	virtual void receiveInteraction(
 	 RTI::InteractionClassHandle theInteraction,
@@ -177,9 +184,6 @@ public:
 	)
 	 throw ( RTI::InteractionClassNotKnown, RTI::InteractionParameterNotKnown, RTI::FederateInternalError ) override;
 
-
-    void processObjectReflectors( void );
-    
     void reflectAttributeValues(
      RTI::ObjectHandle theObject, 
      const RTI::AttributeHandleValuePairSet& theAttributes,
@@ -209,69 +213,69 @@ public:
 	    SynchronizedFederate::finalizeAndTerminate();
 	}
 
-	ObjectMsg *wrapObject( ObjectRoot::SP objectRootSP, const std::string &name, inet::simtime_t timestamp ) {
-	
-		Enter_Method( "wrapObject" );
-
-		ObjectMsg *objectMsgPtr = new ObjectMsg( name.c_str() );
-		objectMsgPtr->setObjectRootSP( objectRootSP );
-		objectMsgPtr->setKind( OBJECT );
-		objectMsgPtr->setTimestamp( timestamp );
-		
-		return objectMsgPtr;
-	}
-	
-	ObjectMsg *wrapObject( ObjectRoot::SP objectRootSP, const std::string &name ) {
-		return wrapObject( objectRootSP, name, inet::simTime() );
-	}
-	
-	ObjectMsg *wrapObject( ObjectRoot &objectRoot, const std::string &name, inet::simtime_t timestamp ) {
-		return wrapObject( objectRoot.cloneObject(), name, timestamp );
-	}
-
-	ObjectMsg *wrapObject( ObjectRoot &objectRoot, const std::string &name ) {
-		return wrapObject( objectRoot.cloneObject(), name );
-	}
-
-	void updateObject( ObjectMsg *objectMsgPtr ) {
-		Enter_Method( "updateObject" );
-		take( objectMsgPtr );
-		scheduleAt( inet::simTime(), objectMsgPtr );
-	}
-	
-	void updateObject( ObjectRoot::SP objectRootSP, const std::string &name, inet::simtime_t timestamp ) {		
-		ObjectMsg *objectMsgPtr = wrapObject( objectRootSP, name, timestamp );
-		updateObject( objectMsgPtr );
-	}
-	
-	void updateObject( ObjectRoot::SP objectRootSP, const std::string &name, double timestamp ) {
-		updateObject(  objectRootSP, name, inet::SimTime( timestamp )  );
-	}
-
-	void updateObject( ObjectRoot::SP objectRootSP, const std::string &name ) {
-		updateObject( objectRootSP, name, inet::simTime() );
-	}
-
-	void updateObject( ObjectRoot &objectRoot, const std::string &name, inet::simtime_t timestamp ) {
-		updateObject( objectRoot.cloneObject(), name, timestamp );
-	}
-	
-	void updateObject( ObjectRoot &objectRoot, const std::string &name, double timestamp ) {
-		updateObject(  objectRoot, name, inet::SimTime( timestamp )  );
-	}
-	
-	void updateObject( ObjectRoot &objectRoot, const std::string &name ) {
-		updateObject( objectRoot, name, inet::simTime() );
-	}
-
-	static ObjectRoot::SP unwrapObject( inet::cMessage *msg ) {
-		if ( msg->getKind() != OBJECT ) return ObjectRoot::SP(  static_cast< ObjectRoot * >( 0 )  );
-		return static_cast< ObjectMsg * >( msg )->getObjectRootSP();
-	}	
+//	ObjectMsg *wrapObject( ObjectRoot::SP objectRootSP, const std::string &name, inet::simtime_t timestamp ) {
+//
+//		Enter_Method( "wrapObject" );
+//
+//		ObjectMsg *objectMsgPtr = new ObjectMsg( name.c_str() );
+//		objectMsgPtr->setObjectRootSP( objectRootSP );
+//		objectMsgPtr->setKind( OBJECT );
+//		objectMsgPtr->setTimestamp( timestamp );
+//
+//		return objectMsgPtr;
+//	}
+//
+//	ObjectMsg *wrapObject( ObjectRoot::SP objectRootSP, const std::string &name ) {
+//		return wrapObject( objectRootSP, name, inet::simTime() );
+//	}
+//
+//	ObjectMsg *wrapObject( ObjectRoot &objectRoot, const std::string &name, inet::simtime_t timestamp ) {
+//		return wrapObject( objectRoot.cloneObject(), name, timestamp );
+//	}
+//
+//	ObjectMsg *wrapObject( ObjectRoot &objectRoot, const std::string &name ) {
+//		return wrapObject( objectRoot.cloneObject(), name );
+//	}
+//
+//	void updateObject( ObjectMsg *objectMsgPtr ) {
+//		Enter_Method( "updateObject" );
+//		take( objectMsgPtr );
+//		scheduleAt( inet::simTime(), objectMsgPtr );
+//	}
+//
+//	void updateObject( ObjectRoot::SP objectRootSP, const std::string &name, inet::simtime_t timestamp ) {
+//		ObjectMsg *objectMsgPtr = wrapObject( objectRootSP, name, timestamp );
+//		updateObject( objectMsgPtr );
+//	}
+//
+//	void updateObject( ObjectRoot::SP objectRootSP, const std::string &name, double timestamp ) {
+//		updateObject(  objectRootSP, name, inet::SimTime( timestamp )  );
+//	}
+//
+//	void updateObject( ObjectRoot::SP objectRootSP, const std::string &name ) {
+//		updateObject( objectRootSP, name, inet::simTime() );
+//	}
+//
+//	void updateObject( ObjectRoot &objectRoot, const std::string &name, inet::simtime_t timestamp ) {
+//		updateObject( objectRoot.cloneObject(), name, timestamp );
+//	}
+//
+//	void updateObject( ObjectRoot &objectRoot, const std::string &name, double timestamp ) {
+//		updateObject(  objectRoot, name, inet::SimTime( timestamp )  );
+//	}
+//
+//	void updateObject( ObjectRoot &objectRoot, const std::string &name ) {
+//		updateObject( objectRoot, name, inet::simTime() );
+//	}
+//
+//	static ObjectRoot::SP unwrapObject( inet::cMessage *msg ) {
+//		if ( msg->getKind() != OBJECT ) return ObjectRoot::SP(  static_cast< ObjectRoot * >( 0 )  );
+//		return static_cast< ObjectMsg * >( msg )->getObjectRootSP();
+//	}
 
 private:
-    void setup( void );
-	void sendKeepAliveMsg( void );
+    void setup();
+	void sendKeepAliveMsg();
 
 };
 

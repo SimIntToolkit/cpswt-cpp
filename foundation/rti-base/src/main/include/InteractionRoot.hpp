@@ -102,7 +102,9 @@ public:
     typedef std::map<int, std::string> IntegerStringMap;
     typedef std::map<std::string, int> StringIntegerMap;
     typedef std::map<std::string, bool> StringBooleanMap;
-    typedef std::map<std::string, std::set<std::string>> StringStringSetMap;
+    
+    typedef boost::shared_ptr<StringSet> StringSetSP;
+    typedef std::map<std::string, StringSetSP> StringStringSetSPMap;
 
     typedef RTI::AttributeHandleSet AttributeHandleSet;
     typedef boost::shared_ptr<AttributeHandleSet> AttributeHandleSetSP;
@@ -1101,10 +1103,6 @@ public:
         remove_federate_name_soft_publish(get_hla_class_name(), networkFederateName);
     }
 
-    std::set<std::string> getFederateNameSoftPublishSet() {
-        return get_federate_name_soft_publish_set(get_hla_class_name());
-    }
-
     //-----------------------------------------------------
     // END METHODS FOR PUBLISHING/SUBSCRIBING-TO THIS CLASS
     //-----------------------------------------------------
@@ -1482,8 +1480,8 @@ public:
     static SP fromJson(const std::string &jsonString);
 
 private:
-    static StringStringSetMap &get_hla_class_name_to_federate_name_soft_publish_set_map() {
-        static StringStringSetMap hlaClassNameToFederateNameSoftPublishSetMap;
+    static StringStringSetSPMap &get_hla_class_name_to_federate_name_soft_publish_set_sp_map() {
+        static StringStringSetSPMap hlaClassNameToFederateNameSoftPublishSetMap;
         return hlaClassNameToFederateNameSoftPublishSetMap;
     }
 
@@ -1500,14 +1498,15 @@ public:
         remove_federate_name_soft_publish(getInstanceHlaClassName(), federateName);
     }
 
-    std::set<std::string> get_federate_name_soft_publish_set(const std::string &hlaClassName) {
-        return get_hla_class_name_to_federate_name_soft_publish_set_map().find(hlaClassName) ==
-          get_hla_class_name_to_federate_name_soft_publish_set_map().end() ?
-            std::set<std::string>() : get_hla_class_name_to_federate_name_soft_publish_set_map()[hlaClassName];
+    const StringSetSP &get_federate_name_soft_publish_set_sp(const std::string &hlaClassName) {
+        static StringSetSP defaultStringSetSP( new StringSet() );
+        return get_hla_class_name_to_federate_name_soft_publish_set_sp_map().find(hlaClassName) ==
+          get_hla_class_name_to_federate_name_soft_publish_set_sp_map().end() ?
+            defaultStringSetSP : get_hla_class_name_to_federate_name_soft_publish_set_sp_map()[hlaClassName];
     }
 
-    std::set<std::string> getFederateNameSoftPublishSet(const std::string &hlaClassName) {
-        return get_federate_name_soft_publish_set(getInstanceHlaClassName());
+    const StringSetSP &getFederateNameSoftPublishSetSP() {
+        return get_federate_name_soft_publish_set_sp(getInstanceHlaClassName());
     }
 
 private:

@@ -32,7 +32,7 @@
 #include <boost/lexical_cast.hpp>
 #include <inet/common/packet/chunk/cPacketChunk.h>
 
-#include <messages/InteractionMsg_m.h>
+#include <messages/HlaMsg_m.h>
 
 #include <InteractionRoot_p/C2WInteractionRoot.hpp>
 
@@ -104,15 +104,15 @@ void BasicUdpAppWrapper::handleMessage( omnetpp::cMessage *msg ) {
     auto c_packetChunkPtr = packet->template peekAtFront<inet::cPacketChunk>();
     inet::cPacket *c_packetPtr = c_packetChunkPtr->getPacket();
 
-    InteractionMsg *interactionMsg = dynamic_cast< InteractionMsg * >( c_packetPtr );
-    if ( interactionMsg != 0 ) {
-        int messageNo = interactionMsg->getMessageNo();
-        if ( !interactionMsg->getToHLA() && !_messageTracker.addInt( messageNo )  ) {
+    HlaMsg *hlaMsg = dynamic_cast< HlaMsg * >( c_packetPtr );
+    if ( hlaMsg != 0 ) {
+        int messageNo = hlaMsg->getMessageNo();
+        if ( !hlaMsg->getToHLA() && !_messageTracker.addInt( messageNo )  ) {
 //          std::cout << "BasicUdpAppWrapper: \"" << getHostName() << "\" dropping duplicate message (" << messageNo << ")." << std::endl;
             delete msg;
             return;  // DROP MESSAGE
         }
-        interactionMsg->setToHLA( !interactionMsg->getToHLA() );
+        hlaMsg->setToHLA( !hlaMsg->getToHLA() );
     }
     // std::cout << "BasicUdpAppWrapper: \"" << getHostName() << "\" received message, forwarding to wrapped module." << std::endl;
 
@@ -124,14 +124,15 @@ void BasicUdpAppWrapper::sendToUDP( inet::Packet *packet, const inet::Ipv4Addres
     auto c_packetChunkPtr = packet->template peekAtFront<inet::cPacketChunk>();
     inet::cPacket *c_packetPtr = c_packetChunkPtr->getPacket();
 
-    InteractionMsg *interactionMsgPtr = dynamic_cast< InteractionMsg * >( c_packetPtr );
-	if ( interactionMsgPtr == 0 ) {
-		std::cerr << "Hostname \"" << getHostName() << "\":  BasicUdpAppWrapper:  sendToUDP method:  sending non-InteractionMsg-containing-Packet into network." << std::endl;
+    HlaMsg *hlaMsgPtr = dynamic_cast< HlaMsg * >( c_packetPtr );
+	if ( hlaMsgPtr == 0 ) {
+		std::cerr << "Hostname \"" << getHostName() << "\":  BasicUdpAppWrapper:  sendToUDP method:  sending non-HlaMsg-containing-Packet into network." << std::endl;
 		Super::sendToUDP( packet, destAddr, destPort );
 		return;
 	}
 
-    InteractionRoot &interactionRoot = *interactionMsgPtr->getInteractionRootSP();
+    InteractionRoot::SP interactionRootSP = hlaMsgPtr->getInteractionRootSP();
+    ObjectReflector::SP objectReflectorSP = hlaMsgPtr->getObjectReflectorSP();
 
 	//
 	// INTEGRITY ATTACK
@@ -139,19 +140,27 @@ void BasicUdpAppWrapper::sendToUDP( inet::Packet *packet, const inet::Ipv4Addres
 	if ( AttackCoordinator::getSingleton().isIntegrityAttackEnabled( getHostName() ) ) {
 
         std::cout << "Got network packet, and integrity attack is enabled" << std::endl;
-        std::cout << "Got interaction is: " << interactionRoot << std::endl;
 
         AttackCoordinator::IntegrityAttackParams &iap = AttackCoordinator::getSingleton().getIntegrityAttackParams( this, getHostName() );
 
-        tweakIncoming( interactionRoot, iap);
+        if (interactionRootSP) {
+            std::cout << "Got interaction is: " << *interactionRootSP << std::endl;
+            tweakIncoming( *interactionRootSP, iap);
+        } else if (objectReflectorSP) {
+            tweakIncoming( *objectReflectorSP, iap);
+        }
     }
 
-    if ( interactionMsgPtr->getToHLA() ) {
+    if ( hlaMsgPtr->getToHLA() ) {
 
         std::cout << "BasicUdpAppWrapper: \"" << getHostName() << "\" sending cPacket to HLA" << std::endl;
 
 		if (  AttackCoordinator::getSingleton().modifyToHLAPackets( getHostName() )  ) {
-		    setToDefaultValues( interactionRoot );
+            if (interactionRootSP) {
+                setToDefaultValues(*interactionRootSP);
+            } else if (objectReflectorSP) {
+                setToDefaultValues(*objectReflectorSP);
+            }
 		}
 
         sendDirect( packet, _hlaModulePtr, "hlaOut" );
@@ -160,20 +169,23 @@ void BasicUdpAppWrapper::sendToUDP( inet::Packet *packet, const inet::Ipv4Addres
 	}
 
 	if (  AttackCoordinator::getSingleton().modifyFromHLAPackets( getHostName() )  ) {
-	    setToDefaultValues( interactionRoot );
+        if (interactionRootSP) {
+            setToDefaultValues(*interactionRootSP);
+        } else if (objectReflectorSP) {
+            setToDefaultValues(*objectReflectorSP);
+        }
 	}
 
-    std::string receiverHost( interactionMsgPtr->getReceiverHost() );
-    std::string receiverHostApp( interactionMsgPtr->getReceiverHostApp() );
-    int receiverAppIndex( interactionMsgPtr->getReceiverAppIndex() );
-    std::string receiverAppInterface( interactionMsgPtr->getReceiverAppInterface() );
+    std::string receiverHost( hlaMsgPtr->getReceiverHost() );
+    std::string receiverHostApp( hlaMsgPtr->getReceiverHostApp() );
+    int receiverAppIndex( hlaMsgPtr->getReceiverAppIndex() );
+    std::string receiverAppInterface( hlaMsgPtr->getReceiverAppInterface() );
 
 	// Udpate message length
 
 	if ( receiverAppIndex == -1 ) {
-		// std::cerr << "Hostname \"" << getHostName() << "\":  BasicUdpAppWrapper:  handleMessage method:  sending InteractionMsg to application-specified destination in network." << std::endl;
+		// std::cerr << "Hostname \"" << getHostName() << "\":  BasicUdpAppWrapper:  handleMessage method:  sending HlaMsg to application-specified destination in network." << std::endl;
 		Super::sendToUDP( packet, destAddr, destPort );
-
 	}
 
 	AttackCoordinator::AppSpec appSpec( receiverHost, receiverHostApp, receiverAppIndex );
@@ -188,69 +200,6 @@ void BasicUdpAppWrapper::sendToUDP( inet::Packet *packet, const inet::Ipv4Addres
 	int destinationPort = appProperties.getPort();
 	// std::cerr << "BasicUDPAppWrapper: sending packet to " << destinationIPAddress << "(" << destinationPort << ")" << std::endl;
 
-	// std::cerr << "Hostname \"" << getHostName() << "\":  BasicUdpAppWrapper:  handleMessage method:  sending InteractionMsg to NetworkPacket-specified destination in network." << std::endl;
+	// std::cerr << "Hostname \"" << getHostName() << "\":  BasicUdpAppWrapper:  handleMessage method:  sending HlaMsg to NetworkPacket-specified destination in network." << std::endl;
 	Super::sendToUDP( packet, destinationIPAddress, destinationPort );
-}
-
-void BasicUdpAppWrapper::setToDefaultValues( InteractionRoot &interactionRoot ) {
-    InteractionRoot defaultInteractionRoot( interactionRoot.getInstanceHlaClassName() );
-
-    const InteractionRoot::ClassAndPropertyNameValueSPMap &classAndPropertyValueSPMap = interactionRoot.getClassAndPropertyNameValueSPMap();
-    const InteractionRoot::ClassAndPropertyNameValueSPMap &defaultClassAndPropertyValueSPMap = defaultInteractionRoot.getClassAndPropertyNameValueSPMap();
-
-    for(
-      InteractionRoot::ClassAndPropertyNameValueSPMap::const_iterator cvmCit = classAndPropertyValueSPMap.begin() ;
-      cvmCit != classAndPropertyValueSPMap.end() ;
-      ++cvmCit
-    ) {
-        TypeMedley &value = *cvmCit->second;
-        TypeMedley &defaultValue = *defaultClassAndPropertyValueSPMap.find(cvmCit->first)->second;
-
-        value.setValue(defaultValue);
-    }
-}
-
-void BasicUdpAppWrapper::tweakIncoming( InteractionRoot &interactionRoot, AttackCoordinator::IntegrityAttackParams &iap) {
-
-    const InteractionRoot::ClassAndPropertyNameValueSPMap &classAndPropertyValueSPMap = interactionRoot.getClassAndPropertyNameValueSPMap();
-
-    for(
-      InteractionRoot::ClassAndPropertyNameValueSPMap::const_iterator cvmCit = classAndPropertyValueSPMap.begin() ;
-      cvmCit != classAndPropertyValueSPMap.end() ;
-      ++cvmCit
-    ) {
-        const ClassAndPropertyName &classAndPropertyName = cvmCit->first;
-        if (classAndPropertyName.getClassName() == C2WInteractionRoot::get_hla_class_name()) {
-            continue;
-        }
-
-        TypeMedley &value = *cvmCit->second;
-
-        switch( value.getDataType() ) {
-
-            case TypeMedley::BOOLEAN: {
-                if ( iap.getBooleanEnableFlip() ) {
-                    value.setValue( !value.asBool() );
-                }
-                break;
-            }
-            case TypeMedley::DOUBLE: {
-                value.setValue( value.asDouble() * iap.getDoubleMultiplier() + iap.getDoubleAdder() );
-                break;
-            }
-            case TypeMedley::INTEGER: {
-                value.setValue( value.asInt() * iap.getIntMultiplier() + iap.getIntAdder() );
-                break;
-            }
-            case TypeMedley::LONG: {
-                value.setValue( value.asLong() * iap.getLongMultiplier() + iap.getLongAdder() );
-                break;
-            }
-            case TypeMedley::STRING: {
-                if (!iap.getStringReplacement().empty()) {
-                    value.setValue( iap.getStringReplacement() );
-                }
-            }
-        }
-    }
 }

@@ -180,22 +180,173 @@ void SynchronizedFederate::joinFederation() {
     FederateResignInteraction::publish_interaction( getRTI() );
 
 
-    FederateJoinInteraction::SP intJoin = FederateJoinInteraction::create();
+    FederateJoinInteraction::SP intJoinSP = FederateJoinInteraction::create();
     // joinInteraction.set_sourceFed(this.federateId);
     // joinInteraction.set_originFed(this.federateId);
     // joinInteraction.setFederateId(this.federateId);
     // joinInteraction.setFederateType(this.federateType);
     // joinInteraction.setLateJoiner(this.isLateJoiner);
 
-    intJoin->set_FederateType( getFederateType() );
-    intJoin->set_FederateId( getFederateId() );
-    intJoin->set_IsLateJoiner(get_IsLateJoiner());
+    intJoinSP->set_FederateType( getFederateType() );
+    intJoinSP->set_FederateId( getFederateId() );
+    intJoinSP->set_IsLateJoiner(get_IsLateJoiner());
 
     
     std::cout << "Sending Join interaction #-"  << std::endl;
+    std::cout << *intJoinSP << std::endl;
+    std::cout << "HERE" << std::endl;
 
-    sendInteraction( intJoin, _currentTime );
+    sendInteraction( *intJoinSP, _currentTime );
 }
+
+void SynchronizedFederate::sendInteraction(InteractionRoot &interactionRoot, const StringSet &federateNameSet, double time) {
+
+    if (!interactionRoot.isInstanceHlaClassDerivedFromHlaClass(EmbeddedMessaging::get_hla_class_name())) {
+
+        std::string interactionJson = interactionRoot.toJson();
+
+        for (const std::string &federateName : federateNameSet) {
+
+            const std::string embeddedMessagingHlaClassName =
+              EmbeddedMessaging::get_hla_class_name() + "." + federateName;
+            InteractionRoot::SP embeddedMessagingForNetworkFederateSP(
+              new InteractionRoot(embeddedMessagingHlaClassName)
+            );
+            if (interactionRoot.isInstanceHlaClassDerivedFromHlaClass(C2WInteractionRoot::get_hla_class_name())) {
+                embeddedMessagingForNetworkFederateSP->setParameter(
+                        "federateSequence",
+                        interactionRoot.getParameter("federateSequence")
+                );
+                embeddedMessagingForNetworkFederateSP->setFederateAppendedToFederateSequence(true);
+            }
+            embeddedMessagingForNetworkFederateSP->setParameter("command", "interaction");
+            embeddedMessagingForNetworkFederateSP->setParameter(
+                    "hlaClassName", interactionRoot.getInstanceHlaClassName()
+            );
+            embeddedMessagingForNetworkFederateSP->setParameter("messagingJson", interactionJson);
+
+            if (time >= 0) {
+                sendInteraction(*embeddedMessagingForNetworkFederateSP, time);
+            } else {
+                sendInteraction(*embeddedMessagingForNetworkFederateSP);
+            }
+        }
+    }
+}
+
+void SynchronizedFederate::registerObject(ObjectRoot &objectRoot) {
+    objectRoot.registerObject(getRTI());
+
+    if (objectRoot.getFederateNameSoftPublishDirectSetSP()->size() > 0) {
+        for (const std::string &federateName : *objectRoot.getFederateNameSoftPublishDirectSetSP()) {
+            const std::string embeddedMessagingHlaClassName =
+              EmbeddedMessaging::get_hla_class_name() + "." + federateName;
+            InteractionRoot::SP embeddedMessagingDirectSP(new InteractionRoot(embeddedMessagingHlaClassName));
+
+            embeddedMessagingDirectSP->setParameter("command", "discover");
+            embeddedMessagingDirectSP->setParameter("hlaClassName", objectRoot.getInstanceHlaClassName());
+
+            Json::Value topLevelJSONObject(Json::objectValue);
+
+            topLevelJSONObject["object_handle"] = objectRoot.getObjectHandle();
+
+            Json::StreamWriterBuilder streamWriterBuilder;
+            streamWriterBuilder["commandStyle"] = "None";
+            streamWriterBuilder["indentation"] = "    ";
+            std::unique_ptr<Json::StreamWriter> streamWriterUPtr(streamWriterBuilder.newStreamWriter());
+            std::ostringstream stringOutputStream;
+            streamWriterUPtr->write(topLevelJSONObject, &stringOutputStream);
+
+            embeddedMessagingDirectSP->setParameter("messagingJson", stringOutputStream.str());
+
+            sendInteraction(*embeddedMessagingDirectSP);
+        }
+    }
+}
+
+void SynchronizedFederate::sendInteraction(
+  const std::string &objectReflectorJson,
+  const std::string &hlaClassName,
+  const std::string &federateSequence,
+  const StringSet &federateNameSet,
+  double time
+) {
+
+    for(const std::string &federateName : federateNameSet) {
+        const std::string embeddedMessagingHlaClassName =
+          EmbeddedMessaging::get_hla_class_name() + "." + federateName;
+        InteractionRoot::SP embeddedMessagingForNetworkFederateSP(new InteractionRoot(embeddedMessagingHlaClassName));
+        embeddedMessagingForNetworkFederateSP->setParameter("command", "object");
+        embeddedMessagingForNetworkFederateSP->setParameter("hlaClassName", hlaClassName);
+        embeddedMessagingForNetworkFederateSP->setParameter("federateSequence", federateSequence);
+        embeddedMessagingForNetworkFederateSP->setParameter("messagingJson", objectReflectorJson);
+
+        if (time >= 0) {
+            sendInteraction(*embeddedMessagingForNetworkFederateSP, time);
+        } else {
+            sendInteraction(*embeddedMessagingForNetworkFederateSP);
+        }
+    }
+}
+
+void SynchronizedFederate::receiveEmbeddedInteraction(EmbeddedMessaging::SP embeddedMessagingSP, double timestamp) {
+    const std::string command = embeddedMessagingSP->get_command();
+    const std::string hlaClassName = embeddedMessagingSP->get_hlaClassName();
+    const std::string federateSequence = embeddedMessagingSP->get_federateSequence();
+
+    if (command == "discover") {
+        std::istringstream jsonInputStream(embeddedMessagingSP->get_messagingJson());
+
+        Json::Value jsonObject;
+        jsonInputStream >> jsonObject;
+
+        int objectHandle = jsonObject["object_handle"].asInt();
+        if (
+          ObjectRoot::get_object_hla_class_name_set().find(hlaClassName) ==
+            ObjectRoot::get_object_hla_class_name_set().end()
+        ) {
+            BOOST_LOG_SEV( get_logger(), error ) << "SynchronizedFederate.receiveEmbeddedInteraction: "
+              << "Bad class name \"" << hlaClassName << "\" on discover";
+            return;
+        }
+        ObjectRoot::add_object_update_embedded_only_id(hlaClassName, objectHandle);
+        return;
+    }
+
+    if (command == "interaction") {
+        if (!InteractionRoot::get_is_soft_subscribed(hlaClassName)) {
+            BOOST_LOG_SEV( get_logger(), warning ) << "SynchronizedFederate.receiveEmbeddedInteraction: "
+              << "interaction class \"" << hlaClassName << "\" not soft subscribed";
+            return;
+        }
+
+        InteractionRoot::SP embeddedInteractionSP =
+          InteractionRoot::fromJson(embeddedMessagingSP->get_messagingJson());
+        embeddedInteractionSP->setTime(embeddedMessagingSP->getTime());
+
+        receiveInteractionAux(embeddedInteractionSP, timestamp);
+        return;
+    }
+
+    if (command == "object") {
+        if (!ObjectRoot::get_is_soft_subscribed(hlaClassName)) {
+            BOOST_LOG_SEV( get_logger(), warning ) << "SynchronizedFederate.receiveEmbeddedInteraction: "
+              << "object class \"" << hlaClassName << "\" not soft subscribed";
+            return;
+        }
+
+        ObjectRoot::ObjectReflector::SP objectReflectorSP =
+          ObjectRoot::fromJson(embeddedMessagingSP->get_messagingJson());
+        objectReflectorSP->setFederateSequence(federateSequence);
+
+        addObjectReflectorSP(objectReflectorSP);
+        return;
+    }
+
+    BOOST_LOG_SEV( get_logger(), warning ) << "SynchronizedFederate.receiveEmbeddedInteraction: "
+      << "unrecognized command \"" << command;
+}
+
 
 void SynchronizedFederate::enableTimeConstrained( void ) throw( RTI::FederateNotExecutionMember ){
     if ( !_timeConstrainedNotEnabled ) return;
@@ -358,13 +509,13 @@ void SynchronizedFederate::resignFederationExecution( RTI::ResignAction resignAc
         }
     }
     
-    FederateResignInteraction::SP intResign = FederateResignInteraction::create();
-    intResign->set_FederateType( getFederateType() );
-    intResign->set_FederateId( getFederateId() );
-    intResign->set_IsLateJoiner(get_IsLateJoiner());
+    FederateResignInteraction::SP intResignSP = FederateResignInteraction::create();
+    intResignSP->set_FederateType( getFederateType() );
+    intResignSP->set_FederateId( getFederateId() );
+    intResignSP->set_IsLateJoiner(get_IsLateJoiner());
 
     std::cout << "Sending Resign interaction #-"  << std::endl;
-    sendInteraction( intResign, _currentTime );
+    sendInteraction( *intResignSP, _currentTime );
 }
 
 /**

@@ -284,10 +284,6 @@ public:
         InteractionRoot::remove_federate_name_soft_publish(get_hla_class_name(), networkFederateName);
     }
 
-    std::set<std::string> getFederateNameSoftPublishSet() {
-        return InteractionRoot::get_federate_name_soft_publish_set(get_hla_class_name());
-    }
-
     //-----------------------------------------------------
     // END METHODS FOR PUBLISHING/SUBSCRIBING-TO THIS CLASS
     //-----------------------------------------------------
@@ -453,6 +449,9 @@ public:
     //------------------------------
     // END INSTANCE CREATION METHODS
     //------------------------------
+
+    static StringList get_federate_sequence_list(const std::string &federateSequence);
+
 private:
     static bool is_federate_sequence(const std::string &federateSequence);
 

@@ -35,6 +35,7 @@
 #include "BasicUdpApp.h"
 #include "AttackCoordinator.h"
 #include <InteractionRoot_p/C2WInteractionRoot_p/ActionBase_p/NetworkPacket.hpp>
+#include <ObjectRoot.hpp>
 
 /**
  * TODO - Generated class
@@ -42,6 +43,9 @@
 class BasicUdpAppWrapper : public BasicUdpApp {
 public:
     using InteractionRoot = ::org::cpswt::hla::InteractionRoot;
+    using C2WInteractionRoot = ::org::cpswt::hla::InteractionRoot_p::C2WInteractionRoot;
+    using ObjectRoot = ::org::cpswt::hla::ObjectRoot;
+    using ObjectReflector = ObjectRoot::ObjectReflector;
     using NetworkPacket = ::org::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::NetworkPacket;
 
 	typedef BasicUdpApp Super;
@@ -88,11 +92,96 @@ protected:
 	virtual void initialize( int stage ) override;
 	virtual void handleMessage(omnetpp::cMessage *msg) override;
 	virtual void sendToUDP( inet::Packet *msg, const inet::Ipv4Address& destAddr, int destPort ) override;
-	void setToDefaultValues( InteractionRoot &interactionRoot );
-    void setToDefaultValues( InteractionRoot::SP interactionRootSP ) {
-        setToDefaultValues( *interactionRootSP );
+
+    template <typename CVSMAP> void setToDefaultValues(
+      const CVSMAP &classAndPropertyValueSPMap,
+      const CVSMAP &defaultClassAndPropertyValueSPMap
+    ) {
+        for(
+          typename CVSMAP::const_iterator cvmCit = classAndPropertyValueSPMap.begin() ;
+          cvmCit != classAndPropertyValueSPMap.end() ;
+          ++cvmCit
+        ) {
+            TypeMedley &value = *cvmCit->second;
+            TypeMedley &defaultValue = *defaultClassAndPropertyValueSPMap.find(cvmCit->first)->second;
+
+            value.setValue(defaultValue);
+        }
     }
-	virtual void tweakIncoming(InteractionRoot &interactionRoot, AttackCoordinator::IntegrityAttackParams &iap);
+
+	virtual void setToDefaultValues( InteractionRoot &interactionRoot ) {
+	    InteractionRoot defaultInteractionRoot( interactionRoot.getInstanceHlaClassName() );
+
+        const InteractionRoot::ClassAndPropertyNameValueSPMap &classAndPropertyValueSPMap =
+          interactionRoot.getClassAndPropertyNameValueSPMap();
+        const InteractionRoot::ClassAndPropertyNameValueSPMap &defaultClassAndPropertyValueSPMap =
+          defaultInteractionRoot.getClassAndPropertyNameValueSPMap();
+
+        setToDefaultValues(classAndPropertyValueSPMap, defaultClassAndPropertyValueSPMap);
+	}
+    virtual void setToDefaultValues( ObjectReflector &objectReflector ) {
+	    ObjectRoot defaultObjectRoot( objectReflector.getHlaClassName() );
+
+        const ObjectRoot::ClassAndPropertyNameValueSPMap &classAndPropertyValueSPMap =
+          objectReflector.getClassAndPropertyNameValueSPMap();
+        const ObjectRoot::ClassAndPropertyNameValueSPMap &defaultClassAndPropertyValueSPMap =
+          defaultObjectRoot.getClassAndPropertyNameValueSPMap();
+
+        setToDefaultValues(classAndPropertyValueSPMap, defaultClassAndPropertyValueSPMap);
+    }
+
+    template<typename CVSMAP> void tweakIncoming(
+      CVSMAP &classAndPropertyValueSPMap,
+      AttackCoordinator::IntegrityAttackParams &iap
+    ) {
+        for(
+          typename CVSMAP::const_iterator cvmCit = classAndPropertyValueSPMap.begin() ;
+          cvmCit != classAndPropertyValueSPMap.end() ;
+          ++cvmCit
+        ) {
+            const ClassAndPropertyName &classAndPropertyName = cvmCit->first;
+            if (classAndPropertyName.getClassName() == C2WInteractionRoot::get_hla_class_name()) {
+                continue;
+            }
+
+            TypeMedley &value = *cvmCit->second;
+
+            switch( value.getDataType() ) {
+
+                case TypeMedley::BOOLEAN: {
+                    if ( iap.getBooleanEnableFlip() ) {
+                        value.setValue( !value.asBool() );
+                    }
+                    break;
+                }
+                case TypeMedley::DOUBLE: {
+                    value.setValue( value.asDouble() * iap.getDoubleMultiplier() + iap.getDoubleAdder() );
+                    break;
+                }
+                case TypeMedley::INTEGER: {
+                    value.setValue( value.asInt() * iap.getIntMultiplier() + iap.getIntAdder() );
+                    break;
+                }
+                case TypeMedley::LONG: {
+                    value.setValue( value.asLong() * iap.getLongMultiplier() + iap.getLongAdder() );
+                    break;
+                }
+                case TypeMedley::STRING: {
+                    if (!iap.getStringReplacement().empty()) {
+                        value.setValue( iap.getStringReplacement() );
+                    }
+                }
+            }
+        }
+    }
+	virtual void tweakIncoming(InteractionRoot &interactionRoot, AttackCoordinator::IntegrityAttackParams &iap) {
+        tweakIncoming(interactionRoot.getClassAndPropertyNameValueSPMap(), iap);
+	}
+	virtual void tweakIncoming(
+	  ObjectReflector &objectReflector, AttackCoordinator::IntegrityAttackParams &iap
+	) {
+        tweakIncoming(objectReflector.getClassAndPropertyNameValueSPMap(), iap);
+	}
 };
 
 #endif
