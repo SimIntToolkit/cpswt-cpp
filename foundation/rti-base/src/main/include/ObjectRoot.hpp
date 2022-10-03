@@ -102,7 +102,7 @@ public:
     typedef std::map<int, std::string> IntegerStringMap;
     typedef std::map<std::string, int> StringIntegerMap;
     typedef std::map<std::string, bool> StringBooleanMap;
-    
+
     typedef boost::shared_ptr<StringSet> StringSetSP;
     typedef std::map<std::string, StringSetSP> StringStringSetSPMap;
 
@@ -241,7 +241,13 @@ public:
         void initHlaClassName() {
             ObjectRoot::SP objectRootSP = get_object( _objectHandle );
             if (objectRootSP) {
-                _hlaClassName = objectRootSP->getInstanceHlaClassName();
+                const std::string &hlaClassName = objectRootSP->getInstanceHlaClassName();
+                if (!_hlaClassName.empty() && _hlaClassName != hlaClassName) {
+                    BOOST_LOG_SEV( get_logger(), warning ) << "HLA class name from object with object handle"
+                      << _objectHandle << "(\"" << hlaClassName << "\") not the same as that provided (\""
+                      << _hlaClassName << "\") -- Overriding provided";
+                }
+                _hlaClassName = hlaClassName;
             }
         }
 
@@ -252,6 +258,19 @@ public:
          RTI::ObjectHandle objectHandle, const ClassAndPropertyNameValueSPMap &classAndPropertyNameValueSPMap
         ) :
          _objectHandle(objectHandle),
+         _federateSequence("[]"),
+         _classAndPropertyNameValueSPMap( classAndPropertyNameValueSPMap ),
+         _time(-1) {
+            initHlaClassName();
+        }
+
+        ObjectReflector(
+         RTI::ObjectHandle objectHandle,
+         const std::string &hlaClassName,
+         const ClassAndPropertyNameValueSPMap &classAndPropertyNameValueSPMap
+        ) :
+         _objectHandle(objectHandle),
+         _hlaClassName(hlaClassName),
          _federateSequence("[]"),
          _classAndPropertyNameValueSPMap( classAndPropertyNameValueSPMap ),
          _time(-1) {
@@ -284,6 +303,20 @@ public:
 
         ObjectReflector(
          RTI::ObjectHandle objectHandle,
+         const std::string &hlaClassName,
+         const ClassAndPropertyNameValueSPMap &classAndPropertyNameValueSPMap,
+         double time
+        ) :
+         _objectHandle( objectHandle ),
+         _hlaClassName(hlaClassName),
+         _federateSequence("[]"),
+         _classAndPropertyNameValueSPMap( classAndPropertyNameValueSPMap ),
+         _time( time ) {
+            initHlaClassName();
+        }
+
+        ObjectReflector(
+         RTI::ObjectHandle objectHandle,
          const RTI::AttributeHandleValuePairSet& theAttributes,
          double time
         ) :
@@ -301,6 +334,20 @@ public:
          const RTI::FedTime &fedTime
         ) :
          _objectHandle( objectHandle ),
+         _federateSequence("[]"),
+         _classAndPropertyNameValueSPMap( classAndPropertyNameValueSPMap ),
+         _time(  RTIfedTime( fedTime ).getTime()  ) {
+            initHlaClassName();
+        }
+
+        ObjectReflector(
+         RTI::ObjectHandle objectHandle,
+         const std::string &hlaClassName,
+         const ClassAndPropertyNameValueSPMap &classAndPropertyNameValueSPMap,
+         const RTI::FedTime &fedTime
+        ) :
+         _objectHandle( objectHandle ),
+         _hlaClassName(hlaClassName),
          _federateSequence("[]"),
          _classAndPropertyNameValueSPMap( classAndPropertyNameValueSPMap ),
          _time(  RTIfedTime( fedTime ).getTime()  ) {

@@ -329,22 +329,22 @@ void SynchronizedFederate::receiveEmbeddedInteraction(EmbeddedMessaging::SP embe
     }
 
     if (command == "object") {
-        if (!ObjectRoot::get_is_soft_subscribed(hlaClassName)) {
+        if (!ObjectRoot::get_is_subscribed(hlaClassName) && !ObjectRoot::get_is_soft_subscribed(hlaClassName)) {
             BOOST_LOG_SEV( get_logger(), warning ) << "SynchronizedFederate.receiveEmbeddedInteraction: "
-              << "object class \"" << hlaClassName << "\" not soft subscribed";
+              << "object class \"" << hlaClassName << "\" neither subscribed nor soft subscribed";
             return;
         }
 
         ObjectRoot::ObjectReflector::SP objectReflectorSP =
           ObjectRoot::fromJson(embeddedMessagingSP->get_messagingJson());
         objectReflectorSP->setFederateSequence(federateSequence);
-
+std::cout << "Adding reflector for class \"" << hlaClassName << "\"" << std::endl;
         addObjectReflectorSP(objectReflectorSP);
         return;
     }
 
     BOOST_LOG_SEV( get_logger(), warning ) << "SynchronizedFederate.receiveEmbeddedInteraction: "
-      << "unrecognized command \"" << command;
+      << "unrecognized command \"" << command << "\"";
 }
 
 
