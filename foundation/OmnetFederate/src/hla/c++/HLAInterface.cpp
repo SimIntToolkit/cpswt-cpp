@@ -855,7 +855,8 @@ void HLAInterface::processObjectReflectors() {
 
         // GET FULL HLA CLASS NAME OF INTERACTION
         std::string hlaClassName = objectReflectorSP->getHlaClassName();
-
+std::cout << "Received reflector for \"" << hlaClassName << "\"" << std::endl;
+std::cout << "Reflector: " << objectReflectorSP << std::endl;
         // IS THIS CLASS NAME ONE THAT COULD BE PROPAGATED?
         // IF SO, CHECK SEQUENCE OF FEDERATES IT CAME TRHOUGH
         StringList federateSequenceList(
@@ -1060,7 +1061,17 @@ std::cout << "3" << std::endl;
 
 std::cout << "4" << std::endl;
     for(const std::string &dynamicSoftSubscribeHlaClassName: _dynamicSoftSubscribeFullHlaClassNameSet) {
-        InteractionRoot::soft_subscribe_interaction(dynamicSoftSubscribeHlaClassName, getRTI() );
+        if (
+          dynamicSoftSubscribeHlaClassName == "InteractionRoot" ||
+          dynamicSoftSubscribeHlaClassName.find("InteractionRoot.") == 0
+        ) {
+            InteractionRoot::soft_subscribe_interaction(dynamicSoftSubscribeHlaClassName, getRTI() );
+        } else if (
+          dynamicSoftSubscribeHlaClassName == "ObjectRoot" ||
+          dynamicSoftSubscribeHlaClassName.find("ObjectRoot.") == 0
+        ) {
+            ObjectRoot::soft_subscribe_object(dynamicSoftSubscribeHlaClassName, getRTI() );
+        }
     }
 
     SubscribedInteractionFilter::get_singleton().initialize();
@@ -1134,6 +1145,7 @@ void HLAInterface::handleMessage( omnetpp::cMessage* msg ) {
     // PROCESS ANY INCOMING INTERACTIONS
     if ( msg == _hlaArrivalMsg ) {
         processInteractions();
+        processObjectReflectors();
         _noHlaArrivalFlag = true;
         return;
     }

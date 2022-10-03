@@ -822,6 +822,7 @@ std::string ObjectRoot::toJson() {
 }
 
 ObjectRoot::ObjectReflector::SP ObjectRoot::fromJson(const std::string &jsonString) {
+std::cout << "jsonString = " << jsonString << std::endl;
     std::istringstream jsonInputStream(jsonString);
 
     Json::Value topLevelJSONObject;
@@ -848,10 +849,10 @@ ObjectRoot::ObjectReflector::SP ObjectRoot::fromJson(const std::string &jsonStri
         const std::string memberName(*mbrCit);
         ClassAndPropertyName classAndPropertyName(memberName);
 
-        if (subscribedAttributeNameSet.find(classAndPropertyName) == subscribedAttributeNameSet.end()) {
-            // LOG ERROR
-            continue;
-        }
+//        if (subscribedAttributeNameSet.find(classAndPropertyName) == subscribedAttributeNameSet.end()) {
+//            // LOG ERROR
+//            continue;
+//        }
 
         Value &initialValue = *get_class_and_property_name_initial_value_sp_map().find(classAndPropertyName)->second;
         classAndPropertyNameValueSPMap[classAndPropertyName] = ValueSP(new Value(initialValue));
@@ -907,7 +908,7 @@ ObjectRoot::ObjectReflector::SP ObjectRoot::fromJson(const std::string &jsonStri
         }
     }
 
-    ObjectReflector::SP objectReflectorSP(new ObjectReflector(objectHandle, classAndPropertyNameValueSPMap));
+    ObjectReflector::SP objectReflectorSP(new ObjectReflector(objectHandle, className, classAndPropertyNameValueSPMap));
     objectReflectorSP->setFederateSequence(federateSequence);
     return objectReflectorSP;
 }
@@ -1080,7 +1081,7 @@ void ObjectRoot::readFederateDynamicMessageClass(const std::string &hlaClassName
 
             Json::Value typeDataMap = messagingPropertyDataMap[propertyName];
             if (!typeDataMap["Hidden"].asBool()) {
-                const std::string propertyTypeString = typeDataMap["AttributeType"].asString();
+                const std::string propertyTypeString = typeDataMap["ParameterType"].asString();
                 get_class_and_property_name_initial_value_sp_map()[classAndPropertyName] =
                   ValueSP( new Value(*get_type_initial_value_sp_map()[propertyTypeString]) );
             }

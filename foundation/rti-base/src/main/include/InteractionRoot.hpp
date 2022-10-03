@@ -102,7 +102,7 @@ public:
     typedef std::map<int, std::string> IntegerStringMap;
     typedef std::map<std::string, int> StringIntegerMap;
     typedef std::map<std::string, bool> StringBooleanMap;
-    
+
     typedef boost::shared_ptr<StringSet> StringSetSP;
     typedef std::map<std::string, StringSetSP> StringStringSetSPMap;
 
