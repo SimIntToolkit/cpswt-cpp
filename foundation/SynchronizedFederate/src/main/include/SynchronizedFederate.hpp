@@ -284,7 +284,6 @@ protected:
 
         std::ifstream federationJsonInputStream(federationJsonFileName);
         std::ifstream federateDynamicMessagingClassJsonInputStream(federateDynamicMessagingClassesJsonFileName);
-
         if (rejectSourceFederateIdJsonFileName.empty()) {
             initializeDynamicMessaging(
               federationJsonInputStream,
@@ -784,11 +783,13 @@ public:
     }
 
     static ObjectReflector::SP getNextObjectReflectorSP( void ) {
+std::cout << "getNextObjectReflectorSP() called" << std::endl;
         if ( getObjectReflectorSPQueue().empty() ) return ObjectReflector::SP();
 
         ObjectReflectorSPQueue::iterator orqItr = getObjectReflectorSPQueue().begin();
         ObjectReflector::SP objectReflectorSP = *orqItr;
         getObjectReflectorSPQueue().erase( orqItr );
+std::cout << "returning objectReflectorSP" << std::endl;
         return objectReflectorSP;
     }
 
