@@ -162,7 +162,7 @@ void GridlabDFederate::execute( void )
 			output->get_Units() << ": " << 
 			output->get_Operation() <<
 			std::endl;
-		      output->sendInteraction( getRTI(), _currentTime + getLookAhead() );
+		      output->sendInteraction( getRTI(), _currentTime + getLookahead() );
 		    }
 		}
 	    }

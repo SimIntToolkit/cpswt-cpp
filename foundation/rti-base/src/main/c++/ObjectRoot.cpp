@@ -313,19 +313,14 @@ ClassAndPropertyNameSP ObjectRoot::findProperty(
 
 ObjectRoot::PropertyHandleValuePairSetSP ObjectRoot::createPropertyHandleValuePairSetSP( bool force ) {
 
-    int count;
-    if (force) {
-        count = _classAndPropertyNameValueSPMap.size();
-    } else {
-        count = 0;
-        for(
-          ClassAndPropertyNameValueSPMap::const_iterator cvmCit = _classAndPropertyNameValueSPMap.begin();
-          cvmCit != _classAndPropertyNameValueSPMap.end();
-          ++cvmCit
-        ) {
-            if (cvmCit->second->shouldBeUpdated(false)) {
-                ++count;
-            }
+    int count = 0;
+    for(
+      const ClassAndPropertyName &key:
+       *get_class_name_published_class_and_property_name_set_sp_map()[getInstanceHlaClassName()]
+    ) {
+        Attribute &attribute = *_classAndPropertyNameValueSPMap[key];
+        if (attribute.getShouldBeUpdated(force)) {
+            ++count;
         }
     }
 
@@ -333,19 +328,45 @@ ObjectRoot::PropertyHandleValuePairSetSP ObjectRoot::createPropertyHandleValuePa
     PropertyHandleValuePairSet &propertyHandleValuePairSet = *propertyHandleValuePairSetSP;
 
     for(
-      ClassAndPropertyNameValueSPMap::const_iterator cvmCit = _classAndPropertyNameValueSPMap.begin();
-      cvmCit != _classAndPropertyNameValueSPMap.end();
-      ++cvmCit
+      const ClassAndPropertyName &key:
+       *get_class_name_published_class_and_property_name_set_sp_map()[getInstanceHlaClassName()]
     ) {
-        if (cvmCit->second->shouldBeUpdated(force)) {
-            int handle = get_class_and_property_name_handle_map()[cvmCit->first];
-            std::string value = cvmCit->second->getStringRepresentation();
+        Attribute &attribute = *_classAndPropertyNameValueSPMap[key];
+        if (attribute.getShouldBeUpdated(force)) {
+            int handle = get_class_and_property_name_handle_map()[key];
+            std::string value = attribute.getStringRepresentation();
             propertyHandleValuePairSet.add(handle, value.c_str(), value.size());
-            cvmCit->second->setHasBeenUpdated();
+            attribute.setHasBeenUpdated();
         }
     }
 
     return propertyHandleValuePairSetSP;
+}
+
+ClassAndPropertyNameSet ObjectRoot::getAttributesToBeUpdatedClassAndPropertyNameSet() {
+    ClassAndPropertyNameSet attributesToBeUpdatedSet;
+    for(
+      const ClassAndPropertyName &key:
+       *get_class_name_published_class_and_property_name_set_sp_map()[getInstanceHlaClassName()]
+    ) {
+        Attribute &attribute = *_classAndPropertyNameValueSPMap[key];
+        if (attribute.getShouldBeUpdated(false)) {
+            attributesToBeUpdatedSet.insert(key);
+        }
+    }
+
+    return attributesToBeUpdatedSet;
+}
+
+void ObjectRoot::restoreAttributesToBeUpdated(const ClassAndPropertyNameSet &classAndPropertyNameSet) {
+    for(
+      const ClassAndPropertyName &key:
+       *get_class_name_published_class_and_property_name_set_sp_map()[getInstanceHlaClassName()]
+    ) {
+        Attribute &attribute = *_classAndPropertyNameValueSPMap[key];
+        bool shouldBeUpdated = classAndPropertyNameSet.find(key) != classAndPropertyNameSet.end();
+        attribute.setShouldBeUpdated(shouldBeUpdated);
+    }
 }
 
 const ObjectRoot::Value &ObjectRoot::getAttribute( int propertyHandle ) const {
@@ -766,7 +787,7 @@ void ObjectRoot::updateAttributeValues( RTI::RTIambassador *rti, bool force ) {
     }
 }
 
-std::string ObjectRoot::toJson() {
+std::string ObjectRoot::toJson(bool force) {
     Json::Value topLevelJSONObject(Json::objectValue);
     topLevelJSONObject["messaging_type"] = "object";
     topLevelJSONObject["messaging_name"] = getInstanceHlaClassName();
@@ -781,7 +802,7 @@ std::string ObjectRoot::toJson() {
     ) {
         const std::string key(cvmItr->first);
         Attribute &value = *cvmItr->second;
-        if (value.shouldBeUpdated(false)) {
+        if (value.getShouldBeUpdated(force)) {
             switch(value.getDataType()) {
                 case(TypeMedley::BOOLEAN):
                     propertyJSONObject[key] = static_cast<bool>(value);
@@ -822,7 +843,6 @@ std::string ObjectRoot::toJson() {
 }
 
 ObjectRoot::ObjectReflector::SP ObjectRoot::fromJson(const std::string &jsonString) {
-std::cout << "jsonString = " << jsonString << std::endl;
     std::istringstream jsonInputStream(jsonString);
 
     Json::Value topLevelJSONObject;
@@ -849,10 +869,10 @@ std::cout << "jsonString = " << jsonString << std::endl;
         const std::string memberName(*mbrCit);
         ClassAndPropertyName classAndPropertyName(memberName);
 
-//        if (subscribedAttributeNameSet.find(classAndPropertyName) == subscribedAttributeNameSet.end()) {
-//            // LOG ERROR
-//            continue;
-//        }
+        if (subscribedAttributeNameSet.find(classAndPropertyName) == subscribedAttributeNameSet.end()) {
+            // LOG ERROR
+            continue;
+        }
 
         Value &initialValue = *get_class_and_property_name_initial_value_sp_map().find(classAndPropertyName)->second;
         classAndPropertyNameValueSPMap[classAndPropertyName] = ValueSP(new Value(initialValue));
