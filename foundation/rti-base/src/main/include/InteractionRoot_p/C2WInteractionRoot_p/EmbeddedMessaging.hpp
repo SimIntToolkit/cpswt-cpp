@@ -231,7 +231,7 @@ public:
      * Unpublishes the org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.EmbeddedMessaging interaction class for a federate.
      *
      * @param rti handle to the Local RTI Component, usu. obtained through the
-     *            {@link SynchronizedFederate#getLRC()} call
+     *            {@link SynchronizedFederate#getRTI()} call
      */
     static void unpublish_interaction(RTI::RTIambassador *rti) {
         InteractionRoot::unpublish_interaction( get_hla_class_name(), rti);

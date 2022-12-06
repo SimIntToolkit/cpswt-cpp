@@ -70,8 +70,11 @@ public:
         _oldValueInit = true;
     }
 
-    bool shouldBeUpdated(bool force) const {
+    bool getShouldBeUpdated(bool force) const {
         return force || !_oldValueInit || _oldValue != _value;
+    }
+    void setShouldBeUpdated(bool shouldBeUpdated) {
+        _oldValueInit = !shouldBeUpdated;
     }
 };
 

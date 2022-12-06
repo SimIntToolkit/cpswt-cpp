@@ -371,6 +371,10 @@ public:
             else  ObjectRoot::reflect( _objectHandle, _classAndPropertyNameValueSPMap, _time );
         }
 
+        ClassAndPropertyNameValueSPMap &getClassAndPropertyNameValueSPMap() {
+            return _classAndPropertyNameValueSPMap;
+        }
+
         const ClassAndPropertyNameValueSPMap &getClassAndPropertyNameValueSPMap() const {
             return _classAndPropertyNameValueSPMap;
         }
@@ -996,6 +1000,10 @@ public:
     }
 
     PropertyHandleValuePairSetSP createPropertyHandleValuePairSetSP( bool force );
+
+    ClassAndPropertyNameSet getAttributesToBeUpdatedClassAndPropertyNameSet();
+
+    void restoreAttributesToBeUpdated(const ClassAndPropertyNameSet &classAndPropertyNameSet);
 
     //------------------------------------------------
     // END CLASS-AND-PROPERTY-NAME PROPERTY-HANDLE MAP
@@ -1625,7 +1633,7 @@ public:
      * Unpublishes the org.cpswt.hla.ObjectRoot object class for a federate.
      *
      * @param rti handle to the Local RTI Component, usu. obtained through the
-     *            {@link SynchronizedFederate#getLRC()} call
+     *            {@link SynchronizedFederate#getRTI()} call
      */
     static void unpublish_object(RTI::RTIambassador *rti) {
         unpublish_object( get_hla_class_name(), rti);
@@ -2106,7 +2114,11 @@ public:
     // END INSTANCE VERSIONS OF STATIC METHODS DEFINED IN DERIVED CLASSES
     //-------------------------------------------------------------------
 
-    std::string toJson();
+    std::string toJson(bool force);
+
+    std::string toJson() {
+        return toJson(false);
+    }
 
     static ObjectReflector::SP fromJson(const std::string &jsonString);
 
