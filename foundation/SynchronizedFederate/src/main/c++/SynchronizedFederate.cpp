@@ -43,8 +43,6 @@
 #include <sstream>
 
 
-C2WLogger* SynchronizedFederate::_logger = &C2W_FED_LOGGER_CLS::get_singleton();
-
 const std::string SynchronizedFederate::FEDERATION_MANAGER_NAME( "manager" );
 
 const std::string SynchronizedFederate::ReadyToPopulateSynch( "readyToPopulate" );
@@ -85,67 +83,43 @@ void SynchronizedFederate::createRTI( void ) {
 
 }
 
-// void SynchronizedFederate::joinFederation( const std::string &federation_id, const std::string &federate_id, bool ignoreLockFile ) {
+void SynchronizedFederate::notifyFederationOfJoin() {
+
+    // Federate state interaction pubsub
+    FederateJoinInteraction::publish_interaction( getRTI() );
+    FederateResignInteraction::publish_interaction( getRTI() );
+
+    FederateJoinInteraction intJoin;
+
+    intJoin.set_FederateType( getFederateType() );
+    intJoin.set_FederateId( getFederateId() );
+    intJoin.set_IsLateJoiner(get_IsLateJoiner());
+
+
+    std::cout << "Sending Join interaction #-"  << std::endl;
+    std::cout << intJoin << std::endl;
+
+    sendInteraction(intJoin, _currentTime);
+}
+
+void SynchronizedFederate::notifyFederationOfResign() {
+    FederateResignInteraction intResign;
+    intResign.set_FederateType( getFederateType() );
+    intResign.set_FederateId( getFederateId() );
+    intResign.set_IsLateJoiner(get_IsLateJoiner());
+
+    std::cout << "Sending Resign interaction #-"  << std::endl;
+    sendInteraction(intResign, _currentTime);
+}
+
 void SynchronizedFederate::joinFederation() {
-    // std::stringstream temp;  //temp as in temporary
 
-    // std::cout << "[" << federate_id << "] federate joining federation [" << federation_id << "] ... " << std::flush;
-    std::cout << " federate joining federation ...." << std::flush;
-
-    //_federateId = federate_id; (old)
-    // _federationId = federation_id;
-    
-    // _FederateType = federate_id;
-    
-    // int random_variable = std::rand();
-
-    // _federateId =_FederateType + std::string(random_variable);
-
-    //_federateId = _FederateType + std::to_string(random_variable);
-    //_federateId = concat FederateType+GUID
-
-
-
-    // temp<<_FederateType<<random_variable;
-    // _federateId=temp.str();      //str is temp as string
-
-    // _IsLateJoiner = false;
-
-    // federateType ==> federate_id(old) --> Source,Sink,PingCounter
-    // federateID => federateType+GUID
-
-    
+    std::cout << " federate joining federation ... " << std::flush;
 
     bool federationNotPresent = true;
     while( federationNotPresent ) {
         try {
-
-
-            // if(!ignoreLockFile) {
-            //     int descriptor;
-            //     int counter = 0;
-            //     while(   (  descriptor = open( _lockFileName.c_str(), O_RDONLY | O_CREAT | O_EXCL, 0777 )  )  <  0   ) {
-            //         if ( errno == EEXIST || errno == EBUSY ) {
-            //             if ( counter++ >= 60 ) {
-            //                 std::cerr << "ERROR: [" << federate_id << "] federate:  could not open lock file \"" << _lockFileName << "\": timeout after 60 seconds.  Exiting." << std::endl;
-            //                 exit(1);
-            //             }
-            //             std::cout << "Waiting for federation to be created.." << std::endl;
-            //             usleep( 1000000 );
-            //         } else {
-            //             std::cerr << "ERROR: [" << federate_id << "] federate:  could not open lock file \"" << _lockFileName << "\": " << sys_errlist[ errno ] << ".  Exiting." << std::endl;
-            //             exit(1);
-            //         }
-            //     }
-            //     close( descriptor );
-            // }
-
             getRTI()->joinFederationExecution( this->_federateId.c_str(), this->_federationId.c_str(), this );
-
-            // if(!ignoreLockFile) {
-            //     remove( _lockFileName.c_str() );
-            // }
-
             federationNotPresent = false;
         } catch ( RTI::FederateAlreadyExecutionMember & ) {
             std::cout << "failed (already execution member)." << std::endl;
@@ -175,31 +149,14 @@ void SynchronizedFederate::joinFederation() {
       _federationJsonFileName, _federateDynamicMessagingClassesJsonFileName, _rejectSourceFederateIdJsonFileName
     );
 
-    // Federate state interaction pubsub
-    FederateJoinInteraction::publish_interaction( getRTI() );
-    FederateResignInteraction::publish_interaction( getRTI() );
+    ensureSimEndSubscription();
 
-
-    FederateJoinInteraction::SP intJoinSP = FederateJoinInteraction::create();
-    // joinInteraction.set_sourceFed(this.federateId);
-    // joinInteraction.set_originFed(this.federateId);
-    // joinInteraction.setFederateId(this.federateId);
-    // joinInteraction.setFederateType(this.federateType);
-    // joinInteraction.setLateJoiner(this.isLateJoiner);
-
-    intJoinSP->set_FederateType( getFederateType() );
-    intJoinSP->set_FederateId( getFederateId() );
-    intJoinSP->set_IsLateJoiner(get_IsLateJoiner());
-
-    
-    std::cout << "Sending Join interaction #-"  << std::endl;
-    std::cout << *intJoinSP << std::endl;
-    std::cout << "HERE" << std::endl;
-
-    sendInteraction( *intJoinSP, _currentTime );
+    notifyFederationOfJoin();
 }
 
-void SynchronizedFederate::sendInteraction(InteractionRoot &interactionRoot, const StringSet &federateNameSet, double time) {
+void SynchronizedFederate::sendInteraction(
+  InteractionRoot &interactionRoot, const StringSet &federateNameSet, double time
+) {
 
     if (!interactionRoot.isInstanceHlaClassDerivedFromHlaClass(EmbeddedMessaging::get_hla_class_name())) {
 
@@ -271,14 +228,13 @@ void SynchronizedFederate::sendInteraction(
   const StringSet &federateNameSet,
   double time
 ) {
-
     for(const std::string &federateName : federateNameSet) {
         const std::string embeddedMessagingHlaClassName =
           EmbeddedMessaging::get_hla_class_name() + "." + federateName;
         InteractionRoot::SP embeddedMessagingForNetworkFederateSP(new InteractionRoot(embeddedMessagingHlaClassName));
         embeddedMessagingForNetworkFederateSP->setParameter("command", "object");
-        embeddedMessagingForNetworkFederateSP->setParameter("hlaClassName", hlaClassName);
         embeddedMessagingForNetworkFederateSP->setParameter("federateSequence", federateSequence);
+        embeddedMessagingForNetworkFederateSP->setParameter("hlaClassName", hlaClassName);
         embeddedMessagingForNetworkFederateSP->setParameter("messagingJson", objectReflectorJson);
 
         if (time >= 0) {
@@ -288,65 +244,6 @@ void SynchronizedFederate::sendInteraction(
         }
     }
 }
-
-void SynchronizedFederate::receiveEmbeddedInteraction(EmbeddedMessaging::SP embeddedMessagingSP, double timestamp) {
-    const std::string command = embeddedMessagingSP->get_command();
-    const std::string hlaClassName = embeddedMessagingSP->get_hlaClassName();
-    const std::string federateSequence = embeddedMessagingSP->get_federateSequence();
-
-    if (command == "discover") {
-        std::istringstream jsonInputStream(embeddedMessagingSP->get_messagingJson());
-
-        Json::Value jsonObject;
-        jsonInputStream >> jsonObject;
-
-        int objectHandle = jsonObject["object_handle"].asInt();
-        if (
-          ObjectRoot::get_object_hla_class_name_set().find(hlaClassName) ==
-            ObjectRoot::get_object_hla_class_name_set().end()
-        ) {
-            BOOST_LOG_SEV( get_logger(), error ) << "SynchronizedFederate.receiveEmbeddedInteraction: "
-              << "Bad class name \"" << hlaClassName << "\" on discover";
-            return;
-        }
-        ObjectRoot::add_object_update_embedded_only_id(hlaClassName, objectHandle);
-        return;
-    }
-
-    if (command == "interaction") {
-        if (!InteractionRoot::get_is_soft_subscribed(hlaClassName)) {
-            BOOST_LOG_SEV( get_logger(), warning ) << "SynchronizedFederate.receiveEmbeddedInteraction: "
-              << "interaction class \"" << hlaClassName << "\" not soft subscribed";
-            return;
-        }
-
-        InteractionRoot::SP embeddedInteractionSP =
-          InteractionRoot::fromJson(embeddedMessagingSP->get_messagingJson());
-        embeddedInteractionSP->setTime(embeddedMessagingSP->getTime());
-
-        receiveInteractionAux(embeddedInteractionSP, timestamp);
-        return;
-    }
-
-    if (command == "object") {
-        if (!ObjectRoot::get_is_subscribed(hlaClassName) && !ObjectRoot::get_is_soft_subscribed(hlaClassName)) {
-            BOOST_LOG_SEV( get_logger(), warning ) << "SynchronizedFederate.receiveEmbeddedInteraction: "
-              << "object class \"" << hlaClassName << "\" neither subscribed nor soft subscribed";
-            return;
-        }
-
-        ObjectRoot::ObjectReflector::SP objectReflectorSP =
-          ObjectRoot::fromJson(embeddedMessagingSP->get_messagingJson());
-        objectReflectorSP->setFederateSequence(federateSequence);
-std::cout << "Adding reflector for class \"" << hlaClassName << "\"" << std::endl;
-        addObjectReflectorSP(objectReflectorSP);
-        return;
-    }
-
-    BOOST_LOG_SEV( get_logger(), warning ) << "SynchronizedFederate.receiveEmbeddedInteraction: "
-      << "unrecognized command \"" << command << "\"";
-}
-
 
 void SynchronizedFederate::enableTimeConstrained( void ) throw( RTI::FederateNotExecutionMember ){
     if ( !_timeConstrainedNotEnabled ) return;
@@ -422,13 +319,11 @@ void SynchronizedFederate::enableTimeRegulation( double time, double lookahead )
         tick();
     }
 
-
     setLookahead( lookahead );
 }
 
-
 void SynchronizedFederate::disableTimeRegulation()
-throw( RTI::RTIinternalError, RTI::FederateNotExecutionMember ){
+ throw( RTI::RTIinternalError, RTI::FederateNotExecutionMember ){
 
     if ( _timeRegulationNotEnabled ) return;
 
@@ -473,7 +368,6 @@ throw( RTI::RTIinternalError, RTI::FederateNotExecutionMember ){
         }
 }
 
-
 void SynchronizedFederate::resignFederationExecution( RTI::ResignAction resignAction ) {
     bool federationNotResigned = true;
     int resignAttempts = 10;
@@ -508,15 +402,131 @@ void SynchronizedFederate::resignFederationExecution( RTI::ResignAction resignAc
             }
         }
     }
-    
-    FederateResignInteraction::SP intResignSP = FederateResignInteraction::create();
-    intResignSP->set_FederateType( getFederateType() );
-    intResignSP->set_FederateId( getFederateId() );
-    intResignSP->set_IsLateJoiner(get_IsLateJoiner());
-
-    std::cout << "Sending Resign interaction #-"  << std::endl;
-    sendInteraction( *intResignSP, _currentTime );
 }
+
+void SynchronizedFederate::achieveSynchronizationPoint( const std::string &label )
+        throw( RTI::FederateNotExecutionMember, RTI::RTIinternalError ) {
+    bool synchronizationPointNotAccepted = true;
+    while( synchronizationPointNotAccepted ) {
+        try {
+            std::cout << "Synchronizing on label \"" << label << "\"" << std::endl;
+            getRTI()->synchronizationPointAchieved( label.c_str() );
+            while(  _achievedSynchronizationPoints.find( label ) == _achievedSynchronizationPoints.end()  ) {
+#ifdef _WIN32
+                Sleep( 500 );
+#else
+                usleep( 500000 );
+#endif
+                tick();
+            }
+            synchronizationPointNotAccepted = false;
+        } catch ( RTI::FederateNotExecutionMember &f ) {
+            throw f;
+        } catch ( RTI::SynchronizationPointLabelWasNotAnnounced & ) {
+            if (  _achievedSynchronizationPoints.find( label ) != _achievedSynchronizationPoints.end()  ) {
+                synchronizationPointNotAccepted = false;
+            } else {
+                try {
+                    tick();
+                } catch ( RTI::RTIinternalError &r ) {
+                    throw r;
+                } catch ( ... ) {
+#ifdef _WIN32
+                    Sleep( 500 );
+#else
+                    usleep( 500000 );
+#endif
+                }
+            }
+        } catch( ... ) {
+#ifdef _WIN32
+            Sleep( 500 );
+#else
+            usleep( 500000 );
+#endif
+        }
+    }
+}
+
+void SynchronizedFederate::receiveEmbeddedInteraction(EmbeddedMessaging::SP embeddedMessagingSP, double timestamp) {
+    const std::string command = embeddedMessagingSP->get_command();
+    const std::string hlaClassName = embeddedMessagingSP->get_hlaClassName();
+    const std::string federateSequence = embeddedMessagingSP->get_federateSequence();
+
+    if (command == "discover") {
+        std::istringstream jsonInputStream(embeddedMessagingSP->get_messagingJson());
+
+        Json::Value jsonObject;
+        jsonInputStream >> jsonObject;
+
+        int objectHandle = jsonObject["object_handle"].asInt();
+        if (
+          ObjectRoot::get_object_hla_class_name_set().find(hlaClassName) ==
+            ObjectRoot::get_object_hla_class_name_set().end()
+        ) {
+            BOOST_LOG_SEV( get_logger(), error ) << "SynchronizedFederate.receiveEmbeddedInteraction: "
+              << "Bad class name \"" << hlaClassName << "\" on discover";
+            return;
+        }
+        ObjectRoot::add_object_update_embedded_only_id(hlaClassName, objectHandle);
+        return;
+    }
+
+    if (command == "interaction") {
+        if (!InteractionRoot::get_is_soft_subscribed(hlaClassName)) {
+            BOOST_LOG_SEV( get_logger(), warning ) << "SynchronizedFederate.receiveEmbeddedInteraction: "
+              << "interaction class \"" << hlaClassName << "\" not soft subscribed";
+            return;
+        }
+
+        InteractionRoot::SP embeddedInteractionSP =
+          InteractionRoot::fromJson(embeddedMessagingSP->get_messagingJson());
+        embeddedInteractionSP->setTime(embeddedMessagingSP->getTime());
+
+        receiveInteractionAux(embeddedInteractionSP, timestamp);
+        return;
+    }
+
+    if (command == "object") {
+        if (!ObjectRoot::get_is_subscribed(hlaClassName) && !ObjectRoot::get_is_soft_subscribed(hlaClassName)) {
+            BOOST_LOG_SEV( get_logger(), warning ) << "SynchronizedFederate.receiveEmbeddedInteraction: "
+              << "object class \"" << hlaClassName << "\" neither subscribed nor soft subscribed";
+            return;
+        }
+
+        ObjectRoot::ObjectReflector::SP objectReflectorSP =
+          ObjectRoot::fromJson(embeddedMessagingSP->get_messagingJson());
+        objectReflectorSP->setFederateSequence(federateSequence);
+
+        const ClassAndPropertyNameSet &attributeClassAndPropertyNameSet =
+          *ObjectRoot::get_subscribed_class_and_property_name_set_sp(objectReflectorSP->getHlaClassName());
+
+        ObjectRoot::ClassAndPropertyNameValueSPMap &classAndPropertyNameValueSPMap =
+          objectReflectorSP->getClassAndPropertyNameValueSPMap();
+
+        ClassAndPropertyNameSet keys;
+        for(
+          ObjectRoot::ClassAndPropertyNameValueSPMap::const_iterator cnmCit = classAndPropertyNameValueSPMap.begin() ;
+          cnmCit != classAndPropertyNameValueSPMap.end() ;
+          ++cnmCit
+        ) {
+            keys.insert(cnmCit->first);
+        }
+
+        for(const ClassAndPropertyName &classAndPropertyName: keys) {
+            if (attributeClassAndPropertyNameSet.find(classAndPropertyName) == attributeClassAndPropertyNameSet.end()) {
+                classAndPropertyNameValueSPMap.erase(classAndPropertyName);
+            }
+        }
+
+        addObjectReflectorSP(objectReflectorSP);
+        return;
+    }
+
+    BOOST_LOG_SEV( get_logger(), warning ) << "SynchronizedFederate.receiveEmbeddedInteraction: "
+      << "unrecognized command \"" << command << "\"";
+}
+
 
 /**
  * Returns the current time for this federate.
@@ -601,50 +611,6 @@ double SynchronizedFederate::getMinTSOTimestamp( void ) {
         return fedTime.getTime();
     else
         return lbtsTime.getTime();
-}
-
-void SynchronizedFederate::achieveSynchronizationPoint( const std::string &label )
-        throw( RTI::FederateNotExecutionMember, RTI::RTIinternalError ) {
-    bool synchronizationPointNotAccepted = true;
-    while( synchronizationPointNotAccepted ) {
-        try {
-            std::cout << "Synchronizing on label \"" << label << "\"" << std::endl;
-            getRTI()->synchronizationPointAchieved( label.c_str() );
-            while(  _achievedSynchronizationPoints.find( label ) == _achievedSynchronizationPoints.end()  ) {
-#ifdef _WIN32
-                Sleep( 500 );
-#else
-                usleep( 500000 );
-#endif
-                tick();
-            }
-            synchronizationPointNotAccepted = false;
-        } catch ( RTI::FederateNotExecutionMember &f ) {
-            throw f;
-        } catch ( RTI::SynchronizationPointLabelWasNotAnnounced & ) {
-            if (  _achievedSynchronizationPoints.find( label ) != _achievedSynchronizationPoints.end()  ) {
-                synchronizationPointNotAccepted = false;
-            } else {
-                try {
-                    tick();
-                } catch ( RTI::RTIinternalError &r ) {
-                    throw r;
-                } catch ( ... ) {
-#ifdef _WIN32
-                    Sleep( 500 );
-#else
-                    usleep( 500000 );
-#endif
-                }
-            }
-        } catch( ... ) {
-#ifdef _WIN32
-            Sleep( 500 );
-#else
-            usleep( 500000 );
-#endif
-        }
-    }
 }
 
 void SynchronizedFederate::run( void ) {

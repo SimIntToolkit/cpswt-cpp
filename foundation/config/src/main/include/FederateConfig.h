@@ -37,11 +37,11 @@ public:
     FederateConfig(){
 
     }
-    FederateConfig(std::string federateType, std::string federationId, bool isLateJoiner, double lookAhead, double stepSize){
+    FederateConfig(std::string federateType, std::string federationId, bool isLateJoiner, double lookahead, double stepSize){
         this->federateType = federateType;
         this->federationId = federationId;
         this->isLateJoiner=isLateJoiner;
-        this->lookAhead = lookAhead;
+        this->lookahead = lookahead;
         this->stepSize = stepSize;
         this->federateRTIInitWaitTimeMs =20;
         this->configFileName = "configfile.json";
@@ -54,7 +54,7 @@ public:
     std::string federationId;
     bool isLateJoiner;// = false;
     long federateRTIInitWaitTimeMs;//=20;
-    double lookAhead;// = 0.1;
+    double lookahead;// = 0.1;
     double stepSize ;//=1 ;
     std::string federationJsonFileName;
     std::string federateDynamicMessagingClassesJsonFileName;
