@@ -842,10 +842,23 @@ public:
         return objectReflectorSP;
     }
 
-
-    virtual void discoverObjectInstance( RTI::ObjectHandle theObject, RTI::ObjectClassHandle theObjectClass, const char *objectName )
-     throw ( RTI::CouldNotDiscover, RTI::ObjectClassNotKnown, RTI::FederateInternalError) {
+    virtual void discoverObjectInstance(
+      RTI::ObjectHandle theObject, RTI::ObjectClassHandle theObjectClass, const char *objectName
+    ) throw ( RTI::CouldNotDiscover, RTI::ObjectClassNotKnown, RTI::FederateInternalError) {
         ObjectRoot::discover( theObjectClass, theObject );
+    }
+
+    virtual void removeObjectInstance(RTI::ObjectHandle theObject, const char *userSuppliedTag) {
+        ObjectRoot::remove_object(theObject);
+    }
+
+    virtual void removeObjectInstance(
+      RTI::ObjectHandle theObject,
+      const char *userSuppliedTag,
+      const RTI::FedTime& theTime,
+      RTI::EventRetractionHandle retractionHandle
+    ) {
+        ObjectRoot::remove_object(theObject);
     }
 
 private:
