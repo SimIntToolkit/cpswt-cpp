@@ -97,8 +97,6 @@ void SynchronizedFederate::notifyFederationOfJoin() {
 
 
     std::cout << "Sending Join interaction #-"  << std::endl;
-    std::cout << intJoin << std::endl;
-
     sendInteraction(intJoin, _currentTime);
 }
 
@@ -111,6 +109,38 @@ void SynchronizedFederate::notifyFederationOfResign() {
     std::cout << "Sending Resign interaction #-"  << std::endl;
     sendInteraction(intResign, _currentTime);
 }
+
+void SynchronizedFederate::initializeDynamicMessaging(
+  const std::string &federationJsonFileName,
+  const std::string &federateDynamicMessagingClassesJsonFileName,
+  const std::string &rejectSourceFederateIdJsonFileName
+) {
+    if (federationJsonFileName.empty() || federateDynamicMessagingClassesJsonFileName.empty()) {
+        initializeMessaging();
+        return;
+    }
+
+    std::ifstream federationJsonInputStream(federationJsonFileName);
+    std::ifstream federateDynamicMessagingClassJsonInputStream(federateDynamicMessagingClassesJsonFileName);
+    if (rejectSourceFederateIdJsonFileName.empty()) {
+        initializeDynamicMessaging(
+          federationJsonInputStream,
+          federateDynamicMessagingClassJsonInputStream
+        );
+    } else {
+        std::ifstream rejectSourceFederateIdJsonInputStream(rejectSourceFederateIdJsonFileName);
+        initializeDynamicMessaging(
+          federationJsonInputStream,
+          federateDynamicMessagingClassJsonInputStream,
+          rejectSourceFederateIdJsonInputStream
+        );
+        rejectSourceFederateIdJsonInputStream.close();
+    }
+
+    federationJsonInputStream.close();
+    federateDynamicMessagingClassJsonInputStream.close();
+}
+
 
 void SynchronizedFederate::joinFederation() {
 

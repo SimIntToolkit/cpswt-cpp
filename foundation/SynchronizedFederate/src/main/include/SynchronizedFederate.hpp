@@ -51,9 +51,10 @@
 #include <boost/log/attributes.hpp>
 #include <boost/log/utility/setup/common_attributes.hpp>
 
+#ifndef CPSWT_TEST
 #include "NullFederateAmbassador.hh"
-#include "RTI.hh"
-#include "fedtime.hh"
+#endif // CPSWT_TEST
+
 #include "InteractionRoot.hpp"
 #include "ObjectRoot.hpp"
 #include "InteractionRoot_p/C2WInteractionRoot_p/SimulationControl_p/SimEnd.hpp"
@@ -112,9 +113,10 @@ public:
         SF_NEXT_EVENT_REQUEST_AVAILABLE
     };
 
-private:
+protected:
     RTI::RTIambassador *_rti;
 
+private:
     std::string _federationId;
 //    std::string _lockFileName;
 
@@ -233,7 +235,7 @@ private:
         _timeAdvanceNotGranted = timeAdvanceNotGranted;
     }
 
-protected:
+public:
     SynchronizedFederate( void ) :
       _federateId( "" ),
       _federateType(""),
@@ -327,32 +329,7 @@ protected:
       const std::string &federationJsonFileName,
       const std::string &federateDynamicMessagingClassesJsonFileName,
       const std::string &rejectSourceFederateIdJsonFileName
-    ) {
-        if (federationJsonFileName.empty() || federateDynamicMessagingClassesJsonFileName.empty()) {
-            initializeMessaging();
-            return;
-        }
-
-        std::ifstream federationJsonInputStream(federationJsonFileName);
-        std::ifstream federateDynamicMessagingClassJsonInputStream(federateDynamicMessagingClassesJsonFileName);
-        if (rejectSourceFederateIdJsonFileName.empty()) {
-            initializeDynamicMessaging(
-              federationJsonInputStream,
-              federateDynamicMessagingClassJsonInputStream
-            );
-        } else {
-            std::ifstream rejectSourceFederateIdJsonInputStream(rejectSourceFederateIdJsonFileName);
-            initializeDynamicMessaging(
-              federationJsonInputStream,
-              federateDynamicMessagingClassJsonInputStream,
-              rejectSourceFederateIdJsonInputStream
-            );
-            rejectSourceFederateIdJsonInputStream.close();
-        }
-
-        federationJsonInputStream.close();
-        federateDynamicMessagingClassJsonInputStream.close();
-    }
+    );
 
     void notifyFederationOfJoin();
     void notifyFederationOfResign();
@@ -402,6 +379,10 @@ protected:
     }
 
     void registerObject(ObjectRoot &objectRoot);
+
+    void unregisterObject(ObjectRoot &objectRoot) {
+        objectRoot.unregisterObject(getRTI());
+    }
 
     void sendInteraction(
       const std::string &objectReflectorJson,
@@ -723,7 +704,6 @@ public:
             RTIfedTime rtitime(theTime);
             double ltime = rtitime.getTime();
 
-std::cerr << "Received interaction with time" << std::endl;
             InteractionRoot::SP interactionRootSP = InteractionRoot::create_interaction( theInteraction, theParameters, theTime );
             receiveInteractionAux(interactionRootSP, ltime);
 //          interactionRootSP->createLog( ltime, false );
@@ -737,8 +717,8 @@ std::cerr << "Received interaction with time" << std::endl;
      const char *theTag
     )
      throw ( RTI::InteractionClassNotKnown, RTI::InteractionParameterNotKnown, RTI::FederateInternalError) {
-        if ( getMoreATRs() ) {
 
+        if ( getMoreATRs() ) {
             // Himanshu: We normally use only TSO updates, so this shouldn't be
             // called, but due to an RTI bug, it seemingly is getting called. So,
             // for now, use the federate's current time or LBTS whichever is greater
@@ -747,7 +727,6 @@ std::cerr << "Received interaction with time" << std::endl;
 
             InteractionRoot::SP interactionRootSP = InteractionRoot::create_interaction(theInteraction, theParameters);
             receiveInteractionAux(interactionRootSP, assumedTimestamp);
-//          interactionRootSP->createLog( assumedTimestamp, false );
         }
     }
 
@@ -848,7 +827,8 @@ public:
         ObjectRoot::discover( theObjectClass, theObject );
     }
 
-    virtual void removeObjectInstance(RTI::ObjectHandle theObject, const char *userSuppliedTag) {
+    virtual void removeObjectInstance(RTI::ObjectHandle theObject, const char *userSuppliedTag)
+      throw (RTI::ObjectNotKnown, RTI:: FederateInternalError) {
         ObjectRoot::remove_object(theObject);
     }
 
@@ -857,7 +837,7 @@ public:
       const char *userSuppliedTag,
       const RTI::FedTime& theTime,
       RTI::EventRetractionHandle retractionHandle
-    ) {
+    ) throw (RTI::ObjectNotKnown, RTI::InvalidFederationTime, RTI::FederateInternalError) {
         ObjectRoot::remove_object(theObject);
     }
 
@@ -877,9 +857,9 @@ private:
             BOOST_LOG_SEV( get_logger(), info ) <<
               "Direct \"reflectAttributeValues\" for Object (" << theObject << ") of class \"" << hlaClassName <<
                 "\" rejected as it should only reflect via EmbeddedMessaging";
-            return false;
+            return true;
         }
-        return true;
+        return false;
     }
 
 public:
@@ -908,8 +888,8 @@ public:
         }
 
         addObjectReflectorSP( theObject, theAttributes, theTime );
-        RTIfedTime rtitime(theTime);
-        double ltime = rtitime.getTime();
+//        RTIfedTime rtitime(theTime);
+//        double ltime = rtitime.getTime();
     }
 
     void exitGracefully() {

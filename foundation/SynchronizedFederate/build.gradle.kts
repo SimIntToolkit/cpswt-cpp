@@ -28,9 +28,13 @@
  * OR MODIFICATIONS.
  */
 
+import java.nio.file.Files
+import java.util.regex.Pattern
+
 plugins {
     `cpp-library`
     `maven-publish`
+    `cpp-unit-test`
 }
 
 val rtiHome: String? = System.getenv("RTI_HOME")
@@ -48,10 +52,19 @@ library {
         implementation(group="org.cpswt", name="C2WConsoleLogger", version="0.7.0-SNAPSHOT")
         implementation(group="org.cpswt", name="rti-base-cpp", version="0.7.0-SNAPSHOT")
         implementation(group="org.cpswt", name="CPSWTConfig", version="0.7.0-SNAPSHOT")
+
+        testImplementation(group="org.cpswt", name="CppTestHarness", version="0.7.0-SNAPSHOT")
     }
     source.from(file("src/main/c++"))
     publicHeaders.from(file("src/main/include"))
 }
+
+unitTest {
+    targetMachines.set(listOf(machines.linux.x86_64))
+    source.from(file("src/test/c++"))
+    privateHeaders.from(file("src/test/include"))
+}
+
 
 tasks.withType(CppCompile::class.java).configureEach {
     compilerArgs.addAll(toolChain.map { toolChain ->
@@ -62,6 +75,42 @@ tasks.withType(CppCompile::class.java).configureEach {
         }
     })
 }
+
+tasks.withType(LinkExecutable::class.java).configureEach {
+
+    val linkLibraryList = listOf(
+        "cppunit", "jsoncpp", "boost_log_setup", "boost_log", "boost_system", "boost_thread", "pthread", "boost_regex"
+    )
+
+    val linkLibraryOptionList = linkLibraryList.map { "-l$it" }
+
+    linkerArgs.addAll(toolChain.map { toolChain ->
+        when(toolChain) {
+            is Gcc, is Clang -> linkLibraryOptionList
+            else -> listOf()
+        }
+    })
+}
+
+tasks.withType(InstallExecutable::class.java).configureEach {
+    doLast {
+        val libraryDirectory = File(installDirectory.asFile.get(), "lib")
+        val sharedObjectFileList = libraryDirectory.listFiles { file -> file.name.endsWith(".so") }!!.toList()
+
+        val pattern = Pattern.compile("(.*)_(?:debug|release)")
+
+        for(file in sharedObjectFileList) {
+            val fileName = file.name
+            val matcher = pattern.matcher(fileName)
+            if (matcher.find()) {
+                val libName = matcher.group(1);
+                val libraryFile = File(libraryDirectory, "lib${libName}.so")
+                Files.createSymbolicLink(libraryFile.toPath(), File(fileName).toPath())
+            }
+        }
+    }
+}
+
 
 publishing {
     publications {
