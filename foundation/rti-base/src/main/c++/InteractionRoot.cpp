@@ -433,7 +433,7 @@ void InteractionRoot::sendInteraction( RTI::RTIambassador *rti ) {
         try {
             PropertyHandleValuePairSetSP properties = createPropertyHandleValuePairSetSP();
             rti->sendInteraction(  getClassHandle(), *properties, 0  );
-//            createLog( 0, true );
+            interactionNotSent = false;
         } catch ( RTI::InteractionClassNotDefined & ) {
             BOOST_LOG_SEV(get_logger(), error) << "could not send interaction:  interaction class \"" << get_hla_class_name() << "\" not defined";
             return;

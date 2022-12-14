@@ -28,24 +28,16 @@
  * OR MODIFICATIONS.
  */
 
-#include "RTIForTesting.hpp"
-#include "AttributeHandleSetForTesting.hpp"
-#include "PropertyHandleValuePairSetForTesting.hpp"
+#include <cppunit/extensions/TestFactoryRegistry.h>
+#include <cppunit/ui/text/TestRunner.h>
 
-RTI::ParameterHandleValuePairSet *RTI::ParameterSetFactory::create(ULong count) throw (
-  MemoryExhausted, ValueCountExceeded, HandleValuePairMaximumExceeded
-) {
-    return new PropertyHandleValuePairSetForTesting(count);
-}
+#include <iostream>
+#include <boost/lexical_cast.hpp>
+int main(void) {
+    CppUnit::TextUi::TestRunner runner;
+    CppUnit::TestFactoryRegistry &registry = CppUnit::TestFactoryRegistry::getRegistry();
 
-RTI::AttributeHandleValuePairSet *RTI::AttributeSetFactory::create(ULong count) throw (
-  MemoryExhausted, ValueCountExceeded, HandleValuePairMaximumExceeded
-) {
-    return new PropertyHandleValuePairSetForTesting(count);
-}
-
-RTI::AttributeHandleSet* RTI::AttributeHandleSetFactory::create(ULong count) throw (
-  MemoryExhausted, ValueCountExceeded
-) {
-    return new AttributeHandleSetTest();
+    runner.addTest( registry.makeTest() );
+    runner.run();
+    return 0;
 }
