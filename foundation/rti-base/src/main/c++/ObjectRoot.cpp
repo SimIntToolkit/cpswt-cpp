@@ -795,13 +795,13 @@ std::string ObjectRoot::toJson(bool force) {
     topLevelJSONObject["federateSequence"] = "[]";
 
     Json::Value propertyJSONObject(Json::objectValue);
-    for(
-      ClassAndPropertyNameValueSPMap::iterator cvmItr = _classAndPropertyNameValueSPMap.begin() ;
-      cvmItr != _classAndPropertyNameValueSPMap.end() ;
-      ++cvmItr
-    ) {
-        const std::string key(cvmItr->first);
-        Attribute &value = *cvmItr->second;
+
+    ClassAndPropertyNameSetSP publishedClassAndPropertyNameSetSP = getPublishedClassAndPropertyNameSetSP();
+    ClassAndPropertyNameSet &publishedClassAndPropertyNameSet = *publishedClassAndPropertyNameSetSP;
+
+    for(const ClassAndPropertyName &classAndPropertyName: publishedClassAndPropertyNameSet) {
+        const std::string key(classAndPropertyName);
+        Attribute &value = *_classAndPropertyNameValueSPMap[classAndPropertyName];
         if (value.getShouldBeUpdated(force)) {
             switch(value.getDataType()) {
                 case(TypeMedley::BOOLEAN):

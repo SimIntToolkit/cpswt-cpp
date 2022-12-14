@@ -28,24 +28,52 @@
  * OR MODIFICATIONS.
  */
 
-#include "RTIForTesting.hpp"
-#include "AttributeHandleSetForTesting.hpp"
-#include "PropertyHandleValuePairSetForTesting.hpp"
+#include "org/cpswt/hla/embeddedmessagingobjectcpptest/sender/Sender.hpp"
 
-RTI::ParameterHandleValuePairSet *RTI::ParameterSetFactory::create(ULong count) throw (
-  MemoryExhausted, ValueCountExceeded, HandleValuePairMaximumExceeded
-) {
-    return new PropertyHandleValuePairSetForTesting(count);
+
+namespace org {
+ namespace cpswt {
+  namespace hla {
+   namespace embeddedmessagingobjectcpptest {
+    namespace sender {
+
+Sender::Sender(FederateConfig *federateConfig): Super(federateConfig) {
+    //////////////////////////////////////////////////////
+    // TODO register object instances after super(args) //
+    //////////////////////////////////////////////////////
+    registerObject(TestObject_0);
 }
 
-RTI::AttributeHandleValuePairSet *RTI::AttributeSetFactory::create(ULong count) throw (
-  MemoryExhausted, ValueCountExceeded, HandleValuePairMaximumExceeded
-) {
-    return new PropertyHandleValuePairSetForTesting(count);
+void Sender::initialize( void ) {
+    m_currentTime = 0;
+    if ( this->get_IsLateJoiner() ) {
+        m_currentTime = getLBTS() - getLookahead();
+        disableTimeRegulation();
+    }
+    SenderATRCallback advanceTimeRequest(*this);
+    putAdvanceTimeRequest(m_currentTime, advanceTimeRequest);
+    if ( !this->get_IsLateJoiner() ) {
+        readyToPopulate();
+        readyToRun();
+    }
 }
 
-RTI::AttributeHandleSet* RTI::AttributeHandleSetFactory::create(ULong count) throw (
-  MemoryExhausted, ValueCountExceeded
-) {
-    return new AttributeHandleSetTest();
+void Sender::execute() {
+
+    TestObject_0.set_BooleanValue1(false);
+    TestObject_0.set_BooleanValue2(true);
+    TestObject_0.set_ByteValue(42);
+    TestObject_0.set_CharValue('X');
+    TestObject_0.set_DoubleValue(2.7181);
+    TestObject_0.set_FloatValue(3.14f);
+    TestObject_0.set_IntValue(1000000);
+    TestObject_0.set_ShortValue(300);
+    TestObject_0.set_LongValue(1000000000000000000L);
+    TestObject_0.set_StringValue("Hello");
+    updateAttributeValues(TestObject_0, 0.0);
 }
+    } // NAMESPACE "sender"
+   } // NAMESPACE "embeddedmessagingobjectcpptest"
+  } // NAMESPACE "hla"
+ } // NAMESPACE "cpswt"
+} // NAMESPACE "org"
