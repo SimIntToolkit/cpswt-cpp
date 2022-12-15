@@ -16,9 +16,12 @@
 #define GENERIC_HANDLE_VALUE_PAIR_HPP
 
 #include "RTIForTesting.hpp"
+#include <boost/shared_ptr.hpp>
 
-class GenericHandleValuePair
-{
+class GenericHandleValuePair {
+public:
+    typedef boost::shared_ptr<char[]> CharStringSP;
+
 	//----------------------------------------------------------
 	//                    STATIC VARIABLES
 	//----------------------------------------------------------
@@ -26,38 +29,40 @@ class GenericHandleValuePair
 	//----------------------------------------------------------
 	//                   INSTANCE VARIABLES
 	//----------------------------------------------------------
-	private:
-		RTI::Handle theHandle;
-		char *buffer;
-		RTI::ULong valueLength;
+private:
+    RTI::Handle _theHandle;
+    CharStringSP _buffer;
+    RTI::ULong _valueLength;
 
 	//----------------------------------------------------------
 	//                      CONSTRUCTORS
 	//----------------------------------------------------------
-	public:
-		GenericHandleValuePair();
-		~GenericHandleValuePair();
+public:
+    GenericHandleValuePair();
+    ~GenericHandleValuePair() {}
 
 	//----------------------------------------------------------
 	//                    INSTANCE METHODS
 	//----------------------------------------------------------
-	public:
-		RTI::Handle getHandle();
-		void setHandle( RTI::Handle newHandle );
-		void setValue( const char *newData, RTI::ULong newDataLength );
-		char* getValue();
-		RTI::ULong getValueLength();
-		
-		// sets the value to the given data, but DOESN'T COPY IT. this means that
-		// when call this method, it is passing responsibility for deleting it over
-		// to us and making the guarantee that the caller won't delete the data.
-		void setValueButDontCopy( char *newData, RTI::ULong newDataLength );
+public:
+    RTI::Handle getHandle();
+    void setHandle( RTI::Handle newHandle );
+    void setValue( const char *newData, RTI::ULong newDataLength );
+    char* getValue();
+    RTI::ULong getValueLength();
+
+    // sets the value to the given data, but DOESN'T COPY IT. this means that
+    // when call this method, it is passing responsibility for deleting it over
+    // to us and making the guarantee that the caller won't delete the data.
+    void setValueButDontCopy( char *newData, RTI::ULong newDataLength );
 
 	//----------------------------------------------------------
 	//                     STATIC METHODS
 	//----------------------------------------------------------
 
 };
+
+typedef boost::shared_ptr<GenericHandleValuePair> GenericHandleValuePairSP;
 
 #endif
 

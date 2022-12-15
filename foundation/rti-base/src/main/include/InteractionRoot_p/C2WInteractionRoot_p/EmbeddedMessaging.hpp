@@ -231,7 +231,7 @@ public:
      * Unpublishes the org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.EmbeddedMessaging interaction class for a federate.
      *
      * @param rti handle to the Local RTI Component, usu. obtained through the
-     *            {@link SynchronizedFederate#getLRC()} call
+     *            {@link SynchronizedFederate#getRTI()} call
      */
     static void unpublish_interaction(RTI::RTIambassador *rti) {
         InteractionRoot::unpublish_interaction( get_hla_class_name(), rti);
@@ -279,10 +279,6 @@ public:
         InteractionRoot::remove_federate_name_soft_publish(get_hla_class_name(), networkFederateName);
     }
 
-    std::set<std::string> getFederateNameSoftPublishSet() {
-        return InteractionRoot::get_federate_name_soft_publish_set(get_hla_class_name());
-    }
-
     //-----------------------------------------------------
     // END METHODS FOR PUBLISHING/SUBSCRIBING-TO THIS CLASS
     //-----------------------------------------------------
@@ -307,6 +303,28 @@ public:
     //------------------------------
     // PROPERTY MANIPULATION METHODS
     //------------------------------
+
+
+    /**
+     * Set the value of the "command" parameter to "value" for this parameter.
+     *
+     * @param value the new value for the "command" parameter
+     */
+    void set_command(const std::string & newValue) {
+        ClassAndPropertyName key(get_hla_class_name(), "command");
+        Value &value(*_classAndPropertyNameValueSPMap[key]);
+        value.setValue(newValue);
+    }
+
+    /**
+     * Returns the value of the "command" parameter of this interaction.
+     *
+     * @return the value of the "command" parameter
+     */
+    std::string get_command() {
+        ClassAndPropertyName key(get_hla_class_name(), "command");
+        return static_cast<std::string>(*_classAndPropertyNameValueSPMap[key]);
+    }
 
 
     /**

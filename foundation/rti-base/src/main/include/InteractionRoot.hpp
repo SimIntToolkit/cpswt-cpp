@@ -102,7 +102,9 @@ public:
     typedef std::map<int, std::string> IntegerStringMap;
     typedef std::map<std::string, int> StringIntegerMap;
     typedef std::map<std::string, bool> StringBooleanMap;
-    typedef std::map<std::string, std::set<std::string>> StringStringSetMap;
+
+    typedef boost::shared_ptr<StringSet> StringSetSP;
+    typedef std::map<std::string, StringSetSP> StringStringSetSPMap;
 
     typedef RTI::AttributeHandleSet AttributeHandleSet;
     typedef boost::shared_ptr<AttributeHandleSet> AttributeHandleSetSP;
@@ -527,13 +529,9 @@ private:
     static bool get_is_published_aux(const std::string &hlaClassName, bool default_value) {
         StringBooleanMap::const_iterator sbmCit = get_class_name_publish_status_map().find(hlaClassName);
         if (sbmCit == get_class_name_publish_status_map().end()) {
-//            readFederateDynamicMessageClass(hlaClassName);
-//            sbmCit = get_class_name_publish_status_map().find(hlaClassName);
-//            if (sbmCit == get_class_name_publish_status_map().end()) {
-                BOOST_LOG_SEV(get_logger(), error) << "could not get publish status for hla class \"" << hlaClassName
-                  << "\":  class does not exist";
-                return default_value;
-//            }
+            BOOST_LOG_SEV(get_logger(), error) << "could not get publish status for hla class \"" << hlaClassName
+              << "\":  class does not exist";
+            return default_value;
         }
         return sbmCit->second;
     }
@@ -778,34 +776,6 @@ public:
         set_is_soft_subscribed(hlaClassName, false);
     }
 
-    //-----------------------------------------------------------------------------------------------------------
-    // PROPERTY-CLASS-NAME AND PROPERTY-VALUE-SP DATA CLASS
-    // THIS CLASS IS USED ESPECIALLY FOR THE BENEFIT OF THE SET METHOD BELOW.  WHEN A VALUE IS RETRIEVED FROM THE
-    // classPropertyNameValueMap USING A GET METHOD, IT IS PAIRED WITH THE NAME OF THE CLASS IN WHICH THE
-    // PROPERTY IS DEFINED. IN THIS WAY, THE SET METHOD CAN PLACE THE NEW VALUE FOR THE PROPERTY USING THE
-    // CORRECT (CLASS-NAME, PROPERTY-NAME) KEY.
-    //-----------------------------------------------------------------------------------------------------------
- protected:
-    class PropertyClassNameAndValue {
-    private:
-        const std::string hlaClassName;
-        const ValueSP valueSP;
-
-    public:
-        PropertyClassNameAndValue(const std::string &hlaClassName, const ValueSP &localValueSP) :
-         hlaClassName(hlaClassName), valueSP(localValueSP) {}
-
-        const std::string &getClassName() const {
-            return hlaClassName;
-        }
-
-        const ValueSP &getValueSP() const {
-            return valueSP;
-        }
-    };
-
-    typedef boost::shared_ptr<PropertyClassNameAndValue> PropertyClassNameAndValueSP;
-
     //----------------------------------------------
     // CLASS-AND-PROPERTY-NAME PROPERTY-VALUE-SP MAP
     //----------------------------------------------
@@ -824,17 +794,16 @@ public:
     void setParameter(
       const std::string &hlaClassName, const std::string &propertyName, const T &value
     ) {
-        PropertyClassNameAndValueSP propertyClassNameAndValueSP =
-          getParameterAux(hlaClassName, propertyName);
+        ClassAndPropertyNameSP classAndPropertyNameSP = findProperty(hlaClassName, propertyName);
 
-        if (!propertyClassNameAndValueSP) {
-            BOOST_LOG_SEV(get_logger(), error) << "setParameter(\"" << propertyName << "\", "
-              << typeid(T).name() << " value): could not find \"" << propertyName
-              << "\" parameter in class \"" << getInstanceHlaClassName() << "\" or any of its superclasses.";
+        if (!classAndPropertyNameSP) {
+            BOOST_LOG_SEV(get_logger(), error) << "setParameter(\"" << hlaClassName << "\", "
+              << "\"" << propertyName << "\", " << typeid(T).name() << " value): could not find \"" << propertyName
+              << "\" parameter in class \"" << hlaClassName << "\" or any of its superclasses.";
             return;
         }
 
-        Value &currentValue = *propertyClassNameAndValueSP->getValueSP();
+        Value &currentValue = *_classAndPropertyNameValueSPMap[*classAndPropertyNameSP];
 
         if (!currentValue.setValue(value)) {
             BOOST_LOG_SEV(get_logger(), error) << "setParameter(\"" << propertyName << "\", "
@@ -861,29 +830,9 @@ public:
         setParameter(getInstanceHlaClassName(), propertyName, value);
     }
 
-private:
-    PropertyClassNameAndValueSP getParameterAux(
-      const std::string &hlaClassName, const std::string &propertyName
-    ) const {
-        ClassAndPropertyNameSP classAndPropertyNameSP = findProperty(hlaClassName, propertyName);
-        if (classAndPropertyNameSP) {
-            ClassAndPropertyNameValueSPMap::const_iterator cvmCit =
-              _classAndPropertyNameValueSPMap.find(*classAndPropertyNameSP);
-            if (cvmCit == _classAndPropertyNameValueSPMap.end()) {
-                return PropertyClassNameAndValueSP();
-            }
-            ValueSP valueSP = cvmCit->second;
-            return PropertyClassNameAndValueSP(
-              new PropertyClassNameAndValue(classAndPropertyNameSP->getClassName(), valueSP)
-            );
-        }
-
-        return PropertyClassNameAndValueSP();
-    }
-
 public:
     bool hasParameter(const std::string &hlaClassName, const std::string &propertyName) {
-        return static_cast<bool>(getParameterAux(hlaClassName, propertyName));
+        return static_cast<bool>(findProperty(hlaClassName, propertyName));
     }
 
     bool hasParameter(const std::string &propertyName) {
@@ -895,10 +844,9 @@ public:
     ) const override {
         static Value value(0);
 
-        PropertyClassNameAndValueSP propertyClassNameAndValueSP =
-          getParameterAux(hlaClassName, propertyName);
+        ClassAndPropertyNameSP classAndPropertyNameSP = findProperty(hlaClassName, propertyName);
 
-        return propertyClassNameAndValueSP ? *propertyClassNameAndValueSP->getValueSP() : value;
+        return classAndPropertyNameSP ? *(_classAndPropertyNameValueSPMap.find(*classAndPropertyNameSP)->second) : value;
     }
 
     const Value &getParameter(const ClassAndPropertyName &classAndPropertyName) {
@@ -1107,7 +1055,7 @@ public:
      * Unpublishes the org.cpswt.hla.InteractionRoot interaction class for a federate.
      *
      * @param rti handle to the Local RTI Component, usu. obtained through the
-     *            {@link SynchronizedFederate#getLRC()} call
+     *            {@link SynchronizedFederate#getRTI()} call
      */
     static void unpublish_interaction(RTI::RTIambassador *rti) {
         unpublish_interaction( get_hla_class_name(), rti);
@@ -1153,10 +1101,6 @@ public:
 
     static void remove_federate_name_soft_publish(const std::string &networkFederateName) {
         remove_federate_name_soft_publish(get_hla_class_name(), networkFederateName);
-    }
-
-    std::set<std::string> getFederateNameSoftPublishSet() {
-        return get_federate_name_soft_publish_set(get_hla_class_name());
     }
 
     //-----------------------------------------------------
@@ -1536,8 +1480,8 @@ public:
     static SP fromJson(const std::string &jsonString);
 
 private:
-    static StringStringSetMap &get_hla_class_name_to_federate_name_soft_publish_set_map() {
-        static StringStringSetMap hlaClassNameToFederateNameSoftPublishSetMap;
+    static StringStringSetSPMap &get_hla_class_name_to_federate_name_soft_publish_set_sp_map() {
+        static StringStringSetSPMap hlaClassNameToFederateNameSoftPublishSetMap;
         return hlaClassNameToFederateNameSoftPublishSetMap;
     }
 
@@ -1554,14 +1498,15 @@ public:
         remove_federate_name_soft_publish(getInstanceHlaClassName(), federateName);
     }
 
-    std::set<std::string> get_federate_name_soft_publish_set(const std::string &hlaClassName) {
-        return get_hla_class_name_to_federate_name_soft_publish_set_map().find(hlaClassName) ==
-          get_hla_class_name_to_federate_name_soft_publish_set_map().end() ?
-            std::set<std::string>() : get_hla_class_name_to_federate_name_soft_publish_set_map()[hlaClassName];
+    const StringSetSP &get_federate_name_soft_publish_set_sp(const std::string &hlaClassName) {
+        static StringSetSP defaultStringSetSP( new StringSet() );
+        return get_hla_class_name_to_federate_name_soft_publish_set_sp_map().find(hlaClassName) ==
+          get_hla_class_name_to_federate_name_soft_publish_set_sp_map().end() ?
+            defaultStringSetSP : get_hla_class_name_to_federate_name_soft_publish_set_sp_map()[hlaClassName];
     }
 
-    std::set<std::string> getFederateNameSoftPublishSet(const std::string &hlaClassName) {
-        return get_federate_name_soft_publish_set(getInstanceHlaClassName());
+    const StringSetSP &getFederateNameSoftPublishSetSP() {
+        return get_federate_name_soft_publish_set_sp(getInstanceHlaClassName());
     }
 
 private:

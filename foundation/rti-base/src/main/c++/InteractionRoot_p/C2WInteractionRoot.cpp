@@ -80,10 +80,8 @@ void C2WInteractionRoot::update_federate_sequence_aux(
     interactionRoot.setParameter("federateSequence", stringOutputStream.str());
 }
 
-C2WInteractionRoot::StringList C2WInteractionRoot::get_federate_sequence_list_aux(const ::org::cpswt::hla::InteractionRoot &interactionRoot) {
+C2WInteractionRoot::StringList C2WInteractionRoot::get_federate_sequence_list(const std::string &federateSequence) {
     StringList retval;
-
-    const std::string federateSequence = interactionRoot.getParameter("federateSequence").asString();
 
     if (  is_federate_sequence( federateSequence )  ) {
         Json::Value jsonArray(Json::arrayValue);
@@ -97,6 +95,12 @@ C2WInteractionRoot::StringList C2WInteractionRoot::get_federate_sequence_list_au
     }
 
     return retval;
+}
+
+C2WInteractionRoot::StringList C2WInteractionRoot::get_federate_sequence_list_aux(const ::org::cpswt::hla::InteractionRoot &interactionRoot) {
+    const std::string federateSequence = interactionRoot.getParameter("federateSequence").asString();
+
+    return get_federate_sequence_list(federateSequence);
 }
 
 void C2WInteractionRoot::add_reject_source_federate_id(const std::string &hlaClassName, const std::string &federateId) {

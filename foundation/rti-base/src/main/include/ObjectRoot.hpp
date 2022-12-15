@@ -102,7 +102,9 @@ public:
     typedef std::map<int, std::string> IntegerStringMap;
     typedef std::map<std::string, int> StringIntegerMap;
     typedef std::map<std::string, bool> StringBooleanMap;
-    typedef std::map<std::string, std::set<std::string>> StringStringSetMap;
+
+    typedef boost::shared_ptr<StringSet> StringSetSP;
+    typedef std::map<std::string, StringSetSP> StringStringSetSPMap;
 
     typedef RTI::AttributeHandleSet AttributeHandleSet;
     typedef boost::shared_ptr<AttributeHandleSet> AttributeHandleSetSP;
@@ -118,6 +120,9 @@ public:
     typedef std::map< std::string, PubsubFunctionPtr > ClassNamePubSubMap;
     typedef std::map< std::string, std::string> PropertyTypeMap;typedef std::map< std::string, AttributeHandleSetSP > StringAttributesHandleSetSPMap;
     typedef std::unordered_map< int, SP > ObjectHandleInstanceSPMap;
+    typedef std::set<int> IntegerSet;
+    typedef boost::shared_ptr<IntegerSet> IntegerSetSP;
+    typedef std::map<std::string, IntegerSetSP> StringIntegerSetSPMap;
 
 protected:
     static void defaultSleep() {
@@ -215,6 +220,198 @@ public:
         size_t position = hlaClassName.find_last_of('.');
         return position == std::string::npos ? hlaClassName : hlaClassName.substr(position + 1);
     }
+
+private:
+    static ClassAndPropertyNameValueSPMap getClassAndPropertyNameValueSPMap(
+      const RTI::AttributeHandleValuePairSet &propertyMap
+    );
+
+public:
+    class ObjectReflector {
+    public:
+        typedef boost::shared_ptr<ObjectReflector> SP;
+
+    private:
+        RTI::ObjectHandle _objectHandle;
+        std::string _hlaClassName;
+        std::string _federateSequence;
+        ClassAndPropertyNameValueSPMap _classAndPropertyNameValueSPMap;
+        double _time;
+
+        void initHlaClassName() {
+            ObjectRoot::SP objectRootSP = get_object( _objectHandle );
+            if (objectRootSP) {
+                const std::string &hlaClassName = objectRootSP->getInstanceHlaClassName();
+                if (!_hlaClassName.empty() && _hlaClassName != hlaClassName) {
+                    BOOST_LOG_SEV( get_logger(), warning ) << "HLA class name from object with object handle"
+                      << _objectHandle << "(\"" << hlaClassName << "\") not the same as that provided (\""
+                      << _hlaClassName << "\") -- Overriding provided";
+                }
+                _hlaClassName = hlaClassName;
+            }
+        }
+
+    public:
+//        ObjectReflector() : _objectHandle(0), _time(-1), _federateSequence("[]") { }
+
+        ObjectReflector(
+         RTI::ObjectHandle objectHandle, const ClassAndPropertyNameValueSPMap &classAndPropertyNameValueSPMap
+        ) :
+         _objectHandle(objectHandle),
+         _federateSequence("[]"),
+         _classAndPropertyNameValueSPMap( classAndPropertyNameValueSPMap ),
+         _time(-1) {
+            initHlaClassName();
+        }
+
+        ObjectReflector(
+         RTI::ObjectHandle objectHandle,
+         const std::string &hlaClassName,
+         const ClassAndPropertyNameValueSPMap &classAndPropertyNameValueSPMap
+        ) :
+         _objectHandle(objectHandle),
+         _hlaClassName(hlaClassName),
+         _federateSequence("[]"),
+         _classAndPropertyNameValueSPMap( classAndPropertyNameValueSPMap ),
+         _time(-1) {
+            initHlaClassName();
+        }
+
+        ObjectReflector(
+         RTI::ObjectHandle objectHandle,
+         const RTI::AttributeHandleValuePairSet& theAttributes
+        ) :
+         _objectHandle(objectHandle),
+         _federateSequence("[]"),
+         _classAndPropertyNameValueSPMap(ObjectRoot::getClassAndPropertyNameValueSPMap(theAttributes)),
+         _time(-1) {
+            initHlaClassName();
+        }
+
+
+        ObjectReflector(
+         RTI::ObjectHandle objectHandle,
+         const ClassAndPropertyNameValueSPMap &classAndPropertyNameValueSPMap,
+         double time
+        ) :
+         _objectHandle( objectHandle ),
+         _federateSequence("[]"),
+         _classAndPropertyNameValueSPMap( classAndPropertyNameValueSPMap ),
+         _time( time ) {
+            initHlaClassName();
+        }
+
+        ObjectReflector(
+         RTI::ObjectHandle objectHandle,
+         const std::string &hlaClassName,
+         const ClassAndPropertyNameValueSPMap &classAndPropertyNameValueSPMap,
+         double time
+        ) :
+         _objectHandle( objectHandle ),
+         _hlaClassName(hlaClassName),
+         _federateSequence("[]"),
+         _classAndPropertyNameValueSPMap( classAndPropertyNameValueSPMap ),
+         _time( time ) {
+            initHlaClassName();
+        }
+
+        ObjectReflector(
+         RTI::ObjectHandle objectHandle,
+         const RTI::AttributeHandleValuePairSet& theAttributes,
+         double time
+        ) :
+         _objectHandle( objectHandle ),
+         _federateSequence("[]"),
+         _classAndPropertyNameValueSPMap(ObjectRoot::getClassAndPropertyNameValueSPMap(theAttributes)),
+         _time( time ) {
+            initHlaClassName();
+        }
+
+
+        ObjectReflector(
+         RTI::ObjectHandle objectHandle,
+         const ClassAndPropertyNameValueSPMap &classAndPropertyNameValueSPMap,
+         const RTI::FedTime &fedTime
+        ) :
+         _objectHandle( objectHandle ),
+         _federateSequence("[]"),
+         _classAndPropertyNameValueSPMap( classAndPropertyNameValueSPMap ),
+         _time(  RTIfedTime( fedTime ).getTime()  ) {
+            initHlaClassName();
+        }
+
+        ObjectReflector(
+         RTI::ObjectHandle objectHandle,
+         const std::string &hlaClassName,
+         const ClassAndPropertyNameValueSPMap &classAndPropertyNameValueSPMap,
+         const RTI::FedTime &fedTime
+        ) :
+         _objectHandle( objectHandle ),
+         _hlaClassName(hlaClassName),
+         _federateSequence("[]"),
+         _classAndPropertyNameValueSPMap( classAndPropertyNameValueSPMap ),
+         _time(  RTIfedTime( fedTime ).getTime()  ) {
+            initHlaClassName();
+        }
+
+        ObjectReflector(
+         RTI::ObjectHandle objectHandle,
+         const RTI::AttributeHandleValuePairSet& theAttributes,
+         const RTI::FedTime &fedTime
+        ) :
+         _objectHandle( objectHandle ),
+         _federateSequence("[]"),
+         _classAndPropertyNameValueSPMap(ObjectRoot::getClassAndPropertyNameValueSPMap(theAttributes)),
+          _time(  RTIfedTime( fedTime ).getTime()  ) {
+            initHlaClassName();
+         }
+
+        void reflect() const {
+            if ( _time < 0 ) ObjectRoot::reflect( _objectHandle, _classAndPropertyNameValueSPMap );
+            else  ObjectRoot::reflect( _objectHandle, _classAndPropertyNameValueSPMap, _time );
+        }
+
+        ClassAndPropertyNameValueSPMap &getClassAndPropertyNameValueSPMap() {
+            return _classAndPropertyNameValueSPMap;
+        }
+
+        const ClassAndPropertyNameValueSPMap &getClassAndPropertyNameValueSPMap() const {
+            return _classAndPropertyNameValueSPMap;
+        }
+
+        RTI::ObjectHandle getObjectHandle() const {
+            return _objectHandle;
+        }
+
+        const std::string &getHlaClassName() const {
+            return _hlaClassName;
+        }
+
+        void setFederateSequence(const std::string &federateSequence) {
+            _federateSequence = federateSequence;
+        }
+
+        const std::string &getFederateSequence() const {
+            return _federateSequence;
+        }
+
+        std::string toJson() const;
+
+        ObjectRoot::SP getObjectRootSP() const {
+            return ObjectRoot::get_object( _objectHandle );
+        }
+
+        double getTime() const {
+            return _time;
+        }
+    };
+
+    class ObjectReflectorSPComparator {
+    public:
+        bool operator()(const ObjectReflector::SP &objectReflectorSP1, const ObjectReflector::SP &objectReflectorSP2) {
+            return objectReflectorSP1->getTime() < objectReflectorSP2->getTime();
+        }
+    };
 
     //-------------------------------------------------------------------------
     // HLA CLASS-NAME SET
@@ -519,13 +716,9 @@ private:
     static bool get_is_published_aux(const std::string &hlaClassName, bool default_value) {
         StringBooleanMap::const_iterator sbmCit = get_class_name_publish_status_map().find(hlaClassName);
         if (sbmCit == get_class_name_publish_status_map().end()) {
-//            readFederateDynamicMessageClass(hlaClassName);
-//            sbmCit = get_class_name_publish_status_map().find(hlaClassName);
-//            if (sbmCit == get_class_name_publish_status_map().end()) {
-                BOOST_LOG_SEV(get_logger(), error) << "could not get publish status for hla class \"" << hlaClassName
-                  << "\":  class does not exist";
-                return default_value;
-//            }
+            BOOST_LOG_SEV(get_logger(), error) << "could not get publish status for hla class \"" << hlaClassName
+              << "\":  class does not exist";
+            return default_value;
         }
         return sbmCit->second;
     }
@@ -680,7 +873,7 @@ public:
     static const ClassAndPropertyNameSetSP &get_published_class_and_property_name_set_sp(
       const std::string &hlaClassName
     ) {
-        static ClassAndPropertyNameSetSP classAndPropertyNameSetSP;
+        static ClassAndPropertyNameSetSP classAndPropertyNameSetSP( new ClassAndPropertyNameSet() );
         StringClassAndPropertyNameSetSPMap::const_iterator scmCit =
           get_class_name_published_class_and_property_name_set_sp_map().find( hlaClassName );
 
@@ -745,7 +938,7 @@ public:
     static const ClassAndPropertyNameSetSP &get_subscribed_class_and_property_name_set_sp(
       const std::string &hlaClassName
     ) {
-        static ClassAndPropertyNameSetSP classAndPropertyNameSetSP;
+        static ClassAndPropertyNameSetSP classAndPropertyNameSetSP( new ClassAndPropertyNameSet() );
         StringClassAndPropertyNameSetSPMap::const_iterator scmCit =
           get_class_name_subscribed_class_and_property_name_set_sp_map().find( hlaClassName );
 
@@ -807,6 +1000,10 @@ public:
     }
 
     PropertyHandleValuePairSetSP createPropertyHandleValuePairSetSP( bool force );
+
+    ClassAndPropertyNameSet getAttributesToBeUpdatedClassAndPropertyNameSet();
+
+    void restoreAttributesToBeUpdated(const ClassAndPropertyNameSet &classAndPropertyNameSet);
 
     //------------------------------------------------
     // END CLASS-AND-PROPERTY-NAME PROPERTY-HANDLE MAP
@@ -998,19 +1195,40 @@ public:
         return objectRootSP;
     }
 
-    static SP reflect( int object_handle, const RTI::AttributeHandleValuePairSet &propertyMap ) {
+private:
+    void setAttributes(const ClassAndPropertyNameValueSPMap &classAndPropertyNameValueSPMap) {
+        for(
+          ClassAndPropertyNameValueSPMap::const_iterator cvmCit = classAndPropertyNameValueSPMap.begin() ;
+          cvmCit != classAndPropertyNameValueSPMap.end() ;
+          ++cvmCit
+        ) {
+            const ClassAndPropertyName &classAndPropertyName(cvmCit->first);
+            Value &value(*cvmCit->second);
+            _classAndPropertyNameValueSPMap[classAndPropertyName]->setValue(value);
+        }
+    }
+
+public:
+    static SP reflect( int object_handle, const ClassAndPropertyNameValueSPMap &classAndPropertyNameValueSPMap ) {
         SP objectRootSP = get_object( object_handle );
         if ( !objectRootSP ) {
             return objectRootSP;
         }
 
         objectRootSP->setTime( -1 );
-        objectRootSP->setAttributes( propertyMap );
+        objectRootSP->setAttributes( classAndPropertyNameValueSPMap );
         return objectRootSP;
     }
 
+    static SP reflect( int object_handle, const RTI::AttributeHandleValuePairSet &propertyMap ) {
+        return reflect(object_handle, getClassAndPropertyNameValueSPMap(propertyMap));
+    }
+
+
     static SP reflect(
-      int object_handle, const RTI::AttributeHandleValuePairSet &propertyMap, const RTIfedTime &rtiFedTime
+      int object_handle,
+      const ClassAndPropertyNameValueSPMap &classAndPropertyNameValueSPMap,
+      const RTIfedTime &rtiFedTime
     ) {
         SP objectRootSP = get_object( object_handle );
         if ( !objectRootSP ) {
@@ -1018,19 +1236,34 @@ public:
         }
 
         objectRootSP->setTime( rtiFedTime.getTime() );
-        objectRootSP->setAttributes( propertyMap );
+        objectRootSP->setAttributes( classAndPropertyNameValueSPMap );
         return objectRootSP;
     }
 
-    static SP reflect( int object_handle, const RTI::AttributeHandleValuePairSet &propertyMap, double theTime ) {
+    static SP reflect(
+      int object_handle, const RTI::AttributeHandleValuePairSet &propertyMap, const RTIfedTime &rtiFedTime
+    ) {
+        return reflect(object_handle, getClassAndPropertyNameValueSPMap(propertyMap), rtiFedTime);
+    }
+
+
+    static SP reflect(
+      int object_handle,
+      const ClassAndPropertyNameValueSPMap &classAndPropertyNameValueSPMap,
+      double theTime
+    ) {
         SP objectRootSP = get_object( object_handle );
         if ( !objectRootSP ) {
             return objectRootSP;
         }
 
         objectRootSP->setTime( theTime );
-        objectRootSP->setAttributes( propertyMap );
+        objectRootSP->setAttributes( classAndPropertyNameValueSPMap );
         return objectRootSP;
+    }
+
+    static SP reflect( int object_handle, const RTI::AttributeHandleValuePairSet &propertyMap, double theTime ) {
+        return reflect(object_handle, getClassAndPropertyNameValueSPMap(propertyMap), theTime);
     }
 
     //-------------------------------------
@@ -1041,10 +1274,14 @@ public:
     // METHODS THAT USE BOTH OBJECT MAP AND OBJECT HANDLE
     //---------------------------------------------------
 private:
-    void setObjectHandle( int object_handle ) {
+    void setObjectHandle(int objectHandle) {
+        _objectHandle = objectHandle;
+    }
+
+    void static set_object_handle( SP objectRootSP, int object_handle ) {
         remove_object( object_handle );
-        _objectHandle = object_handle;
-        get_object_handle_instance_sp_map().insert(  std::make_pair( object_handle, SP(this) )  );
+        objectRootSP->setObjectHandle(object_handle);
+        get_object_handle_instance_sp_map().insert(  std::make_pair( object_handle, objectRootSP )  );
     }
 
     //-------------------------------------------------------
@@ -1058,8 +1295,7 @@ public:
     static SP discover( int class_handle, int object_handle ) {
         SP objectRootSP = create_object( class_handle );
         if (objectRootSP) {
-            objectRootSP->setObjectHandle( object_handle );
-            get_object_handle_instance_sp_map().insert( std::make_pair(object_handle, objectRootSP) );
+            set_object_handle(objectRootSP, object_handle);
         }
         return objectRootSP;
     }
@@ -1102,34 +1338,6 @@ public:
 
     void requestUpdate( RTI::RTIambassador *rti );
 
-    //-----------------------------------------------------------------------------------------------------------
-    // PROPERTY-CLASS-NAME AND PROPERTY-VALUE-SP DATA CLASS
-    // THIS CLASS IS USED ESPECIALLY FOR THE BENEFIT OF THE SET METHOD BELOW.  WHEN A VALUE IS RETRIEVED FROM THE
-    // classPropertyNameValueMap USING A GET METHOD, IT IS PAIRED WITH THE NAME OF THE CLASS IN WHICH THE
-    // PROPERTY IS DEFINED. IN THIS WAY, THE SET METHOD CAN PLACE THE NEW VALUE FOR THE PROPERTY USING THE
-    // CORRECT (CLASS-NAME, PROPERTY-NAME) KEY.
-    //-----------------------------------------------------------------------------------------------------------
- protected:
-    class PropertyClassNameAndValue {
-    private:
-        const std::string hlaClassName;
-        const ValueSP valueSP;
-
-    public:
-        PropertyClassNameAndValue(const std::string &hlaClassName, const ValueSP &localValueSP) :
-         hlaClassName(hlaClassName), valueSP(localValueSP) {}
-
-        const std::string &getClassName() const {
-            return hlaClassName;
-        }
-
-        const ValueSP &getValueSP() const {
-            return valueSP;
-        }
-    };
-
-    typedef boost::shared_ptr<PropertyClassNameAndValue> PropertyClassNameAndValueSP;
-
     //----------------------------------------------
     // CLASS-AND-PROPERTY-NAME PROPERTY-VALUE-SP MAP
     //----------------------------------------------
@@ -1148,22 +1356,21 @@ public:
     void setAttribute(
       const std::string &hlaClassName, const std::string &propertyName, const T &value
     ) {
-        PropertyClassNameAndValueSP propertyClassNameAndValueSP =
-          getAttributeAux(hlaClassName, propertyName);
+        ClassAndPropertyNameSP classAndPropertyNameSP = findProperty(hlaClassName, propertyName);
 
-        if (!propertyClassNameAndValueSP) {
-            BOOST_LOG_SEV(get_logger(), error) << "setAttribute(\"" << propertyName << "\", "
-              << typeid(T).name() << " value): could not find \"" << propertyName
-              << "\" attribute in class \"" << getInstanceHlaClassName() << "\" or any of its superclasses.";
+        if (!classAndPropertyNameSP) {
+            BOOST_LOG_SEV(get_logger(), error) << "setAttribute(\"" << hlaClassName << "\", "
+              << "\"" << propertyName << "\", " << typeid(T).name() << " value): could not find \"" << propertyName
+              << "\" attribute in class \"" << hlaClassName << "\" or any of its superclasses.";
             return;
         }
 
-        Value &currentValue = *propertyClassNameAndValueSP->getValueSP();
+        Value &currentValue = *_classAndPropertyNameValueSPMap[*classAndPropertyNameSP];
 
         if (!currentValue.setValue(value)) {
             BOOST_LOG_SEV(get_logger(), error) << "setAttribute(\"" << propertyName << "\", "
               << typeid(T).name() << " value): \"value\" is incorrect type \"" << typeid(T).name()
-              << "\" for \"" << propertyName << "\" parameter, should be of type \""
+              << "\" for \"" << propertyName << "\" attribute, should be of type \""
               << currentValue.getTypeName() << "\"";
         }
     }
@@ -1185,29 +1392,9 @@ public:
         setAttribute(getInstanceHlaClassName(), propertyName, value);
     }
 
-private:
-    PropertyClassNameAndValueSP getAttributeAux(
-      const std::string &hlaClassName, const std::string &propertyName
-    ) const {
-        ClassAndPropertyNameSP classAndPropertyNameSP = findProperty(hlaClassName, propertyName);
-        if (classAndPropertyNameSP) {
-            ClassAndPropertyNameValueSPMap::const_iterator cvmCit =
-              _classAndPropertyNameValueSPMap.find(*classAndPropertyNameSP);
-            if (cvmCit == _classAndPropertyNameValueSPMap.end()) {
-                return PropertyClassNameAndValueSP();
-            }
-            ValueSP valueSP = cvmCit->second;
-            return PropertyClassNameAndValueSP(
-              new PropertyClassNameAndValue(classAndPropertyNameSP->getClassName(), valueSP)
-            );
-        }
-
-        return PropertyClassNameAndValueSP();
-    }
-
 public:
     bool hasAttribute(const std::string &hlaClassName, const std::string &propertyName) {
-        return static_cast<bool>(getAttributeAux(hlaClassName, propertyName));
+        return static_cast<bool>(findProperty(hlaClassName, propertyName));
     }
 
     bool hasAttribute(const std::string &propertyName) {
@@ -1219,10 +1406,9 @@ public:
     ) const override {
         static Value value(0);
 
-        PropertyClassNameAndValueSP propertyClassNameAndValueSP =
-          getAttributeAux(hlaClassName, propertyName);
+        ClassAndPropertyNameSP classAndPropertyNameSP = findProperty(hlaClassName, propertyName);
 
-        return propertyClassNameAndValueSP ? *propertyClassNameAndValueSP->getValueSP() : value;
+        return classAndPropertyNameSP ? *(_classAndPropertyNameValueSPMap.find(*classAndPropertyNameSP)->second) : value;
     }
 
     const Value &getAttribute(const ClassAndPropertyName &classAndPropertyName) {
@@ -1447,7 +1633,7 @@ public:
      * Unpublishes the org.cpswt.hla.ObjectRoot object class for a federate.
      *
      * @param rti handle to the Local RTI Component, usu. obtained through the
-     *            {@link SynchronizedFederate#getLRC()} call
+     *            {@link SynchronizedFederate#getRTI()} call
      */
     static void unpublish_object(RTI::RTIambassador *rti) {
         unpublish_object( get_hla_class_name(), rti);
@@ -1495,16 +1681,40 @@ public:
         return get_class_name_subscribed_class_and_property_name_set_sp_map()[get_hla_class_name()];
     }
 
+    static void add_object_update_embedded_only_id(int id) {
+        add_object_update_embedded_only_id(get_hla_class_name(), id);
+    }
+
+    static void remove_object_update_embedded_only_id(int id) {
+        remove_object_update_embedded_only_id(get_hla_class_name(), id);
+    }
+
+    static const IntegerSetSP &get_object_update_embedded_only_id_set_sp() {
+        return get_object_update_embedded_only_id_set_sp(get_hla_class_name());
+    }
+
+    static bool get_is_object_update_embedded_only_id(int id) {
+        return get_is_object_update_embedded_only_id(get_hla_class_name(), id);
+    }
+
+    static void add_federate_name_soft_publish_direct(const std::string &federateName) {
+        add_federate_name_soft_publish_direct(get_hla_class_name(), federateName);
+    }
+
+    static void remove_federate_name_soft_publish_direct(const std::string &federateName) {
+        remove_federate_name_soft_publish_direct(get_hla_class_name(), federateName);
+    }
+
+    static const StringSetSP &get_federate_name_soft_publish_direct_set() {
+        return get_federate_name_soft_publish_direct_set_sp(get_hla_class_name());
+    }
+
     static void add_federate_name_soft_publish(const std::string &networkFederateName) {
         add_federate_name_soft_publish(get_hla_class_name(), networkFederateName);
     }
 
     static void remove_federate_name_soft_publish(const std::string &networkFederateName) {
         remove_federate_name_soft_publish(get_hla_class_name(), networkFederateName);
-    }
-
-    std::set<std::string> getFederateNameSoftPublishSet() {
-        return get_federate_name_soft_publish_set(get_hla_class_name());
     }
 
     //-----------------------------------------------------
@@ -1760,7 +1970,7 @@ public:
         if (!currentValue.setValue(value)) {
             BOOST_LOG_SEV(get_logger(), error) << "setAttribute(int propertyHandle, "
               << typeid(T).name() << " value): \"value\" is incorrect type \"" << typeid(T).name()
-              << "\" for \"" << classAndPropertyName.getPropertyName() << "\" parameter, should be of type \""
+              << "\" for \"" << classAndPropertyName.getPropertyName() << "\" attribute, should be of type \""
               << currentValue.getTypeName() << "\"";
         }
     }
@@ -1904,13 +2114,71 @@ public:
     // END INSTANCE VERSIONS OF STATIC METHODS DEFINED IN DERIVED CLASSES
     //-------------------------------------------------------------------
 
-    std::string toJson();
+    std::string toJson(bool force);
 
-    static void fromJson(const std::string &jsonString);
+    std::string toJson() {
+        return toJson(false);
+    }
+
+    static ObjectReflector::SP fromJson(const std::string &jsonString);
 
 private:
-    static StringStringSetMap &get_hla_class_name_to_federate_name_soft_publish_set_map() {
-        static StringStringSetMap hlaClassNameToFederateNameSoftPublishSetMap;
+    static StringIntegerSetSPMap &get_hla_class_name_object_update_embedded_only_id_set_sp_map() {
+        static StringIntegerSetSPMap hlaClassNameObjectUpdateEmbeddedOnlyIdSetSPMap;
+        return hlaClassNameObjectUpdateEmbeddedOnlyIdSetSPMap;
+    }
+
+public:
+    static void add_object_update_embedded_only_id(const std::string &hlaClassName, int id);
+
+    static void remove_object_update_embedded_only_id(const std::string &hlaClassName, int id);
+
+    static const IntegerSetSP &get_object_update_embedded_only_id_set_sp(const std::string &hlaClassName) {
+        static IntegerSetSP defaultIntegerSetSP( new IntegerSet() );
+        StringIntegerSetSPMap::const_iterator simCit =
+          get_hla_class_name_object_update_embedded_only_id_set_sp_map().find(hlaClassName);
+        return simCit == get_hla_class_name_object_update_embedded_only_id_set_sp_map().end() ?
+            defaultIntegerSetSP : simCit->second;
+    }
+
+    static bool get_is_object_update_embedded_only_id(const std::string &hlaClassName, int id) {
+        const IntegerSet &integerSet = *get_object_update_embedded_only_id_set_sp(hlaClassName);
+        return integerSet.find(id) != integerSet.end();
+    }
+
+    static bool get_is_object_update_embedded_only_id(int classId, int id) {
+        IntegerStringMap::const_iterator ismCit = get_class_handle_name_map().find(classId);
+        return ismCit == get_class_handle_name_map().end() ?
+          false : get_is_object_update_embedded_only_id(ismCit->second, id);
+    }
+
+private:
+    static StringStringSetSPMap &get_hla_class_name_to_federate_name_soft_publish_direct_set_sp_map() {
+        static StringStringSetSPMap hlaClassNameToFederateNameSoftPublishDirectSetMap;
+        return hlaClassNameToFederateNameSoftPublishDirectSetMap;
+    }
+
+public:
+    static void add_federate_name_soft_publish_direct(const std::string &hlaClassName, const std::string &federateName);
+
+    static void remove_federate_name_soft_publish_direct(
+      const std::string &hlaClassName, const std::string &federateName
+    );
+
+    static const StringSetSP &get_federate_name_soft_publish_direct_set_sp(const std::string &hlaClassName) {
+        static StringSetSP defaultStringSetSP ( new StringSet() );
+        return get_hla_class_name_to_federate_name_soft_publish_direct_set_sp_map().find(hlaClassName) ==
+          get_hla_class_name_to_federate_name_soft_publish_direct_set_sp_map().end() ?
+            defaultStringSetSP : get_hla_class_name_to_federate_name_soft_publish_direct_set_sp_map()[hlaClassName];
+    }
+
+    const StringSetSP &getFederateNameSoftPublishDirectSetSP() {
+        return get_federate_name_soft_publish_direct_set_sp(getInstanceHlaClassName());
+    }
+
+private:
+    static StringStringSetSPMap &get_hla_class_name_to_federate_name_soft_publish_set_sp_map() {
+        static StringStringSetSPMap hlaClassNameToFederateNameSoftPublishSetMap;
         return hlaClassNameToFederateNameSoftPublishSetMap;
     }
 
@@ -1927,14 +2195,15 @@ public:
         remove_federate_name_soft_publish(getInstanceHlaClassName(), federateName);
     }
 
-    std::set<std::string> get_federate_name_soft_publish_set(const std::string &hlaClassName) {
-        return get_hla_class_name_to_federate_name_soft_publish_set_map().find(hlaClassName) ==
-          get_hla_class_name_to_federate_name_soft_publish_set_map().end() ?
-            std::set<std::string>() : get_hla_class_name_to_federate_name_soft_publish_set_map()[hlaClassName];
+    const StringSetSP &get_federate_name_soft_publish_set_sp(const std::string &hlaClassName) {
+        static StringSetSP defaultStringSetSP( new StringSet() );
+        return get_hla_class_name_to_federate_name_soft_publish_set_sp_map().find(hlaClassName) ==
+          get_hla_class_name_to_federate_name_soft_publish_set_sp_map().end() ?
+            defaultStringSetSP : get_hla_class_name_to_federate_name_soft_publish_set_sp_map()[hlaClassName];
     }
 
-    std::set<std::string> getFederateNameSoftPublishSet(const std::string &hlaClassName) {
-        return get_federate_name_soft_publish_set(getInstanceHlaClassName());
+    const StringSetSP &getFederateNameSoftPublishSetSP() {
+        return get_federate_name_soft_publish_set_sp(getInstanceHlaClassName());
     }
 
 private:
@@ -2025,6 +2294,13 @@ private:
 std::ostream &operator<<( std::ostream &os, const ::org::cpswt::hla::ObjectRoot &messaging );
 inline std::ostream &operator<<( std::ostream &os, ::org::cpswt::hla::ObjectRoot::SP messagingSP ) {
     return os << *messagingSP;
+}
+
+std::ostream &operator<<( std::ostream &os, const ::org::cpswt::hla::ObjectRoot::ObjectReflector &objectReflector );
+inline std::ostream &operator<<(
+  std::ostream &os, ::org::cpswt::hla::ObjectRoot::ObjectReflector::SP objectReflectorSP
+) {
+    return os << *objectReflectorSP;
 }
 
 #endif // _OBJECT_ROOT
