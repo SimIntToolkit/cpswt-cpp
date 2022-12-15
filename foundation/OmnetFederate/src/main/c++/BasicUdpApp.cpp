@@ -32,7 +32,7 @@
 #include <inet/networklayer/ipv4/Ipv4InterfaceData.h>
 
 #include "BasicUdpApp.h"
-#include <messages/InteractionMsg_m.h>
+#include <messages/HlaMsg_m.h>
 
 Define_Module(BasicUdpApp);
 

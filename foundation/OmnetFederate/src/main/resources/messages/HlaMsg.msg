@@ -34,16 +34,20 @@
 
 cplusplus {{
 #include <InteractionRoot.hpp>
+#include <ObjectRoot.hpp>
 
 using InteractionRoot = ::org::cpswt::hla::InteractionRoot;
+using ObjectReflector = ::org::cpswt::hla::ObjectRoot::ObjectReflector;
 }};
 
 class noncobject InteractionRoot::SP;
+class noncobject ObjectReflector::SP;
 
-message InteractionMsg extends cPacket {
+message HlaMsg extends cPacket {
     bool toHLA;
     int messageNo;
     InteractionRoot::SP interactionRootSP;
+    ObjectReflector::SP objectReflectorSP;
 
     string senderHost;
     string senderHostApp;

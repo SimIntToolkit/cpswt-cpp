@@ -36,6 +36,7 @@ import java.nio.file.attribute.BasicFileAttributes
 import java.io.FileWriter
 import org.json.JSONObject
 
+import java.util.stream.Collectors
 
 
 plugins {
@@ -67,7 +68,6 @@ class MessageFileVisitor: SimpleFileVisitor<Path>() {
         if (p0 != null) {
             val file = p0.toFile()
             if (file.name.endsWith(".msg")) {
-
                 messageFileSet.add(file)
 
                 val parentDirFile = file.parentFile.absoluteFile
@@ -149,7 +149,15 @@ tasks.register("processMessageFiles") {
         for(file in messageFileList) {
             val processBuilder = ProcessBuilder("opp_msgc", "-s", "_m.cpp", file.absolutePath)
             val process = processBuilder.start()
-            process.waitFor()
+            val exitStatus = process.waitFor()
+            if (exitStatus != 0) {
+                val errorMessage = process.getErrorStream().bufferedReader(Charsets.UTF_8).use {
+                    it.lines().collect(Collectors.joining())
+                }
+                val exceptionMessage =
+                    "\"${processBuilder.command().joinToString(" ")}\": error \"${errorMessage}\""
+                throw TaskExecutionException(this, Exception(exceptionMessage))
+            }
         }
     }
 }

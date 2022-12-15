@@ -12,31 +12,31 @@
  *   (that goes for your lawyer as well)
  *
  */
-#include "AttributeHandleValuePairSetForTesting.hpp"
+#include "PropertyHandleValuePairSetForTesting.hpp"
 
 //////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////// Constructors ////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////
-AttributeHandleValuePairSetForTesting::AttributeHandleValuePairSetForTesting()
+PropertyHandleValuePairSetForTesting::PropertyHandleValuePairSetForTesting()
 {
 }
 
-AttributeHandleValuePairSetForTesting::AttributeHandleValuePairSetForTesting( RTI::ULong size )
+PropertyHandleValuePairSetForTesting::PropertyHandleValuePairSetForTesting( RTI::ULong size )
 {
 	// we ignore the size for now because we're using a map which will resize itself
 }
 
-AttributeHandleValuePairSetForTesting::~AttributeHandleValuePairSetForTesting()
+PropertyHandleValuePairSetForTesting::~PropertyHandleValuePairSetForTesting()
 {
-	this->empty();
+	empty();
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////// Instance Methods //////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////
-GenericHandleValuePair* AttributeHandleValuePairSetForTesting::getPairAt( RTI::ULong index ) const
+GenericHandleValuePairSP PropertyHandleValuePairSetForTesting::getPairAt( RTI::ULong index ) const
 {
-	std::map<RTI::Handle,GenericHandleValuePair*>::const_iterator mapIterator = pairs.begin();
+	std::map<RTI::Handle,GenericHandleValuePairSP>::const_iterator mapIterator = pairs.begin();
 	RTI::ULong counter = 0;
 
 	while( mapIterator != pairs.end() )
@@ -49,13 +49,13 @@ GenericHandleValuePair* AttributeHandleValuePairSetForTesting::getPairAt( RTI::U
 		mapIterator++;
 	}
 
-	return 0;
+	return GenericHandleValuePairSP();
 }
 
-void AttributeHandleValuePairSetForTesting::checkIndex( RTI::ULong index ) const
+void PropertyHandleValuePairSetForTesting::checkIndex( RTI::ULong index ) const
 	throw( RTI::ArrayIndexOutOfBounds )
 {
-	if( pairs.empty() || index > pairs.size()-1 )
+	if( pairs.empty() || index >= pairs.size() )
 	{
 		char message[32];
 		sprintf( message, "Index [%lo] out of bounds", index );
@@ -63,28 +63,28 @@ void AttributeHandleValuePairSetForTesting::checkIndex( RTI::ULong index ) const
 	}
 }
 
-RTI::ULong AttributeHandleValuePairSetForTesting::size() const
+RTI::ULong PropertyHandleValuePairSetForTesting::size() const
 {
 	return (RTI::ULong)pairs.size();
 }
 
-RTI::Handle AttributeHandleValuePairSetForTesting::getHandle( RTI::ULong index ) const
+RTI::Handle PropertyHandleValuePairSetForTesting::getHandle( RTI::ULong index ) const
 	throw( RTI::ArrayIndexOutOfBounds )
 {
 	checkIndex( index );
-	GenericHandleValuePair *thePair = this->getPairAt(index);
+	GenericHandleValuePairSP thePair = getPairAt(index);
 	return thePair->getHandle();
 }
 
-RTI::ULong AttributeHandleValuePairSetForTesting::getValueLength( RTI::ULong index ) const
+RTI::ULong PropertyHandleValuePairSetForTesting::getValueLength( RTI::ULong index ) const
 	throw( RTI::ArrayIndexOutOfBounds )
 {
 	checkIndex( index );
-	GenericHandleValuePair *thePair = this->getPairAt(index);
+	GenericHandleValuePairSP thePair = getPairAt(index);
 	return thePair->getValueLength();
 }
 
-void AttributeHandleValuePairSetForTesting::getValue( RTI::ULong index,
+void PropertyHandleValuePairSetForTesting::getValue( RTI::ULong index,
                                             char* buffer,
                                             RTI::ULong& valueLength ) const 
 	throw( RTI::ArrayIndexOutOfBounds )
@@ -97,48 +97,64 @@ void AttributeHandleValuePairSetForTesting::getValue( RTI::ULong index,
 	checkIndex( index );
 
 	// fetch the pair that contains the information
-	GenericHandleValuePair *thePair = this->getPairAt(index);
+	GenericHandleValuePairSP thePair = getPairAt(index);
 	// attempt to copy the entire value into the given buffer
 	memcpy( buffer, thePair->getValue(), thePair->getValueLength() );
 	// store the amount of bytes that were written
 	valueLength = thePair->getValueLength();
 }
 
-char* AttributeHandleValuePairSetForTesting::getValuePointer( RTI::ULong index,
+char* PropertyHandleValuePairSetForTesting::getValuePointer( RTI::ULong index,
                                                     RTI::ULong& valueLength ) const
 	throw( RTI::ArrayIndexOutOfBounds )
 {
 	checkIndex( index );
 
-	GenericHandleValuePair *thePair = this->getPairAt(index);
+	GenericHandleValuePairSP thePair = getPairAt(index);
 	valueLength = thePair->getValueLength();
 	return thePair->getValue();
 }
 
-RTI::TransportType AttributeHandleValuePairSetForTesting::getTransportType( RTI::ULong index ) const
+RTI::TransportType PropertyHandleValuePairSetForTesting::getTransportType() const
+	throw( RTI::InvalidHandleValuePairSetContext )
+{
+	return 0;
+}
+
+RTI::TransportType PropertyHandleValuePairSetForTesting::getTransportType( RTI::ULong index ) const
 	throw( RTI::ArrayIndexOutOfBounds, RTI::InvalidHandleValuePairSetContext )
 {
 	return 0;
 }
 
-RTI::OrderType AttributeHandleValuePairSetForTesting::getOrderType( RTI::ULong index ) const
+RTI::OrderType PropertyHandleValuePairSetForTesting::getOrderType() const
+	throw( RTI::InvalidHandleValuePairSetContext )
+{
+	return 0;
+}
+
+RTI::OrderType PropertyHandleValuePairSetForTesting::getOrderType( RTI::ULong index ) const
 	throw( RTI::ArrayIndexOutOfBounds, RTI::InvalidHandleValuePairSetContext )
 {
 	return 0;
 }
 
-RTI::Region* AttributeHandleValuePairSetForTesting::getRegion( RTI::ULong index ) const
+RTI::Region* PropertyHandleValuePairSetForTesting::getRegion() const
+	throw( RTI::InvalidHandleValuePairSetContext )
+{
+	return 0;
+}
+
+RTI::Region* PropertyHandleValuePairSetForTesting::getRegion( RTI::ULong index ) const
 	throw( RTI::ArrayIndexOutOfBounds, RTI::InvalidHandleValuePairSetContext )
 {
 	return 0;
 }
 
-void AttributeHandleValuePairSetForTesting::add( RTI::Handle handle,
-                                       const char* buffer,
-                                       RTI::ULong valueLength )
+void PropertyHandleValuePairSetForTesting::add(RTI::Handle handle, const char* buffer, RTI::ULong valueLength)
 	throw( RTI::ValueLengthExceeded, RTI::ValueCountExceeded )
 {
-	GenericHandleValuePair *thePair = new GenericHandleValuePair();
+	GenericHandleValuePairSP thePair(new GenericHandleValuePair());
 
 	thePair->setHandle( handle );
 	thePair->setValue( buffer, valueLength ); // will make a copy
@@ -146,44 +162,40 @@ void AttributeHandleValuePairSetForTesting::add( RTI::Handle handle,
 	pairs[handle] = thePair;
 }
 
-void AttributeHandleValuePairSetForTesting::remove( RTI::Handle handle ) throw( RTI::ArrayIndexOutOfBounds )
+void PropertyHandleValuePairSetForTesting::remove( RTI::Handle handle ) throw( RTI::ArrayIndexOutOfBounds )
 {
-	delete pairs[handle];  // delete the GenericHandleValuePair, releasing the memory
 	pairs.erase( handle ); // remove the key from the map
 }
 
-void AttributeHandleValuePairSetForTesting::moveFrom( const RTI::AttributeHandleValuePairSet& ahvps,
-                                                  RTI::ULong& index ) 
+void PropertyHandleValuePairSetForTesting::moveFrom(const RTI::AttributeHandleValuePairSet& ahvps, RTI::ULong& index )
 	throw( RTI::ValueCountExceeded, RTI::ArrayIndexOutOfBounds )
 {
 	
 }
 
-void AttributeHandleValuePairSetForTesting::empty() // Empty the Set without deallocating space.
+void PropertyHandleValuePairSetForTesting::moveFrom(const RTI::ParameterHandleValuePairSet& ahvps, RTI::ULong& index )
+	throw( RTI::ValueCountExceeded, RTI::ArrayIndexOutOfBounds )
 {
-	// recoup any space for the contents of the map
-	std::map<RTI::Handle,GenericHandleValuePair*>::iterator iterator;
-	for( iterator = pairs.begin(); iterator != pairs.end(); iterator++ )
-	{
-		GenericHandleValuePair *current = (*iterator).second;
-		delete current;
-	}
 
+}
+
+void PropertyHandleValuePairSetForTesting::empty() // Empty the Set without deallocating space.
+{
 	// empty the set
 	pairs.clear();
 }
 
-RTI::ULong AttributeHandleValuePairSetForTesting::start() const
+RTI::ULong PropertyHandleValuePairSetForTesting::start() const
 {
 	return 0;
 }
 
-RTI::ULong AttributeHandleValuePairSetForTesting::valid( RTI::ULong index ) const
+RTI::ULong PropertyHandleValuePairSetForTesting::valid( RTI::ULong index ) const
 {
 	return 0;	
 }
 
-RTI::ULong AttributeHandleValuePairSetForTesting::next( RTI::ULong index ) const
+RTI::ULong PropertyHandleValuePairSetForTesting::next( RTI::ULong index ) const
 {
 	return 0;	
 }
@@ -196,11 +208,11 @@ RTI::ULong AttributeHandleValuePairSetForTesting::next( RTI::ULong index ) const
 // this is designed to allow data coming in from the JNI to only be copied
 // once, rather than being copied from the JNI, and then copied again when
 // it is put in the set.
-void AttributeHandleValuePairSetForTesting::addButDontCopy( RTI::Handle handle,
+void PropertyHandleValuePairSetForTesting::addButDontCopy( RTI::Handle handle,
                                                   char *buffer,
                                                   RTI::ULong size )
 {
-	GenericHandleValuePair *thePair = new GenericHandleValuePair();
+	GenericHandleValuePairSP thePair(new GenericHandleValuePair());
 
 	thePair->setHandle( handle );
 	thePair->setValueButDontCopy( buffer, size );

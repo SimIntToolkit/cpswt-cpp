@@ -75,7 +75,7 @@ void FederateConfigParser::parseJson(std::string configFileName, FederateConfig 
         std::cerr << e.what() << std::endl;
     }
     try {
-        obj->lookAhead = iroot.get<double>("lookAhead");
+        obj->lookahead = iroot.get<double>("lookahead");
 
     } catch (pt::ptree_error &e) {
         std::cerr << e.what() << std::endl;
@@ -147,7 +147,7 @@ FederateConfig* FederateConfigParser::parseArgs(const int argc, char *argv[]) {
               po::value<std::string>()->implicit_value("false"),
               "Whether the federate is LateJoiner? default: false"
             )
-            ("lookAhead", po::value<double>()->implicit_value(0.0), "Lookahead values, default 0.0")
+            ("lookahead", po::value<double>()->implicit_value(0.0), "Lookahead values, default 0.0")
             ("stepSize", po::value<double>()->implicit_value(1.0), "Simulation step size, default:1.0")
             (
               "federationJsonFileName",
@@ -196,7 +196,7 @@ FederateConfig* FederateConfigParser::parseArgs(const int argc, char *argv[]) {
 
     }
 
-//    std::cout << "lookahead: " << fedConfig->lookAhead << " stepSize: " << fedConfig->stepSize
+//    std::cout << "lookahead: " << fedConfig->lookahead << " stepSize: " << fedConfig->stepSize
 //              << " federateType: " << fedConfig->federateType << " federationID: " << fedConfig->federationId
 //              << " isLateJoiner: " << std::boolalpha << fedConfig->isLateJoiner << std::endl;
 //
@@ -210,8 +210,8 @@ FederateConfig* FederateConfigParser::parseArgs(const int argc, char *argv[]) {
     if (vm.count("isLateJoiner"))
         fedConfig->isLateJoiner = this->to_bool(vm["isLateJoiner"].as<std::string>());
 
-    if (vm.count("lookAhead"))
-        fedConfig->lookAhead = vm["lookAhead"].as<double>();
+    if (vm.count("lookahead"))
+        fedConfig->lookahead = vm["lookahead"].as<double>();
 
     if (vm.count("stepSize"))
         fedConfig->stepSize = vm["stepSize"].as<double>();
@@ -223,7 +223,7 @@ FederateConfig* FederateConfigParser::parseArgs(const int argc, char *argv[]) {
         fedConfig->federateDynamicMessagingClassesJsonFileName =
           vm["federateDynamicMessagingClassesJsonFileName"].as<std::string>();
 
-    std::cout << "lookahead: " << fedConfig->lookAhead
+    std::cout << "lookahead: " << fedConfig->lookahead
               << ", stepSize: " << fedConfig->stepSize
               << ", federateType: \"" << fedConfig->federateType
               << "\", federationID: \"" << fedConfig->federationId

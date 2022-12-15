@@ -231,7 +231,7 @@ public:
      * Unpublishes the org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.FederateJoinInteraction interaction class for a federate.
      *
      * @param rti handle to the Local RTI Component, usu. obtained through the
-     *            {@link SynchronizedFederate#getLRC()} call
+     *            {@link SynchronizedFederate#getRTI()} call
      */
     static void unpublish_interaction(RTI::RTIambassador *rti) {
         InteractionRoot::unpublish_interaction( get_hla_class_name(), rti);
@@ -277,10 +277,6 @@ public:
 
     static void remove_federate_name_soft_publish(const std::string &networkFederateName) {
         InteractionRoot::remove_federate_name_soft_publish(get_hla_class_name(), networkFederateName);
-    }
-
-    std::set<std::string> getFederateNameSoftPublishSet() {
-        return InteractionRoot::get_federate_name_soft_publish_set(get_hla_class_name());
     }
 
     //-----------------------------------------------------

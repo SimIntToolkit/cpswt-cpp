@@ -268,7 +268,7 @@ RTI::ObjectHandle RTIAmbassadorTest1::registerObjectInstance (
 ) {
     setCurrentClassHandle(theClass);
     setCurrentObjectHandle();
-    return getCurrentClassHandle();
+    return getCurrentObjectHandle();
 }
 
 RTI::EventRetractionHandle RTIAmbassadorTest1::updateAttributeValues (

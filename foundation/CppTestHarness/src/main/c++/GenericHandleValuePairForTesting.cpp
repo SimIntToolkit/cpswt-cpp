@@ -20,16 +20,12 @@
 //////////////////////////////////////////////////////////////////////////////////////////////
 GenericHandleValuePair::GenericHandleValuePair()
 {
-	this->theHandle = 0;
-	this->buffer = NULL;
-	this->valueLength = 0;
+	_theHandle = 0;
+	_buffer = CharStringSP(new char[1]);
+	*_buffer.get() = '\0';
+	_valueLength = 0;
 }
 
-GenericHandleValuePair::~GenericHandleValuePair()
-{
-	if( this->buffer != NULL )
-		delete [] this->buffer;
-}
 
 //////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////// Instance Methods //////////////////////////////////////
@@ -37,22 +33,19 @@ GenericHandleValuePair::~GenericHandleValuePair()
 
 RTI::Handle GenericHandleValuePair::getHandle()
 {
-	return this->theHandle;
+	return _theHandle;
 }
 
 void GenericHandleValuePair::setHandle( RTI::Handle newHandle )
 {
-	this->theHandle = newHandle;
+	_theHandle = newHandle;
 }
 
 void GenericHandleValuePair::setValue( const char *newData, RTI::ULong newDataLength )
 {
-	if( this->buffer != NULL )
-		delete [] this->buffer;
-
-	this->buffer = new char[newDataLength]();
-	memcpy( this->buffer, newData, newDataLength );
-	this->valueLength = newDataLength;
+	_buffer = CharStringSP(new char[newDataLength]());
+	memcpy( _buffer.get(), newData, newDataLength );
+	_valueLength = newDataLength;
 }
 
 // sets the value to the given data, but DOESN'T COPY IT. this means that
@@ -60,25 +53,19 @@ void GenericHandleValuePair::setValue( const char *newData, RTI::ULong newDataLe
 // to us and making the guarantee that the caller won't delete the data.
 void GenericHandleValuePair::setValueButDontCopy( char *newData, RTI::ULong newDataLength )
 {
-	if( this->buffer != NULL )
-	{
-		delete [] this->buffer;
-		this->buffer = NULL;
-	}
-
 	// don't copy! we're just going to use what's given to us
-	this->buffer = newData;
-	this->valueLength = newDataLength;
+    _buffer = CharStringSP(newData);
+	_valueLength = newDataLength;
 }
 
 char* GenericHandleValuePair::getValue()
 {
-	return this->buffer;
+	return _buffer.get();
 }
 
 RTI::ULong GenericHandleValuePair::getValueLength()
 {
-	return this->valueLength;
+	return _valueLength;
 }
 //////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////// Static Methods ///////////////////////////////////////

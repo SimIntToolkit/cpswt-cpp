@@ -52,6 +52,12 @@ public:
     explicit Attribute(double value) : TypeMedley(value), _oldValueInit(false), _time(-1) { }
     explicit Attribute(const std::string &value) : TypeMedley(value), _oldValueInit(false), _time(-1) { }
 
+    using TypeMedley::setValue;
+
+    bool setValue(const Attribute &other) {
+        return TypeMedley::setValue(static_cast<const TypeMedley &>(other));
+    }
+
     double getTime() const {
         return _time;
     }
@@ -64,8 +70,11 @@ public:
         _oldValueInit = true;
     }
 
-    bool shouldBeUpdated(bool force) const {
+    bool getShouldBeUpdated(bool force) const {
         return force || !_oldValueInit || _oldValue != _value;
+    }
+    void setShouldBeUpdated(bool shouldBeUpdated) {
+        _oldValueInit = !shouldBeUpdated;
     }
 };
 
