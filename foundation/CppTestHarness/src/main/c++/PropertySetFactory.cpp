@@ -30,18 +30,18 @@
 
 #include "RTIForTesting.hpp"
 #include "AttributeHandleSetForTesting.hpp"
-#include "AttributeHandleValuePairSetForTesting.hpp"
+#include "PropertyHandleValuePairSetForTesting.hpp"
 
 RTI::ParameterHandleValuePairSet *RTI::ParameterSetFactory::create(ULong count) throw (
   MemoryExhausted, ValueCountExceeded, HandleValuePairMaximumExceeded
 ) {
-    return nullptr;
+    return new PropertyHandleValuePairSetForTesting(count);
 }
 
 RTI::AttributeHandleValuePairSet *RTI::AttributeSetFactory::create(ULong count) throw (
   MemoryExhausted, ValueCountExceeded, HandleValuePairMaximumExceeded
 ) {
-    return new AttributeHandleValuePairSetForTesting(count);
+    return new PropertyHandleValuePairSetForTesting(count);
 }
 
 RTI::AttributeHandleSet* RTI::AttributeHandleSetFactory::create(ULong count) throw (

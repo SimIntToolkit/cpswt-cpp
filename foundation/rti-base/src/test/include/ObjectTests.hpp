@@ -28,12 +28,12 @@
  * OR MODIFICATIONS.
  */
 
-#ifndef _INTERACTION_TESTS
-#define _INTERACTION_TESTS
+#ifndef _OBJECT_TESTS
+#define _OBJECT_TESTS
 
 #define BOOST_LOG_DYN_LINK
 
-#include "RTIAmbassadorTest1.hpp"
+#include "Initialization.hpp"
 
 #include <cppunit/extensions/HelperMacros.h>
 
@@ -50,29 +50,14 @@ public:
     typedef sinks::synchronous_sink< sinks::text_ostream_backend > text_sink;
 
 private:
-    static RTIAmbassadorTest1 &get_rti_ambassador_test_1() {
-        static RTIAmbassadorTest1 rtiAmbassadorTest1;
-        return rtiAmbassadorTest1;
-    }
-    static RTI::RTIambassador *get_rti_ambassador_1_ptr();
-
-    static bool &get_is_initialized() {
-        static bool isInitialized = false;
-        return isInitialized;
-    }
-
-    static void init_1();
-
     CPPUNIT_TEST_SUITE( ObjectTests );
     CPPUNIT_TEST(objectTest1);
     CPPUNIT_TEST_SUITE_END();
 
 public:
-    ObjectTests() : CppUnit::TestCase() {
-        init_1();
-    }
+    ObjectTests();
 
     void objectTest1();
 };
 
-#endif // _INTERACTION_TESTS
+#endif // _OBJECT_TESTS

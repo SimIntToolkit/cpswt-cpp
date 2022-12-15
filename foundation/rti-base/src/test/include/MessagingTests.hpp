@@ -28,8 +28,8 @@
  * OR MODIFICATIONS.
  */
 
-#ifndef _INTERACTION_TESTS
-#define _INTERACTION_TESTS
+#ifndef _MESSAGING_TESTS
+#define _MESSAGING_TESTS
 
 #define BOOST_LOG_DYN_LINK
 
@@ -50,17 +50,6 @@ public:
     typedef sinks::synchronous_sink< sinks::text_ostream_backend > text_sink;
 
 private:
-    static RTI::RTIambassador *get_rti_ambassador_1_ptr();
-
-    static bool &get_is_initialized() {
-        static bool isInitialized = false;
-        return isInitialized;
-    }
-
-    static void interaction_root_dynamic_init();
-
-    static void init_1();
-
     static bool null_filter(const logging::attribute_value_set &attrs) {
         return false;
     }
@@ -88,12 +77,7 @@ private:
     CPPUNIT_TEST_SUITE_END();
 
 public:
-    MessagingTests() : CppUnit::TestCase() {
-        init_1();
-        nullSink = boost::make_shared< text_sink >();
-        nullSink->set_filter(&null_filter);
-        logging::core::get()->add_sink(nullSink);
-    }
+    MessagingTests();
 
     void setUp() override;
 
@@ -115,4 +99,4 @@ public:
     void rejectSourceFederateIdTest();
 };
 
-#endif // _INTERACTION_TESTS
+#endif // _MESSAGING_TESTS
