@@ -37,6 +37,7 @@ val rtiHome = System.getenv("RTI_HOME")
 
 val archivaHostId: String by project
 val archivaPort: String by project
+val version: String by project
 
 
 dependencies {
@@ -44,15 +45,15 @@ dependencies {
 
     implementation(files("$rtiHome/lib/portico.jar"))
 
-    implementation(group="org.cpswt", name="utils", version="0.7.0-SNAPSHOT")
+    implementation(group="org.cpswt", name="utils", version=version)
 
-    implementation(group="org.cpswt", name="root", version="0.7.0-SNAPSHOT")
+    implementation(group="org.cpswt", name="root", version=version)
 
-    implementation(group="org.cpswt", name="base-events", version="0.7.0-SNAPSHOT")
+    implementation(group="org.cpswt", name="base-events", version=version)
 
-    implementation(group="org.cpswt", name="federate-base", version="0.7.0-SNAPSHOT")
+    implementation(group="org.cpswt", name="federate-base", version=version)
 
-    implementation(group="org.cpswt", name="config", version="0.7.0-SNAPSHOT")
+    implementation(group="org.cpswt", name="config", version=version)
 }
 
 application {

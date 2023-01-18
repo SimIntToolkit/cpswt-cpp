@@ -34,13 +34,14 @@ plugins {
 }
 
 val rtiHome = System.getenv("RTI_HOME")
+val version: String by project
 
 dependencies {
     implementation(group="org.apache.logging.log4j", name="log4j-core", version="2.14.1")
 
     implementation(files("$rtiHome/lib/portico.jar"))
 
-    implementation(group="org.cpswt", name="federation-manager", version="0.7.0-SNAPSHOT")
+    implementation(group="org.cpswt", name="federation-manager", version=version)
 }
 
 application {
