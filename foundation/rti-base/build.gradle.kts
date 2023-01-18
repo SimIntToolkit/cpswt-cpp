@@ -49,10 +49,10 @@ val archivaPort: String by project
 
 library {
     dependencies {
-        implementation(group="org.cpswt", name="core-cpp", version="0.7.0-SNAPSHOT")
-        implementation(group="org.cpswt", name="C2WConsoleLogger", version="0.7.0-SNAPSHOT")
+        implementation(group="org.cpswt", name="core-cpp", version=version)
+        implementation(group="org.cpswt", name="C2WConsoleLogger", version=version)
 
-        testImplementation(group="org.cpswt", name="CppTestHarness", version="0.7.0-SNAPSHOT")
+        testImplementation(group="org.cpswt", name="CppTestHarness", version=version)
     }
     source.from(file("src/main/c++"))
     publicHeaders.from(file("src/main/include"))
