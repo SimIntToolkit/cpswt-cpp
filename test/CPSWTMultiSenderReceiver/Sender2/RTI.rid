@@ -125,15 +125,15 @@
 #
 # portico.connection = jgroups
 
-# (3.2) LRC Tick Timeout
-#        When a federate calls tick() and there is no work to do, the LRC will wait for a period of
+# (3.2) RTI Tick Timeout
+#        When a federate calls tick() and there is no work to do, the RTI will wait for a period of
 #        time to allow work to arrive before it returns. This is designed to avoid a busy-looping
 #        situation where people are calling tick in a loop while waiting for some event.
 #
-#        The period of time the LRC will wait is specified by this value (in *MILLISECONDS*).
+#        The period of time the RTI will wait is specified by this value (in *MILLISECONDS*).
 #        DEFAULT = 5
 #
-#        (NOTE) This does not apply to the tick(min,max) call (in that case, the LRC will wait
+#        (NOTE) This does not apply to the tick(min,max) call (in that case, the RTI will wait
 #               for at most "min" seconds for work to arrive).
 #
 # portico.lrc.tt = 5

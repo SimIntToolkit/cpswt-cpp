@@ -28,7 +28,7 @@
  * OR MODIFICATIONS.
  */
 
-package org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p;
+package org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.EmbeddedMessaging_p;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -44,10 +44,10 @@ import hla.rti.ReceivedInteraction;
 
 
 /**
- * Implements org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.TestInteraction
+ * Implements org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.EmbeddedMessaging_p.Receiver3
  */
 @SuppressWarnings("unused")
-public class TestInteraction extends org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot {
+public class Receiver3 extends org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.EmbeddedMessaging {
 
     private static final Logger logger = LogManager.getLogger();
 
@@ -60,7 +60,7 @@ public class TestInteraction extends org.cpswt.hla.InteractionRoot_p.C2WInteract
     // ----------------------------------------------------------------------------
 
     /**
-     * Returns the fully-qualified (dot-delimited) name of the org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.TestInteraction interaction class.
+     * Returns the fully-qualified (dot-delimited) name of the org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.EmbeddedMessaging_p.Receiver3 interaction class.
      * Note: As this is a static method, it is NOT polymorphic, and so, if called on
      * a reference will return the name of the class pertaining to the reference,
      * rather than the name of the class for the instance referred to by the reference.
@@ -69,7 +69,7 @@ public class TestInteraction extends org.cpswt.hla.InteractionRoot_p.C2WInteract
      * @return the fully-qualified Java class name for this interaction class
      */
     public static String get_java_class_name() {
-        return "org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.TestInteraction";
+        return "org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.EmbeddedMessaging_p.Receiver3";
     }
 
     /**
@@ -85,7 +85,7 @@ public class TestInteraction extends org.cpswt.hla.InteractionRoot_p.C2WInteract
 
     /**
      * Returns the simple name (the last name in the dot-delimited fully-qualified
-     * class name) of the org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.TestInteraction interaction class.
+     * class name) of the org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.EmbeddedMessaging_p.Receiver3 interaction class.
      *
      * @return the name of this interaction class
      */
@@ -95,7 +95,7 @@ public class TestInteraction extends org.cpswt.hla.InteractionRoot_p.C2WInteract
 
     /**
      * Returns the fully-qualified (dot-delimited) hla class name of the
-     * InteractionRoot.C2WInteractionRoot.TestInteraction interaction class.
+     * InteractionRoot.C2WInteractionRoot.EmbeddedMessaging.Receiver3 interaction class.
      * Note: As this is a static method, it is NOT polymorphic, and so, if called on
      * a reference will return the federation name of the class pertaining to the reference,
      * rather than the name of the class for the instance referred to by the reference.
@@ -104,7 +104,7 @@ public class TestInteraction extends org.cpswt.hla.InteractionRoot_p.C2WInteract
      * @return the fully-qualified federation (HLA) class name for this interaction class
      */
     public static String get_hla_class_name() {
-        return "InteractionRoot.C2WInteractionRoot.TestInteraction";
+        return "InteractionRoot.C2WInteractionRoot.EmbeddedMessaging.Receiver3";
     }
 
     /**
@@ -119,7 +119,7 @@ public class TestInteraction extends org.cpswt.hla.InteractionRoot_p.C2WInteract
 
     /**
      * Returns a sorted list containing the names of all of the non-hidden parameters in the
-     * org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.TestInteraction interaction class.
+     * org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.EmbeddedMessaging_p.Receiver3 interaction class.
      * The property names are paired with name of the hla class in which they are defined in a
      * ClassAndPropertyName POJO.
      * Note: As this is a static method, it is NOT polymorphic, and so, if called on
@@ -137,7 +137,7 @@ public class TestInteraction extends org.cpswt.hla.InteractionRoot_p.C2WInteract
 
     /**
      * Returns a sorted list containing the names of all of the parameters in the
-     * org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.TestInteraction interaction class.
+     * org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.EmbeddedMessaging_p.Receiver3 interaction class.
      * The property names are paired with name of the hla class in which they are defined in a
      * ClassAndPropertyName POJO.
      * Note: As this is a static method, it is NOT polymorphic, and so, if called on
@@ -159,13 +159,10 @@ public class TestInteraction extends org.cpswt.hla.InteractionRoot_p.C2WInteract
     static {
         _hlaClassNameSet.add(get_hla_class_name());
 
-        TestInteraction instance = new TestInteraction(noInstanceInit);
+        Receiver3 instance = new Receiver3(noInstanceInit);
         _hlaClassNameInstanceMap.put(get_hla_class_name(), instance);
 
         Set<ClassAndPropertyName> classAndPropertyNameSet = new HashSet<>();
-        classAndPropertyNameSet.add(new ClassAndPropertyName(
-            "InteractionRoot.C2WInteractionRoot.TestInteraction", "TestParameter"
-        ));
 
         // ADD THIS CLASS'S classAndPropertyNameSet TO _classNamePropertyNameSetMap DEFINED
         // IN InteractionRoot
@@ -175,7 +172,15 @@ public class TestInteraction extends org.cpswt.hla.InteractionRoot_p.C2WInteract
         Set<ClassAndPropertyName> allClassAndPropertyNameSet = new HashSet<>();
 
         allClassAndPropertyNameSet.add(new ClassAndPropertyName(
-            "InteractionRoot.C2WInteractionRoot.TestInteraction", "TestParameter"
+            "InteractionRoot.C2WInteractionRoot.EmbeddedMessaging", "command"
+        ));
+
+        allClassAndPropertyNameSet.add(new ClassAndPropertyName(
+            "InteractionRoot.C2WInteractionRoot.EmbeddedMessaging", "hlaClassName"
+        ));
+
+        allClassAndPropertyNameSet.add(new ClassAndPropertyName(
+            "InteractionRoot.C2WInteractionRoot.EmbeddedMessaging", "messagingJson"
         ));
 
         allClassAndPropertyNameSet.add(new ClassAndPropertyName(
@@ -195,17 +200,12 @@ public class TestInteraction extends org.cpswt.hla.InteractionRoot_p.C2WInteract
         // IN InteractionRoot
         _allClassNamePropertyNameSetMap.put(get_hla_class_name(), allClassAndPropertyNameSet);
 
-        ClassAndPropertyName key;
-
-        key = new ClassAndPropertyName(get_hla_class_name(), "TestParameter");
-        _classAndPropertyNameInitialValueMap.put(key, 0);
-
         logger.info(
-          "Class \"org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.TestInteraction\" (hla class \"{}\") loaded", get_hla_class_name()
+          "Class \"org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.EmbeddedMessaging_p.Receiver3\" (hla class \"{}\") loaded", get_hla_class_name()
         );
 
         System.err.println(
-          "Class \"org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.TestInteraction\" (hla class \"" +
+          "Class \"org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.EmbeddedMessaging_p.Receiver3\" (hla class \"" +
           get_hla_class_name() + "\") loaded"
         );
     }
@@ -221,7 +221,7 @@ public class TestInteraction extends org.cpswt.hla.InteractionRoot_p.C2WInteract
     // ----------------------------------------------------------------------------
 
     /**
-     * Returns the handle (RTI assigned) of the org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.TestInteraction interaction class.
+     * Returns the handle (RTI assigned) of the org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.EmbeddedMessaging_p.Receiver3 interaction class.
      * Note: As this is a static method, it is NOT polymorphic, and so, if called on
      * a reference will return the handle of the class pertaining to the reference,
      * rather than the handle of the class for the instance referred to by the reference.
@@ -235,7 +235,7 @@ public class TestInteraction extends org.cpswt.hla.InteractionRoot_p.C2WInteract
 
     /**
      * Returns the handle of an parameter (RTI assigned) of
-     * this interaction class (i.e. "org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.TestInteraction") given the parameter's name.
+     * this interaction class (i.e. "org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.EmbeddedMessaging_p.Receiver3") given the parameter's name.
      *
      * @param propertyName name of parameter
      * @return the handle (RTI assigned) of the parameter "propertyName" of interaction class "className"
@@ -254,7 +254,7 @@ public class TestInteraction extends org.cpswt.hla.InteractionRoot_p.C2WInteract
     //-------------------------------------------------
 
     /**
-     * Publishes the org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.TestInteraction interaction class for a federate.
+     * Publishes the org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.EmbeddedMessaging_p.Receiver3 interaction class for a federate.
      *
      * @param rti handle to the Local RTI Component
      */
@@ -267,7 +267,7 @@ public class TestInteraction extends org.cpswt.hla.InteractionRoot_p.C2WInteract
     }
 
     /**
-     * Unpublishes the org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.TestInteraction interaction class for a federate.
+     * Unpublishes the org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.EmbeddedMessaging_p.Receiver3 interaction class for a federate.
      *
      * @param rti handle to the Local RTI Component, usu. obtained through the
      *            {@link SynchronizedFederate#getRTI()} call
@@ -277,7 +277,7 @@ public class TestInteraction extends org.cpswt.hla.InteractionRoot_p.C2WInteract
     }
 
     /**
-     * Subscribes a federate to the org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.TestInteraction interaction class.
+     * Subscribes a federate to the org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.EmbeddedMessaging_p.Receiver3 interaction class.
      *
      * @param rti handle to the Local RTI Component
      */
@@ -298,7 +298,7 @@ public class TestInteraction extends org.cpswt.hla.InteractionRoot_p.C2WInteract
     }
 
     /**
-     * Unsubscribes a federate from the org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.TestInteraction interaction class.
+     * Unsubscribes a federate from the org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.EmbeddedMessaging_p.Receiver3 interaction class.
      *
      * @param rti handle to the Local RTI Component
      */
@@ -324,12 +324,12 @@ public class TestInteraction extends org.cpswt.hla.InteractionRoot_p.C2WInteract
 
     /**
      * Return true if "handle" is equal to the handle (RTI assigned) of this class
-     * (that is, the org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.TestInteraction interaction class).
+     * (that is, the org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.EmbeddedMessaging_p.Receiver3 interaction class).
      *
      * @param handle handle to compare to the value of the handle (RTI assigned) of
-     * this class (the org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.TestInteraction interaction class).
+     * this class (the org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.EmbeddedMessaging_p.Receiver3 interaction class).
      * @return "true" if "handle" matches the value of the handle of this class
-     * (that is, the org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.TestInteraction interaction class).
+     * (that is, the org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.EmbeddedMessaging_p.Receiver3 interaction class).
      */
     public static boolean match(int handle) {
         return handle == get_class_handle();
@@ -338,21 +338,21 @@ public class TestInteraction extends org.cpswt.hla.InteractionRoot_p.C2WInteract
     //-------------
     // CONSTRUCTORS
     //-------------
-    public TestInteraction() {
+    public Receiver3() {
         this(get_hla_class_name());
     }
 
-    public TestInteraction(LogicalTime logicalTime) {
+    public Receiver3(LogicalTime logicalTime) {
         this();
         setTime(logicalTime);
     }
 
-    public TestInteraction(ReceivedInteraction propertyMap) {
+    public Receiver3(ReceivedInteraction propertyMap) {
         this();
         setParameters( propertyMap );
     }
 
-    public TestInteraction(ReceivedInteraction propertyMap, LogicalTime logicalTime) {
+    public Receiver3(ReceivedInteraction propertyMap, LogicalTime logicalTime) {
         this(propertyMap);
         setTime(logicalTime);
     }
@@ -365,35 +365,35 @@ public class TestInteraction extends org.cpswt.hla.InteractionRoot_p.C2WInteract
     //-----------------
     // CREATION METHODS
     //-----------------
-    public static TestInteraction create_interaction() {
-        return new TestInteraction();
+    public static Receiver3 create_interaction() {
+        return new Receiver3();
     }
 
-    public TestInteraction createInteraction() {
+    public Receiver3 createInteraction() {
         return create_interaction();
     }
 
-    public static TestInteraction create_interaction(LogicalTime logicalTime) {
-        return new TestInteraction(logicalTime);
+    public static Receiver3 create_interaction(LogicalTime logicalTime) {
+        return new Receiver3(logicalTime);
     }
 
-    public TestInteraction createInteraction(LogicalTime logicalTime) {
+    public Receiver3 createInteraction(LogicalTime logicalTime) {
         return create_interaction(logicalTime);
     }
 
-    public static TestInteraction create_interaction(ReceivedInteraction propertyMap) {
-        return new TestInteraction(propertyMap);
+    public static Receiver3 create_interaction(ReceivedInteraction propertyMap) {
+        return new Receiver3(propertyMap);
     }
 
-    public TestInteraction createInteraction(ReceivedInteraction propertyMap) {
+    public Receiver3 createInteraction(ReceivedInteraction propertyMap) {
         return create_interaction(propertyMap);
     }
 
-    public static TestInteraction create_interaction(ReceivedInteraction propertyMap, LogicalTime logicalTime) {
-        return new TestInteraction(propertyMap, logicalTime);
+    public static Receiver3 create_interaction(ReceivedInteraction propertyMap, LogicalTime logicalTime) {
+        return new Receiver3(propertyMap, logicalTime);
     }
 
-    public TestInteraction createInteraction(ReceivedInteraction propertyMap, LogicalTime logicalTime) {
+    public Receiver3 createInteraction(ReceivedInteraction propertyMap, LogicalTime logicalTime) {
         return create_interaction(propertyMap, logicalTime);
     }
 
@@ -409,27 +409,6 @@ public class TestInteraction extends org.cpswt.hla.InteractionRoot_p.C2WInteract
     //------------------------------
     // PROPERTY MANIPULATION METHODS
     //------------------------------
-
-
-    /**
-     * Set the value of the "TestParameter" parameter to "value" for this parameter.
-     *
-     * @param value the new value for the "TestParameter" parameter
-     */
-    public void set_TestParameter(Integer value) {
-        ClassAndPropertyName key = new ClassAndPropertyName(get_hla_class_name(), "TestParameter");
-        classAndPropertyNameValueMap.put(key, value);
-    }
-
-    /**
-     * Returns the value of the "TestParameter" parameter of this interaction.
-     *
-     * @return the value of the "TestParameter" parameter
-     */
-    public int get_TestParameter() {
-        ClassAndPropertyName key = new ClassAndPropertyName(get_hla_class_name(), "TestParameter");
-        return (int)classAndPropertyNameValueMap.get(key);
-    }
 
     //----------------------------------
     // END PROPERTY MANIPULATION METHODS
@@ -447,32 +426,32 @@ public class TestInteraction extends org.cpswt.hla.InteractionRoot_p.C2WInteract
         remove_reject_source_federate_id(get_hla_class_name(), federateId);
     }
 
-    protected TestInteraction(NoInstanceInit noInstanceInit) {
+    protected Receiver3(NoInstanceInit noInstanceInit) {
         super(noInstanceInit);
     }
 
     /**
-    * Creates an instance of the TestInteraction interaction class, using
+    * Creates an instance of the Receiver3 interaction class, using
     * "datamemberMap" to initialize its parameter values.
     * "datamemberMap" is usually acquired as an argument to an RTI federate
     * callback method, such as "receiveInteraction".
     *
     * @param datamemberMap data structure containing initial values for the
-    * parameters of this new TestInteraction interaction class instance
+    * parameters of this new Receiver3 interaction class instance
     */
-    protected TestInteraction( String hlaClassName ) {
+    protected Receiver3( String hlaClassName ) {
         super( hlaClassName );
     }
 
     /**
-    * Creates a new TestInteraction interaction class instance that is a duplicate
+    * Creates a new Receiver3 interaction class instance that is a duplicate
     * of the instance referred to by messaging_var.
     *
-    * @param messaging_var TestInteraction interaction class instance of which
-    * this newly created TestInteraction interaction class instance will be a
+    * @param messaging_var Receiver3 interaction class instance of which
+    * this newly created Receiver3 interaction class instance will be a
     * duplicate
     */
-    public TestInteraction(TestInteraction messaging_var) {
+    public Receiver3(Receiver3 messaging_var) {
     
         // SHALLOW COPY
         classAndPropertyNameValueMap = new HashMap<>(messaging_var.classAndPropertyNameValueMap);

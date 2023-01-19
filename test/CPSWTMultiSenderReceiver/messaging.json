@@ -503,6 +503,24 @@
                 "ParameterType": "String"
             }
         },
+        "InteractionRoot.C2WInteractionRoot.EmbeddedMessaging": {
+            "command": {
+                "Hidden": false,
+                "ParameterType": "String"
+            },
+            "hlaClassName": {
+                "Hidden": false,
+                "ParameterType": "String"
+            },
+            "messagingJson": {
+                "Hidden": false,
+                "ParameterType": "String"
+            }
+        },
+        "InteractionRoot.C2WInteractionRoot.EmbeddedMessaging.OmnetFederate": {},
+        "InteractionRoot.C2WInteractionRoot.EmbeddedMessaging.Receiver1": {},
+        "InteractionRoot.C2WInteractionRoot.EmbeddedMessaging.Receiver2": {},
+        "InteractionRoot.C2WInteractionRoot.EmbeddedMessaging.Receiver3": {},
         "InteractionRoot.C2WInteractionRoot.FederateJoinInteraction": {
             "FederateId": {
                 "Hidden": false,
@@ -559,10 +577,7 @@
                 "Hidden": false,
                 "ParameterType": "int"
             }
-        },
-        "InteractionRoot.C2WInteractionRoot.TestInteraction.Receiver1": {},
-        "InteractionRoot.C2WInteractionRoot.TestInteraction.Receiver2": {},
-        "InteractionRoot.C2WInteractionRoot.TestInteraction.Receiver3": {}
+        }
     },
     "objects": {
         "ObjectRoot": {},

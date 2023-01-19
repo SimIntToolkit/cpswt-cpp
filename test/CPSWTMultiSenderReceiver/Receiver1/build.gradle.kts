@@ -37,8 +37,8 @@ val rtiHome = System.getenv("RTI_HOME")
 
 val archivaHostId: String by project
 val archivaPort: String by project
-val version: String by project
 
+val version: String by project
 
 dependencies {
     implementation(group="org.apache.logging.log4j", name="log4j-core", version="2.14.1")
