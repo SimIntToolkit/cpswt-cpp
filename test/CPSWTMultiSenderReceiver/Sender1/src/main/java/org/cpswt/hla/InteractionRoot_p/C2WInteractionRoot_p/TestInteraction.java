@@ -159,7 +159,7 @@ public class TestInteraction extends org.cpswt.hla.InteractionRoot_p.C2WInteract
     static {
         _hlaClassNameSet.add(get_hla_class_name());
 
-        TestInteraction instance = new TestInteraction(createNoInstanceInit());
+        TestInteraction instance = new TestInteraction(noInstanceInit);
         _hlaClassNameInstanceMap.put(get_hla_class_name(), instance);
 
         Set<ClassAndPropertyName> classAndPropertyNameSet = new HashSet<>();
@@ -262,11 +262,15 @@ public class TestInteraction extends org.cpswt.hla.InteractionRoot_p.C2WInteract
         publish_interaction(get_hla_class_name(), rti);
     }
 
+    public static Boolean get_is_published() {
+        return get_is_published(get_hla_class_name());
+    }
+
     /**
      * Unpublishes the org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.TestInteraction interaction class for a federate.
      *
      * @param rti handle to the Local RTI Component, usu. obtained through the
-     *            {@link SynchronizedFederate#getLRC()} call
+     *            {@link SynchronizedFederate#getRTI()} call
      */
     public static void unpublish_interaction(RTIambassador rti) {
         unpublish_interaction(get_hla_class_name(), rti);
@@ -281,6 +285,18 @@ public class TestInteraction extends org.cpswt.hla.InteractionRoot_p.C2WInteract
         subscribe_interaction(get_hla_class_name(), rti);
     }
 
+    public static Boolean get_is_subscribed() {
+        return get_is_subscribed(get_hla_class_name());
+    }
+
+    public static void soft_subscribe_interaction(RTIambassador rti) {
+        soft_subscribe_interaction(get_hla_class_name(), rti);
+    }
+
+    public static Boolean get_is_soft_subscribed() {
+        return get_is_soft_subscribed(get_hla_class_name());
+    }
+
     /**
      * Unsubscribes a federate from the org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.TestInteraction interaction class.
      *
@@ -290,6 +306,17 @@ public class TestInteraction extends org.cpswt.hla.InteractionRoot_p.C2WInteract
         unsubscribe_interaction(get_hla_class_name(), rti);
     }
 
+    public static void soft_unsubscribe_interaction(RTIambassador rti) {
+        soft_unsubscribe_interaction(get_hla_class_name(), rti);
+    }
+
+    public static void add_federate_name_soft_publish(String networkFederateName) {
+        add_federate_name_soft_publish(get_hla_class_name(), networkFederateName);
+    }
+
+    public static void remove_federate_name_soft_publish(String networkFederateName) {
+        remove_federate_name_soft_publish(get_hla_class_name(), networkFederateName);
+    }
 
     //-----------------------------------------------------
     // END METHODS FOR PUBLISHING/SUBSCRIBING-TO THIS CLASS
@@ -374,6 +401,11 @@ public class TestInteraction extends org.cpswt.hla.InteractionRoot_p.C2WInteract
     // END CREATION METHODS
     //---------------------
 
+    public static int get_num_parameters() {
+        return _allClassNamePropertyNameSetMap.get(get_hla_class_name()).size();
+    }
+
+
     //------------------------------
     // PROPERTY MANIPULATION METHODS
     //------------------------------
@@ -402,6 +434,18 @@ public class TestInteraction extends org.cpswt.hla.InteractionRoot_p.C2WInteract
     //----------------------------------
     // END PROPERTY MANIPULATION METHODS
     //----------------------------------
+
+    public static void add_reject_source_federate_id(String federateId) {
+        add_reject_source_federate_id(get_hla_class_name(), federateId);
+    }
+
+    public static boolean is_reject_source_federate_id(String federateId) {
+        return is_reject_source_federate_id(get_hla_class_name(), federateId);
+    }
+
+    public static void remove_reject_source_federate_id(String federateId) {
+        remove_reject_source_federate_id(get_hla_class_name(), federateId);
+    }
 
     protected TestInteraction(NoInstanceInit noInstanceInit) {
         super(noInstanceInit);

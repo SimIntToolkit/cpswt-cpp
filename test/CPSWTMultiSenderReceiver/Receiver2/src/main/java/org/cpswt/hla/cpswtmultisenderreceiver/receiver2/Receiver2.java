@@ -53,21 +53,38 @@ public class Receiver2 extends Receiver2Base {
         super(params);
     }
 
+    private void handleInteractionClass_InteractionRoot_C2WInteractionRoot_TestInteraction(InteractionRoot interactionRoot) {
+        org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.TestInteraction testInteraction2 =
+            (org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.TestInteraction)interactionRoot;
+        ///////////////////////////////////////////////////////////////
+        // TODO implement how to handle reception of the interaction //
+        ///////////////////////////////////////////////////////////////
+        System.out.println(
+                getFederateType() + ": Received \"" + testInteraction2.getInstanceHlaClassName() +
+                        "\" interaction with TestParameter value " + testInteraction2.getParameter("TestParameter") +
+                        " from \"" + C2WInteractionRoot.get_origin_federate_id(testInteraction2) + "\""
+        );
+    }
+
     private void checkReceivedSubscriptions() {
+
         InteractionRoot interactionRoot;
         while ((interactionRoot = getNextInteractionNoWait()) != null) {
-            if (interactionRoot instanceof org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.TestInteraction_p.Receiver2) {
-                handleInteractionClass((org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.TestInteraction_p.Receiver2)interactionRoot);
-            } else {
-                log.debug("unhandled interaction: {}", interactionRoot.getJavaClassName());
+        
+            if (interactionRoot.isInstanceHlaClassDerivedFromHlaClass("InteractionRoot.C2WInteractionRoot.TestInteraction")) {
+
+                handleInteractionClass_InteractionRoot_C2WInteractionRoot_TestInteraction(interactionRoot);
+                continue;
             }
+
+            log.debug("unhandled interaction: {}", interactionRoot.getJavaClassName());
         }
     }
 
     private void execute() throws Exception {
         if(super.isLateJoiner()) {
             log.info("turning off time regulation (late joiner)");
-            currentTime = super.getLBTS() - super.getLookAhead();
+            currentTime = super.getLBTS() - super.getLookahead();
             super.disableTimeRegulation();
         }
 
@@ -122,17 +139,6 @@ public class Receiver2 extends Receiver2Base {
         //////////////////////////////////////////////////////////////////////
         // TODO Perform whatever cleanups are needed before exiting the app //
         //////////////////////////////////////////////////////////////////////
-    }
-
-    private void handleInteractionClass(org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.TestInteraction_p.Receiver2 interaction) {
-        ///////////////////////////////////////////////////////////////
-        // TODO implement how to handle reception of the interaction //
-        ///////////////////////////////////////////////////////////////
-        System.out.println(
-                getFederateType() + ": Received \"" + interaction.getInstanceHlaClassName() +
-                        "\" interaction with TestParameter value " + interaction.getParameter("TestParameter") +
-                        " from \"" + C2WInteractionRoot.get_origin_federate_id(interaction) + "\""
-        );
     }
 
     public static void main(String[] args) {

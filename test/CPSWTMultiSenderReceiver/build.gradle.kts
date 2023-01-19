@@ -79,7 +79,7 @@ fun spawnProcess() {
 val runAsynchronous = tasks.register("runAsynchronous") {
     doLast {
         spawnProcess()
-        Thread.sleep(5000)
+        Thread.sleep(10000)
     }
 }
 

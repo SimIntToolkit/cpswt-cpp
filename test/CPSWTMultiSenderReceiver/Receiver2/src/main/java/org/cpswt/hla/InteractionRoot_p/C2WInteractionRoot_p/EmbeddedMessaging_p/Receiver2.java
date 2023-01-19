@@ -28,7 +28,7 @@
  * OR MODIFICATIONS.
  */
 
-package org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.TestInteraction_p;
+package org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.EmbeddedMessaging_p;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -44,10 +44,10 @@ import hla.rti.ReceivedInteraction;
 
 
 /**
- * Implements org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.TestInteraction_p.Receiver1
+ * Implements org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.EmbeddedMessaging_p.Receiver2
  */
 @SuppressWarnings("unused")
-public class Receiver1 extends org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.TestInteraction {
+public class Receiver2 extends org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.EmbeddedMessaging {
 
     private static final Logger logger = LogManager.getLogger();
 
@@ -60,7 +60,7 @@ public class Receiver1 extends org.cpswt.hla.InteractionRoot_p.C2WInteractionRoo
     // ----------------------------------------------------------------------------
 
     /**
-     * Returns the fully-qualified (dot-delimited) name of the org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.TestInteraction_p.Receiver1 interaction class.
+     * Returns the fully-qualified (dot-delimited) name of the org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.EmbeddedMessaging_p.Receiver2 interaction class.
      * Note: As this is a static method, it is NOT polymorphic, and so, if called on
      * a reference will return the name of the class pertaining to the reference,
      * rather than the name of the class for the instance referred to by the reference.
@@ -69,7 +69,7 @@ public class Receiver1 extends org.cpswt.hla.InteractionRoot_p.C2WInteractionRoo
      * @return the fully-qualified Java class name for this interaction class
      */
     public static String get_java_class_name() {
-        return "org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.TestInteraction_p.Receiver1";
+        return "org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.EmbeddedMessaging_p.Receiver2";
     }
 
     /**
@@ -85,7 +85,7 @@ public class Receiver1 extends org.cpswt.hla.InteractionRoot_p.C2WInteractionRoo
 
     /**
      * Returns the simple name (the last name in the dot-delimited fully-qualified
-     * class name) of the org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.TestInteraction_p.Receiver1 interaction class.
+     * class name) of the org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.EmbeddedMessaging_p.Receiver2 interaction class.
      *
      * @return the name of this interaction class
      */
@@ -95,7 +95,7 @@ public class Receiver1 extends org.cpswt.hla.InteractionRoot_p.C2WInteractionRoo
 
     /**
      * Returns the fully-qualified (dot-delimited) hla class name of the
-     * InteractionRoot.C2WInteractionRoot.TestInteraction.Receiver1 interaction class.
+     * InteractionRoot.C2WInteractionRoot.EmbeddedMessaging.Receiver2 interaction class.
      * Note: As this is a static method, it is NOT polymorphic, and so, if called on
      * a reference will return the federation name of the class pertaining to the reference,
      * rather than the name of the class for the instance referred to by the reference.
@@ -104,7 +104,7 @@ public class Receiver1 extends org.cpswt.hla.InteractionRoot_p.C2WInteractionRoo
      * @return the fully-qualified federation (HLA) class name for this interaction class
      */
     public static String get_hla_class_name() {
-        return "InteractionRoot.C2WInteractionRoot.TestInteraction.Receiver1";
+        return "InteractionRoot.C2WInteractionRoot.EmbeddedMessaging.Receiver2";
     }
 
     /**
@@ -119,7 +119,7 @@ public class Receiver1 extends org.cpswt.hla.InteractionRoot_p.C2WInteractionRoo
 
     /**
      * Returns a sorted list containing the names of all of the non-hidden parameters in the
-     * org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.TestInteraction_p.Receiver1 interaction class.
+     * org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.EmbeddedMessaging_p.Receiver2 interaction class.
      * The property names are paired with name of the hla class in which they are defined in a
      * ClassAndPropertyName POJO.
      * Note: As this is a static method, it is NOT polymorphic, and so, if called on
@@ -137,7 +137,7 @@ public class Receiver1 extends org.cpswt.hla.InteractionRoot_p.C2WInteractionRoo
 
     /**
      * Returns a sorted list containing the names of all of the parameters in the
-     * org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.TestInteraction_p.Receiver1 interaction class.
+     * org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.EmbeddedMessaging_p.Receiver2 interaction class.
      * The property names are paired with name of the hla class in which they are defined in a
      * ClassAndPropertyName POJO.
      * Note: As this is a static method, it is NOT polymorphic, and so, if called on
@@ -159,7 +159,7 @@ public class Receiver1 extends org.cpswt.hla.InteractionRoot_p.C2WInteractionRoo
     static {
         _hlaClassNameSet.add(get_hla_class_name());
 
-        Receiver1 instance = new Receiver1(createNoInstanceInit());
+        Receiver2 instance = new Receiver2(noInstanceInit);
         _hlaClassNameInstanceMap.put(get_hla_class_name(), instance);
 
         Set<ClassAndPropertyName> classAndPropertyNameSet = new HashSet<>();
@@ -172,7 +172,15 @@ public class Receiver1 extends org.cpswt.hla.InteractionRoot_p.C2WInteractionRoo
         Set<ClassAndPropertyName> allClassAndPropertyNameSet = new HashSet<>();
 
         allClassAndPropertyNameSet.add(new ClassAndPropertyName(
-            "InteractionRoot.C2WInteractionRoot.TestInteraction", "TestParameter"
+            "InteractionRoot.C2WInteractionRoot.EmbeddedMessaging", "command"
+        ));
+
+        allClassAndPropertyNameSet.add(new ClassAndPropertyName(
+            "InteractionRoot.C2WInteractionRoot.EmbeddedMessaging", "hlaClassName"
+        ));
+
+        allClassAndPropertyNameSet.add(new ClassAndPropertyName(
+            "InteractionRoot.C2WInteractionRoot.EmbeddedMessaging", "messagingJson"
         ));
 
         allClassAndPropertyNameSet.add(new ClassAndPropertyName(
@@ -193,11 +201,11 @@ public class Receiver1 extends org.cpswt.hla.InteractionRoot_p.C2WInteractionRoo
         _allClassNamePropertyNameSetMap.put(get_hla_class_name(), allClassAndPropertyNameSet);
 
         logger.info(
-          "Class \"org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.TestInteraction_p.Receiver1\" (hla class \"{}\") loaded", get_hla_class_name()
+          "Class \"org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.EmbeddedMessaging_p.Receiver2\" (hla class \"{}\") loaded", get_hla_class_name()
         );
 
         System.err.println(
-          "Class \"org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.TestInteraction_p.Receiver1\" (hla class \"" +
+          "Class \"org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.EmbeddedMessaging_p.Receiver2\" (hla class \"" +
           get_hla_class_name() + "\") loaded"
         );
     }
@@ -213,7 +221,7 @@ public class Receiver1 extends org.cpswt.hla.InteractionRoot_p.C2WInteractionRoo
     // ----------------------------------------------------------------------------
 
     /**
-     * Returns the handle (RTI assigned) of the org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.TestInteraction_p.Receiver1 interaction class.
+     * Returns the handle (RTI assigned) of the org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.EmbeddedMessaging_p.Receiver2 interaction class.
      * Note: As this is a static method, it is NOT polymorphic, and so, if called on
      * a reference will return the handle of the class pertaining to the reference,
      * rather than the handle of the class for the instance referred to by the reference.
@@ -227,7 +235,7 @@ public class Receiver1 extends org.cpswt.hla.InteractionRoot_p.C2WInteractionRoo
 
     /**
      * Returns the handle of an parameter (RTI assigned) of
-     * this interaction class (i.e. "org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.TestInteraction_p.Receiver1") given the parameter's name.
+     * this interaction class (i.e. "org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.EmbeddedMessaging_p.Receiver2") given the parameter's name.
      *
      * @param propertyName name of parameter
      * @return the handle (RTI assigned) of the parameter "propertyName" of interaction class "className"
@@ -246,7 +254,7 @@ public class Receiver1 extends org.cpswt.hla.InteractionRoot_p.C2WInteractionRoo
     //-------------------------------------------------
 
     /**
-     * Publishes the org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.TestInteraction_p.Receiver1 interaction class for a federate.
+     * Publishes the org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.EmbeddedMessaging_p.Receiver2 interaction class for a federate.
      *
      * @param rti handle to the Local RTI Component
      */
@@ -254,18 +262,22 @@ public class Receiver1 extends org.cpswt.hla.InteractionRoot_p.C2WInteractionRoo
         publish_interaction(get_hla_class_name(), rti);
     }
 
+    public static Boolean get_is_published() {
+        return get_is_published(get_hla_class_name());
+    }
+
     /**
-     * Unpublishes the org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.TestInteraction_p.Receiver1 interaction class for a federate.
+     * Unpublishes the org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.EmbeddedMessaging_p.Receiver2 interaction class for a federate.
      *
      * @param rti handle to the Local RTI Component, usu. obtained through the
-     *            {@link SynchronizedFederate#getLRC()} call
+     *            {@link SynchronizedFederate#getRTI()} call
      */
     public static void unpublish_interaction(RTIambassador rti) {
         unpublish_interaction(get_hla_class_name(), rti);
     }
 
     /**
-     * Subscribes a federate to the org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.TestInteraction_p.Receiver1 interaction class.
+     * Subscribes a federate to the org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.EmbeddedMessaging_p.Receiver2 interaction class.
      *
      * @param rti handle to the Local RTI Component
      */
@@ -273,8 +285,20 @@ public class Receiver1 extends org.cpswt.hla.InteractionRoot_p.C2WInteractionRoo
         subscribe_interaction(get_hla_class_name(), rti);
     }
 
+    public static Boolean get_is_subscribed() {
+        return get_is_subscribed(get_hla_class_name());
+    }
+
+    public static void soft_subscribe_interaction(RTIambassador rti) {
+        soft_subscribe_interaction(get_hla_class_name(), rti);
+    }
+
+    public static Boolean get_is_soft_subscribed() {
+        return get_is_soft_subscribed(get_hla_class_name());
+    }
+
     /**
-     * Unsubscribes a federate from the org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.TestInteraction_p.Receiver1 interaction class.
+     * Unsubscribes a federate from the org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.EmbeddedMessaging_p.Receiver2 interaction class.
      *
      * @param rti handle to the Local RTI Component
      */
@@ -282,6 +306,17 @@ public class Receiver1 extends org.cpswt.hla.InteractionRoot_p.C2WInteractionRoo
         unsubscribe_interaction(get_hla_class_name(), rti);
     }
 
+    public static void soft_unsubscribe_interaction(RTIambassador rti) {
+        soft_unsubscribe_interaction(get_hla_class_name(), rti);
+    }
+
+    public static void add_federate_name_soft_publish(String networkFederateName) {
+        add_federate_name_soft_publish(get_hla_class_name(), networkFederateName);
+    }
+
+    public static void remove_federate_name_soft_publish(String networkFederateName) {
+        remove_federate_name_soft_publish(get_hla_class_name(), networkFederateName);
+    }
 
     //-----------------------------------------------------
     // END METHODS FOR PUBLISHING/SUBSCRIBING-TO THIS CLASS
@@ -289,12 +324,12 @@ public class Receiver1 extends org.cpswt.hla.InteractionRoot_p.C2WInteractionRoo
 
     /**
      * Return true if "handle" is equal to the handle (RTI assigned) of this class
-     * (that is, the org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.TestInteraction_p.Receiver1 interaction class).
+     * (that is, the org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.EmbeddedMessaging_p.Receiver2 interaction class).
      *
      * @param handle handle to compare to the value of the handle (RTI assigned) of
-     * this class (the org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.TestInteraction_p.Receiver1 interaction class).
+     * this class (the org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.EmbeddedMessaging_p.Receiver2 interaction class).
      * @return "true" if "handle" matches the value of the handle of this class
-     * (that is, the org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.TestInteraction_p.Receiver1 interaction class).
+     * (that is, the org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.EmbeddedMessaging_p.Receiver2 interaction class).
      */
     public static boolean match(int handle) {
         return handle == get_class_handle();
@@ -303,21 +338,21 @@ public class Receiver1 extends org.cpswt.hla.InteractionRoot_p.C2WInteractionRoo
     //-------------
     // CONSTRUCTORS
     //-------------
-    public Receiver1() {
+    public Receiver2() {
         this(get_hla_class_name());
     }
 
-    public Receiver1(LogicalTime logicalTime) {
+    public Receiver2(LogicalTime logicalTime) {
         this();
         setTime(logicalTime);
     }
 
-    public Receiver1(ReceivedInteraction propertyMap) {
+    public Receiver2(ReceivedInteraction propertyMap) {
         this();
         setParameters( propertyMap );
     }
 
-    public Receiver1(ReceivedInteraction propertyMap, LogicalTime logicalTime) {
+    public Receiver2(ReceivedInteraction propertyMap, LogicalTime logicalTime) {
         this(propertyMap);
         setTime(logicalTime);
     }
@@ -330,41 +365,46 @@ public class Receiver1 extends org.cpswt.hla.InteractionRoot_p.C2WInteractionRoo
     //-----------------
     // CREATION METHODS
     //-----------------
-    public static Receiver1 create_interaction() {
-        return new Receiver1();
+    public static Receiver2 create_interaction() {
+        return new Receiver2();
     }
 
-    public Receiver1 createInteraction() {
+    public Receiver2 createInteraction() {
         return create_interaction();
     }
 
-    public static Receiver1 create_interaction(LogicalTime logicalTime) {
-        return new Receiver1(logicalTime);
+    public static Receiver2 create_interaction(LogicalTime logicalTime) {
+        return new Receiver2(logicalTime);
     }
 
-    public Receiver1 createInteraction(LogicalTime logicalTime) {
+    public Receiver2 createInteraction(LogicalTime logicalTime) {
         return create_interaction(logicalTime);
     }
 
-    public static Receiver1 create_interaction(ReceivedInteraction propertyMap) {
-        return new Receiver1(propertyMap);
+    public static Receiver2 create_interaction(ReceivedInteraction propertyMap) {
+        return new Receiver2(propertyMap);
     }
 
-    public Receiver1 createInteraction(ReceivedInteraction propertyMap) {
+    public Receiver2 createInteraction(ReceivedInteraction propertyMap) {
         return create_interaction(propertyMap);
     }
 
-    public static Receiver1 create_interaction(ReceivedInteraction propertyMap, LogicalTime logicalTime) {
-        return new Receiver1(propertyMap, logicalTime);
+    public static Receiver2 create_interaction(ReceivedInteraction propertyMap, LogicalTime logicalTime) {
+        return new Receiver2(propertyMap, logicalTime);
     }
 
-    public Receiver1 createInteraction(ReceivedInteraction propertyMap, LogicalTime logicalTime) {
+    public Receiver2 createInteraction(ReceivedInteraction propertyMap, LogicalTime logicalTime) {
         return create_interaction(propertyMap, logicalTime);
     }
 
     //---------------------
     // END CREATION METHODS
     //---------------------
+
+    public static int get_num_parameters() {
+        return _allClassNamePropertyNameSetMap.get(get_hla_class_name()).size();
+    }
+
 
     //------------------------------
     // PROPERTY MANIPULATION METHODS
@@ -374,32 +414,44 @@ public class Receiver1 extends org.cpswt.hla.InteractionRoot_p.C2WInteractionRoo
     // END PROPERTY MANIPULATION METHODS
     //----------------------------------
 
-    protected Receiver1(NoInstanceInit noInstanceInit) {
+    public static void add_reject_source_federate_id(String federateId) {
+        add_reject_source_federate_id(get_hla_class_name(), federateId);
+    }
+
+    public static boolean is_reject_source_federate_id(String federateId) {
+        return is_reject_source_federate_id(get_hla_class_name(), federateId);
+    }
+
+    public static void remove_reject_source_federate_id(String federateId) {
+        remove_reject_source_federate_id(get_hla_class_name(), federateId);
+    }
+
+    protected Receiver2(NoInstanceInit noInstanceInit) {
         super(noInstanceInit);
     }
 
     /**
-    * Creates an instance of the Receiver1 interaction class, using
+    * Creates an instance of the Receiver2 interaction class, using
     * "datamemberMap" to initialize its parameter values.
     * "datamemberMap" is usually acquired as an argument to an RTI federate
     * callback method, such as "receiveInteraction".
     *
     * @param datamemberMap data structure containing initial values for the
-    * parameters of this new Receiver1 interaction class instance
+    * parameters of this new Receiver2 interaction class instance
     */
-    protected Receiver1( String hlaClassName ) {
+    protected Receiver2( String hlaClassName ) {
         super( hlaClassName );
     }
 
     /**
-    * Creates a new Receiver1 interaction class instance that is a duplicate
+    * Creates a new Receiver2 interaction class instance that is a duplicate
     * of the instance referred to by messaging_var.
     *
-    * @param messaging_var Receiver1 interaction class instance of which
-    * this newly created Receiver1 interaction class instance will be a
+    * @param messaging_var Receiver2 interaction class instance of which
+    * this newly created Receiver2 interaction class instance will be a
     * duplicate
     */
-    public Receiver1(Receiver1 messaging_var) {
+    public Receiver2(Receiver2 messaging_var) {
     
         // SHALLOW COPY
         classAndPropertyNameValueMap = new HashMap<>(messaging_var.classAndPropertyNameValueMap);
