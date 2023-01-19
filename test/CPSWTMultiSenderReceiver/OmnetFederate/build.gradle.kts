@@ -44,7 +44,7 @@ val archivaPort: String by project
 
 tasks.register<Exec>("run") {
     if ( omnetppCpswtHome == null || omnetppCpswtHome.isEmpty() ) {
-        throw GradleException("OMNET_CPSWT_HOME environment variable not set")
+        throw GradleException("OMNETPP_CPSWT_HOME environment variable not set")
     }
     val omnetFederateInfoJsonFile = File(omnetppCpswtHome, "OmnetFederateInfo.json")
     val fileReader = FileReader(omnetFederateInfoJsonFile)

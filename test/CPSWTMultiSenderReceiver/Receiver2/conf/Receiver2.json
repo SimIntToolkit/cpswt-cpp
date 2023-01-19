@@ -3,6 +3,6 @@
   "federateType": "Receiver2",
   "federationId": "CPSWTMultiSenderReceiver",
   "isLateJoiner": false,
-  "lookAhead": 0.2,
+  "lookahead": 0.2,
   "stepSize": 1.0
 }

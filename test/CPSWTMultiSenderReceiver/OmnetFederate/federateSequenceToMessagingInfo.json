@@ -2,38 +2,38 @@
     "InteractionRoot.C2WInteractionRoot.TestInteraction" : [
         {
             "federate_sequence" : [
-                "Sender2"
+                "Sender1"
             ],
             "messaging_info" : [
                 {
-                    "full_hla_class_name" : "InteractionRoot.C2WInteractionRoot.TestInteraction.Receiver2",
+                    "full_hla_class_name" : "Receiver1",
                     "payload_size" : 20
                 },
                 {
-                    "full_hla_class_name" : "InteractionRoot.C2WInteractionRoot.TestInteraction.Receiver3",
+                    "full_hla_class_name" : "Receiver2",
                     "payload_size" : 20
                 },
                 {
-                    "full_hla_class_name" : "InteractionRoot.C2WInteractionRoot.TestInteraction.Receiver1",
+                    "full_hla_class_name" : "Receiver3",
                     "payload_size" : 20
                 }
             ]
         },
         {
             "federate_sequence" : [
-                "Sender1"
+                "Sender2"
             ],
             "messaging_info" : [
                 {
-                    "full_hla_class_name" : "InteractionRoot.C2WInteractionRoot.TestInteraction.Receiver2",
+                    "full_hla_class_name" : "Receiver1",
                     "payload_size" : 20
                 },
                 {
-                    "full_hla_class_name" : "InteractionRoot.C2WInteractionRoot.TestInteraction.Receiver3",
+                    "full_hla_class_name" : "Receiver2",
                     "payload_size" : 20
                 },
                 {
-                    "full_hla_class_name" : "InteractionRoot.C2WInteractionRoot.TestInteraction.Receiver1",
+                    "full_hla_class_name" : "Receiver3",
                     "payload_size" : 20
                 }
             ]

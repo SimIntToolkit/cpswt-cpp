@@ -54,7 +54,7 @@ public class Sender2 extends Sender2Base {
     private void execute() throws Exception {
         if(super.isLateJoiner()) {
             log.info("turning off time regulation (late joiner)");
-            currentTime = super.getLBTS() - super.getLookAhead();
+            currentTime = super.getLBTS() - super.getLookahead();
             super.disableTimeRegulation();
         }
 
@@ -89,10 +89,9 @@ public class Sender2 extends Sender2Base {
             atr.requestSyncStart();
             enteredTimeGrantedState();
 
-            ////////////////////////////////////////////////////////////
-            // TODO send interactions that must be sent every logical //
-            // time step below                                        //
-            ////////////////////////////////////////////////////////////
+            ////////////////////////////////////////////////////////////////////////////
+            // TODO send interactions that must be sent every logical time step below //
+            ////////////////////////////////////////////////////////////////////////////
 
             // Set the interaction's parameters.
             //
@@ -108,7 +107,7 @@ public class Sender2 extends Sender2Base {
 
                 System.out.println(getFederateType() + ": Sending \"" + testInteraction1.getInstanceHlaClassName() + "\" interaction with TestParameter value " + testValue);
 
-                sendInteraction(testInteraction1, currentTime + getLookAhead());
+                sendInteraction(testInteraction1, currentTime + getLookahead());
             }
 
             ////////////////////////////////////////////////////////////////////

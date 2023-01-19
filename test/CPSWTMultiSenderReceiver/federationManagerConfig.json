@@ -3,7 +3,7 @@
     "federationId"      : "CPSWTMultiSenderReceiver",
     "federationEndTime" : 0,
     "fedFile"           : "CPSWTMultiSenderReceiver.fed",
-    "lookAhead"         : 0.01,
+    "lookahead"         : 0.01,
     "stepSize"          : 0.1,
     "realTimeMode"      : false
 }

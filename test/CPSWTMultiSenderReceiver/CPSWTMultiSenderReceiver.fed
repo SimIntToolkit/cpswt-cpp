@@ -444,6 +444,19 @@
             )
           )
         )
+        (class EmbeddedMessaging reliable timestamp
+          (parameter command)
+          (parameter messagingJson)
+          (parameter hlaClassName)
+          (class OmnetFederate reliable timestamp
+          )
+          (class Receiver1 reliable timestamp
+          )
+          (class Receiver2 reliable timestamp
+          )
+          (class Receiver3 reliable timestamp
+          )
+        )
         (class FederateJoinInteraction reliable timestamp
           (parameter IsLateJoiner)
           (parameter FederateId)
@@ -479,12 +492,6 @@
         )
         (class TestInteraction reliable timestamp
           (parameter TestParameter)
-          (class Receiver1 reliable timestamp
-          )
-          (class Receiver2 reliable timestamp
-          )
-          (class Receiver3 reliable timestamp
-          )
         )
       )
     )

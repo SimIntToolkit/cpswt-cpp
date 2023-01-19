@@ -28,7 +28,6 @@
  * OR MODIFICATIONS.
  */
 
-
 package org.cpswt.hla.cpswtmultisenderreceiver.receiver3;
 
 import hla.rti.EventRetractionHandle;
@@ -53,24 +52,30 @@ public class Receiver3Base extends SynchronizedFederate {
         org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.FederateResignInteraction.load();
         org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.FederateJoinInteraction.load();
         org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.SimulationControl_p.SimEnd.load();
-        org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.TestInteraction_p.Receiver3.load();
+        org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.TestInteraction.load();
+        org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.EmbeddedMessaging_p.Receiver3.load();
         org.cpswt.hla.ObjectRoot.load();
     }
 
     // constructor
     public Receiver3Base(FederateConfig config) throws Exception {
         super(config);
-        super.createLRC();
-        super.joinFederation();
+
+        createRTI();
+        joinFederation();
 
         enableTimeConstrained();
-        enableTimeRegulation(getLookAhead());
+        enableTimeRegulation(getLookahead());
 
-        // INTERACTION SUBSCRIPTIONS
-        org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.TestInteraction_p.Receiver3.subscribe_interaction(getLRC());
+        // DIRECT INTERACTION SUBSCRIPTIONS
 
+        org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.EmbeddedMessaging_p.Receiver3.subscribe_interaction(getRTI());
+
+        // SOFT INTERACTION SUBSCRIPTIONS
+
+        org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.TestInteraction.soft_subscribe_interaction(getRTI());
         _subscribedInteractionFilter.setFedFilters(
-            org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.TestInteraction_p.Receiver3.get_class_handle(),
+            org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.TestInteraction.get_class_handle(),
             SubscribedInteractionFilter.OriginFedFilter.ORIGIN_FILTER_DISABLED,
             SubscribedInteractionFilter.SourceFedFilter.SOURCE_FILTER_DISABLED
         );

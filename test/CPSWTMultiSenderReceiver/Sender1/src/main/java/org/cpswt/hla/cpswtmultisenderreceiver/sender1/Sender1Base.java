@@ -28,7 +28,6 @@
  * OR MODIFICATIONS.
  */
 
-
 package org.cpswt.hla.cpswtmultisenderreceiver.sender1;
 
 import hla.rti.EventRetractionHandle;
@@ -54,20 +53,25 @@ public class Sender1Base extends SynchronizedFederate {
         org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.FederateJoinInteraction.load();
         org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.SimulationControl_p.SimEnd.load();
         org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.TestInteraction.load();
+        org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.EmbeddedMessaging_p.OmnetFederate.load();
         org.cpswt.hla.ObjectRoot.load();
     }
 
     // constructor
     public Sender1Base(FederateConfig config) throws Exception {
         super(config);
-        super.createLRC();
-        super.joinFederation();
+
+        createRTI();
+        joinFederation();
 
         enableTimeConstrained();
-        enableTimeRegulation(getLookAhead());
+        enableTimeRegulation(getLookahead());
 
-        // INTERACTION PUBLICATIONS
-        org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.TestInteraction.publish_interaction(getLRC());
+        // DIRECT INTERACTION PUBLICATIONS
+        org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.EmbeddedMessaging_p.OmnetFederate.publish_interaction(getRTI());
+
+        // SOFT INTERACTION PUBLICATIONS
+        org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.TestInteraction.add_federate_name_soft_publish("OmnetFederate");
     }
 
     public org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.TestInteraction create_InteractionRoot_C2WInteractionRoot_TestInteraction() {
