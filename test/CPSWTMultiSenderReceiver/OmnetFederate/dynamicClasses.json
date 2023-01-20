@@ -1,9 +1,0 @@
-{
-    "interactions": [
-        "InteractionRoot.C2WInteractionRoot.EmbeddedMessaging.Receiver1",
-        "InteractionRoot.C2WInteractionRoot.EmbeddedMessaging.Receiver2",
-        "InteractionRoot.C2WInteractionRoot.EmbeddedMessaging.Receiver3"
-    ],
-    "objects": [
-    ]
-}
