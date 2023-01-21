@@ -29,16 +29,18 @@
  */
 
 #include "ObjectRoot_p/BaseObjectClass_p/DerivedObjectClass.hpp"
-namespace org {
- namespace cpswt {
-  namespace hla {
-   namespace ObjectRoot_p {
-    namespace BaseObjectClass_p {
+namespace edu {
+ namespace vanderbilt {
+  namespace vuisis {
+   namespace cpswt {
+    namespace hla {
+     namespace ObjectRoot_p {
+      namespace BaseObjectClass_p {
 
 bool DerivedObjectClass::static_init_var = DerivedObjectClass::static_init();
 
 bool DerivedObjectClass::static_init() {
-    BOOST_LOG_SEV(get_logger(), info) << "Class \"::org::cpswt::hla::ObjectRoot_p::BaseObjectClass_p::DerivedObjectClass\" loaded.";
+    BOOST_LOG_SEV(get_logger(), info) << "Class \"::edu::vanderbilt::vuisis::cpswt::hla::ObjectRoot_p::BaseObjectClass_p::DerivedObjectClass\" loaded.";
 
     // ADD THIS CLASS TO THE _classNameSet DEFINED IN ObjectRoot
     get_hla_class_name_set().insert(get_hla_class_name());
@@ -98,8 +100,10 @@ bool DerivedObjectClass::static_init() {
     return true;
 }
 
-    } // NAMESPACE "BaseObjectClass_p"
-   } // NAMESPACE "ObjectRoot_p"
-  } // NAMESPACE "hla"
- } // NAMESPACE "cpswt"
-} // NAMESPACE "org"
+      } // NAMESPACE "BaseObjectClass_p"
+     } // NAMESPACE "ObjectRoot_p"
+    } // NAMESPACE "hla"
+   } // NAMESPACE "cpswt"
+  } // NAMESPACE "vuisis"
+ } // NAMESPACE "vanderbilt"
+} // NAMESPACE "edu"

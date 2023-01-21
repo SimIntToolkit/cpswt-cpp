@@ -44,8 +44,8 @@
 
 #include <jsoncpp/json/json.h>
 
-using ObjectRoot = ::org::cpswt::hla::ObjectRoot;
-using FederateObject = ::org::cpswt::hla::ObjectRoot_p::FederateObject;
+using ObjectRoot = ::edu::vanderbilt::vuisis::cpswt::hla::ObjectRoot;
+using FederateObject = ::edu::vanderbilt::vuisis::cpswt::hla::ObjectRoot_p::FederateObject;
 
 ObjectTests::ObjectTests() : CppUnit::TestCase() {
     Initialization::init_1();

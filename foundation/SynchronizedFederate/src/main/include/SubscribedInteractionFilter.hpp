@@ -37,7 +37,7 @@
 
 class SubscribedInteractionFilter {
 
-using C2WInteractionRoot = ::org::cpswt::hla::InteractionRoot_p::C2WInteractionRoot;
+using C2WInteractionRoot = ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot;
 
 public:
     enum OriginFedFilter { ORIGIN_FILTER_DISABLED, SELF, NON_SELF };

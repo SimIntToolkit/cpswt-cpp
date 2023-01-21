@@ -1,17 +1,17 @@
 #include "EmbeddedMessagingObjectTests.hpp"
-#include "org/cpswt/hla/embeddedmessagingobjectcpptest/sender/Sender.hpp"
-#include "org/cpswt/hla/embeddedmessagingobjectcpptest/receiver/Receiver.hpp"
+#include "edu/vanderbilt/vuisis/cpswt/hla/embeddedmessagingobjectcpptest/sender/Sender.hpp"
+#include "edu/vanderbilt/vuisis/cpswt/hla/embeddedmessagingobjectcpptest/receiver/Receiver.hpp"
 
 #include <boost/lexical_cast.hpp>
 
-typedef ::org::cpswt::hla::InteractionRoot InteractionRoot;
-typedef ::org::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::EmbeddedMessaging EmbeddedMessaging;
+typedef ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot InteractionRoot;
+typedef ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::EmbeddedMessaging EmbeddedMessaging;
 
-typedef ::org::cpswt::hla::ObjectRoot ObjectRoot;
-typedef ::org::cpswt::hla::ObjectRoot_p::TestObject TestObject;
+typedef ::edu::vanderbilt::vuisis::cpswt::hla::ObjectRoot ObjectRoot;
+typedef ::edu::vanderbilt::vuisis::cpswt::hla::ObjectRoot_p::TestObject TestObject;
 
-typedef ::org::cpswt::hla::embeddedmessagingobjectcpptest::sender::Sender Sender;
-typedef ::org::cpswt::hla::embeddedmessagingobjectcpptest::receiver::Receiver Receiver;
+typedef ::edu::vanderbilt::vuisis::cpswt::hla::embeddedmessagingobjectcpptest::sender::Sender Sender;
+typedef ::edu::vanderbilt::vuisis::cpswt::hla::embeddedmessagingobjectcpptest::receiver::Receiver Receiver;
 
 
 void EmbeddedMessagingObjectTests::testObjectNetworkPropagation() {
@@ -92,16 +92,16 @@ void EmbeddedMessagingObjectTests::testObjectNetworkPropagation() {
     );
 
     // CAST THE LOCAL INTERACTION TO EmbeddedInteraction.Receiver
-    org::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::EmbeddedMessaging_p::Receiver::SP
+    edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::EmbeddedMessaging_p::Receiver::SP
       localEmbeddedMessagingReceiverInteractionSP =
         boost::dynamic_pointer_cast<
-          org::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::EmbeddedMessaging_p::Receiver
+          edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::EmbeddedMessaging_p::Receiver
         >(localEmbeddedMessagingReceiverInteractionRootSP);
 
     // MAKE SURE THE CREATED LOCAL INTERACTION IS OF TYPE EmbeddedInteraction.Receiver
     CPPUNIT_ASSERT(localEmbeddedMessagingReceiverInteractionSP);
 
-    org::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::EmbeddedMessaging_p::Receiver
+    edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::EmbeddedMessaging_p::Receiver
       &localEmbeddedMessagingReceiverInteraction = *localEmbeddedMessagingReceiverInteractionSP;
 
     // command FOR EmbeddedInteraction.Receiver INTERACTION SHOULD BE "discover"
@@ -200,10 +200,10 @@ void EmbeddedMessagingObjectTests::testObjectNetworkPropagation() {
            updatedAttributesEmbeddedMessagingOmnetFederateData.getParameterHandleValuePairSet()
     );
 
-    org::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::EmbeddedMessaging_p::OmnetFederate::SP
+    edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::EmbeddedMessaging_p::OmnetFederate::SP
       localEmbeddedMessagingOmnetFederateInteractionSP =
         boost::dynamic_pointer_cast<
-          org::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::EmbeddedMessaging_p::OmnetFederate
+          edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::EmbeddedMessaging_p::OmnetFederate
         >(localEmbeddedMessagingOmnetFederateInteractionRootSP);
 
 
@@ -211,7 +211,7 @@ void EmbeddedMessagingObjectTests::testObjectNetworkPropagation() {
     CPPUNIT_ASSERT(localEmbeddedMessagingOmnetFederateInteractionSP);
 
     // CAST THE LOCAL INTERACTION TO THE OmnetFederate-SPECIFIC EmbeddedMessaging CLASS
-    ::org::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::EmbeddedMessaging_p::OmnetFederate
+    ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::EmbeddedMessaging_p::OmnetFederate
       &localEmbeddedMessagingOmnetFederateInteraction = *localEmbeddedMessagingOmnetFederateInteractionSP;
 
     // THE command FOR THE LOCAL EmbeddedMessaging.OmnetFederate INTERACTION SHOULD BE "object"

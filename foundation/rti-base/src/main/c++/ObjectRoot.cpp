@@ -33,9 +33,11 @@
 #include "ObjectRoot.hpp"
 
 
-namespace org {
- namespace cpswt {
-  namespace hla {
+namespace edu {
+ namespace vanderbilt {
+  namespace vuisis {
+   namespace cpswt {
+    namespace hla {
 
 bool ObjectRoot::static_init_var = ObjectRoot::static_init();
 
@@ -705,7 +707,7 @@ void ObjectRoot::setAttributes( const RTI::AttributeHandleValuePairSet &property
 }
 
 bool ObjectRoot::static_init() {
-    BOOST_LOG_SEV(get_logger(), info) << "Class \"::org::cpswt::hla::ObjectRoot\" loaded.";
+    BOOST_LOG_SEV(get_logger(), info) << "Class \"::edu::vanderbilt::vuisis::cpswt::hla::ObjectRoot\" loaded.";
 
     // ADD THIS CLASS TO THE _classNameSet DEFINED IN ObjectRoot
     get_hla_class_name_set().insert(get_hla_class_name());
@@ -1133,14 +1135,16 @@ void ObjectRoot::readFederateDynamicMessageClass(const std::string &hlaClassName
 }
 
 
-  } // NAMESPACE "hla"
- } // NAMESPACE "cpswt"
-} // NAMESPACE "org"
+    } // NAMESPACE "hla"
+   } // NAMESPACE "cpswt"
+  } // NAMESPACE "vuisis"
+ } // NAMESPACE "vanderbilt"
+} // NAMESPACE "edu"
 
-std::ostream &operator<<( std::ostream &os, const ::org::cpswt::hla::ObjectRoot &messaging ) {
+std::ostream &operator<<( std::ostream &os, const ::edu::vanderbilt::vuisis::cpswt::hla::ObjectRoot &messaging ) {
 
-    typedef ::org::cpswt::hla::ObjectRoot::ClassAndPropertyNameValueSPMap::const_iterator const_iterator;
-    const ::org::cpswt::hla::ObjectRoot::ClassAndPropertyNameValueSPMap &classAndPropertyNameValueSPMap =
+    typedef ::edu::vanderbilt::vuisis::cpswt::hla::ObjectRoot::ClassAndPropertyNameValueSPMap::const_iterator const_iterator;
+    const ::edu::vanderbilt::vuisis::cpswt::hla::ObjectRoot::ClassAndPropertyNameValueSPMap &classAndPropertyNameValueSPMap =
       messaging.getClassAndPropertyNameValueSPMap();
     os << messaging.getInstanceHlaClassName() << "(";
     bool first = true;
@@ -1176,11 +1180,14 @@ std::ostream &operator<<( std::ostream &os, const ::org::cpswt::hla::ObjectRoot 
     return os << ")";
 }
 
-std::ostream &operator<<( std::ostream &os, const ::org::cpswt::hla::ObjectRoot::ObjectReflector &objectReflector ) {
+std::ostream &operator<<(
+  std::ostream &os, const ::edu::vanderbilt::vuisis::cpswt::hla::ObjectRoot::ObjectReflector &objectReflector
+) {
 
-    typedef ::org::cpswt::hla::ObjectRoot::ClassAndPropertyNameValueSPMap::const_iterator const_iterator;
-    const ::org::cpswt::hla::ObjectRoot::ClassAndPropertyNameValueSPMap &classAndPropertyNameValueSPMap =
-      objectReflector.getClassAndPropertyNameValueSPMap();
+    typedef ::edu::vanderbilt::vuisis::cpswt::hla::ObjectRoot::ClassAndPropertyNameValueSPMap::const_iterator
+      const_iterator;
+    const ::edu::vanderbilt::vuisis::cpswt::hla::ObjectRoot::ClassAndPropertyNameValueSPMap
+      &classAndPropertyNameValueSPMap = objectReflector.getClassAndPropertyNameValueSPMap();
     os << "[" << objectReflector.getHlaClassName() << "," << objectReflector.getObjectHandle() << ","
       << "" << objectReflector.getFederateSequence() << "](";
     bool first = true;
