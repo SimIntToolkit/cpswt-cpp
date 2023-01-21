@@ -33,9 +33,11 @@
 #include "InteractionRoot.hpp"
 
 
-namespace org {
- namespace cpswt {
-  namespace hla {
+namespace edu {
+ namespace vanderbilt {
+  namespace vuisis {
+   namespace cpswt {
+    namespace hla {
 
 bool InteractionRoot::static_init_var = InteractionRoot::static_init();
 
@@ -372,7 +374,7 @@ void InteractionRoot::setParameters( const RTI::ParameterHandleValuePairSet &pro
 }
 
 bool InteractionRoot::static_init() {
-    BOOST_LOG_SEV(get_logger(), info) << "Class \"::org::cpswt::hla::InteractionRoot\" loaded.";
+    BOOST_LOG_SEV(get_logger(), info) << "Class \"::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot\" loaded.";
 
     // ADD THIS CLASS TO THE _classNameSet DEFINED IN InteractionRoot
     get_hla_class_name_set().insert(get_hla_class_name());
@@ -715,14 +717,16 @@ void InteractionRoot::readFederateDynamicMessageClass(const std::string &hlaClas
 }
 
 
-  } // NAMESPACE "hla"
- } // NAMESPACE "cpswt"
-} // NAMESPACE "org"
+    } // NAMESPACE "hla"
+   } // NAMESPACE "cpswt"
+  } // NAMESPACE "vuisis"
+ } // NAMESPACE "vanderbilt"
+} // NAMESPACE "edu"
 
-std::ostream &operator<<( std::ostream &os, const ::org::cpswt::hla::InteractionRoot &messaging ) {
+std::ostream &operator<<( std::ostream &os, const ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot &messaging ) {
 
-    typedef ::org::cpswt::hla::InteractionRoot::ClassAndPropertyNameValueSPMap::const_iterator const_iterator;
-    const ::org::cpswt::hla::InteractionRoot::ClassAndPropertyNameValueSPMap &classAndPropertyNameValueSPMap =
+    typedef ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot::ClassAndPropertyNameValueSPMap::const_iterator const_iterator;
+    const ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot::ClassAndPropertyNameValueSPMap &classAndPropertyNameValueSPMap =
       messaging.getClassAndPropertyNameValueSPMap();
     os << messaging.getInstanceHlaClassName() << "(";
     bool first = true;

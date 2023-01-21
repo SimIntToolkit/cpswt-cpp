@@ -32,23 +32,25 @@
 #define ORG_CPSWT_HLA_EMBEDDEDMESSAGINGOBJECTCPPTEST_SENDER_CLASS_CLASS
 
 
-#include "org/cpswt/hla/embeddedmessagingobjectcpptest/sender/SenderBase.hpp"
+#include "edu/vanderbilt/vuisis/cpswt/hla/embeddedmessagingobjectcpptest/sender/SenderBase.hpp"
 #include "FederateConfigParser.h"
 
 
-namespace org {
- namespace cpswt {
-  namespace hla {
-   namespace embeddedmessagingobjectcpptest {
-    namespace sender {
+namespace edu {
+ namespace vanderbilt {
+  namespace vuisis {
+   namespace cpswt {
+    namespace hla {
+     namespace embeddedmessagingobjectcpptest {
+      namespace sender {
 
 class Sender: public SenderBase {
 
-using InteractionRoot = ::org::cpswt::hla::InteractionRoot;
-using C2WInteractionRoot = ::org::cpswt::hla::InteractionRoot_p::C2WInteractionRoot;
+using InteractionRoot = ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot;
+using C2WInteractionRoot = ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot;
 
 public:
-    typedef ::org::cpswt::hla::ObjectRoot_p::TestObject TestObject;
+    typedef ::edu::vanderbilt::vuisis::cpswt::hla::ObjectRoot_p::TestObject TestObject;
 //    private final static Logger log = LogManager.getLogger();
 
 private:
@@ -88,10 +90,12 @@ public:
     void initialize();
     void execute();
 };
-    } // NAMESPACE "sender"
-   } // NAMESPACE "embeddedmessagingobjectcpptest"
-  } // NAMESPACE "hla"
- } // NAMESPACE "cpswt"
-} // NAMESPACE "org"
+      } // NAMESPACE "sender"
+     } // NAMESPACE "embeddedmessagingobjectcpptest"
+    } // NAMESPACE "hla"
+   } // NAMESPACE "cpswt"
+  } // NAMESPACE "vuisis"
+ } // NAMESPACE "vanderbilt"
+} // NAMESPACE "edu"
 
 #endif // ORG_CPSWT_HLA_EMBEDDEDMESSAGINGOBJECTCPPTEST_SENDER_CLASS_CLASS

@@ -2,8 +2,8 @@
 #include "InteractionRoot.hpp"
 #include "ObjectRoot.hpp"
 
-typedef ::org::cpswt::hla::InteractionRoot InteractionRoot;
-typedef ::org::cpswt::hla::ObjectRoot ObjectRoot;
+typedef ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot InteractionRoot;
+typedef ::edu::vanderbilt::vuisis::cpswt::hla::ObjectRoot ObjectRoot;
 
 
 const RTIAmbassadorTest2::ClassNameHandleMap &RTIAmbassadorTest2::get_interaction_class_name_handle_map_aux() {

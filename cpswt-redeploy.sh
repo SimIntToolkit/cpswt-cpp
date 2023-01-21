@@ -1,12 +1,13 @@
 #!/bin/bash
 
-for package in CppTestHarness core-cpp C2WConsoleLogger rti-base-cpp CPSWTConfig SynchronizedFederate; do
+#for package in CppTestHarness core-cpp C2WConsoleLogger rti-base-cpp CPSWTConfig SynchronizedFederate; do
+for package in SynchronizedFederate; do
 
     echo "PLEASE REMOVE THE FOLLOWING PACKAGES FROM YOUR MAVEN REPOSITORY:"
     echo
-    echo "org.cpswt.$package"
-    echo "org.cpswt.${package}_debug"
-    echo "org.cpswt.${package}_release"
+    echo "edu.vanderbilt.vuisis.cpswt.$package"
+    echo "edu.vanderbilt.vuisis.cpswt.${package}_debug"
+    echo "edu.vanderbilt.vuisis.cpswt.${package}_release"
     echo
     echo -n "PRESS ENTER ONCE THESE PACKAGES HAVE BEEN REMOVED: "
     read dummy

@@ -29,15 +29,17 @@
  */
 
 #include "ObjectRoot_p/TestObject.hpp"
-namespace org {
- namespace cpswt {
-  namespace hla {
-   namespace ObjectRoot_p {
+namespace edu {
+ namespace vanderbilt {
+  namespace vuisis {
+   namespace cpswt {
+    namespace hla {
+     namespace ObjectRoot_p {
 
 bool TestObject::static_init_var = TestObject::static_init();
 
 bool TestObject::static_init() {
-    BOOST_LOG_SEV(get_logger(), info) << "Class \"::org::cpswt::hla::ObjectRoot_p::TestObject\" loaded.";
+    BOOST_LOG_SEV(get_logger(), info) << "Class \"::edu::vanderbilt::vuisis::cpswt::hla::ObjectRoot_p::TestObject\" loaded.";
 
     // ADD THIS CLASS TO THE _classNameSet DEFINED IN ObjectRoot
     get_hla_class_name_set().insert(get_hla_class_name());
@@ -159,7 +161,9 @@ bool TestObject::static_init() {
     return true;
 }
 
-   } // NAMESPACE "ObjectRoot_p"
-  } // NAMESPACE "hla"
- } // NAMESPACE "cpswt"
-} // NAMESPACE "org"
+     } // NAMESPACE "ObjectRoot_p"
+    } // NAMESPACE "hla"
+   } // NAMESPACE "cpswt"
+  } // NAMESPACE "vuisis"
+ } // NAMESPACE "vanderbilt"
+} // NAMESPACE "edu"

@@ -36,8 +36,8 @@
 #include <limits>
 #include <iostream>
 
-using InteractionRoot = ::org::cpswt::hla::InteractionRoot;
-using ObjectRoot = ::org::cpswt::hla::ObjectRoot;
+using InteractionRoot = ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot;
+using ObjectRoot = ::edu::vanderbilt::vuisis::cpswt::hla::ObjectRoot;
 
 const RTIAmbassadorTest1::ClassNameHandleMap &RTIAmbassadorTest1::get_class_name_handle_map_aux() {
     static ClassNameHandleMap classNameHandleMap;
