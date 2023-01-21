@@ -29,16 +29,18 @@
  */
 
 #include "InteractionRoot_p/C2WInteractionRoot_p/FederateResignInteraction.hpp"
-namespace org {
- namespace cpswt {
-  namespace hla {
-   namespace InteractionRoot_p {
-    namespace C2WInteractionRoot_p {
+namespace edu {
+ namespace vanderbilt {
+  namespace vuisis {
+   namespace cpswt {
+    namespace hla {
+     namespace InteractionRoot_p {
+      namespace C2WInteractionRoot_p {
 
 bool FederateResignInteraction::static_init_var = FederateResignInteraction::static_init();
 
 bool FederateResignInteraction::static_init() {
-    BOOST_LOG_SEV(get_logger(), info) << "Class \"::org::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::FederateResignInteraction\" loaded.";
+    BOOST_LOG_SEV(get_logger(), info) << "Class \"::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::FederateResignInteraction\" loaded.";
 
     // ADD THIS CLASS TO THE _classNameSet DEFINED IN InteractionRoot
     get_hla_class_name_set().insert(get_hla_class_name());
@@ -102,8 +104,10 @@ bool FederateResignInteraction::static_init() {
     return true;
 }
 
-    } // NAMESPACE "C2WInteractionRoot_p"
-   } // NAMESPACE "InteractionRoot_p"
-  } // NAMESPACE "hla"
- } // NAMESPACE "cpswt"
-} // NAMESPACE "org"
+      } // NAMESPACE "C2WInteractionRoot_p"
+     } // NAMESPACE "InteractionRoot_p"
+    } // NAMESPACE "hla"
+   } // NAMESPACE "cpswt"
+  } // NAMESPACE "vuisis"
+ } // NAMESPACE "vanderbilt"
+} // NAMESPACE "edu"

@@ -28,8 +28,8 @@
  * OR MODIFICATIONS.
  */
 
-#ifndef _org_cpswt_hla_ObjectRoot_p_FederateObject_CLASS
-#define _org_cpswt_hla_ObjectRoot_p_FederateObject_CLASS
+#ifndef _edu_vanderbilt_vuisis_cpswt_hla_ObjectRoot_p_FederateObject_CLASS
+#define _edu_vanderbilt_vuisis_cpswt_hla_ObjectRoot_p_FederateObject_CLASS
 
 #include "ObjectRoot.hpp"
 #include "C2WException.hpp"
@@ -37,15 +37,17 @@
 #include <boost/unordered_set.hpp>
 
 
-namespace org {
- namespace cpswt {
-  namespace hla {
-   namespace ObjectRoot_p {
+namespace edu {
+ namespace vanderbilt {
+  namespace vuisis {
+   namespace cpswt {
+    namespace hla {
+     namespace ObjectRoot_p {
 
-class FederateObject : public ::org::cpswt::hla::ObjectRoot {
+class FederateObject : public ::edu::vanderbilt::vuisis::cpswt::hla::ObjectRoot {
 public:
-//    using ::org::cpswt::hla::ObjectRoot;
-    typedef ::org::cpswt::hla::ObjectRoot Super;
+//    using ::edu::vanderbilt::vuisis::cpswt::hla::ObjectRoot;
+    typedef ::edu::vanderbilt::vuisis::cpswt::hla::ObjectRoot Super;
     typedef boost::shared_ptr< FederateObject > SP;
 
 private:
@@ -71,7 +73,7 @@ public:
     // ----------------------------------------------------------------------------
 
     /**
-     * Returns the fully-qualified (dot-delimited) name of the ::org::cpswt::hla::ObjectRoot_p::FederateObject object class.
+     * Returns the fully-qualified (dot-delimited) name of the ::edu::vanderbilt::vuisis::cpswt::hla::ObjectRoot_p::FederateObject object class.
      * Note: As this is a static method, it is NOT polymorphic, and so, if called on
      * a reference will return the name of the class pertaining to the reference,
      * rather than the name of the class for the instance referred to by the reference.
@@ -80,7 +82,7 @@ public:
      * @return the fully-qualified Java class name for this object class
      */
     static const std::string &get_cpp_class_name() {
-        static const std::string cppClassName("::org::cpswt::hla::ObjectRoot_p::FederateObject");
+        static const std::string cppClassName("::edu::vanderbilt::vuisis::cpswt::hla::ObjectRoot_p::FederateObject");
         return cppClassName;
     }
 
@@ -96,7 +98,7 @@ public:
 
     /**
      * Returns the simple name (the last name in the dot-delimited fully-qualified
-     * class name) of the org.cpswt.hla.ObjectRoot_p.FederateObject object class.
+     * class name) of the edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.FederateObject object class.
      *
      * @return the name of this object class
      */
@@ -131,7 +133,7 @@ public:
 
     /**
      * Returns a sorted list containing the names of all of the non-hidden attributes in the
-     * org.cpswt.hla.ObjectRoot_p.FederateObject object class.
+     * edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.FederateObject object class.
      * The property names are paired with name of the hla class in which they are defined in a
      * ClassAndPropertyName POJO.
      * Note: As this is a static method, it is NOT polymorphic, and so, if called on
@@ -149,7 +151,7 @@ public:
 
     /**
      * Returns a sorted list containing the names of all of the attributes in the
-     * org.cpswt.hla.ObjectRoot_p.FederateObject object class.
+     * edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.FederateObject object class.
      * The property names are paired with name of the hla class in which they are defined in a
      * ClassAndPropertyName POJO.
      * Note: As this is a static method, it is NOT polymorphic, and so, if called on
@@ -181,7 +183,7 @@ public:
     // THIS CODE IS STATIC BECAUSE IT IS CLASS-DEPENDENT AND NOT INSTANCE-DEPENDENT
     // ----------------------------------------------------------------------------
     /**
-     * Returns the handle (RTI assigned) of the org.cpswt.hla.ObjectRoot_p.FederateObject object class.
+     * Returns the handle (RTI assigned) of the edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.FederateObject object class.
      * Note: As this is a static method, it is NOT polymorphic, and so, if called on
      * a reference will return the handle of the class pertaining to the reference,
      * rather than the handle of the class for the instance referred to by the reference.
@@ -195,7 +197,7 @@ public:
 
     /**
      * Returns the handle of an attribute (RTI assigned) of
-     * this object class (i.e. "org.cpswt.hla.ObjectRoot_p.FederateObject") given the attribute's name.
+     * this object class (i.e. "edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.FederateObject") given the attribute's name.
      *
      * @param propertyName name of attribute
      * @return the handle (RTI assigned) of the attribute "propertyName" of object class "hlaClassName"
@@ -230,7 +232,7 @@ public:
     //-------------------------------------------------
 
     /**
-     * Publishes the org.cpswt.hla.ObjectRoot_p.FederateObject object class for a federate.
+     * Publishes the edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.FederateObject object class for a federate.
      *
      * @param rti handle to the Local RTI Component
      */
@@ -243,7 +245,7 @@ public:
     }
 
     /**
-     * Unpublishes the org.cpswt.hla.ObjectRoot_p.FederateObject object class for a federate.
+     * Unpublishes the edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.FederateObject object class for a federate.
      *
      * @param rti handle to the Local RTI Component, usu. obtained through the
      *            {@link SynchronizedFederate#getRTI()} call
@@ -253,7 +255,7 @@ public:
     }
 
 /**
- * Subscribes a federate to the org.cpswt.hla.ObjectRoot_p.FederateObject object class.
+ * Subscribes a federate to the edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.FederateObject object class.
  *
  * @param rti handle to the Local RTI Component
  */
@@ -274,7 +276,7 @@ public:
     }
 
     /**
-     * Unsubscribes a federate from the org.cpswt.hla.ObjectRoot_p.FederateObject object class.
+     * Unsubscribes a federate from the edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.FederateObject object class.
      *
      * @param rti handle to the Local RTI Component
      */
@@ -336,12 +338,12 @@ public:
 
     /**
      * Return true if "handle" is equal to the handle (RTI assigned) of this class
-     * (that is, the org.cpswt.hla.ObjectRoot_p.FederateObject object class).
+     * (that is, the edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.FederateObject object class).
      *
      * @param handle handle to compare to the value of the handle (RTI assigned) of
-     * this class (the org.cpswt.hla.ObjectRoot_p.FederateObject object class).
+     * this class (the edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.FederateObject object class).
      * @return "true" if "handle" matches the value of the handle of this class
-     * (that is, the org.cpswt.hla.ObjectRoot_p.FederateObject object class).
+     * (that is, the edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.FederateObject object class).
      */
     static bool match(int handle) {
         return handle == get_class_handle();
@@ -530,7 +532,7 @@ public:
     //------------------------------
 
     static void publish_attribute(const std::string &attributeClass, const std::string &attributeName) {
-        ::org::cpswt::hla::ObjectRoot::publish_attribute(
+        ::edu::vanderbilt::vuisis::cpswt::hla::ObjectRoot::publish_attribute(
           get_hla_class_name(), attributeClass, attributeName
         );
     }
@@ -540,7 +542,7 @@ public:
     }
 
     static void unpublish_attribute(const std::string &attributeClass, const std::string &attributeName) {
-        ::org::cpswt::hla::ObjectRoot::unpublish_attribute(
+        ::edu::vanderbilt::vuisis::cpswt::hla::ObjectRoot::unpublish_attribute(
           get_hla_class_name(), attributeClass, attributeName
         );
     }
@@ -550,7 +552,7 @@ public:
     }
 
     static void subscribe_attribute(const std::string &attributeClass, const std::string &attributeName) {
-        ::org::cpswt::hla::ObjectRoot::subscribe_attribute(
+        ::edu::vanderbilt::vuisis::cpswt::hla::ObjectRoot::subscribe_attribute(
           get_hla_class_name(), attributeClass, attributeName
         );
     }
@@ -560,7 +562,7 @@ public:
     }
 
     static void unsubscribe_attribute(const std::string &attributeClass, const std::string &attributeName) {
-        ::org::cpswt::hla::ObjectRoot::unsubscribe_attribute(
+        ::edu::vanderbilt::vuisis::cpswt::hla::ObjectRoot::unsubscribe_attribute(
           get_hla_class_name(), attributeClass, attributeName
         );
     }
@@ -742,13 +744,15 @@ protected:
     ) : Super( hlaClassName, propertyMap, rtiFedTime ) { }
 
 };
-   } // NAMESPACE "ObjectRoot_p"
-  } // NAMESPACE "hla"
- } // NAMESPACE "cpswt"
-} // NAMESPACE "org"
+     } // NAMESPACE "ObjectRoot_p"
+    } // NAMESPACE "hla"
+   } // NAMESPACE "cpswt"
+  } // NAMESPACE "vuisis"
+ } // NAMESPACE "vanderbilt"
+} // NAMESPACE "edu"
 
-inline std::ostream &operator<<( std::ostream &os, ::org::cpswt::hla::ObjectRoot_p::FederateObject::SP messagingSP ) {
+inline std::ostream &operator<<( std::ostream &os, ::edu::vanderbilt::vuisis::cpswt::hla::ObjectRoot_p::FederateObject::SP messagingSP ) {
     return os << *messagingSP;
 }
 
-#endif // _org_cpswt_hla_ObjectRoot_p_FederateObject_CLASS
+#endif // _edu_vanderbilt_vuisis_cpswt_hla_ObjectRoot_p_FederateObject_CLASS

@@ -29,17 +29,19 @@
  */
 
 #include "InteractionRoot_p/C2WInteractionRoot_p/SimulationControl_p/SimResume.hpp"
-namespace org {
- namespace cpswt {
-  namespace hla {
-   namespace InteractionRoot_p {
-    namespace C2WInteractionRoot_p {
-     namespace SimulationControl_p {
+namespace edu {
+ namespace vanderbilt {
+  namespace vuisis {
+   namespace cpswt {
+    namespace hla {
+     namespace InteractionRoot_p {
+      namespace C2WInteractionRoot_p {
+       namespace SimulationControl_p {
 
 bool SimResume::static_init_var = SimResume::static_init();
 
 bool SimResume::static_init() {
-    BOOST_LOG_SEV(get_logger(), info) << "Class \"::org::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::SimulationControl_p::SimResume\" loaded.";
+    BOOST_LOG_SEV(get_logger(), info) << "Class \"::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::SimulationControl_p::SimResume\" loaded.";
 
     // ADD THIS CLASS TO THE _classNameSet DEFINED IN InteractionRoot
     get_hla_class_name_set().insert(get_hla_class_name());
@@ -73,9 +75,11 @@ bool SimResume::static_init() {
     return true;
 }
 
-     } // NAMESPACE "SimulationControl_p"
-    } // NAMESPACE "C2WInteractionRoot_p"
-   } // NAMESPACE "InteractionRoot_p"
-  } // NAMESPACE "hla"
- } // NAMESPACE "cpswt"
-} // NAMESPACE "org"
+       } // NAMESPACE "SimulationControl_p"
+      } // NAMESPACE "C2WInteractionRoot_p"
+     } // NAMESPACE "InteractionRoot_p"
+    } // NAMESPACE "hla"
+   } // NAMESPACE "cpswt"
+  } // NAMESPACE "vuisis"
+ } // NAMESPACE "vanderbilt"
+} // NAMESPACE "edu"

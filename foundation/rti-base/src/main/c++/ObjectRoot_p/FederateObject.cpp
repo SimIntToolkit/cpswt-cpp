@@ -29,15 +29,17 @@
  */
 
 #include "ObjectRoot_p/FederateObject.hpp"
-namespace org {
- namespace cpswt {
-  namespace hla {
-   namespace ObjectRoot_p {
+namespace edu {
+ namespace vanderbilt {
+  namespace vuisis {
+   namespace cpswt {
+    namespace hla {
+     namespace ObjectRoot_p {
 
 bool FederateObject::static_init_var = FederateObject::static_init();
 
 bool FederateObject::static_init() {
-    BOOST_LOG_SEV(get_logger(), info) << "Class \"::org::cpswt::hla::ObjectRoot_p::FederateObject\" loaded.";
+    BOOST_LOG_SEV(get_logger(), info) << "Class \"::edu::vanderbilt::vuisis::cpswt::hla::ObjectRoot_p::FederateObject\" loaded.";
 
     // ADD THIS CLASS TO THE _classNameSet DEFINED IN ObjectRoot
     get_hla_class_name_set().insert(get_hla_class_name());
@@ -89,7 +91,9 @@ bool FederateObject::static_init() {
     return true;
 }
 
-   } // NAMESPACE "ObjectRoot_p"
-  } // NAMESPACE "hla"
- } // NAMESPACE "cpswt"
-} // NAMESPACE "org"
+     } // NAMESPACE "ObjectRoot_p"
+    } // NAMESPACE "hla"
+   } // NAMESPACE "cpswt"
+  } // NAMESPACE "vuisis"
+ } // NAMESPACE "vanderbilt"
+} // NAMESPACE "edu"

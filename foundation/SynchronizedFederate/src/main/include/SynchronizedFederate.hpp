@@ -88,17 +88,17 @@ class SynchronizedFederate : public NullFederateAmbassador {
 public:
     typedef logging_source::severity_logger< severity_level > severity_logger;
 
-    using ObjectRoot = ::org::cpswt::hla::ObjectRoot;
+    using ObjectRoot = ::edu::vanderbilt::vuisis::cpswt::hla::ObjectRoot;
     using ObjectReflector = ObjectRoot::ObjectReflector;
     using ObjectReflectorSPComparator = ObjectRoot::ObjectReflectorSPComparator;
-    using InteractionRoot = ::org::cpswt::hla::InteractionRoot;
-    using C2WInteractionRoot = ::org::cpswt::hla::InteractionRoot_p::C2WInteractionRoot;
-    using EmbeddedMessaging = ::org::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::EmbeddedMessaging;
-    using SimEnd = ::org::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::SimulationControl_p::SimEnd;
+    using InteractionRoot = ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot;
+    using C2WInteractionRoot = ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot;
+    using EmbeddedMessaging = ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::EmbeddedMessaging;
+    using SimEnd = ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::SimulationControl_p::SimEnd;
     using FederateJoinInteraction =
-      ::org::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::FederateJoinInteraction;
+      ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::FederateJoinInteraction;
     using FederateResignInteraction =
-      ::org::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::FederateResignInteraction;
+      ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::FederateResignInteraction;
 
     static const std::string FEDERATION_MANAGER_NAME;
 
