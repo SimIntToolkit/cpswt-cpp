@@ -29,19 +29,21 @@
  */
 
 #include "InteractionRoot_p/C2WInteractionRoot_p/ActionBase_p/OmnetCommand_p/AttacksNotYetImplemented_p/StartDataInjectionAttack.hpp"
-namespace org {
- namespace cpswt {
-  namespace hla {
-   namespace InteractionRoot_p {
-    namespace C2WInteractionRoot_p {
-     namespace ActionBase_p {
-      namespace OmnetCommand_p {
-       namespace AttacksNotYetImplemented_p {
+namespace edu {
+ namespace vanderbilt {
+  namespace vuisis {
+   namespace cpswt {
+    namespace hla {
+     namespace InteractionRoot_p {
+      namespace C2WInteractionRoot_p {
+       namespace ActionBase_p {
+        namespace OmnetCommand_p {
+         namespace AttacksNotYetImplemented_p {
 
 bool StartDataInjectionAttack::static_init_var = StartDataInjectionAttack::static_init();
 
 bool StartDataInjectionAttack::static_init() {
-    BOOST_LOG_SEV(get_logger(), info) << "Class \"::org::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::OmnetCommand_p::AttacksNotYetImplemented_p::StartDataInjectionAttack\" loaded.";
+    BOOST_LOG_SEV(get_logger(), info) << "Class \"::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::OmnetCommand_p::AttacksNotYetImplemented_p::StartDataInjectionAttack\" loaded.";
 
     // ADD THIS CLASS TO THE _classNameSet DEFINED IN InteractionRoot
     get_hla_class_name_set().insert(get_hla_class_name());
@@ -109,11 +111,13 @@ bool StartDataInjectionAttack::static_init() {
     return true;
 }
 
-       } // NAMESPACE "AttacksNotYetImplemented_p"
-      } // NAMESPACE "OmnetCommand_p"
-     } // NAMESPACE "ActionBase_p"
-    } // NAMESPACE "C2WInteractionRoot_p"
-   } // NAMESPACE "InteractionRoot_p"
-  } // NAMESPACE "hla"
- } // NAMESPACE "cpswt"
-} // NAMESPACE "org"
+         } // NAMESPACE "AttacksNotYetImplemented_p"
+        } // NAMESPACE "OmnetCommand_p"
+       } // NAMESPACE "ActionBase_p"
+      } // NAMESPACE "C2WInteractionRoot_p"
+     } // NAMESPACE "InteractionRoot_p"
+    } // NAMESPACE "hla"
+   } // NAMESPACE "cpswt"
+  } // NAMESPACE "vuisis"
+ } // NAMESPACE "vanderbilt"
+} // NAMESPACE "edu"

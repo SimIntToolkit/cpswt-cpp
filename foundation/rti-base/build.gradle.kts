@@ -49,10 +49,10 @@ val archivaPort: String by project
 
 library {
     dependencies {
-        implementation(group="org.cpswt", name="core-cpp", version=version)
-        implementation(group="org.cpswt", name="C2WConsoleLogger", version=version)
+        implementation(group="edu.vanderbilt.vuisis.cpswt", name="core-cpp", version=version)
+        implementation(group="edu.vanderbilt.vuisis.cpswt", name="C2WConsoleLogger", version=version)
 
-        testImplementation(group="org.cpswt", name="CppTestHarness", version=version)
+        testImplementation(group="edu.vanderbilt.vuisis.cpswt", name="CppTestHarness", version=version)
     }
     source.from(file("src/main/c++"))
     publicHeaders.from(file("src/main/include"))
@@ -113,7 +113,7 @@ tasks.withType(InstallExecutable::class.java).configureEach {
 publishing {
     publications {
         getByName<MavenPublication>("main") {
-            group = "org.cpswt"
+            group = "edu.vanderbilt.vuisis.cpswt"
         }
     }
     repositories {

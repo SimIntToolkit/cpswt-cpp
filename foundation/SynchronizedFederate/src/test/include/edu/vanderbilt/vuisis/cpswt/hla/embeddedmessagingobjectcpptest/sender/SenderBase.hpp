@@ -52,11 +52,13 @@
 #include "ObjectRoot_p/TestObject.hpp"
 
 
-namespace org {
- namespace cpswt {
-  namespace hla {
-   namespace embeddedmessagingobjectcpptest {
-    namespace sender {
+namespace edu {
+ namespace vanderbilt {
+  namespace vuisis {
+   namespace cpswt {
+    namespace hla {
+     namespace embeddedmessagingobjectcpptest {
+      namespace sender {
 
 BOOST_LOG_ATTRIBUTE_KEYWORD(federateName, "FederateName", std::string);
 BOOST_LOG_ATTRIBUTE_KEYWORD(messagingClassName, "MessagingClassName", std::string);
@@ -73,8 +75,8 @@ using namespace logging::trivial;
 
 class SenderBase: public SynchronizedFederateMockRTI {
 
-using InteractionRoot = ::org::cpswt::hla::InteractionRoot;
-using C2WInteractionRoot = ::org::cpswt::hla::InteractionRoot_p::C2WInteractionRoot;
+using InteractionRoot = ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot;
+using C2WInteractionRoot = ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot;
 
 public:
     typedef logging_source::severity_logger< severity_level > severity_logger;
@@ -132,9 +134,9 @@ protected:
 public:
     SenderBase(FederateConfig *federateConfig);
 
-    ::org::cpswt::hla::ObjectRoot_p::TestObject::SP create_ObjectRoot_TestObject() {
-        ::org::cpswt::hla::ObjectRoot_p::TestObject::SP objectSP =
-            ::org::cpswt::hla::ObjectRoot_p::TestObject::create();
+    ::edu::vanderbilt::vuisis::cpswt::hla::ObjectRoot_p::TestObject::SP create_ObjectRoot_TestObject() {
+        ::edu::vanderbilt::vuisis::cpswt::hla::ObjectRoot_p::TestObject::SP objectSP =
+            ::edu::vanderbilt::vuisis::cpswt::hla::ObjectRoot_p::TestObject::create();
         return objectSP;
     }
 
@@ -161,10 +163,12 @@ public:
       RTI::FederateInternalError
     );
 };
-    } // NAMESPACE "sender"
-   } // NAMESPACE "embeddedmessagingobjectcpptest"
-  } // NAMESPACE "hla"
- } // NAMESPACE "cpswt"
-} // NAMESPACE "org"
+      } // NAMESPACE "sender"
+     } // NAMESPACE "embeddedmessagingobjectcpptest"
+    } // NAMESPACE "hla"
+   } // NAMESPACE "cpswt"
+  } // NAMESPACE "vuisis"
+ } // NAMESPACE "vanderbilt"
+} // NAMESPACE "edu"
 
 #endif // ORG_CPSWT_HLA_EMBEDDEDMESSAGINGOBJECTCPPTEST_SENDER_CLASS_BASE_CLASS

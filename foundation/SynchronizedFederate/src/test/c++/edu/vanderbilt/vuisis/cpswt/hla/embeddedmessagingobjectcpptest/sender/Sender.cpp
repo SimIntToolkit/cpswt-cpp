@@ -28,14 +28,16 @@
  * OR MODIFICATIONS.
  */
 
-#include "org/cpswt/hla/embeddedmessagingobjectcpptest/sender/Sender.hpp"
+#include "edu/vanderbilt/vuisis/cpswt/hla/embeddedmessagingobjectcpptest/sender/Sender.hpp"
 
 
-namespace org {
- namespace cpswt {
-  namespace hla {
-   namespace embeddedmessagingobjectcpptest {
-    namespace sender {
+namespace edu {
+ namespace vanderbilt {
+  namespace vuisis {
+   namespace cpswt {
+    namespace hla {
+     namespace embeddedmessagingobjectcpptest {
+      namespace sender {
 
 Sender::Sender(FederateConfig *federateConfig): Super(federateConfig) {
     //////////////////////////////////////////////////////
@@ -72,8 +74,10 @@ void Sender::execute() {
     TestObject_0.set_StringValue("Hello");
     updateAttributeValues(TestObject_0, 0.0);
 }
-    } // NAMESPACE "sender"
-   } // NAMESPACE "embeddedmessagingobjectcpptest"
-  } // NAMESPACE "hla"
- } // NAMESPACE "cpswt"
-} // NAMESPACE "org"
+      } // NAMESPACE "sender"
+     } // NAMESPACE "embeddedmessagingobjectcpptest"
+    } // NAMESPACE "hla"
+   } // NAMESPACE "cpswt"
+  } // NAMESPACE "vuisis"
+ } // NAMESPACE "vanderbilt"
+} // NAMESPACE "edu"

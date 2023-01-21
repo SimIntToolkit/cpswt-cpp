@@ -37,11 +37,11 @@
 #include "InteractionRoot_p/C2WInteractionRoot_p/SimulationControl_p/SimEnd.hpp"
 #include "ObjectRoot_p/FederateObject.hpp"
 
-using InteractionRoot = ::org::cpswt::hla::InteractionRoot;
-using ObjectRoot = ::org::cpswt::hla::ObjectRoot;
+using InteractionRoot = ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot;
+using ObjectRoot = ::edu::vanderbilt::vuisis::cpswt::hla::ObjectRoot;
 
-using SimEnd = ::org::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::SimulationControl_p::SimEnd;
-using FederateObject = ::org::cpswt::hla::ObjectRoot_p::FederateObject;
+using SimEnd = ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::SimulationControl_p::SimEnd;
+using FederateObject = ::edu::vanderbilt::vuisis::cpswt::hla::ObjectRoot_p::FederateObject;
 
 JsonTests::JsonTests() : CppUnit::TestCase() {
     Initialization::init_1();

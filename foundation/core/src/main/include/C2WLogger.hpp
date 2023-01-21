@@ -38,8 +38,8 @@
 #include "InteractionRootInterface.hpp"
 #include "ObjectRootInterface.hpp"
 
-using ::org::cpswt::hla::InteractionRootInterface;
-using ::org::cpswt::hla::ObjectRootInterface;
+using ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRootInterface;
+using ::edu::vanderbilt::vuisis::cpswt::hla::ObjectRootInterface;
 
 class C2WLogger {
 

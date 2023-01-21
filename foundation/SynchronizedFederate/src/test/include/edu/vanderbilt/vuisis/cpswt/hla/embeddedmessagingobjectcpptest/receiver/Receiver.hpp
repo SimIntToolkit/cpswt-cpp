@@ -32,25 +32,27 @@
 #define ORG_CPSWT_HLA_EMBEDDEDMESSAGINGOBJECTCPPTEST_RECEIVER_CLASS_CLASS
 
 
-#include "org/cpswt/hla/embeddedmessagingobjectcpptest/receiver/ReceiverBase.hpp"
+#include "edu/vanderbilt/vuisis/cpswt/hla/embeddedmessagingobjectcpptest/receiver/ReceiverBase.hpp"
 #include "FederateConfigParser.h"
 
 #include <boost/shared_ptr.hpp>
 
-namespace org {
- namespace cpswt {
-  namespace hla {
-   namespace embeddedmessagingobjectcpptest {
-    namespace receiver {
+namespace edu {
+ namespace vanderbilt {
+  namespace vuisis {
+   namespace cpswt {
+    namespace hla {
+     namespace embeddedmessagingobjectcpptest {
+      namespace receiver {
 
 class Receiver: public ReceiverBase {
 
-using InteractionRoot = ::org::cpswt::hla::InteractionRoot;
-using C2WInteractionRoot = ::org::cpswt::hla::InteractionRoot_p::C2WInteractionRoot;
+using InteractionRoot = ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot;
+using C2WInteractionRoot = ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot;
 
 //    private final static Logger log = LogManager.getLogger();
 public:
-    typedef ::org::cpswt::hla::ObjectRoot_p::TestObject TestObject;
+    typedef ::edu::vanderbilt::vuisis::cpswt::hla::ObjectRoot_p::TestObject TestObject;
     typedef boost::shared_ptr<TestObject> TestObjectSP;
 private:
     double m_currentTime;
@@ -93,10 +95,12 @@ public:
     void initialize();
     void execute();
 };
-    } // NAMESPACE "receiver"
-   } // NAMESPACE "embeddedmessagingobjectcpptest"
-  } // NAMESPACE "hla"
- } // NAMESPACE "cpswt"
-} // NAMESPACE "org"
+      } // NAMESPACE "receiver"
+     } // NAMESPACE "embeddedmessagingobjectcpptest"
+    } // NAMESPACE "hla"
+   } // NAMESPACE "cpswt"
+  } // NAMESPACE "vuisis"
+ } // NAMESPACE "vanderbilt"
+} // NAMESPACE "edu"
 
 #endif // ORG_CPSWT_HLA_EMBEDDEDMESSAGINGOBJECTCPPTEST_RECEIVER_CLASS_CLASS

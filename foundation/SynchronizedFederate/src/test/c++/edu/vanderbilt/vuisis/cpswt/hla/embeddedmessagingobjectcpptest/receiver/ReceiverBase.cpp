@@ -30,50 +30,46 @@
 
 
 
-#include "org/cpswt/hla/embeddedmessagingobjectcpptest/sender/SenderBase.hpp"
+#include "edu/vanderbilt/vuisis/cpswt/hla/embeddedmessagingobjectcpptest/receiver/ReceiverBase.hpp"
 
 
-namespace org {
- namespace cpswt {
-  namespace hla {
-   namespace embeddedmessagingobjectcpptest {
-    namespace sender {
+namespace edu {
+ namespace vanderbilt {
+  namespace vuisis {
+   namespace cpswt {
+    namespace hla {
+     namespace embeddedmessagingobjectcpptest {
+      namespace receiver {
 
 
 // constructor
-void SenderBase::init() {
+void ReceiverBase::init() {
     createRTI();
     joinFederation();
 
     enableTimeConstrained();
     enableTimeRegulation(getLookahead());
 
-    // DIRECT INTERACTION PUBLICATIONS
-    ::org::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::EmbeddedMessaging_p::OmnetFederate::publish_interaction(getRTI());
-    ::org::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::EmbeddedMessaging_p::Receiver::publish_interaction(getRTI());
+    // INTERACTION SUBSCRIPTIONS
 
-    // OBJECT PUBLICATIONS
-    ::org::cpswt::hla::ObjectRoot_p::TestObject::publish_BooleanValue1_attribute();
-    ::org::cpswt::hla::ObjectRoot_p::TestObject::publish_BooleanValue2_attribute();
-    ::org::cpswt::hla::ObjectRoot_p::TestObject::publish_ByteValue_attribute();
-    ::org::cpswt::hla::ObjectRoot_p::TestObject::publish_CharValue_attribute();
-    ::org::cpswt::hla::ObjectRoot_p::TestObject::publish_DoubleValue_attribute();
-    ::org::cpswt::hla::ObjectRoot_p::TestObject::publish_FloatValue_attribute();
-    ::org::cpswt::hla::ObjectRoot_p::TestObject::publish_IntValue_attribute();
-    ::org::cpswt::hla::ObjectRoot_p::TestObject::publish_object(getRTI());
+    ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::EmbeddedMessaging_p::Receiver::subscribe_interaction(getRTI());
 
-    // SOFT OBJECT PUBLICATIONS
-    ::org::cpswt::hla::ObjectRoot_p::TestObject::add_federate_name_soft_publish("OmnetFederate");
-
-    // DIRECT OBJECT STATUS PUBLICATION
-    ::org::cpswt::hla::ObjectRoot_p::TestObject::add_federate_name_soft_publish_direct("Receiver");
+    // OBJECT SUBSCRIPTIONS
+    ::edu::vanderbilt::vuisis::cpswt::hla::ObjectRoot_p::TestObject::subscribe_CharValue_attribute();
+    ::edu::vanderbilt::vuisis::cpswt::hla::ObjectRoot_p::TestObject::subscribe_DoubleValue_attribute();
+    ::edu::vanderbilt::vuisis::cpswt::hla::ObjectRoot_p::TestObject::subscribe_FloatValue_attribute();
+    ::edu::vanderbilt::vuisis::cpswt::hla::ObjectRoot_p::TestObject::subscribe_IntValue_attribute();
+    ::edu::vanderbilt::vuisis::cpswt::hla::ObjectRoot_p::TestObject::subscribe_LongValue_attribute();
+    ::edu::vanderbilt::vuisis::cpswt::hla::ObjectRoot_p::TestObject::subscribe_ShortValue_attribute();
+    ::edu::vanderbilt::vuisis::cpswt::hla::ObjectRoot_p::TestObject::subscribe_StringValue_attribute();
+    ::edu::vanderbilt::vuisis::cpswt::hla::ObjectRoot_p::TestObject::subscribe_object(getRTI());
 }
 
-SenderBase::SenderBase(FederateConfig *federateConfig): Super(federateConfig) {
+ReceiverBase::ReceiverBase(FederateConfig *federateConfig): Super(federateConfig) {
     init();
 }
 
-void SenderBase::receiveInteraction(
+void ReceiverBase::receiveInteraction(
   RTI::InteractionClassHandle interactionClassHandle,
   const RTI::ParameterHandleValuePairSet& parameterHandleValuePairSet,
   const char *userSuppliedTag
@@ -83,8 +79,8 @@ void SenderBase::receiveInteraction(
   RTI::FederateInternalError
 ) {
     if (getMoreATRs()) {
-        ::org::cpswt::hla::InteractionRoot::SP interactionRootSP =
-          ::org::cpswt::hla::InteractionRoot::create_interaction(
+        ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot::SP interactionRootSP =
+          ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot::create_interaction(
             interactionClassHandle, parameterHandleValuePairSet
           );
 
@@ -100,7 +96,7 @@ void SenderBase::receiveInteraction(
     }
 }
 
-void SenderBase::receiveInteraction(
+void ReceiverBase::receiveInteraction(
   RTI::InteractionClassHandle interactionClassHandle,
   const RTI::ParameterHandleValuePairSet &parameterHandleValuePairSet,
   const RTI::FedTime &fedTime,
@@ -113,8 +109,8 @@ void SenderBase::receiveInteraction(
   RTI::FederateInternalError
 ) {
     if (getMoreATRs()) {
-        ::org::cpswt::hla::InteractionRoot::SP interactionRootSP =
-          ::org::cpswt::hla::InteractionRoot::create_interaction(
+        ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot::SP interactionRootSP =
+          ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot::create_interaction(
             interactionClassHandle, parameterHandleValuePairSet, fedTime
           );
 
@@ -131,8 +127,10 @@ void SenderBase::receiveInteraction(
         );
     }
 }
-    } // NAMESPACE "sender"
-   } // NAMESPACE "embeddedmessagingobjectcpptest"
-  } // NAMESPACE "hla"
- } // NAMESPACE "cpswt"
-} // NAMESPACE "org"
+      } // NAMESPACE "receiver"
+     } // NAMESPACE "embeddedmessagingobjectcpptest"
+    } // NAMESPACE "hla"
+   } // NAMESPACE "cpswt"
+  } // NAMESPACE "vuisis"
+ } // NAMESPACE "vanderbilt"
+} // NAMESPACE "edu"

@@ -51,11 +51,13 @@
 #include "ObjectRoot_p/TestObject.hpp"
 
 
-namespace org {
- namespace cpswt {
-  namespace hla {
-   namespace embeddedmessagingobjectcpptest {
-    namespace receiver {
+namespace edu {
+ namespace vanderbilt {
+  namespace vuisis {
+   namespace cpswt {
+    namespace hla {
+     namespace embeddedmessagingobjectcpptest {
+      namespace receiver {
 
 BOOST_LOG_ATTRIBUTE_KEYWORD(federateName, "FederateName", std::string);
 BOOST_LOG_ATTRIBUTE_KEYWORD(messagingClassName, "MessagingClassName", std::string);
@@ -72,8 +74,8 @@ using namespace logging::trivial;
 
 class ReceiverBase: public SynchronizedFederateMockRTI {
 
-using InteractionRoot = ::org::cpswt::hla::InteractionRoot;
-using C2WInteractionRoot = ::org::cpswt::hla::InteractionRoot_p::C2WInteractionRoot;
+using InteractionRoot = ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot;
+using C2WInteractionRoot = ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot;
 
 public:
     typedef logging_source::severity_logger< severity_level > severity_logger;
@@ -154,10 +156,12 @@ public:
       RTI::FederateInternalError
     );
 };
-    } // NAMESPACE "receiver"
-   } // NAMESPACE "embeddedmessagingobjectcpptest"
-  } // NAMESPACE "hla"
- } // NAMESPACE "cpswt"
-} // NAMESPACE "org"
+      } // NAMESPACE "receiver"
+     } // NAMESPACE "embeddedmessagingobjectcpptest"
+    } // NAMESPACE "hla"
+   } // NAMESPACE "cpswt"
+  } // NAMESPACE "vuisis"
+ } // NAMESPACE "vanderbilt"
+} // NAMESPACE "edu"
 
 #endif // ORG_CPSWT_HLA_EMBEDDEDMESSAGINGOBJECTCPPTEST_RECEIVER_CLASS_BASE_CLASS

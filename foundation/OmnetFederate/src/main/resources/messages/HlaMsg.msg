@@ -36,8 +36,8 @@ cplusplus {{
 #include <InteractionRoot.hpp>
 #include <ObjectRoot.hpp>
 
-using InteractionRoot = ::org::cpswt::hla::InteractionRoot;
-using ObjectReflector = ::org::cpswt::hla::ObjectRoot::ObjectReflector;
+using InteractionRoot = ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot;
+using ObjectReflector = ::edu::vanderbilt::vuisis::cpswt::hla::ObjectRoot::ObjectReflector;
 }};
 
 class noncobject InteractionRoot::SP;

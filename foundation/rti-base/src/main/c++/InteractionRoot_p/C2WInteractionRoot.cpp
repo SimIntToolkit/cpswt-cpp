@@ -29,10 +29,12 @@
  */
 
 #include "InteractionRoot_p/C2WInteractionRoot.hpp"
-namespace org {
- namespace cpswt {
-  namespace hla {
-   namespace InteractionRoot_p {
+namespace edu {
+ namespace vanderbilt {
+  namespace vuisis {
+   namespace cpswt {
+    namespace hla {
+     namespace InteractionRoot_p {
 
 bool C2WInteractionRoot::is_federate_sequence(const std::string &federateSequence) {
     Json::Value jsonArray(Json::arrayValue);
@@ -54,7 +56,7 @@ bool C2WInteractionRoot::is_federate_sequence(const std::string &federateSequenc
 }
 
 void C2WInteractionRoot::update_federate_sequence_aux(
-  ::org::cpswt::hla::InteractionRoot &interactionRoot, const std::string &federateId
+  ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot &interactionRoot, const std::string &federateId
 ) {
     if (interactionRoot.getFederateAppendedToFederateSequence()) {
         return;
@@ -97,7 +99,7 @@ C2WInteractionRoot::StringList C2WInteractionRoot::get_federate_sequence_list(co
     return retval;
 }
 
-C2WInteractionRoot::StringList C2WInteractionRoot::get_federate_sequence_list_aux(const ::org::cpswt::hla::InteractionRoot &interactionRoot) {
+C2WInteractionRoot::StringList C2WInteractionRoot::get_federate_sequence_list_aux(const ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot &interactionRoot) {
     const std::string federateSequence = interactionRoot.getParameter("federateSequence").asString();
 
     return get_federate_sequence_list(federateSequence);
@@ -153,7 +155,7 @@ void C2WInteractionRoot::remove_reject_source_federate_id(
 bool C2WInteractionRoot::static_init_var = C2WInteractionRoot::static_init();
 
 bool C2WInteractionRoot::static_init() {
-    BOOST_LOG_SEV(get_logger(), info) << "Class \"::org::cpswt::hla::InteractionRoot_p::C2WInteractionRoot\" loaded.";
+    BOOST_LOG_SEV(get_logger(), info) << "Class \"::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot\" loaded.";
 
     // ADD THIS CLASS TO THE _classNameSet DEFINED IN InteractionRoot
     get_hla_class_name_set().insert(get_hla_class_name());
@@ -205,7 +207,9 @@ bool C2WInteractionRoot::static_init() {
     return true;
 }
 
-   } // NAMESPACE "InteractionRoot_p"
-  } // NAMESPACE "hla"
- } // NAMESPACE "cpswt"
-} // NAMESPACE "org"
+     } // NAMESPACE "InteractionRoot_p"
+    } // NAMESPACE "hla"
+   } // NAMESPACE "cpswt"
+  } // NAMESPACE "vuisis"
+ } // NAMESPACE "vanderbilt"
+} // NAMESPACE "edu"
