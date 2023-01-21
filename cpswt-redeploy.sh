@@ -1,7 +1,6 @@
 #!/bin/bash
 
-#for package in CppTestHarness core-cpp C2WConsoleLogger rti-base-cpp CPSWTConfig SynchronizedFederate; do
-for package in SynchronizedFederate; do
+for package in CppTestHarness core-cpp C2WConsoleLogger rti-base-cpp CPSWTConfig SynchronizedFederate; do
 
     echo "PLEASE REMOVE THE FOLLOWING PACKAGES FROM YOUR MAVEN REPOSITORY:"
     echo
