@@ -32,6 +32,7 @@ rootProject.name = "cpswt-cpp"
   
 val archivaHostId: String by settings
 val archivaPort: String by settings
+val version: String by settings
 
 pluginManagement {
     repositories {
