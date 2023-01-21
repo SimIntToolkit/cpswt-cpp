@@ -58,9 +58,11 @@
 #include <StringCollections.hpp>
 
 
-namespace org {
- namespace cpswt {
-  namespace hla {
+namespace edu {
+ namespace vanderbilt {
+  namespace vuisis {
+   namespace cpswt {
+    namespace hla {
 
 struct InteractionRootInterface {
 
@@ -112,8 +114,10 @@ struct InteractionRootInterface {
 };
 
 
-  } // NAMESPACE "hla"
- } // NAMESPACE "cpswt"
-} // NAMESPACE "org"
+    } // NAMESPACE "hla"
+   } // NAMESPACE "cpswt"
+  } // NAMESPACE "vuisis"
+ } // NAMESPACE "vanderbilt"
+} // NAMESPACE "edu"
 
 #endif // - _INTERACTION_ROOT_INTERFACE

@@ -48,68 +48,68 @@
 Define_Module(HLAInterface);
 
 
-using AddRouteToRoutingTable = ::org::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::OmnetCommand_p::AddRouteToRoutingTable;
-using DropRouteFromRoutingTable = ::org::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::OmnetCommand_p::DropRouteFromRoutingTable;
+using AddRouteToRoutingTable = ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::OmnetCommand_p::AddRouteToRoutingTable;
+using DropRouteFromRoutingTable = ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::OmnetCommand_p::DropRouteFromRoutingTable;
 
-using CommandExecutionStatus = ::org::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::CommandExecutionStatus;
+using CommandExecutionStatus = ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::CommandExecutionStatus;
 
 // USED IN HEADER FILE
-//using C2WInteractionRoot = ::org::cpswt::hla::InteractionRoot_p::C2WInteractionRoot;
+//using C2WInteractionRoot = ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot;
 
-using NetworkPacket = ::org::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::NetworkPacket;
-using EmbeddedMessaging = ::org::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::EmbeddedMessaging;
+using NetworkPacket = ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::NetworkPacket;
+using EmbeddedMessaging = ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::EmbeddedMessaging;
 
-using OmnetCommand = ::org::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::OmnetCommand;
+using OmnetCommand = ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::OmnetCommand;
 
-using ObjectReflector = ::org::cpswt::hla::ObjectRoot::ObjectReflector;
+using ObjectReflector = ::edu::vanderbilt::vuisis::cpswt::hla::ObjectRoot::ObjectReflector;
 
-using RecordPacketsForReplayAttack = ::org::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::OmnetCommand_p::RecordPacketsForReplayAttack;
-using CeaseReplayAttack = ::org::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::OmnetCommand_p::CeaseReplayAttack;
+using RecordPacketsForReplayAttack = ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::OmnetCommand_p::RecordPacketsForReplayAttack;
+using CeaseReplayAttack = ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::OmnetCommand_p::CeaseReplayAttack;
 
-using StartDataInjectionAttack = ::org::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::OmnetCommand_p::AttacksNotYetImplemented_p::StartDataInjectionAttack;
-using StopDataInjectionAttack = ::org::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::OmnetCommand_p::AttacksNotYetImplemented_p::StopDataInjectionAttack;
+using StartDataInjectionAttack = ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::OmnetCommand_p::AttacksNotYetImplemented_p::StartDataInjectionAttack;
+using StopDataInjectionAttack = ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::OmnetCommand_p::AttacksNotYetImplemented_p::StopDataInjectionAttack;
 
-using StartDelayNodeAttack = ::org::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::OmnetCommand_p::StartDelayNodeAttack;
-using StopDelayNodeAttack = ::org::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::OmnetCommand_p::StopDelayNodeAttack;
+using StartDelayNodeAttack = ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::OmnetCommand_p::StartDelayNodeAttack;
+using StopDelayNodeAttack = ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::OmnetCommand_p::StopDelayNodeAttack;
 
-using StartDisableNetworkAttack = ::org::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::OmnetCommand_p::StartDisableNetworkAttack;
-using StopDisableNetworkAttack = ::org::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::OmnetCommand_p::StopDisableNetworkAttack;
+using StartDisableNetworkAttack = ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::OmnetCommand_p::StartDisableNetworkAttack;
+using StopDisableNetworkAttack = ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::OmnetCommand_p::StopDisableNetworkAttack;
 
-using StartDNSPoisoningAttack = ::org::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::OmnetCommand_p::AttacksNotYetImplemented_p::StartDNSPoisoningAttack;
-using StopDNSPoisoningAttack = ::org::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::OmnetCommand_p::AttacksNotYetImplemented_p::StopDNSPoisoningAttack;
+using StartDNSPoisoningAttack = ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::OmnetCommand_p::AttacksNotYetImplemented_p::StartDNSPoisoningAttack;
+using StopDNSPoisoningAttack = ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::OmnetCommand_p::AttacksNotYetImplemented_p::StopDNSPoisoningAttack;
 
-using StartIntegrityAttack = ::org::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::OmnetCommand_p::StartIntegrityAttack;
-using StopIntegrityAttack = ::org::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::OmnetCommand_p::StopIntegrityAttack;
+using StartIntegrityAttack = ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::OmnetCommand_p::StartIntegrityAttack;
+using StopIntegrityAttack = ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::OmnetCommand_p::StopIntegrityAttack;
 
-using StartLinkAttack = ::org::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::OmnetCommand_p::AttacksNotYetImplemented_p::StartLinkAttack;
-using StopLinkAttack = ::org::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::OmnetCommand_p::AttacksNotYetImplemented_p::StopLinkAttack;
+using StartLinkAttack = ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::OmnetCommand_p::AttacksNotYetImplemented_p::StartLinkAttack;
+using StopLinkAttack = ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::OmnetCommand_p::AttacksNotYetImplemented_p::StopLinkAttack;
 
-using StartMasqueradingAttack = ::org::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::OmnetCommand_p::AttacksNotYetImplemented_p::StartMasqueradingAttack;
-using StopMasqueradingAttack = ::org::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::OmnetCommand_p::AttacksNotYetImplemented_p::StopMasqueradingAttack;
+using StartMasqueradingAttack = ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::OmnetCommand_p::AttacksNotYetImplemented_p::StartMasqueradingAttack;
+using StopMasqueradingAttack = ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::OmnetCommand_p::AttacksNotYetImplemented_p::StopMasqueradingAttack;
 
-using StartModifyFromHLAPacketsAttack = ::org::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::OmnetCommand_p::StartModifyFromHLAPacketsAttack;
-using StopModifyFromHLAPacketsAttack = ::org::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::OmnetCommand_p::StopModifyFromHLAPacketsAttack;
+using StartModifyFromHLAPacketsAttack = ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::OmnetCommand_p::StartModifyFromHLAPacketsAttack;
+using StopModifyFromHLAPacketsAttack = ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::OmnetCommand_p::StopModifyFromHLAPacketsAttack;
 
-using StartModifyToHLAPacketsAttack = ::org::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::OmnetCommand_p::StartModifyToHLAPacketsAttack;
-using StopModifyToHLAPacketsAttack = ::org::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::OmnetCommand_p::StopModifyToHLAPacketsAttack;
+using StartModifyToHLAPacketsAttack = ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::OmnetCommand_p::StartModifyToHLAPacketsAttack;
+using StopModifyToHLAPacketsAttack = ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::OmnetCommand_p::StopModifyToHLAPacketsAttack;
 
-using StartNetworkFilterAttack = ::org::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::OmnetCommand_p::StartNetworkFilterAttack;
-using StopNetworkFilterAttack = ::org::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::OmnetCommand_p::StopNetworkFilterAttack;
+using StartNetworkFilterAttack = ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::OmnetCommand_p::StartNetworkFilterAttack;
+using StopNetworkFilterAttack = ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::OmnetCommand_p::StopNetworkFilterAttack;
 
-using StartNetworkIPFirewall = ::org::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::OmnetCommand_p::StartNetworkIPFirewall;
-using StopNetworkIPFirewall = ::org::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::OmnetCommand_p::StopNetworkIPFirewall;
+using StartNetworkIPFirewall = ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::OmnetCommand_p::StartNetworkIPFirewall;
+using StopNetworkIPFirewall = ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::OmnetCommand_p::StopNetworkIPFirewall;
 
-using StartNodeAttack = ::org::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::OmnetCommand_p::StartNodeAttack;
-using StopNodeAttack = ::org::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::OmnetCommand_p::StopNodeAttack;
+using StartNodeAttack = ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::OmnetCommand_p::StartNodeAttack;
+using StopNodeAttack = ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::OmnetCommand_p::StopNodeAttack;
 
-using StartOutOfOrderPacketsAttack = ::org::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::OmnetCommand_p::StartOutOfOrderPacketsAttack;
-using StopOutOfOrderPacketsAttack = ::org::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::OmnetCommand_p::StopOutOfOrderPacketsAttack;
+using StartOutOfOrderPacketsAttack = ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::OmnetCommand_p::StartOutOfOrderPacketsAttack;
+using StopOutOfOrderPacketsAttack = ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::OmnetCommand_p::StopOutOfOrderPacketsAttack;
 
-using StartReplayAttack = ::org::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::OmnetCommand_p::StartReplayAttack;
-using TerminateReplayAttack = ::org::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::OmnetCommand_p::TerminateReplayAttack;
+using StartReplayAttack = ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::OmnetCommand_p::StartReplayAttack;
+using TerminateReplayAttack = ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::OmnetCommand_p::TerminateReplayAttack;
 
-using StartSnifferAttack = ::org::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::OmnetCommand_p::StartSnifferAttack;
-using StopSnifferAttack = ::org::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::OmnetCommand_p::StopSnifferAttack;
+using StartSnifferAttack = ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::OmnetCommand_p::StartSnifferAttack;
+using StopSnifferAttack = ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::OmnetCommand_p::StopSnifferAttack;
 
 
 void HLAInterface::FederateHostConfig::assignFromJson(const Json::Value &jsonValue) {

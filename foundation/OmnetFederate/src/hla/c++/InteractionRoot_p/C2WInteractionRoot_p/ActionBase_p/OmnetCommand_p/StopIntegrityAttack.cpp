@@ -29,18 +29,20 @@
  */
 
 #include "InteractionRoot_p/C2WInteractionRoot_p/ActionBase_p/OmnetCommand_p/StopIntegrityAttack.hpp"
-namespace org {
- namespace cpswt {
-  namespace hla {
-   namespace InteractionRoot_p {
-    namespace C2WInteractionRoot_p {
-     namespace ActionBase_p {
-      namespace OmnetCommand_p {
+namespace edu {
+ namespace vanderbilt {
+  namespace vuisis {
+   namespace cpswt {
+    namespace hla {
+     namespace InteractionRoot_p {
+      namespace C2WInteractionRoot_p {
+       namespace ActionBase_p {
+        namespace OmnetCommand_p {
 
 bool StopIntegrityAttack::static_init_var = StopIntegrityAttack::static_init();
 
 bool StopIntegrityAttack::static_init() {
-    BOOST_LOG_SEV(get_logger(), info) << "Class \"::org::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::OmnetCommand_p::StopIntegrityAttack\" loaded.";
+    BOOST_LOG_SEV(get_logger(), info) << "Class \"::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::OmnetCommand_p::StopIntegrityAttack\" loaded.";
 
     // ADD THIS CLASS TO THE _classNameSet DEFINED IN InteractionRoot
     get_hla_class_name_set().insert(get_hla_class_name());
@@ -88,10 +90,12 @@ bool StopIntegrityAttack::static_init() {
     return true;
 }
 
-      } // NAMESPACE "OmnetCommand_p"
-     } // NAMESPACE "ActionBase_p"
-    } // NAMESPACE "C2WInteractionRoot_p"
-   } // NAMESPACE "InteractionRoot_p"
-  } // NAMESPACE "hla"
- } // NAMESPACE "cpswt"
-} // NAMESPACE "org"
+        } // NAMESPACE "OmnetCommand_p"
+       } // NAMESPACE "ActionBase_p"
+      } // NAMESPACE "C2WInteractionRoot_p"
+     } // NAMESPACE "InteractionRoot_p"
+    } // NAMESPACE "hla"
+   } // NAMESPACE "cpswt"
+  } // NAMESPACE "vuisis"
+ } // NAMESPACE "vanderbilt"
+} // NAMESPACE "edu"

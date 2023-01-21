@@ -3,8 +3,8 @@
 #include "ObjectRoot.hpp"
 
 
-using InteractionRoot = ::org::cpswt::hla::InteractionRoot;
-using ObjectRoot = ::org::cpswt::hla::ObjectRoot;
+using InteractionRoot = ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot;
+using ObjectRoot = ::edu::vanderbilt::vuisis::cpswt::hla::ObjectRoot;
 
 
 void Initialization::interaction_root_dynamic_init() {

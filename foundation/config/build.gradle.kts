@@ -50,7 +50,7 @@ library {
 publishing {
     publications {
         getByName<MavenPublication>("main") {
-            group = "org.cpswt"
+            group = "edu.vanderbilt.vuisis.cpswt"
         }
     }
     repositories {

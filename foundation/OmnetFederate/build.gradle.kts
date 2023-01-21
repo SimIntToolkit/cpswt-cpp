@@ -117,11 +117,11 @@ fun getMessageFileVisitor(): MessageFileVisitor {
 
 application {
     dependencies {
-        implementation(group="org.cpswt", name="CPSWTConfig", version=version)
-        implementation(group="org.cpswt", name="rti-base-cpp", version=version)
-        implementation(group="org.cpswt", name="C2WConsoleLogger", version=version)
-        implementation(group="org.cpswt", name="core-cpp", version=version)
-        implementation(group="org.cpswt", name="SynchronizedFederate", version=version)
+        implementation(group="edu.vanderbilt.vuisis.cpswt", name="CPSWTConfig", version=version)
+        implementation(group="edu.vanderbilt.vuisis.cpswt", name="rti-base-cpp", version=version)
+        implementation(group="edu.vanderbilt.vuisis.cpswt", name="C2WConsoleLogger", version=version)
+        implementation(group="edu.vanderbilt.vuisis.cpswt", name="core-cpp", version=version)
+        implementation(group="edu.vanderbilt.vuisis.cpswt", name="SynchronizedFederate", version=version)
     }
     source.from(
         file("src/hla/c++"),
@@ -313,7 +313,7 @@ tasks.withType(LinkExecutable::class.java).configureEach {
 //publishing {
 //    publications {
 //        getByName<MavenPublication>("main") {
-//            group = "org.cpswt"
+//            group = "edu.vanderbilt.vuisis.cpswt"
 //        }
 //    }
 //    repositories {

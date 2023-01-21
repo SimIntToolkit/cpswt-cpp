@@ -54,15 +54,15 @@
 
 #include <jsoncpp/json/json.h>
 
-using InteractionRoot = ::org::cpswt::hla::InteractionRoot;
-using ObjectRoot = ::org::cpswt::hla::ObjectRoot;
-using C2WInteractionRoot = ::org::cpswt::hla::InteractionRoot_p::C2WInteractionRoot;
-using SimLog = ::org::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::SimLog;
-using HighPrio = ::org::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::SimLog_p::HighPrio;
-using SimulationControl = ::org::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::SimulationControl;
-using SimEnd = ::org::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::SimulationControl_p::SimEnd;
-using FederateObject = ::org::cpswt::hla::ObjectRoot_p::FederateObject;
-using DerivedObjectClass = ::org::cpswt::hla::ObjectRoot_p::BaseObjectClass_p::DerivedObjectClass;
+using InteractionRoot = ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot;
+using ObjectRoot = ::edu::vanderbilt::vuisis::cpswt::hla::ObjectRoot;
+using C2WInteractionRoot = ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot;
+using SimLog = ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::SimLog;
+using HighPrio = ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::SimLog_p::HighPrio;
+using SimulationControl = ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::SimulationControl;
+using SimEnd = ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::SimulationControl_p::SimEnd;
+using FederateObject = ::edu::vanderbilt::vuisis::cpswt::hla::ObjectRoot_p::FederateObject;
+using DerivedObjectClass = ::edu::vanderbilt::vuisis::cpswt::hla::ObjectRoot_p::BaseObjectClass_p::DerivedObjectClass;
 
 typedef std::set<std::string> StringSet;
 typedef std::list<std::string> StringList;

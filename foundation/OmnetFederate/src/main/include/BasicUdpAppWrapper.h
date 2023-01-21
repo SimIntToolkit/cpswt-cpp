@@ -42,11 +42,11 @@
  */
 class BasicUdpAppWrapper : public BasicUdpApp {
 public:
-    using InteractionRoot = ::org::cpswt::hla::InteractionRoot;
-    using C2WInteractionRoot = ::org::cpswt::hla::InteractionRoot_p::C2WInteractionRoot;
-    using ObjectRoot = ::org::cpswt::hla::ObjectRoot;
+    using InteractionRoot = ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot;
+    using C2WInteractionRoot = ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot;
+    using ObjectRoot = ::edu::vanderbilt::vuisis::cpswt::hla::ObjectRoot;
     using ObjectReflector = ObjectRoot::ObjectReflector;
-    using NetworkPacket = ::org::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::NetworkPacket;
+    using NetworkPacket = ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::NetworkPacket;
 
 	typedef BasicUdpApp Super;
 

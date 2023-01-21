@@ -50,8 +50,8 @@
 
 class HLAInterface : public omnetpp::cSimpleModule, public SynchronizedFederate {
 
-using ObjectRoot = ::org::cpswt::hla::ObjectRoot;
-using C2WInteractionRoot = ::org::cpswt::hla::InteractionRoot_p::C2WInteractionRoot;
+using ObjectRoot = ::edu::vanderbilt::vuisis::cpswt::hla::ObjectRoot;
+using C2WInteractionRoot = ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot;
 
 public:
 	typedef SynchronizedFederate Super;

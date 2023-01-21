@@ -74,9 +74,11 @@
 #endif
 
 
-namespace org {
- namespace cpswt {
-  namespace hla {
+namespace edu {
+ namespace vanderbilt {
+  namespace vuisis {
+   namespace cpswt {
+    namespace hla {
 
 namespace logging = boost::log;
 namespace logging_source = boost::log::sources;
@@ -1458,7 +1460,7 @@ public:
     // ----------------------------------------------------------------------------
 
     /**
-     * Returns the fully-qualified (dot-delimited) name of the ::org::cpswt::hla::ObjectRoot object class.
+     * Returns the fully-qualified (dot-delimited) name of the ::edu::vanderbilt::vuisis::cpswt::hla::ObjectRoot object class.
      * Note: As this is a static method, it is NOT polymorphic, and so, if called on
      * a reference will return the name of the class pertaining to the reference,
      * rather than the name of the class for the instance referred to by the reference.
@@ -1467,7 +1469,7 @@ public:
      * @return the fully-qualified Java class name for this object class
      */
     static const std::string &get_cpp_class_name() {
-        static const std::string cppClassName("::org::cpswt::hla::ObjectRoot");
+        static const std::string cppClassName("::edu::vanderbilt::vuisis::cpswt::hla::ObjectRoot");
         return cppClassName;
     }
 
@@ -1483,7 +1485,7 @@ public:
 
     /**
      * Returns the simple name (the last name in the dot-delimited fully-qualified
-     * class name) of the org.cpswt.hla.ObjectRoot object class.
+     * class name) of the edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot object class.
      *
      * @return the name of this object class
      */
@@ -1518,7 +1520,7 @@ public:
 
     /**
      * Returns a sorted list containing the names of all of the non-hidden attributes in the
-     * org.cpswt.hla.ObjectRoot object class.
+     * edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot object class.
      * The property names are paired with name of the hla class in which they are defined in a
      * ClassAndPropertyName POJO.
      * Note: As this is a static method, it is NOT polymorphic, and so, if called on
@@ -1536,7 +1538,7 @@ public:
 
     /**
      * Returns a sorted list containing the names of all of the attributes in the
-     * org.cpswt.hla.ObjectRoot object class.
+     * edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot object class.
      * The property names are paired with name of the hla class in which they are defined in a
      * ClassAndPropertyName POJO.
      * Note: As this is a static method, it is NOT polymorphic, and so, if called on
@@ -1568,7 +1570,7 @@ public:
     // THIS CODE IS STATIC BECAUSE IT IS CLASS-DEPENDENT AND NOT INSTANCE-DEPENDENT
     // ----------------------------------------------------------------------------
     /**
-     * Returns the handle (RTI assigned) of the org.cpswt.hla.ObjectRoot object class.
+     * Returns the handle (RTI assigned) of the edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot object class.
      * Note: As this is a static method, it is NOT polymorphic, and so, if called on
      * a reference will return the handle of the class pertaining to the reference,
      * rather than the handle of the class for the instance referred to by the reference.
@@ -1582,7 +1584,7 @@ public:
 
     /**
      * Returns the handle of an attribute (RTI assigned) of
-     * this object class (i.e. "org.cpswt.hla.ObjectRoot") given the attribute's name.
+     * this object class (i.e. "edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot") given the attribute's name.
      *
      * @param propertyName name of attribute
      * @return the handle (RTI assigned) of the attribute "propertyName" of object class "hlaClassName"
@@ -1617,7 +1619,7 @@ public:
     //-------------------------------------------------
 
     /**
-     * Publishes the org.cpswt.hla.ObjectRoot object class for a federate.
+     * Publishes the edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot object class for a federate.
      *
      * @param rti handle to the Local RTI Component
      */
@@ -1630,7 +1632,7 @@ public:
     }
 
     /**
-     * Unpublishes the org.cpswt.hla.ObjectRoot object class for a federate.
+     * Unpublishes the edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot object class for a federate.
      *
      * @param rti handle to the Local RTI Component, usu. obtained through the
      *            {@link SynchronizedFederate#getRTI()} call
@@ -1640,7 +1642,7 @@ public:
     }
 
 /**
- * Subscribes a federate to the org.cpswt.hla.ObjectRoot object class.
+ * Subscribes a federate to the edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot object class.
  *
  * @param rti handle to the Local RTI Component
  */
@@ -1661,7 +1663,7 @@ public:
     }
 
     /**
-     * Unsubscribes a federate from the org.cpswt.hla.ObjectRoot object class.
+     * Unsubscribes a federate from the edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot object class.
      *
      * @param rti handle to the Local RTI Component
      */
@@ -1723,12 +1725,12 @@ public:
 
     /**
      * Return true if "handle" is equal to the handle (RTI assigned) of this class
-     * (that is, the org.cpswt.hla.ObjectRoot object class).
+     * (that is, the edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot object class).
      *
      * @param handle handle to compare to the value of the handle (RTI assigned) of
-     * this class (the org.cpswt.hla.ObjectRoot object class).
+     * this class (the edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot object class).
      * @return "true" if "handle" matches the value of the handle of this class
-     * (that is, the org.cpswt.hla.ObjectRoot object class).
+     * (that is, the edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot object class).
      */
     static bool match(int handle) {
         return handle == get_class_handle();
@@ -2287,18 +2289,20 @@ private:
         return true;
     }
 };
-  } // NAMESPACE "hla"
- } // NAMESPACE "cpswt"
-} // NAMESPACE "org"
+    } // NAMESPACE "hla"
+   } // NAMESPACE "cpswt"
+  } // NAMESPACE "vuisis"
+ } // NAMESPACE "vanderbilt"
+} // NAMESPACE "edu"
 
-std::ostream &operator<<( std::ostream &os, const ::org::cpswt::hla::ObjectRoot &messaging );
-inline std::ostream &operator<<( std::ostream &os, ::org::cpswt::hla::ObjectRoot::SP messagingSP ) {
+std::ostream &operator<<( std::ostream &os, const ::edu::vanderbilt::vuisis::cpswt::hla::ObjectRoot &messaging );
+inline std::ostream &operator<<( std::ostream &os, ::edu::vanderbilt::vuisis::cpswt::hla::ObjectRoot::SP messagingSP ) {
     return os << *messagingSP;
 }
 
-std::ostream &operator<<( std::ostream &os, const ::org::cpswt::hla::ObjectRoot::ObjectReflector &objectReflector );
+std::ostream &operator<<( std::ostream &os, const ::edu::vanderbilt::vuisis::cpswt::hla::ObjectRoot::ObjectReflector &objectReflector );
 inline std::ostream &operator<<(
-  std::ostream &os, ::org::cpswt::hla::ObjectRoot::ObjectReflector::SP objectReflectorSP
+  std::ostream &os, ::edu::vanderbilt::vuisis::cpswt::hla::ObjectRoot::ObjectReflector::SP objectReflectorSP
 ) {
     return os << *objectReflectorSP;
 }
