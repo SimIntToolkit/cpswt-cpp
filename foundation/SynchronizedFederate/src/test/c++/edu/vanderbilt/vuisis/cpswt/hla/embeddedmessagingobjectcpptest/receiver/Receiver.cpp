@@ -28,21 +28,23 @@
  * OR MODIFICATIONS.
  */
 
-#include "org/cpswt/hla/embeddedmessagingobjectcpptest/receiver/Receiver.hpp"
+#include "edu/vanderbilt/vuisis/cpswt/hla/embeddedmessagingobjectcpptest/receiver/Receiver.hpp"
 
 
-namespace org {
- namespace cpswt {
-  namespace hla {
-   namespace embeddedmessagingobjectcpptest {
-    namespace receiver {
+namespace edu {
+ namespace vanderbilt {
+  namespace vuisis {
+   namespace cpswt {
+    namespace hla {
+     namespace embeddedmessagingobjectcpptest {
+      namespace receiver {
 
 Receiver::Receiver(FederateConfig *federateConfig): Super(federateConfig) {
 }
 
 void Receiver::handleObjectClass_ObjectRoot_TestObject(ObjectRoot::SP objectRootSP) {
-    ::org::cpswt::hla::ObjectRoot_p::TestObject::SP testObject0SP =
-        boost::dynamic_pointer_cast<::org::cpswt::hla::ObjectRoot_p::TestObject>( objectRootSP );
+    ::edu::vanderbilt::vuisis::cpswt::hla::ObjectRoot_p::TestObject::SP testObject0SP =
+        boost::dynamic_pointer_cast<::edu::vanderbilt::vuisis::cpswt::hla::ObjectRoot_p::TestObject>( objectRootSP );
 
     _testObjectSP = testObject0SP;
 }
@@ -88,8 +90,10 @@ void Receiver::execute() {
     checkReceivedSubscriptions();
 }
 
-    } // NAMESPACE "receiver"
-   } // NAMESPACE "embeddedmessagingobjectcpptest"
-  } // NAMESPACE "hla"
- } // NAMESPACE "cpswt"
-} // NAMESPACE "org"
+      } // NAMESPACE "receiver"
+     } // NAMESPACE "embeddedmessagingobjectcpptest"
+    } // NAMESPACE "hla"
+   } // NAMESPACE "cpswt"
+  } // NAMESPACE "vuisis"
+ } // NAMESPACE "vanderbilt"
+} // NAMESPACE "edu"

@@ -43,7 +43,7 @@ val archivaPort: String by project
 
 library {
     dependencies {
-        implementation(group="org.cpswt", name="core-cpp", version=version)
+        implementation(group="edu.vanderbilt.vuisis.cpswt", name="core-cpp", version=version)
     }
     source.from(file("src/main/c++"))
     publicHeaders.from(file("src/main/include"))
@@ -65,7 +65,7 @@ tasks.withType(CppCompile::class.java).configureEach {
 publishing {
     publications {
         getByName<MavenPublication>("main") {
-            group = "org.cpswt"
+            group = "edu.vanderbilt.vuisis.cpswt"
         }
     }
     repositories {

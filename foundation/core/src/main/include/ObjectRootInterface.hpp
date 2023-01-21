@@ -58,9 +58,11 @@
 #include <StringCollections.hpp>
 
 
-namespace org {
- namespace cpswt {
-  namespace hla {
+namespace edu {
+ namespace vanderbilt {
+  namespace vuisis {
+   namespace cpswt {
+    namespace hla {
 
 struct ObjectRootInterface {
 
@@ -128,8 +130,10 @@ struct ObjectRootInterface {
 };
 
 
-  } // NAMESPACE "hla"
- } // NAMESPACE "cpswt"
-} // NAMESPACE "org"
+    } // NAMESPACE "hla"
+   } // NAMESPACE "cpswt"
+  } // NAMESPACE "vuisis"
+ } // NAMESPACE "vanderbilt"
+} // NAMESPACE "edu"
 
 #endif // - _OBJECT_ROOT_INTERFACE
