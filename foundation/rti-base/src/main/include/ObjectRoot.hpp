@@ -253,17 +253,34 @@ public:
             }
         }
 
+        void copyClassAndPropertyNameValueSPMap(const ClassAndPropertyNameValueSPMap &copyFrom) {
+            for(
+              ClassAndPropertyNameValueSPMap::const_iterator cvmCit = copyFrom.begin() ;
+              cvmCit != copyFrom.end() ;
+              ++cvmCit
+            ) {
+                _classAndPropertyNameValueSPMap.emplace(cvmCit->first, ValueSP(new Value(*cvmCit->second)));
+            }
+        }
+
     public:
-//        ObjectReflector() : _objectHandle(0), _time(-1), _federateSequence("[]") { }
+        ObjectReflector(const ObjectReflector &copyFrom) :
+          _objectHandle(copyFrom._objectHandle),
+          _hlaClassName(copyFrom._hlaClassName),
+          _federateSequence(copyFrom._federateSequence),
+          _time(copyFrom._time)
+        {
+            copyClassAndPropertyNameValueSPMap(copyFrom.getClassAndPropertyNameValueSPMap());
+        }
 
         ObjectReflector(
          RTI::ObjectHandle objectHandle, const ClassAndPropertyNameValueSPMap &classAndPropertyNameValueSPMap
         ) :
          _objectHandle(objectHandle),
          _federateSequence("[]"),
-         _classAndPropertyNameValueSPMap( classAndPropertyNameValueSPMap ),
          _time(-1) {
             initHlaClassName();
+            copyClassAndPropertyNameValueSPMap(classAndPropertyNameValueSPMap);
         }
 
         ObjectReflector(
@@ -274,9 +291,9 @@ public:
          _objectHandle(objectHandle),
          _hlaClassName(hlaClassName),
          _federateSequence("[]"),
-         _classAndPropertyNameValueSPMap( classAndPropertyNameValueSPMap ),
          _time(-1) {
             initHlaClassName();
+            copyClassAndPropertyNameValueSPMap(classAndPropertyNameValueSPMap);
         }
 
         ObjectReflector(
@@ -298,9 +315,9 @@ public:
         ) :
          _objectHandle( objectHandle ),
          _federateSequence("[]"),
-         _classAndPropertyNameValueSPMap( classAndPropertyNameValueSPMap ),
          _time( time ) {
             initHlaClassName();
+            copyClassAndPropertyNameValueSPMap(classAndPropertyNameValueSPMap);
         }
 
         ObjectReflector(
@@ -312,9 +329,9 @@ public:
          _objectHandle( objectHandle ),
          _hlaClassName(hlaClassName),
          _federateSequence("[]"),
-         _classAndPropertyNameValueSPMap( classAndPropertyNameValueSPMap ),
          _time( time ) {
             initHlaClassName();
+            copyClassAndPropertyNameValueSPMap(classAndPropertyNameValueSPMap);
         }
 
         ObjectReflector(
@@ -337,9 +354,9 @@ public:
         ) :
          _objectHandle( objectHandle ),
          _federateSequence("[]"),
-         _classAndPropertyNameValueSPMap( classAndPropertyNameValueSPMap ),
          _time(  RTIfedTime( fedTime ).getTime()  ) {
             initHlaClassName();
+            copyClassAndPropertyNameValueSPMap(classAndPropertyNameValueSPMap);
         }
 
         ObjectReflector(
@@ -351,9 +368,9 @@ public:
          _objectHandle( objectHandle ),
          _hlaClassName(hlaClassName),
          _federateSequence("[]"),
-         _classAndPropertyNameValueSPMap( classAndPropertyNameValueSPMap ),
          _time(  RTIfedTime( fedTime ).getTime()  ) {
             initHlaClassName();
+            copyClassAndPropertyNameValueSPMap(classAndPropertyNameValueSPMap);
         }
 
         ObjectReflector(
@@ -364,7 +381,7 @@ public:
          _objectHandle( objectHandle ),
          _federateSequence("[]"),
          _classAndPropertyNameValueSPMap(ObjectRoot::getClassAndPropertyNameValueSPMap(theAttributes)),
-          _time(  RTIfedTime( fedTime ).getTime()  ) {
+         _time(  RTIfedTime( fedTime ).getTime()  ) {
             initHlaClassName();
          }
 
@@ -1888,17 +1905,32 @@ private:
     //
 public:
 
-    ObjectRoot() : _uniqueId(generate_unique_id()) {
+    ObjectRoot(const ObjectRoot &copyFrom) :
+      _uniqueId(generate_unique_id()), _objectHandle(-1) {
+        setInstanceHlaClassName(copyFrom.getInstanceHlaClassName());
+        for(
+          typename ClassAndPropertyNameValueSPMap::const_iterator cvmCit =
+            copyFrom.getClassAndPropertyNameValueSPMap().begin() ;
+          cvmCit != copyFrom.getClassAndPropertyNameValueSPMap().end() ;
+          ++cvmCit
+        ) {
+            _classAndPropertyNameValueSPMap.emplace(cvmCit->first, ValueSP(new Value(*cvmCit->second)));
+        }
+    }
+
+
+    ObjectRoot() : _uniqueId(generate_unique_id()), _objectHandle(-1) {
         initializeProperties(get_hla_class_name());
     }
 
-    ObjectRoot( const RTIfedTime &rtiFedTime) : _uniqueId(generate_unique_id()) {
+    ObjectRoot( const RTIfedTime &rtiFedTime) :
+      _uniqueId(generate_unique_id()), _objectHandle(-1) {
         initializeProperties(get_hla_class_name());
         setTime(rtiFedTime.getTime());
     }
 
     ObjectRoot(const RTI::AttributeHandleValuePairSet &propertyMap)
-      : _uniqueId(generate_unique_id()) {
+      : _uniqueId(generate_unique_id()), _objectHandle(-1) {
         initializeProperties(get_hla_class_name());
         setAttributes( propertyMap );
     }
@@ -1906,7 +1938,7 @@ public:
     ObjectRoot(
       const RTI::AttributeHandleValuePairSet &propertyMap,
       const RTIfedTime &rtiFedTime
-    ) : _uniqueId(generate_unique_id()) {
+    ) : _uniqueId(generate_unique_id()), _objectHandle(-1) {
         initializeProperties(get_hla_class_name());
         setAttributes( propertyMap );
         setTime(rtiFedTime.getTime());
@@ -1916,14 +1948,15 @@ public:
         initializeProperties(hlaClassName);
     }
 
-    ObjectRoot( const std::string &hlaClassName, const RTIfedTime &rtiFedTime) : _uniqueId(generate_unique_id()) {
+    ObjectRoot( const std::string &hlaClassName, const RTIfedTime &rtiFedTime) :
+      _uniqueId(generate_unique_id()), _objectHandle(-1) {
         initializeProperties(hlaClassName);
         setTime(rtiFedTime.getTime());
     }
 
     ObjectRoot(
       const std::string &hlaClassName, const RTI::AttributeHandleValuePairSet &propertyMap
-    ) : _uniqueId(generate_unique_id()) {
+    ) : _uniqueId(generate_unique_id()), _objectHandle(-1) {
         initializeProperties(hlaClassName);
         setAttributes( propertyMap );
     }
@@ -1932,7 +1965,7 @@ public:
       const std::string &hlaClassName,
       const RTI::AttributeHandleValuePairSet &propertyMap,
       const RTIfedTime &rtiFedTime
-    ) : _uniqueId(generate_unique_id()) {
+    ) : _uniqueId(generate_unique_id()), _objectHandle(-1) {
         initializeProperties(hlaClassName);
         setAttributes( propertyMap );
         setTime(rtiFedTime.getTime());
