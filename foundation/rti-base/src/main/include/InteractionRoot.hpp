@@ -1274,11 +1274,26 @@ private:
     //
 public:
 
+    InteractionRoot(const InteractionRoot &copyFrom) :
+      _uniqueId(generate_unique_id()) {
+        setInstanceHlaClassName(copyFrom.getInstanceHlaClassName());
+        for(
+          typename ClassAndPropertyNameValueSPMap::const_iterator cvmCit =
+            copyFrom.getClassAndPropertyNameValueSPMap().begin() ;
+          cvmCit != copyFrom.getClassAndPropertyNameValueSPMap().end() ;
+          ++cvmCit
+        ) {
+            _classAndPropertyNameValueSPMap.emplace(cvmCit->first, ValueSP(new Value(*cvmCit->second)));
+        }
+    }
+
+
     InteractionRoot() : _uniqueId(generate_unique_id()) {
         initializeProperties(get_hla_class_name());
     }
 
-    InteractionRoot( const RTIfedTime &rtiFedTime) : _uniqueId(generate_unique_id()) {
+    InteractionRoot( const RTIfedTime &rtiFedTime) :
+      _uniqueId(generate_unique_id()) {
         initializeProperties(get_hla_class_name());
         setTime(rtiFedTime.getTime());
     }
@@ -1302,7 +1317,8 @@ public:
         initializeProperties(hlaClassName);
     }
 
-    InteractionRoot( const std::string &hlaClassName, const RTIfedTime &rtiFedTime) : _uniqueId(generate_unique_id()) {
+    InteractionRoot( const std::string &hlaClassName, const RTIfedTime &rtiFedTime) :
+      _uniqueId(generate_unique_id()) {
         initializeProperties(hlaClassName);
         setTime(rtiFedTime.getTime());
     }
