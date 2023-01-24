@@ -312,11 +312,13 @@ void HLAInterface::processMessaging(
         hlaMsgPtr->setMessageNo( AttackCoordinator::getUniqueNo() );
 
         if (interactionRootSP) {
-            hlaMsgPtr->setInteractionRootSP( interactionRootSP );
-            hlaMsgPtr->setTimestamp( interactionRootSP->getTime() );
+            InteractionRoot::SP interactionRootCopySP(new InteractionRoot(*interactionRootSP));
+            hlaMsgPtr->setInteractionRootSP( interactionRootCopySP );
+            hlaMsgPtr->setTimestamp( interactionRootCopySP->getTime() );
         } else {
-            hlaMsgPtr->setObjectReflectorSP( objectReflectorSP );
-            hlaMsgPtr->setTimestamp( objectReflectorSP->getTime() );
+            ObjectReflector::SP objectReflectorCopySP(new ObjectReflector(*objectReflectorSP));
+            hlaMsgPtr->setObjectReflectorSP( objectReflectorCopySP );
+            hlaMsgPtr->setTimestamp( objectReflectorCopySP->getTime() );
         }
         hlaMsgPtr->setByteLength( messagingInfo.getPayloadSize() );
 
@@ -995,17 +997,14 @@ void HLAInterface::setup() {
     createRTI();
     joinFederation();
 
-std::cout << "A" << std::endl;
     enableTimeConstrained();
     enableTimeRegulation( getLookahead() );
     enableAsynchronousDelivery();
 
     // publish interactions
-std::cout << "B" << std::endl;
     NetworkPacket::publish_interaction( getRTI() );
     CommandExecutionStatus::publish_interaction( getRTI() );
 
-std::cout << "C" << std::endl;
     // subscribe interactions
     StartNodeAttack::subscribe_interaction( getRTI() );
     StartLinkAttack::subscribe_interaction( getRTI() );
@@ -1042,24 +1041,19 @@ std::cout << "C" << std::endl;
     StartIntegrityAttack::subscribe_interaction( getRTI() );
     StopIntegrityAttack::subscribe_interaction( getRTI() );
 
-std::cout << "D" << std::endl;
     StartNetworkIPFirewall::subscribe_interaction( getRTI() );
     StopNetworkIPFirewall::subscribe_interaction( getRTI() );
 
-std::cout << "1" << std::endl;
     InteractionRoot::subscribe_interaction(EmbeddedMessaging::get_hla_class_name() + "." + getFederateType(), getRTI());
 
-std::cout << "2" << std::endl;
     for(const std::string &dynamicPublishHlaClassName: _dynamicPublishFullHlaClassNameSet) {
         InteractionRoot::publish_interaction(dynamicPublishHlaClassName, getRTI() );
     }
 
-std::cout << "3" << std::endl;
     for(const std::string &dynamicSubscribeHlaClassName: _dynamicSubscribeFullHlaClassNameSet) {
         InteractionRoot::subscribe_interaction(dynamicSubscribeHlaClassName, getRTI() );
     }
 
-std::cout << "4" << std::endl;
     for(const std::string &dynamicSoftSubscribeHlaClassName: _dynamicSoftSubscribeFullHlaClassNameSet) {
         if (
           dynamicSoftSubscribeHlaClassName == "InteractionRoot" ||
@@ -1075,7 +1069,6 @@ std::cout << "4" << std::endl;
     }
 
     SubscribedInteractionFilter::get_singleton().initialize();
-std::cout << "PAST SUBSCRIPTIONS" << std::endl;
     //publish objects
 
     //subscribe objects

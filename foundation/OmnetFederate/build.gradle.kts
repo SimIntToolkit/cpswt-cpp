@@ -28,13 +28,11 @@
  * OR MODIFICATIONS.
  */
 
-import java.nio.file.FileVisitResult
-import java.nio.file.Files
-import java.nio.file.Path
-import java.nio.file.SimpleFileVisitor
 import java.nio.file.attribute.BasicFileAttributes
 import java.io.FileWriter
 import org.json.JSONObject
+import java.nio.file.*
+import java.nio.file.Path
 
 import java.util.stream.Collectors
 
@@ -175,6 +173,9 @@ tasks.withType(InstallExecutable::class.java).configureEach {
             if (matcher.find()) {
                 val libName = matcher.group(1)
                 val libraryFile = File(libraryDirectory, "lib${libName}.so")
+                if (Files.exists(libraryFile.toPath(), LinkOption.NOFOLLOW_LINKS)) {
+                    Files.delete(libraryFile.toPath());
+                }
                 Files.createSymbolicLink(libraryFile.toPath(), File(fileName).toPath())
             }
         }
