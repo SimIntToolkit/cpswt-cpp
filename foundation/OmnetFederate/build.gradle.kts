@@ -32,9 +32,10 @@ import java.nio.file.attribute.BasicFileAttributes
 import java.io.FileWriter
 import org.json.JSONObject
 import java.nio.file.*
+import java.nio.file.LinkOption.*
 import java.nio.file.Path
 
-import java.util.stream.Collectors
+import java.util.stream.Collectors.*
 
 
 plugins {
@@ -150,7 +151,7 @@ tasks.register("processMessageFiles") {
             val exitStatus = process.waitFor()
             if (exitStatus != 0) {
                 val errorMessage = process.getErrorStream().bufferedReader(Charsets.UTF_8).use {
-                    it.lines().collect(Collectors.joining())
+                    it.lines().collect(joining())
                 }
                 val exceptionMessage =
                     "\"${processBuilder.command().joinToString(" ")}\": error \"${errorMessage}\""
@@ -161,23 +162,30 @@ tasks.register("processMessageFiles") {
 }
 
 tasks.withType(InstallExecutable::class.java).configureEach {
-    doLast {
+
+    doFirst {
         val libraryDirectory = File(installDirectory.asFile.get(), "lib")
-        val sharedObjectFileList = libraryDirectory.listFiles { file -> file.name.endsWith(".so") }!!.toList()
-
-        val pattern = java.util.regex.Pattern.compile("(.*)_(?:debug|release)")
-
-        for(file in sharedObjectFileList) {
-            val fileName = file.name
-            val matcher = pattern.matcher(fileName)
-            if (matcher.find()) {
-                val libName = matcher.group(1)
-                val libraryFile = File(libraryDirectory, "lib${libName}.so")
-                if (Files.exists(libraryFile.toPath(), LinkOption.NOFOLLOW_LINKS)) {
-                    Files.delete(libraryFile.toPath());
-                }
-                Files.createSymbolicLink(libraryFile.toPath(), File(fileName).toPath())
+        for (dependency in project.configurations.get("implementation").dependencies.toList()) {
+            if (dependency.group != "edu.vanderbilt.vuisis.cpswt") {
+                continue;
             }
+            val libraryFile = File(libraryDirectory, "lib${dependency.name}.so")
+            if (Files.exists(libraryFile.toPath(), NOFOLLOW_LINKS)) {
+                Files.delete(libraryFile.toPath())
+            }
+        }
+    }
+
+    doLast {
+        val buildType = if (name.endsWith("Debug")) "debug" else "release"
+        val libraryDirectory = File(installDirectory.asFile.get(), "lib")
+        for (dependency in project.configurations.get("implementation").dependencies.toList()) {
+            if (dependency.group != "edu.vanderbilt.vuisis.cpswt") {
+                continue;
+            }
+            val sharedLibraryFileName = "${dependency.name}_${buildType}-${version}.so"
+            val libraryFile = File(libraryDirectory, "lib${dependency.name}.so")
+            Files.createSymbolicLink(libraryFile.toPath(), File(sharedLibraryFileName).toPath())
         }
 
         val executableFileString = installedExecutable.get().asFile.absolutePath
@@ -192,6 +200,7 @@ tasks.withType(InstallExecutable::class.java).configureEach {
             fileWriter.write(topLevelJSONObject.toString(4))
         }
     }
+
 }
 
 tasks.withType(CppCompile::class.java).configureEach {
