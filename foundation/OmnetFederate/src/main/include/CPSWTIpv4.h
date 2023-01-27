@@ -62,11 +62,6 @@ protected:
 
     std::string _hostFullName;
 
-    //
-    // CODE FOR NODE ATTACK
-    //
-    bool _nodeAttack;
-
     virtual int numInitStages() const override { return inet::NUM_INIT_STAGES; }
 
 public:
@@ -381,7 +376,6 @@ public:
 
     CPSWTIpv4():
         inet::Ipv4(),
-        _nodeAttack( false ),
         _hasListeners( false ),
         _hasFilters( false ),
         _hasNetworkAttack( false ),

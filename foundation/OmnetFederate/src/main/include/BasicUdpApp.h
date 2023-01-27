@@ -48,7 +48,7 @@ class BasicUdpApp : public omnetpp::cSimpleModule, public omnetpp::cListener {
 
 private:
     inet::UdpSocket _socket;
-	std::string _hostName;
+	std::string _hostFullName;
 	inet::cModule *_hostModule;
 	int _port;
 	int _defaultDestPort;
@@ -70,8 +70,8 @@ public:
 		return _hostModule;
 	}
 
-	const std::string &getHostName( void ) const {
-		return _hostName;
+	const std::string &getHostFullName( void ) const {
+		return _hostFullName;
 	}
 
 	int getPort( void ) {

@@ -46,7 +46,7 @@ void BasicUdpApp::initialize( int stage ) {
             _notificationBoard = inet::getContainingNode(this);
 
             _hostModule = getParentModule();
-            _hostName = _hostModule->getFullPath();
+            _hostFullName = _hostModule->getFullPath();
 
             _port = par( "port" );
             _defaultDestPort = par( "destPort" );
@@ -86,7 +86,7 @@ void BasicUdpApp::handleMessage( omnetpp::cMessage *msg ) {
 
 	inet::Packet* packet = dynamic_cast< inet::Packet * > ( msg );
 	if ( packet == nullptr ) {
-		std::cerr << "WARNING:  Hostname \"" << _hostName << "\":  BasicUdpApp:  handleMessage method:  received message is not an inet::Packet:  ignoring." << std::endl;
+		std::cerr << "WARNING:  Hostname \"" << _hostFullName << "\":  BasicUdpApp:  handleMessage method:  received message is not an inet::Packet:  ignoring." << std::endl;
 		cancelAndDelete( msg );
 		return;
 	}

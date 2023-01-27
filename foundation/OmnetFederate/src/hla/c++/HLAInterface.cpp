@@ -374,17 +374,9 @@ void HLAInterface::processInteractions() {
         if (  StartNodeAttack::match( classHandle )  ) {
             StartNodeAttack::SP startNodeAttackSP = boost::static_pointer_cast< StartNodeAttack >( interactionRootSP );
 
-            std::string recordingNodeFullPath = startNodeAttackSP->get_recordingNodeFullPath();
+            std::string nodeFullPath = startNodeAttackSP->get_recordingNodeFullPath();
 
-            NodeAttackMsg *nodeAttackMsg = new NodeAttackMsg;
-            nodeAttackMsg->setAttackInProgress( true );
-
-            cModule *cModulePtr = AttackCoordinator::getSingleton().getIPModule( recordingNodeFullPath );
-            if ( cModulePtr != 0 ) {
-                sendDirect(  nodeAttackMsg, cModulePtr, "hlaIn"  );
-            } else {
-                std::cout << "WARNING:  StartNodeAttack:  NO MODULE FOR NODE \"" << recordingNodeFullPath << "\"" << std::endl;
-            }
+            AttackCoordinator::getSingleton().setNodeAttack( nodeFullPath, true );
             continue;
         }
 
@@ -392,19 +384,9 @@ void HLAInterface::processInteractions() {
         if (  StopNodeAttack::match( classHandle )  ) {
             StopNodeAttack::SP stopNodeAttackSP = boost::static_pointer_cast< StopNodeAttack >( interactionRootSP );
 
-            std::string recordingNodeFullPath = stopNodeAttackSP->get_recordingNodeFullPath();
+            std::string nodeFullPath = stopNodeAttackSP->get_recordingNodeFullPath();
 
-            NodeAttackMsg *nodeAttackMsg = new NodeAttackMsg;
-            nodeAttackMsg->setAttackInProgress( false );
-
-
-
-            cModule *cModulePtr = AttackCoordinator::getSingleton().getIPModule( recordingNodeFullPath );
-            if ( cModulePtr != 0 ) {
-                sendDirect(  nodeAttackMsg, cModulePtr, "hlaIn"  );
-            } else {
-                std::cout << "WARNING:  StopNodeAttack:  NO MODULE FOR NODE \"" << recordingNodeFullPath << "\"" << std::endl;
-            }
+            AttackCoordinator::getSingleton().setNodeAttack( nodeFullPath, false );
             continue;
         }
 

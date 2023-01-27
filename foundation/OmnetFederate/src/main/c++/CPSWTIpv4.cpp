@@ -35,11 +35,11 @@
 //#include "UDPPacket_m.h"
 
 #include <inet/networklayer/ipv4/Ipv4InterfaceData.h>
+#include "AttackCoordinator.h"
 
 #include "HlaMsg_m.h"
 
 #include "FilterAttackMsg_m.h"
-#include "NodeAttackMsg_m.h"
 #include "NetworkAttackMsg_m.h"
 #include "OutOfOrderAttackMsg_m.h"
 #include "OutOfOrderMsg_m.h"
@@ -87,19 +87,6 @@ void CPSWTIpv4::receiveSignal(omnetpp::cComponent *source, omnetpp::simsignal_t 
 }
 
 void CPSWTIpv4::handleMessageWhenUp(omnetpp::cMessage *msg) {
-
-    //
-    // THIS ATTACK PREVENTS THE HOST FROM PROCESSING THE PACKET -- IMPLEMENTED IN routeUnicastPacket METHOD.
-    //
-    NodeAttackMsg *nodeAttackMsg = dynamic_cast<NodeAttackMsg *>(msg);
-    if (nodeAttackMsg != 0) {
-
-        _nodeAttack = nodeAttackMsg->getAttackInProgress();
-
-        cancelAndDelete(msg);
-        return;
-    }
-
 
     //
     // THIS ATTACK SETS UP A PROCESSING DELAY FOR INCOMING PACKETS
@@ -318,7 +305,7 @@ void CPSWTIpv4::routeUnicastPacket(inet::Packet *packet) {
     //
     // IF HOST BEING ATTACKED, DROP Packet
     //
-    if (_nodeAttack) {
+    if (AttackCoordinator::getSingleton().nodeAttack(getHostFullName())) {
 
         std::cout << "Host \"" << _hostFullName << "\":  under host attack -- dropping packet." << std::endl;
 

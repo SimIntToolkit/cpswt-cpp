@@ -477,21 +477,27 @@ public:
     }
 
 
-    typedef std::set< std::string > ModifyToHLAPacketsSet;
-
     typedef std::set< std::string > ModifyFromHLAPacketsSet;
+    typedef std::set< std::string > ModifyToHLAPacketsSet;
+    typedef std::set< std::string > NodeAttackSet;
 
 private:
-    ModifyToHLAPacketsSet _modifyToHLAPacketsSet;
     ModifyFromHLAPacketsSet _modifyFromHLAPacketsSet;
+    ModifyToHLAPacketsSet _modifyToHLAPacketsSet;
+    NodeAttackSet _nodeAttackSet;
 
 public:
-    void setModifyToHLAPackets( const std::string nodeFullPath, bool modify ) {
-        if ( modify ) {
-            _modifyToHLAPacketsSet.insert( nodeFullPath );
+
+    void setNodeAttack( const std::string nodeFullPath, bool attack ) {
+        if ( attack ) {
+            _nodeAttackSet.insert( nodeFullPath );
         } else {
-            _modifyToHLAPacketsSet.erase( nodeFullPath );
+            _nodeAttackSet.erase( nodeFullPath );
         }
+    }
+
+    bool nodeAttack( const std::string nodeFullPath ) {
+        return _nodeAttackSet.find( nodeFullPath ) != _nodeAttackSet.end();
     }
 
     void setModifyFromHLAPackets( const std::string nodeFullPath, bool modify ) {
@@ -502,12 +508,20 @@ public:
         }
     }
 
-    bool modifyToHLAPackets( const std::string nodeFullPath ) {
-        return _modifyToHLAPacketsSet.find( nodeFullPath ) != _modifyToHLAPacketsSet.end();
-    }
-
     bool modifyFromHLAPackets( const std::string nodeFullPath ) {
         return _modifyFromHLAPacketsSet.find( nodeFullPath ) != _modifyFromHLAPacketsSet.end();
+    }
+
+    void setModifyToHLAPackets( const std::string nodeFullPath, bool modify ) {
+        if ( modify ) {
+            _modifyToHLAPacketsSet.insert( nodeFullPath );
+        } else {
+            _modifyToHLAPacketsSet.erase( nodeFullPath );
+        }
+    }
+
+    bool modifyToHLAPackets( const std::string nodeFullPath ) {
+        return _modifyToHLAPacketsSet.find( nodeFullPath ) != _modifyToHLAPacketsSet.end();
     }
 };
 

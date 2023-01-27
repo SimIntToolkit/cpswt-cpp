@@ -33,7 +33,6 @@
 #include "FilterAttackMsg_m.h"
 #include "HlaMsg_m.h"
 #include "NetworkAttackMsg_m.h"
-#include "NodeAttackMsg_m.h"
 #include "OutOfOrderAttackMsg_m.h"
 #include "SnifferAttackMsg_m.h"
 #include "RecordReplayAttackMsg_m.h"

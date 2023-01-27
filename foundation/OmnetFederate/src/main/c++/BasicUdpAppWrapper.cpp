@@ -47,7 +47,7 @@ using C2WInteractionRoot = ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoo
 void BasicUdpAppWrapper::recordInterfaceIPAddresses( void ) {
 
 	AttackCoordinator::InterfaceIPAddressMap &interfaceIPAddressMap =
-	 AttackCoordinator::getSingleton().getAppInterfaceIPAddressMap( getHostName(), getAppName(), getIndex() );
+	 AttackCoordinator::getSingleton().getAppInterfaceIPAddressMap( getHostFullName(), getAppName(), getIndex() );
 
 	interfaceIPAddressMap.clear();
 
@@ -75,7 +75,7 @@ void BasicUdpAppWrapper::initialize( int stage ) {
 	switch( stage ) {
 		case inet::INITSTAGE_LOCAL: {
 		    setName( getAppName().c_str() );
-			AttackCoordinator::getSingleton().registerAppSpecProperties( getHostName(), getAppName(), getIndex(), this, getPort() );
+			AttackCoordinator::getSingleton().registerAppSpecProperties( getHostFullName(), getAppName(), getIndex(), this, getPort() );
 			getNotificationBoard()->emit(inet::l2AssociatedSignal, this);
 			break;
 		}
@@ -83,7 +83,7 @@ void BasicUdpAppWrapper::initialize( int stage ) {
 			recordInterfaceIPAddresses();
 			_hlaModulePtr = getModuleByPath("hlaInterface");
             if (_hlaModulePtr == nullptr) {
-                std::cerr << "ERROR:  BasicUdpAppWrapper:  \"" << getHostName() << "\" no hlaInterface detected:  ceasing execution." << std::endl;
+                std::cerr << "ERROR:  BasicUdpAppWrapper:  \"" << getHostFullName() << "\" no hlaInterface detected:  ceasing execution." << std::endl;
                 throw omnetpp::cException(omnetpp::E_CANCEL);
             }
 			break;
@@ -96,7 +96,7 @@ void BasicUdpAppWrapper::handleMessage( omnetpp::cMessage *msg ) {
 
     inet::Packet* packet = dynamic_cast< inet::Packet * > ( msg );
     if ( packet == nullptr ) {
-        std::cerr << "WARNING:  Hostname \"" << getHostName() << "\":  BasicUdpAppWrapper:  handleMessage method:  received message is not an inet::Packet:  ignoring." << std::endl;
+        std::cerr << "WARNING:  Hostname \"" << getHostFullName() << "\":  BasicUdpAppWrapper:  handleMessage method:  received message is not an inet::Packet:  ignoring." << std::endl;
         delete msg;
         return;
     }
@@ -108,13 +108,13 @@ void BasicUdpAppWrapper::handleMessage( omnetpp::cMessage *msg ) {
     if ( hlaMsg != 0 ) {
         int messageNo = hlaMsg->getMessageNo();
         if ( !hlaMsg->getToHLA() && !_messageTracker.addInt( messageNo )  ) {
-//          std::cout << "BasicUdpAppWrapper: \"" << getHostName() << "\" dropping duplicate message (" << messageNo << ")." << std::endl;
+//          std::cout << "BasicUdpAppWrapper: \"" << getHostFullName() << "\" dropping duplicate message (" << messageNo << ")." << std::endl;
             delete msg;
             return;  // DROP MESSAGE
         }
         hlaMsg->setToHLA( !hlaMsg->getToHLA() );
     }
-    // std::cout << "BasicUdpAppWrapper: \"" << getHostName() << "\" received message, forwarding to wrapped module." << std::endl;
+    // std::cout << "BasicUdpAppWrapper: \"" << getHostFullName() << "\" received message, forwarding to wrapped module." << std::endl;
 
     Super::handleMessage( msg );
 }
@@ -126,7 +126,7 @@ void BasicUdpAppWrapper::sendToUDP( inet::Packet *packet, const inet::Ipv4Addres
 
     HlaMsg *hlaMsgPtr = dynamic_cast< HlaMsg * >( c_packetPtr );
 	if ( hlaMsgPtr == 0 ) {
-		std::cerr << "Hostname \"" << getHostName() << "\":  BasicUdpAppWrapper:  sendToUDP method:  sending non-HlaMsg-containing-Packet into network." << std::endl;
+		std::cerr << "Hostname \"" << getHostFullName() << "\":  BasicUdpAppWrapper:  sendToUDP method:  sending non-HlaMsg-containing-Packet into network." << std::endl;
 		Super::sendToUDP( packet, destAddr, destPort );
 		return;
 	}
@@ -137,11 +137,11 @@ void BasicUdpAppWrapper::sendToUDP( inet::Packet *packet, const inet::Ipv4Addres
 	//
 	// INTEGRITY ATTACK
 	//
-	if ( AttackCoordinator::getSingleton().isIntegrityAttackEnabled( getHostName() ) ) {
+	if ( AttackCoordinator::getSingleton().isIntegrityAttackEnabled( getHostFullName() ) ) {
 
         std::cout << "Got network packet, and integrity attack is enabled" << std::endl;
 
-        AttackCoordinator::IntegrityAttackParams &iap = AttackCoordinator::getSingleton().getIntegrityAttackParams( this, getHostName() );
+        AttackCoordinator::IntegrityAttackParams &iap = AttackCoordinator::getSingleton().getIntegrityAttackParams( this, getHostFullName() );
 
         if (interactionRootSP) {
             std::cout << "Got interaction is: " << *interactionRootSP << std::endl;
@@ -153,9 +153,9 @@ void BasicUdpAppWrapper::sendToUDP( inet::Packet *packet, const inet::Ipv4Addres
 
     if ( hlaMsgPtr->getToHLA() ) {
 
-        std::cout << "BasicUdpAppWrapper: \"" << getHostName() << "\" sending cPacket to HLA" << std::endl;
+        std::cout << "BasicUdpAppWrapper: \"" << getHostFullName() << "\" sending cPacket to HLA" << std::endl;
 
-		if (  AttackCoordinator::getSingleton().modifyToHLAPackets( getHostName() )  ) {
+		if (  AttackCoordinator::getSingleton().modifyToHLAPackets( getHostFullName() )  ) {
             if (interactionRootSP) {
                 setToDefaultValues(*interactionRootSP);
             } else if (objectReflectorSP) {
@@ -168,7 +168,7 @@ void BasicUdpAppWrapper::sendToUDP( inet::Packet *packet, const inet::Ipv4Addres
 		return;
 	}
 
-	if (  AttackCoordinator::getSingleton().modifyFromHLAPackets( getHostName() )  ) {
+	if (  AttackCoordinator::getSingleton().modifyFromHLAPackets( getHostFullName() )  ) {
         if (interactionRootSP) {
             setToDefaultValues(*interactionRootSP);
         } else if (objectReflectorSP) {
@@ -184,14 +184,14 @@ void BasicUdpAppWrapper::sendToUDP( inet::Packet *packet, const inet::Ipv4Addres
 	// Udpate message length
 
 	if ( receiverAppIndex == -1 ) {
-		// std::cerr << "Hostname \"" << getHostName() << "\":  BasicUdpAppWrapper:  handleMessage method:  sending HlaMsg to application-specified destination in network." << std::endl;
+		// std::cerr << "Hostname \"" << getHostFullName() << "\":  BasicUdpAppWrapper:  handleMessage method:  sending HlaMsg to application-specified destination in network." << std::endl;
 		Super::sendToUDP( packet, destAddr, destPort );
 	}
 
 	AttackCoordinator::AppSpec appSpec( receiverHost, receiverHostApp, receiverAppIndex );
 	AttackCoordinator::AppProperties appProperties = AttackCoordinator::getSingleton().getAppSpecProperties( appSpec );
 	if ( appProperties.getPort() == -1 ) {
-		// std::cerr << "ERROR:  Hostname \"" << getHostName() << "\":  BasicUdpAppWrapper:  handleMessage method:  Could not find app properties for \"" << appSpec << "\":  dropping message." << std::endl;
+		// std::cerr << "ERROR:  Hostname \"" << getHostFullName() << "\":  BasicUdpAppWrapper:  handleMessage method:  Could not find app properties for \"" << appSpec << "\":  dropping message." << std::endl;
 		delete packet;
 		return;
 	}
@@ -200,6 +200,6 @@ void BasicUdpAppWrapper::sendToUDP( inet::Packet *packet, const inet::Ipv4Addres
 	int destinationPort = appProperties.getPort();
 	// std::cerr << "BasicUDPAppWrapper: sending packet to " << destinationIPAddress << "(" << destinationPort << ")" << std::endl;
 
-	// std::cerr << "Hostname \"" << getHostName() << "\":  BasicUdpAppWrapper:  handleMessage method:  sending HlaMsg to NetworkPacket-specified destination in network." << std::endl;
+	// std::cerr << "Hostname \"" << getHostFullName() << "\":  BasicUdpAppWrapper:  handleMessage method:  sending HlaMsg to NetworkPacket-specified destination in network." << std::endl;
 	Super::sendToUDP( packet, destinationIPAddress, destinationPort );
 }
