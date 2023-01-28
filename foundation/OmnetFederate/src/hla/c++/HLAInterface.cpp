@@ -374,7 +374,7 @@ void HLAInterface::processInteractions() {
         if (  StartNodeAttack::match( classHandle )  ) {
             StartNodeAttack::SP startNodeAttackSP = boost::static_pointer_cast< StartNodeAttack >( interactionRootSP );
 
-            std::string nodeFullPath = startNodeAttackSP->get_recordingNodeFullPath();
+            std::string recordingNodeFullPath = startNodeAttackSP->get_nodeFullPath();
 
             AttackCoordinator::getSingleton().setNodeAttack( nodeFullPath, true );
             continue;
@@ -384,7 +384,7 @@ void HLAInterface::processInteractions() {
         if (  StopNodeAttack::match( classHandle )  ) {
             StopNodeAttack::SP stopNodeAttackSP = boost::static_pointer_cast< StopNodeAttack >( interactionRootSP );
 
-            std::string nodeFullPath = stopNodeAttackSP->get_recordingNodeFullPath();
+            std::string recordingNodeFullPath = stopNodeAttackSP->get_nodeFullPath();
 
             AttackCoordinator::getSingleton().setNodeAttack( nodeFullPath, false );
             continue;
