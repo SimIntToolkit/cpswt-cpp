@@ -374,7 +374,7 @@ void HLAInterface::processInteractions() {
         if (  StartNodeAttack::match( classHandle )  ) {
             StartNodeAttack::SP startNodeAttackSP = boost::static_pointer_cast< StartNodeAttack >( interactionRootSP );
 
-            std::string recordingNodeFullPath = startNodeAttackSP->get_recordingNodeFullPath();
+            std::string recordingNodeFullPath = startNodeAttackSP->get_nodeFullPath();
 
             NodeAttackMsg *nodeAttackMsg = new NodeAttackMsg;
             nodeAttackMsg->setAttackInProgress( true );
@@ -392,7 +392,7 @@ void HLAInterface::processInteractions() {
         if (  StopNodeAttack::match( classHandle )  ) {
             StopNodeAttack::SP stopNodeAttackSP = boost::static_pointer_cast< StopNodeAttack >( interactionRootSP );
 
-            std::string recordingNodeFullPath = stopNodeAttackSP->get_recordingNodeFullPath();
+            std::string recordingNodeFullPath = stopNodeAttackSP->get_nodeFullPath();
 
             NodeAttackMsg *nodeAttackMsg = new NodeAttackMsg;
             nodeAttackMsg->setAttackInProgress( false );
