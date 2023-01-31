@@ -374,7 +374,7 @@ void HLAInterface::processInteractions() {
         if (  StartNodeAttack::match( classHandle )  ) {
             StartNodeAttack::SP startNodeAttackSP = boost::static_pointer_cast< StartNodeAttack >( interactionRootSP );
 
-            std::string recordingNodeFullPath = startNodeAttackSP->get_nodeFullPath();
+            std::string nodeFullPath = startNodeAttackSP->get_nodeFullPath();
 
             AttackCoordinator::getSingleton().setNodeAttack( nodeFullPath, true );
             continue;
@@ -384,7 +384,7 @@ void HLAInterface::processInteractions() {
         if (  StopNodeAttack::match( classHandle )  ) {
             StopNodeAttack::SP stopNodeAttackSP = boost::static_pointer_cast< StopNodeAttack >( interactionRootSP );
 
-            std::string recordingNodeFullPath = stopNodeAttackSP->get_nodeFullPath();
+            std::string nodeFullPath = stopNodeAttackSP->get_nodeFullPath();
 
             AttackCoordinator::getSingleton().setNodeAttack( nodeFullPath, false );
             continue;
@@ -395,18 +395,10 @@ void HLAInterface::processInteractions() {
             StartDelayNodeAttack::SP startDelayNodeAttackSP = boost::static_pointer_cast< StartDelayNodeAttack >( interactionRootSP );
 
             std::string nodeFullPath = startDelayNodeAttackSP->get_nodeFullPath();
+            float mean = startDelayNodeAttackSP->get_delayMean();
+            float standardDeviation = startDelayNodeAttackSP->get_delayStdDev();
 
-            DelayNodeAttackMsg *delayNodeAttackMsg = new DelayNodeAttackMsg;
-            delayNodeAttackMsg->setAttackInProgress( true );
-            delayNodeAttackMsg->setDelayMean( startDelayNodeAttackSP->get_delayMean() );
-            delayNodeAttackMsg->setDelayStdDev( startDelayNodeAttackSP->get_delayStdDev() );
-
-            cModule *cModulePtr = AttackCoordinator::getSingleton().getIPModule( nodeFullPath );
-            if ( cModulePtr != 0 ) {
-                sendDirect(  delayNodeAttackMsg, cModulePtr, "hlaIn"  );
-            } else {
-                std::cout << "WARNING:  StartDelayNodeAttack:  NO MODULE FOR NODE \"" << nodeFullPath << "\"" << std::endl;
-            }
+            AttackCoordinator::getSingleton().startDelayNodeAttack(nodeFullPath, mean, standardDeviation);
             continue;
         }
 
@@ -416,15 +408,7 @@ void HLAInterface::processInteractions() {
 
             std::string nodeFullPath = stopDelayNodeAttackSP->get_nodeFullPath();
 
-            DelayNodeAttackMsg *delayNodeAttackMsg = new DelayNodeAttackMsg;
-            delayNodeAttackMsg->setAttackInProgress( false );
-
-            cModule *cModulePtr = AttackCoordinator::getSingleton().getIPModule( nodeFullPath );
-            if ( cModulePtr != 0 ) {
-                sendDirect(  delayNodeAttackMsg, cModulePtr, "hlaIn"  );
-            } else {
-                std::cout << "WARNING:  StopDelayNodeAttack:  NO MODULE FOR NODE \"" << nodeFullPath << "\"" << std::endl;
-            }
+            AttackCoordinator::getSingleton().stopDelayNodeAttack(nodeFullPath);
             continue;
         }
 
