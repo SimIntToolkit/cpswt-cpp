@@ -62,11 +62,6 @@ protected:
 
     std::string _hostFullName;
 
-    //
-    // CODE FOR NODE ATTACK
-    //
-    bool _nodeAttack;
-
     virtual int numInitStages() const override { return inet::NUM_INIT_STAGES; }
 
 public:
@@ -199,16 +194,6 @@ public:
 //            return _nextHopAddr;
 //        }
 //    };
-
-    class DelayedPacket: public inet::Packet {
-    public:
-        explicit DelayedPacket(const char *name = nullptr, short kind = 0): inet::Packet(name, kind) { }
-        DelayedPacket(const char *name, const inet::Ptr<const inet::Chunk>& content): inet::Packet(name, content) { }
-        DelayedPacket(const inet::Packet& other): inet::Packet(other) { }
-        DelayedPacket(const inet::Packet *other): inet::Packet(*other) { }
-
-        virtual DelayedPacket *dup() const override { return new DelayedPacket(*this); }
-    };
 
     typedef boost::shared_ptr< inet::Packet > PacketSP;
     typedef std::deque< PacketSP > PacketSPDeque;
@@ -370,26 +355,15 @@ public:
 
     void removeRandomReplayBufferSP( const NetworkAddress &sourceNetworkAddress, const NetworkAddress &destinationNetworkAddress );
 
-    //
-    // CODE FOR NODE DELAY ATTACK
-    //
-    bool _nodeDelayed;
-    double _nodeDelayMean;
-    double _nodeDelayStdDev;
-
     static omnetpp::simsignal_t iPv4PromiscousPacket;
 
     CPSWTIpv4():
         inet::Ipv4(),
-        _nodeAttack( false ),
         _hasListeners( false ),
         _hasFilters( false ),
         _hasNetworkAttack( false ),
         _hasSerialReplayBufferSPMap( false ),
-        _hasRandomReplayBufferSPMap( false ),
-        _nodeDelayed( false ),
-        _nodeDelayMean( 0.0 ),
-        _nodeDelayStdDev( 0.0 ) { }
+        _hasRandomReplayBufferSPMap( false ) { }
 
     virtual ~CPSWTIpv4() {}
 

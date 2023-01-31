@@ -35,11 +35,12 @@
 //#include "UDPPacket_m.h"
 
 #include <inet/networklayer/ipv4/Ipv4InterfaceData.h>
+#include "AttackCoordinator.h"
 
 #include "HlaMsg_m.h"
 
+#include "DelayNodeAttackMsg_m.h"
 #include "FilterAttackMsg_m.h"
-#include "NodeAttackMsg_m.h"
 #include "NetworkAttackMsg_m.h"
 #include "OutOfOrderAttackMsg_m.h"
 #include "OutOfOrderMsg_m.h"
@@ -49,7 +50,6 @@
 #include "SnifferAttackMsg_m.h"
 #include "AddRouteEntryMsg_m.h"
 #include "DropRouteEntryMsg_m.h"
-#include "DelayNodeAttackMsg_m.h"
 #include "IPFirewallMsg_m.h"
 
 Define_Module(CPSWTIpv4);
@@ -88,30 +88,13 @@ void CPSWTIpv4::receiveSignal(omnetpp::cComponent *source, omnetpp::simsignal_t 
 
 void CPSWTIpv4::handleMessageWhenUp(omnetpp::cMessage *msg) {
 
-    //
-    // THIS ATTACK PREVENTS THE HOST FROM PROCESSING THE PACKET -- IMPLEMENTED IN routeUnicastPacket METHOD.
-    //
-    NodeAttackMsg *nodeAttackMsg = dynamic_cast<NodeAttackMsg *>(msg);
-    if (nodeAttackMsg != 0) {
-
-        _nodeAttack = nodeAttackMsg->getAttackInProgress();
-
-        cancelAndDelete(msg);
-        return;
-    }
-
-
-    //
-    // THIS ATTACK SETS UP A PROCESSING DELAY FOR INCOMING PACKETS
-    //
     DelayNodeAttackMsg *delayNodeAttackMsg = dynamic_cast<DelayNodeAttackMsg *>(msg);
-    if (delayNodeAttackMsg != 0) {
+    if (delayNodeAttackMsg != nullptr) {
+        inet::Packet *packet = delayNodeAttackMsg->getDelayedPacket();
+        delayNodeAttackMsg->setDelayedPacket(nullptr);
+        delete delayNodeAttackMsg;
 
-        _nodeDelayed = delayNodeAttackMsg->getAttackInProgress();
-        _nodeDelayMean = delayNodeAttackMsg->getDelayMean();
-        _nodeDelayStdDev = delayNodeAttackMsg->getDelayStdDev();
-
-        cancelAndDelete(msg);
+        Super::routeUnicastPacket(packet);
         return;
     }
 
@@ -242,6 +225,7 @@ void CPSWTIpv4::handleMessageWhenUp(omnetpp::cMessage *msg) {
         return;
     }
 
+
     //
     // REPLAY ATTACK:  START/STOP REPLAYING RECORDED Packet'S
     //
@@ -273,6 +257,7 @@ void CPSWTIpv4::handleMessageWhenUp(omnetpp::cMessage *msg) {
         cancelAndDelete(msg);
         return;
     }
+
 
     //
     // PROCESS REPLAYED Packet
@@ -310,15 +295,17 @@ void CPSWTIpv4::handleMessageWhenUp(omnetpp::cMessage *msg) {
         return;
     }
 
+
     Super::handleMessageWhenUp(msg);
 }
 
 void CPSWTIpv4::routeUnicastPacket(inet::Packet *packet) {
 
+    const std::string hostFullName( getHostFullName() );
     //
     // IF HOST BEING ATTACKED, DROP Packet
     //
-    if (_nodeAttack) {
+    if (AttackCoordinator::getSingleton().nodeAttack(hostFullName)) {
 
         std::cout << "Host \"" << _hostFullName << "\":  under host attack -- dropping packet." << std::endl;
 
@@ -331,17 +318,18 @@ void CPSWTIpv4::routeUnicastPacket(inet::Packet *packet) {
     // IF HOST IS UNDER DELAY ATTACK, DELAY Packet
     // DELAYED PACKET IS RECAST AS "DelayedPacket" SO IT WON'T BE DELAYED MULTIPLE TIMES
     //
-    if (_nodeDelayed && dynamic_cast<DelayedPacket *>(packet) == nullptr) {
+    if (AttackCoordinator::getSingleton().hasDelayNodeAttack(hostFullName)) {
+        const AttackCoordinator::DelayNodeParameters &delayNodeParameters(
+          AttackCoordinator::getSingleton().getDelayNodeAttack( hostFullName )
+        );
 
-        DelayedPacket *delayedPacket = new DelayedPacket(packet);
+        double delay = truncnormal(delayNodeParameters.getMean(), delayNodeParameters.getStandardDeviation());
 
-        double delay = truncnormal(_nodeDelayMean, _nodeDelayStdDev);
+        DelayNodeAttackMsg *delayNodeAttackMsg = new DelayNodeAttackMsg();
+        delayNodeAttackMsg->setDelayedPacket(packet);
+        scheduleAt(omnetpp::simTime() + delay, delayNodeAttackMsg);
 
-        scheduleAt(omnetpp::simTime() + delay, delayedPacket);
-
-        std::cout << "Host \"" << _hostFullName << "\":  delaying packet " << delay << " seconds."<< std::endl;
-
-        delete packet;
+        std::cout << "Host \"" << hostFullName << "\":  delaying packet " << delay << " seconds."<< std::endl;
         return;
     }
 
@@ -383,6 +371,7 @@ void CPSWTIpv4::routeUnicastPacket(inet::Packet *packet) {
     if (srcAddr.isUnspecified()) {
         srcAddr = destAddr;
     }
+
 
     //
     // FILTER ATTACK
@@ -458,6 +447,7 @@ void CPSWTIpv4::routeUnicastPacket(inet::Packet *packet) {
             return;
         }
     }
+
 
     Super::routeUnicastPacket(packet);
 }

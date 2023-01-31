@@ -476,25 +476,53 @@ public:
         return _integrityAttackParamsMap[hostName];
     }
 
+    class DelayNodeParameters {
+    private:
+        const float _mean;
+        const float _standardDeviation;
 
-    typedef std::set< std::string > ModifyToHLAPacketsSet;
+    public:
+        DelayNodeParameters(float mean, float standardDeviation) : _mean(mean), _standardDeviation(standardDeviation) { }
 
+        float getMean() const {
+            return _mean;
+        }
+
+        float getStandardDeviation() const {
+            return _standardDeviation;
+        }
+    };
+
+    typedef std::map< std::string, DelayNodeParameters > DelayNodeAttackMap;
     typedef std::set< std::string > ModifyFromHLAPacketsSet;
+    typedef std::set< std::string > ModifyToHLAPacketsSet;
+    typedef std::set< std::string > NodeAttackSet;
 
 private:
-    ModifyToHLAPacketsSet _modifyToHLAPacketsSet;
+
+    DelayNodeAttackMap _delayNodeAttackMap;
     ModifyFromHLAPacketsSet _modifyFromHLAPacketsSet;
+    ModifyToHLAPacketsSet _modifyToHLAPacketsSet;
+    NodeAttackSet _nodeAttackSet;
 
 public:
-    void setModifyToHLAPackets( const std::string nodeFullPath, bool modify ) {
-        if ( modify ) {
-            _modifyToHLAPacketsSet.insert( nodeFullPath );
-        } else {
-            _modifyToHLAPacketsSet.erase( nodeFullPath );
-        }
+
+    void startDelayNodeAttack( const std::string &nodeFullPath, float mean, float standardDeviation ) {
+        _delayNodeAttackMap.emplace(nodeFullPath, DelayNodeParameters(mean, standardDeviation));
+    }
+    void stopDelayNodeAttack( const std::string &nodeFullPath ) {
+        _delayNodeAttackMap.erase(nodeFullPath);
+    }
+    bool hasDelayNodeAttack( const std::string &nodeFullPath ) {
+        return _delayNodeAttackMap.find( nodeFullPath ) != _delayNodeAttackMap.end();
+    }
+    const DelayNodeParameters &getDelayNodeAttack( const std::string &nodeFullPath ) {
+        static const DelayNodeParameters defaultDelayNodeParameters(0, -1);
+        DelayNodeAttackMap::const_iterator damCit = _delayNodeAttackMap.find( nodeFullPath );
+        return damCit == _delayNodeAttackMap.end() ? defaultDelayNodeParameters : damCit->second;
     }
 
-    void setModifyFromHLAPackets( const std::string nodeFullPath, bool modify ) {
+    void setModifyFromHLAPackets( const std::string &nodeFullPath, bool modify ) {
         if ( modify ) {
             _modifyFromHLAPacketsSet.insert( nodeFullPath );
         } else {
@@ -502,12 +530,32 @@ public:
         }
     }
 
-    bool modifyToHLAPackets( const std::string nodeFullPath ) {
+    bool modifyFromHLAPackets( const std::string &nodeFullPath ) {
+        return _modifyFromHLAPacketsSet.find( nodeFullPath ) != _modifyFromHLAPacketsSet.end();
+    }
+
+    void setModifyToHLAPackets( const std::string &nodeFullPath, bool modify ) {
+        if ( modify ) {
+            _modifyToHLAPacketsSet.insert( nodeFullPath );
+        } else {
+            _modifyToHLAPacketsSet.erase( nodeFullPath );
+        }
+    }
+
+    bool modifyToHLAPackets( const std::string &nodeFullPath ) {
         return _modifyToHLAPacketsSet.find( nodeFullPath ) != _modifyToHLAPacketsSet.end();
     }
 
-    bool modifyFromHLAPackets( const std::string nodeFullPath ) {
-        return _modifyFromHLAPacketsSet.find( nodeFullPath ) != _modifyFromHLAPacketsSet.end();
+    void setNodeAttack( const std::string &nodeFullPath, bool attack ) {
+        if ( attack ) {
+            _nodeAttackSet.insert( nodeFullPath );
+        } else {
+            _nodeAttackSet.erase( nodeFullPath );
+        }
+    }
+
+    bool nodeAttack( const std::string &nodeFullPath ) {
+        return _nodeAttackSet.find( nodeFullPath ) != _nodeAttackSet.end();
     }
 };
 
