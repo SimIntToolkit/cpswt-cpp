@@ -49,6 +49,8 @@ JsonTests::JsonTests() : CppUnit::TestCase() {
 
 void JsonTests::interactionJsonTest() {
 
+    std::cout << "START interactionJsonTest" << std::endl;
+
     SimEnd simEnd1;
     Json::Value jsonArray(Json::arrayValue);
     jsonArray.append("Federate1");
@@ -76,9 +78,13 @@ void JsonTests::interactionJsonTest() {
       simEnd1.get_actualLogicalGenerationTime(), simEnd2.get_actualLogicalGenerationTime(), 0.01
     );
     CPPUNIT_ASSERT_EQUAL(simEnd1.get_federateFilter(), simEnd2.get_federateFilter());
+
+    std::cout << "END interactionJsonTest" << std::endl;
 }
 
 void JsonTests::objectJsonTest() {
+
+    std::cout << "START objectJsonTest" << std::endl;
 
     FederateObject::publish_object(RTIAmbassadorTest1::get_rti_ambassador_1_ptr());
 
@@ -86,9 +92,9 @@ void JsonTests::objectJsonTest() {
     FederateObject::publish_FederateHost_attribute();
     FederateObject::publish_FederateHandle_attribute();
 
-    FederateObject::subscribe_FederateType_attribute();
-    FederateObject::subscribe_FederateHost_attribute();
-    FederateObject::subscribe_FederateHandle_attribute();
+    FederateObject::soft_subscribe_FederateType_attribute();
+    FederateObject::soft_subscribe_FederateHost_attribute();
+    FederateObject::soft_subscribe_FederateHandle_attribute();
 
     FederateObject federateObject1;
 
@@ -113,6 +119,8 @@ void JsonTests::objectJsonTest() {
     CPPUNIT_ASSERT_EQUAL(federateObject1.get_FederateType(), federateObject2.get_FederateType());
     CPPUNIT_ASSERT_EQUAL(federateObject1.get_FederateHost(), federateObject2.get_FederateHost());
     CPPUNIT_ASSERT_EQUAL(federateObject1.get_FederateHandle(), federateObject2.get_FederateHandle());
+
+    std::cout << "END objectJsonTest" << std::endl;
 }
 
 CPPUNIT_TEST_SUITE_REGISTRATION( JsonTests );

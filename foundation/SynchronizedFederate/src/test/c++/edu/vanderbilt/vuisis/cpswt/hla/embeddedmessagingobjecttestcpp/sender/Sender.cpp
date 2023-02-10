@@ -28,7 +28,7 @@
  * OR MODIFICATIONS.
  */
 
-#include "edu/vanderbilt/vuisis/cpswt/hla/embeddedmessagingobjectcpptest/receiver/Receiver.hpp"
+#include "edu/vanderbilt/vuisis/cpswt/hla/embeddedmessagingobjecttestcpp/sender/Sender.hpp"
 
 
 namespace edu {
@@ -36,49 +36,23 @@ namespace edu {
   namespace vuisis {
    namespace cpswt {
     namespace hla {
-     namespace embeddedmessagingobjectcpptest {
-      namespace receiver {
+     namespace embeddedmessagingobjecttestcpp {
+      namespace sender {
 
-Receiver::Receiver(FederateConfig *federateConfig): Super(federateConfig) {
+Sender::Sender(FederateConfig *federateConfig): Super(federateConfig) {
+    //////////////////////////////////////////////////////
+    // TODO register object instances after super(args) //
+    //////////////////////////////////////////////////////
+    registerObject(TestObject_0);
 }
 
-void Receiver::handleObjectClass_ObjectRoot_TestObject(ObjectRoot::SP objectRootSP) {
-    ::edu::vanderbilt::vuisis::cpswt::hla::ObjectRoot_p::TestObject::SP testObject0SP =
-        boost::dynamic_pointer_cast<::edu::vanderbilt::vuisis::cpswt::hla::ObjectRoot_p::TestObject>( objectRootSP );
-
-    _testObjectSP = testObject0SP;
-}
-
-void Receiver::checkReceivedSubscriptions() {
-
-    InteractionRoot::SP interactionRootSP;
-    while(interactionRootSP = getNextInteraction()) {
-
-        std::cerr << "unhandled interaction " << interactionRootSP->getInstanceHlaClassName() << std::endl;
-    }
-
-    ObjectReflector::SP reflectorSP;
-    while(reflectorSP = getNextObjectReflectorSP()) {
-        reflectorSP->reflect();
-        ObjectRoot::SP objectRootSP = reflectorSP->getObjectRootSP();
-
-        if (objectRootSP->isInstanceHlaClassDerivedFromHlaClass("ObjectRoot.TestObject")) {
-            handleObjectClass_ObjectRoot_TestObject(objectRootSP);
-            continue;
-        }
-
-        std::cerr << "unhandled object reflection: " << objectRootSP->getInstanceHlaClassName() << std::endl;
-    }
-
-}
-
-void Receiver::initialize( void ) {
+void Sender::initialize( void ) {
     m_currentTime = 0;
     if ( this->get_IsLateJoiner() ) {
         m_currentTime = getLBTS() - getLookahead();
         disableTimeRegulation();
     }
-    ReceiverATRCallback advanceTimeRequest(*this);
+    SenderATRCallback advanceTimeRequest(*this);
     putAdvanceTimeRequest(m_currentTime, advanceTimeRequest);
     if ( !this->get_IsLateJoiner() ) {
         readyToPopulate();
@@ -86,12 +60,22 @@ void Receiver::initialize( void ) {
     }
 }
 
-void Receiver::execute() {
-    checkReceivedSubscriptions();
-}
+void Sender::execute() {
 
-      } // NAMESPACE "receiver"
-     } // NAMESPACE "embeddedmessagingobjectcpptest"
+    TestObject_0.set_BooleanValue1(false);
+    TestObject_0.set_BooleanValue2(true);
+    TestObject_0.set_ByteValue(42);
+    TestObject_0.set_CharValue('X');
+    TestObject_0.set_DoubleValue(2.7181);
+    TestObject_0.set_FloatValue(3.14f);
+    TestObject_0.set_IntValue(1000000);
+    TestObject_0.set_ShortValue(300);
+    TestObject_0.set_LongValue(1000000000000000000L);
+    TestObject_0.set_StringValue("Hello");
+    updateAttributeValues(TestObject_0, 0.0);
+}
+      } // NAMESPACE "sender"
+     } // NAMESPACE "embeddedmessagingobjecttestcpp"
     } // NAMESPACE "hla"
    } // NAMESPACE "cpswt"
   } // NAMESPACE "vuisis"

@@ -53,6 +53,8 @@ ObjectTests::ObjectTests() : CppUnit::TestCase() {
 
 void ObjectTests::objectTest1() {
 
+    std::cout << "START objectTest1" << std::endl;
+
     // MAKE SURE ATTRIBUTES ARE PUBLISHED
     FederateObject::publish_FederateHandle_attribute();
     FederateObject::publish_FederateHost_attribute();
@@ -139,6 +141,8 @@ void ObjectTests::objectTest1() {
     CPPUNIT_ASSERT_EQUAL(2, federateObject2.get_FederateHandle());
     CPPUNIT_ASSERT_EQUAL(std::string("localhost"), federateObject2.get_FederateHost());
     CPPUNIT_ASSERT_EQUAL(std::string("foobar"), federateObject2.get_FederateType());
+
+    std::cout << "END objectTest1" << std::endl;
 }
 
 CPPUNIT_TEST_SUITE_REGISTRATION( ObjectTests );

@@ -30,7 +30,7 @@
 
 
 
-#include "edu/vanderbilt/vuisis/cpswt/hla/embeddedmessagingobjectcpptest/receiver/ReceiverBase.hpp"
+#include "edu/vanderbilt/vuisis/cpswt/hla/embeddedmessagingobjecttestcpp/sender/SenderBase.hpp"
 
 
 namespace edu {
@@ -38,38 +38,41 @@ namespace edu {
   namespace vuisis {
    namespace cpswt {
     namespace hla {
-     namespace embeddedmessagingobjectcpptest {
-      namespace receiver {
+     namespace embeddedmessagingobjecttestcpp {
+      namespace sender {
 
 
 // constructor
-void ReceiverBase::init() {
+void SenderBase::init() {
     createRTI();
     joinFederation();
 
     enableTimeConstrained();
     enableTimeRegulation(getLookahead());
 
-    // INTERACTION SUBSCRIPTIONS
+    // DIRECT INTERACTION PUBLICATIONS
+    ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::EmbeddedMessaging_p::OmnetFederate::publish_interaction(getRTI());
 
-    ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::EmbeddedMessaging_p::Receiver::subscribe_interaction(getRTI());
+    // OBJECT PUBLICATIONS
+    ::edu::vanderbilt::vuisis::cpswt::hla::ObjectRoot_p::TestObject::publish_attribute("ObjectRoot.TestObject", "BooleanValue1");
+    ::edu::vanderbilt::vuisis::cpswt::hla::ObjectRoot_p::TestObject::publish_attribute("ObjectRoot.TestObject", "BooleanValue2");
+    ::edu::vanderbilt::vuisis::cpswt::hla::ObjectRoot_p::TestObject::publish_attribute("ObjectRoot.TestObject", "ByteValue");
+    ::edu::vanderbilt::vuisis::cpswt::hla::ObjectRoot_p::TestObject::publish_attribute("ObjectRoot.TestObject", "CharValue");
+    ::edu::vanderbilt::vuisis::cpswt::hla::ObjectRoot_p::TestObject::publish_attribute("ObjectRoot.TestObject", "FloatValue");
+    ::edu::vanderbilt::vuisis::cpswt::hla::ObjectRoot_p::TestObject::publish_attribute("ObjectRoot.TestObject", "IntValue");
+    ::edu::vanderbilt::vuisis::cpswt::hla::ObjectRoot_p::TestObject::publish_attribute("ObjectRoot.TestObject", "LongValue");
+    ::edu::vanderbilt::vuisis::cpswt::hla::ObjectRoot_p::TestObject::publish_attribute("ObjectRoot.TestObject", "ShortValue");
+    ::edu::vanderbilt::vuisis::cpswt::hla::ObjectRoot_p::TestObject::publish_object(getRTI());
 
-    // OBJECT SUBSCRIPTIONS
-    ::edu::vanderbilt::vuisis::cpswt::hla::ObjectRoot_p::TestObject::subscribe_CharValue_attribute();
-    ::edu::vanderbilt::vuisis::cpswt::hla::ObjectRoot_p::TestObject::subscribe_DoubleValue_attribute();
-    ::edu::vanderbilt::vuisis::cpswt::hla::ObjectRoot_p::TestObject::subscribe_FloatValue_attribute();
-    ::edu::vanderbilt::vuisis::cpswt::hla::ObjectRoot_p::TestObject::subscribe_IntValue_attribute();
-    ::edu::vanderbilt::vuisis::cpswt::hla::ObjectRoot_p::TestObject::subscribe_LongValue_attribute();
-    ::edu::vanderbilt::vuisis::cpswt::hla::ObjectRoot_p::TestObject::subscribe_ShortValue_attribute();
-    ::edu::vanderbilt::vuisis::cpswt::hla::ObjectRoot_p::TestObject::subscribe_StringValue_attribute();
-    ::edu::vanderbilt::vuisis::cpswt::hla::ObjectRoot_p::TestObject::subscribe_object(getRTI());
+    // SOFT OBJECT PUBLICATIONS
+    ::edu::vanderbilt::vuisis::cpswt::hla::ObjectRoot_p::TestObject::add_federate_name_soft_publish("OmnetFederate");
 }
 
-ReceiverBase::ReceiverBase(FederateConfig *federateConfig): Super(federateConfig) {
+SenderBase::SenderBase(FederateConfig *federateConfig): Super(federateConfig) {
     init();
 }
 
-void ReceiverBase::receiveInteraction(
+void SenderBase::receiveInteraction(
   RTI::InteractionClassHandle interactionClassHandle,
   const RTI::ParameterHandleValuePairSet& parameterHandleValuePairSet,
   const char *userSuppliedTag
@@ -96,7 +99,7 @@ void ReceiverBase::receiveInteraction(
     }
 }
 
-void ReceiverBase::receiveInteraction(
+void SenderBase::receiveInteraction(
   RTI::InteractionClassHandle interactionClassHandle,
   const RTI::ParameterHandleValuePairSet &parameterHandleValuePairSet,
   const RTI::FedTime &fedTime,
@@ -127,8 +130,8 @@ void ReceiverBase::receiveInteraction(
         );
     }
 }
-      } // NAMESPACE "receiver"
-     } // NAMESPACE "embeddedmessagingobjectcpptest"
+      } // NAMESPACE "sender"
+     } // NAMESPACE "embeddedmessagingobjecttestcpp"
     } // NAMESPACE "hla"
    } // NAMESPACE "cpswt"
   } // NAMESPACE "vuisis"

@@ -950,9 +950,9 @@ protected:
         return classNameSubscribedClassAndPropertyNameSetSPMap;
     }
 
-    //---------------------------------------------------------
+    //----------------------------------------------------------
     // METHODS THAT USE CLASS-NAME SUBSCRIBED-ATTRIBUTE-NAME SET
-    //---------------------------------------------------------
+    //----------------------------------------------------------
 public:
     static const ClassAndPropertyNameSetSP &get_subscribed_class_and_property_name_set_sp(
       const std::string &hlaClassName
@@ -971,6 +971,10 @@ public:
         pub_sub_class_and_property_name(
           get_class_name_subscribed_class_and_property_name_set_sp_map(),
           hlaClassName, attributeClassName, attributeName, false, true
+        );
+        pub_sub_class_and_property_name(
+          get_class_name_soft_subscribed_class_and_property_name_set_sp_map(),
+          hlaClassName, attributeClassName, attributeName, false, false
         );
     }
 
@@ -994,6 +998,85 @@ public:
     //---------------------------------------------
     // END CLASS-NAME SUBSCRIBED-ATTRIBUTE-NAME SET
     //---------------------------------------------
+
+    //----------------------------------------------
+    // CLASS-NAME SOFT-SUBSCRIBED-ATTRIBUTE-NAME SET
+    //----------------------------------------------
+protected:
+    static StringClassAndPropertyNameSetSPMap &get_class_name_soft_subscribed_class_and_property_name_set_sp_map() {
+        static StringClassAndPropertyNameSetSPMap classNameSoftSubscribedClassAndPropertyNameSetSPMap;
+        return classNameSoftSubscribedClassAndPropertyNameSetSPMap;
+    }
+
+    //---------------------------------------------------------------
+    // METHODS THAT USE CLASS-NAME SOFT-SUBSCRIBED-ATTRIBUTE-NAME SET
+    //---------------------------------------------------------------
+public:
+    static const ClassAndPropertyNameSetSP &get_soft_subscribed_class_and_property_name_set_sp(
+      const std::string &hlaClassName
+    ) {
+        static ClassAndPropertyNameSetSP classAndPropertyNameSetSP( new ClassAndPropertyNameSet() );
+        StringClassAndPropertyNameSetSPMap::const_iterator scmCit =
+          get_class_name_soft_subscribed_class_and_property_name_set_sp_map().find( hlaClassName );
+
+        return scmCit == get_class_name_soft_subscribed_class_and_property_name_set_sp_map().end()
+          ? classAndPropertyNameSetSP : scmCit->second;
+    }
+
+    static void soft_subscribe_attribute(
+      const std::string &hlaClassName, const std::string &attributeClassName, const std::string &attributeName
+    ) {
+        pub_sub_class_and_property_name(
+          get_class_name_soft_subscribed_class_and_property_name_set_sp_map(),
+          hlaClassName, attributeClassName, attributeName, false, true
+        );
+        pub_sub_class_and_property_name(
+          get_class_name_subscribed_class_and_property_name_set_sp_map(),
+          hlaClassName, attributeClassName, attributeName, false, false
+        );
+    }
+
+    static void soft_subscribe_attribute(const std::string &hlaClassName, const std::string &attributeName) {
+        soft_subscribe_attribute(hlaClassName, hlaClassName, attributeName);
+    }
+
+    static bool is_soft_subscribed_attribute(
+      const std::string &className, const std::string &attributeClassName, const std::string &attributeName
+    ) {
+        ClassAndPropertyName classAndPropertyName(attributeClassName, attributeName);
+
+        StringClassAndPropertyNameSetSPMap::const_iterator scmCit =
+          get_class_name_soft_subscribed_class_and_property_name_set_sp_map().find(className);
+
+        if (scmCit == get_class_name_soft_subscribed_class_and_property_name_set_sp_map().end()) {
+            return false;
+        }
+
+        const ClassAndPropertyNameSet &classAndPropertyNameSet = *scmCit->second;
+
+        return classAndPropertyNameSet.find(classAndPropertyName) != classAndPropertyNameSet.end();
+    }
+
+    static bool is_aoft_subscribed_attribute(const std::string &className, const std::string &attributeName) {
+        return is_soft_subscribed_attribute(className, className, attributeName);
+    }
+
+    static void soft_unsubscribe_attribute(
+      const std::string &hlaClassName, const std::string &attributeClassName, const std::string &attributeName
+    ) {
+        pub_sub_class_and_property_name(
+          get_class_name_soft_subscribed_class_and_property_name_set_sp_map(),
+          hlaClassName, attributeClassName, attributeName, false, false
+        );
+    }
+
+    static void soft_unsubscribe_attribute(const std::string &hlaClassName, const std::string &attributeName) {
+        soft_unsubscribe_attribute(hlaClassName, hlaClassName, attributeName);
+    }
+
+    //--------------------------------------------------
+    // END CLASS-NAME SOFT-SUBSCRIBED-ATTRIBUTE-NAME SET
+    //--------------------------------------------------
 
     //--------------------------------------------
     // CLASS-AND-PROPERTY-NAME PROPERTY-HANDLE MAP
@@ -1700,6 +1783,10 @@ public:
         return get_class_name_subscribed_class_and_property_name_set_sp_map()[get_hla_class_name()];
     }
 
+    static ClassAndPropertyNameSetSP get_soft_subscribed_attribute_name_set_sp() {
+        return get_class_name_soft_subscribed_class_and_property_name_set_sp_map()[get_hla_class_name()];
+    }
+
     static void add_object_update_embedded_only_id(int id) {
         add_object_update_embedded_only_id(get_hla_class_name(), id);
     }
@@ -2095,6 +2182,10 @@ public:
 
     ClassAndPropertyNameSetSP getSubscribedClassAndPropertyNameSetSP() {
         return get_subscribed_class_and_property_name_set_sp( getInstanceHlaClassName() );
+    }
+
+    ClassAndPropertyNameSetSP getSoftSubscribedClassAndPropertyNameSetSP() {
+        return get_soft_subscribed_class_and_property_name_set_sp( getInstanceHlaClassName() );
     }
 
     /**

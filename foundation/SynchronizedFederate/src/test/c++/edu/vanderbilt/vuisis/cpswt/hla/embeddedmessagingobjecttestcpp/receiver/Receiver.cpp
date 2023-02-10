@@ -28,79 +28,72 @@
  * OR MODIFICATIONS.
  */
 
-#ifndef ORG_CPSWT_HLA_EMBEDDEDMESSAGINGOBJECTCPPTEST_RECEIVER_CLASS_CLASS
-#define ORG_CPSWT_HLA_EMBEDDEDMESSAGINGOBJECTCPPTEST_RECEIVER_CLASS_CLASS
+#include "edu/vanderbilt/vuisis/cpswt/hla/embeddedmessagingobjecttestcpp/receiver/Receiver.hpp"
 
-
-#include "edu/vanderbilt/vuisis/cpswt/hla/embeddedmessagingobjectcpptest/receiver/ReceiverBase.hpp"
-#include "FederateConfigParser.h"
-
-#include <boost/shared_ptr.hpp>
 
 namespace edu {
  namespace vanderbilt {
   namespace vuisis {
    namespace cpswt {
     namespace hla {
-     namespace embeddedmessagingobjectcpptest {
+     namespace embeddedmessagingobjecttestcpp {
       namespace receiver {
 
-class Receiver: public ReceiverBase {
+Receiver::Receiver(FederateConfig *federateConfig): Super(federateConfig) {
+}
 
-using InteractionRoot = ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot;
-using C2WInteractionRoot = ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot;
+void Receiver::handleObjectClass_ObjectRoot_TestObject(ObjectRoot::SP objectRootSP) {
+    ::edu::vanderbilt::vuisis::cpswt::hla::ObjectRoot_p::TestObject::SP testObject0SP =
+        boost::dynamic_pointer_cast<::edu::vanderbilt::vuisis::cpswt::hla::ObjectRoot_p::TestObject>( objectRootSP );
 
-//    private final static Logger log = LogManager.getLogger();
-public:
-    typedef ::edu::vanderbilt::vuisis::cpswt::hla::ObjectRoot_p::TestObject TestObject;
-    typedef boost::shared_ptr<TestObject> TestObjectSP;
-private:
-    double m_currentTime;
+    _testObjectSP = testObject0SP;
+}
 
-public:
-    Receiver(FederateConfig *federateConfig);
+void Receiver::checkReceivedSubscriptions() {
 
-    virtual ~Receiver() throw (RTI::FederateInternalError) {}
+    InteractionRoot::SP interactionRootSP;
+    while(interactionRootSP = getNextInteraction()) {
 
-private:
-
-    TestObjectSP _testObjectSP;
-
-    void handleObjectClass_ObjectRoot_TestObject(ObjectRoot::SP objectRootSP);
-
-    void checkReceivedSubscriptions();
-
-public:
-    typedef ReceiverBase Super;
-
-    class ReceiverATRCallback : public ATRCallback {
-        private:
-            Receiver &m_federateInstance;
-        public:
-            ReceiverATRCallback(Receiver &federateInstance): m_federateInstance(federateInstance) {}
-
-            virtual void execute( void ) {
-                m_federateInstance.execute();
-            }
-
-            virtual SP clone() {
-                return SP(new ReceiverATRCallback(*this));
-            }
-    };
-
-    TestObjectSP getTestObjectSP() {
-        return _testObjectSP;
+        std::cerr << "unhandled interaction " << interactionRootSP->getInstanceHlaClassName() << std::endl;
     }
 
-    void initialize();
-    void execute();
-};
+    ObjectReflector::SP reflectorSP;
+    while(reflectorSP = getNextObjectReflectorSP()) {
+        reflectorSP->reflect();
+        ObjectRoot::SP objectRootSP = reflectorSP->getObjectRootSP();
+
+        if (objectRootSP->isInstanceHlaClassDerivedFromHlaClass("ObjectRoot.TestObject")) {
+            handleObjectClass_ObjectRoot_TestObject(objectRootSP);
+            continue;
+        }
+
+        std::cerr << "unhandled object reflection: " << objectRootSP->getInstanceHlaClassName() << std::endl;
+    }
+
+}
+
+void Receiver::initialize( void ) {
+    m_currentTime = 0;
+    if ( this->get_IsLateJoiner() ) {
+        m_currentTime = getLBTS() - getLookahead();
+        disableTimeRegulation();
+    }
+    ReceiverATRCallback advanceTimeRequest(*this);
+    putAdvanceTimeRequest(m_currentTime, advanceTimeRequest);
+    if ( !this->get_IsLateJoiner() ) {
+        readyToPopulate();
+        readyToRun();
+    }
+}
+
+void Receiver::execute() {
+    checkReceivedSubscriptions();
+}
+
       } // NAMESPACE "receiver"
-     } // NAMESPACE "embeddedmessagingobjectcpptest"
+     } // NAMESPACE "embeddedmessagingobjecttestcpp"
     } // NAMESPACE "hla"
    } // NAMESPACE "cpswt"
   } // NAMESPACE "vuisis"
  } // NAMESPACE "vanderbilt"
 } // NAMESPACE "edu"
-
-#endif // ORG_CPSWT_HLA_EMBEDDEDMESSAGINGOBJECTCPPTEST_RECEIVER_CLASS_CLASS
