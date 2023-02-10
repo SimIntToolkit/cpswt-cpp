@@ -296,6 +296,10 @@ public:
         return ObjectRoot::get_class_name_subscribed_class_and_property_name_set_sp_map()[get_hla_class_name()];
     }
 
+    static ClassAndPropertyNameSetSP get_soft_subscribed_attribute_name_set_sp() {
+        return ObjectRoot::get_class_name_soft_subscribed_class_and_property_name_set_sp_map()[get_hla_class_name()];
+    }
+
     static void add_object_update_embedded_only_id(int id) {
         ObjectRoot::add_object_update_embedded_only_id(get_hla_class_name(), id);
     }
