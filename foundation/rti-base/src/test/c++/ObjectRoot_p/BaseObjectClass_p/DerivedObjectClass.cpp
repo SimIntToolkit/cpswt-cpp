@@ -50,18 +50,21 @@ bool DerivedObjectClass::static_init() {
     get_hla_class_name_instance_sp_map()[get_hla_class_name()] = instanceSP;
 
     ClassAndPropertyNameSetSP classAndPropertyNameSetSP( new ClassAndPropertyNameSet() );
+
     classAndPropertyNameSetSP->emplace(
         "ObjectRoot.BaseObjectClass.DerivedObjectClass", "int_attribute1"
     );
 
     get_class_and_property_name_initial_value_sp_map()[ClassAndPropertyName( "ObjectRoot.BaseObjectClass.DerivedObjectClass", "int_attribute1" )] =
       ValueSP( new Value( static_cast<int>(0) ));
+
     classAndPropertyNameSetSP->emplace(
         "ObjectRoot.BaseObjectClass.DerivedObjectClass", "int_attribute2"
     );
 
     get_class_and_property_name_initial_value_sp_map()[ClassAndPropertyName( "ObjectRoot.BaseObjectClass.DerivedObjectClass", "int_attribute2" )] =
       ValueSP( new Value( static_cast<int>(0) ));
+
     classAndPropertyNameSetSP->emplace(
         "ObjectRoot.BaseObjectClass.DerivedObjectClass", "string_attribute2"
     );
