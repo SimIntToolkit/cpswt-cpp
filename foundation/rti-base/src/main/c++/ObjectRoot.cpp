@@ -157,6 +157,10 @@ void ObjectRoot::init(const std::string &hlaClassName, RTI::RTIambassador *rtiAm
 
         ClassAndPropertyNameSetSP subscribedAttributeNameSetSP(new ClassAndPropertyNameSet());
         get_class_name_subscribed_class_and_property_name_set_sp_map()[hlaClassName] = subscribedAttributeNameSetSP;
+
+        ClassAndPropertyNameSetSP softSubscribedAttributeNameSetSP(new ClassAndPropertyNameSet());
+        get_class_name_soft_subscribed_class_and_property_name_set_sp_map()[hlaClassName] =
+          softSubscribedAttributeNameSetSP;
     }
 }
 
@@ -855,12 +859,12 @@ ObjectRoot::ObjectReflector::SP ObjectRoot::fromJson(const std::string &jsonStri
     std::string federateSequence = topLevelJSONObject["federateSequence"].asString();
 
     StringClassAndPropertyNameSetSPMap::const_iterator scmItr =
-      get_class_name_subscribed_class_and_property_name_set_sp_map().find( className );
-    if (scmItr == get_class_name_subscribed_class_and_property_name_set_sp_map().end()) {
+      get_class_name_soft_subscribed_class_and_property_name_set_sp_map().find( className );
+    if (scmItr == get_class_name_soft_subscribed_class_and_property_name_set_sp_map().end()) {
         BOOST_LOG_SEV(get_logger(), error) << "fromJson:  no class \"" << className << "\" is defined";
         return ObjectReflector::SP();
     }
-    ClassAndPropertyNameSet &subscribedAttributeNameSet = *scmItr->second;
+    ClassAndPropertyNameSet &softSubscribedAttributeNameSet = *scmItr->second;
 
     ClassAndPropertyNameValueSPMap classAndPropertyNameValueSPMap;
 
@@ -871,7 +875,7 @@ ObjectRoot::ObjectReflector::SP ObjectRoot::fromJson(const std::string &jsonStri
         const std::string memberName(*mbrCit);
         ClassAndPropertyName classAndPropertyName(memberName);
 
-        if (subscribedAttributeNameSet.find(classAndPropertyName) == subscribedAttributeNameSet.end()) {
+        if (softSubscribedAttributeNameSet.find(classAndPropertyName) == softSubscribedAttributeNameSet.end()) {
             // LOG ERROR
             continue;
         }
