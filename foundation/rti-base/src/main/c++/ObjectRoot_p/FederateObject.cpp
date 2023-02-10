@@ -49,18 +49,21 @@ bool FederateObject::static_init() {
     get_hla_class_name_instance_sp_map()[get_hla_class_name()] = instanceSP;
 
     ClassAndPropertyNameSetSP classAndPropertyNameSetSP( new ClassAndPropertyNameSet() );
+
     classAndPropertyNameSetSP->emplace(
         "ObjectRoot.FederateObject", "FederateHandle"
     );
 
     get_class_and_property_name_initial_value_sp_map()[ClassAndPropertyName( "ObjectRoot.FederateObject", "FederateHandle" )] =
       ValueSP( new Value( static_cast<int>(0) ));
+
     classAndPropertyNameSetSP->emplace(
         "ObjectRoot.FederateObject", "FederateHost"
     );
 
     get_class_and_property_name_initial_value_sp_map()[ClassAndPropertyName( "ObjectRoot.FederateObject", "FederateHost" )] =
       ValueSP( new Value( std::string("") ));
+
     classAndPropertyNameSetSP->emplace(
         "ObjectRoot.FederateObject", "FederateType"
     );
