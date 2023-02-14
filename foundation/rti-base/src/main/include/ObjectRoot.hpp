@@ -901,8 +901,92 @@ public:
     }
 
 private:
+    class PubSubCacheEntry {
+    private:
+        const std::string _callingFunctionName;
+        const std::string _primaryFunctionName;
+        StringClassAndPropertyNameSetSPMap &_stringClassAndPropertyNameSetSPMap;
+        const std::string _hlaClassName;
+        const std::string _attributeClassName;
+        const std::string _attributeName;
+        bool _publish;
+
+        std::string getPrimaryFunctionName(std::string callingFunctionName) {
+            int position = callingFunctionName.find("un");
+            if (position != std::string::npos) {
+              callingFunctionName.replace(position, 2, "");
+            }
+            return callingFunctionName;
+        }
+
+    public:
+        PubSubCacheEntry(
+                const std::string &callingFunctionName,
+                StringClassAndPropertyNameSetSPMap &stringClassAndPropertyNameSetSPMap,
+                const std::string &hlaClassName,
+                const std::string &attributeClassName,
+                const std::string &attributeName,
+                bool publish
+        ) : _callingFunctionName(callingFunctionName),
+            _primaryFunctionName(getPrimaryFunctionName(callingFunctionName)),
+            _stringClassAndPropertyNameSetSPMap(stringClassAndPropertyNameSetSPMap),
+            _hlaClassName(hlaClassName),
+            _attributeClassName(attributeClassName),
+            _attributeName(attributeName),
+            _publish(publish) { }
+
+        void replay() const {
+            pub_sub_class_and_property_name(
+                    _callingFunctionName,
+                    _stringClassAndPropertyNameSetSPMap,
+                    _hlaClassName,
+                    _attributeClassName,
+                    _attributeName,
+                    _publish,
+                    true
+            );
+        }
+
+        bool operator<(const PubSubCacheEntry &other) const;
+    };
+
+    typedef std::set<PubSubCacheEntry> PubSubCacheEntrySet;
+    typedef boost::shared_ptr<PubSubCacheEntrySet> PubSubCacheEntrySetSP;
+    typedef std::map<std::string, PubSubCacheEntrySetSP> StringPubSubCacheEntrySetSPMap;
+
+    static StringPubSubCacheEntrySetSPMap &get_hla_class_name_pub_sub_cache_entry_set_sp_map() {
+        static StringPubSubCacheEntrySetSPMap hlaClassNamePubSubCacheEntrySetSPMap;
+        return hlaClassNamePubSubCacheEntrySetSPMap;
+    }
+
+    static void add_to_pub_sub_cache(
+            const std::string &callingFunctionName,
+            StringClassAndPropertyNameSetSPMap &stringPubSubAttributeNameSetSPMap,
+            const std::string &hlaClassName,
+            const std::string &attributeClassName,
+            const std::string &attributeName,
+            bool publish,
+            bool insert
+    );
+
+    static void replay_pub_sub(const std::string &hlaClassName) {
+        if (
+          get_hla_class_name_pub_sub_cache_entry_set_sp_map().find(hlaClassName) !=
+            get_hla_class_name_pub_sub_cache_entry_set_sp_map().end()
+        ) {
+            for(
+              const PubSubCacheEntry &pubSubCacheEntry:
+                *get_hla_class_name_pub_sub_cache_entry_set_sp_map()[hlaClassName]
+            ) {
+                pubSubCacheEntry.replay();
+            }
+            get_hla_class_name_pub_sub_cache_entry_set_sp_map().erase(hlaClassName);
+        }
+    }
+
     static void pub_sub_class_and_property_name(
-      const StringClassAndPropertyNameSetSPMap &stringClassAndPropertyNameSetSPMap,
+      const std::string &callingFunctionName,
+      StringClassAndPropertyNameSetSPMap &stringClassAndPropertyNameSetSPMap,
       const std::string &hlaClassName,
       const std::string &attributeClassName,
       const std::string &attributeName,
@@ -915,7 +999,7 @@ public:
       const std::string &hlaClassName, const std::string &attributeClassName, const std::string &attributeName
     ) {
         pub_sub_class_and_property_name(
-          get_class_name_published_class_and_property_name_set_sp_map(),
+          "publish_attribute", get_class_name_published_class_and_property_name_set_sp_map(),
           hlaClassName, attributeClassName, attributeName, true, true
         );
     }
@@ -928,7 +1012,7 @@ public:
       const std::string &hlaClassName, const std::string &attributeClassName, const std::string &attributeName
     ) {
         pub_sub_class_and_property_name(
-          get_class_name_published_class_and_property_name_set_sp_map(),
+          "unpublish_attribute", get_class_name_published_class_and_property_name_set_sp_map(),
           hlaClassName, attributeClassName, attributeName, true, false
         );
     }
@@ -969,13 +1053,10 @@ public:
       const std::string &hlaClassName, const std::string &attributeClassName, const std::string &attributeName
     ) {
         pub_sub_class_and_property_name(
-          get_class_name_subscribed_class_and_property_name_set_sp_map(),
+          "subscribe_attribute", get_class_name_subscribed_class_and_property_name_set_sp_map(),
           hlaClassName, attributeClassName, attributeName, false, true
         );
-        pub_sub_class_and_property_name(
-          get_class_name_soft_subscribed_class_and_property_name_set_sp_map(),
-          hlaClassName, attributeClassName, attributeName, false, false
-        );
+        soft_unsubscribe_attribute(hlaClassName, attributeClassName, attributeName);
     }
 
     static void subscribe_attribute(const std::string &hlaClassName, const std::string &attributeName) {
@@ -986,7 +1067,7 @@ public:
       const std::string &hlaClassName, const std::string &attributeClassName, const std::string &attributeName
     ) {
         pub_sub_class_and_property_name(
-          get_class_name_subscribed_class_and_property_name_set_sp_map(),
+          "unsubscribe_attribute", get_class_name_subscribed_class_and_property_name_set_sp_map(),
           hlaClassName, attributeClassName, attributeName, false, false
         );
     }
@@ -1027,13 +1108,10 @@ public:
       const std::string &hlaClassName, const std::string &attributeClassName, const std::string &attributeName
     ) {
         pub_sub_class_and_property_name(
-          get_class_name_soft_subscribed_class_and_property_name_set_sp_map(),
+          "soft_subscribe_attribute", get_class_name_soft_subscribed_class_and_property_name_set_sp_map(),
           hlaClassName, attributeClassName, attributeName, false, true
         );
-        pub_sub_class_and_property_name(
-          get_class_name_subscribed_class_and_property_name_set_sp_map(),
-          hlaClassName, attributeClassName, attributeName, false, false
-        );
+        unsubscribe_attribute(hlaClassName, attributeClassName, attributeName);
     }
 
     static void soft_subscribe_attribute(const std::string &hlaClassName, const std::string &attributeName) {
@@ -1065,7 +1143,7 @@ public:
       const std::string &hlaClassName, const std::string &attributeClassName, const std::string &attributeName
     ) {
         pub_sub_class_and_property_name(
-          get_class_name_soft_subscribed_class_and_property_name_set_sp_map(),
+          "soft_unsubscribe_attribute", get_class_name_soft_subscribed_class_and_property_name_set_sp_map(),
           hlaClassName, attributeClassName, attributeName, false, false
         );
     }
@@ -1787,22 +1865,6 @@ public:
         return get_class_name_soft_subscribed_class_and_property_name_set_sp_map()[get_hla_class_name()];
     }
 
-    static void add_object_update_embedded_only_id(int id) {
-        add_object_update_embedded_only_id(get_hla_class_name(), id);
-    }
-
-    static void remove_object_update_embedded_only_id(int id) {
-        remove_object_update_embedded_only_id(get_hla_class_name(), id);
-    }
-
-    static const IntegerSetSP &get_object_update_embedded_only_id_set_sp() {
-        return get_object_update_embedded_only_id_set_sp(get_hla_class_name());
-    }
-
-    static bool get_is_object_update_embedded_only_id(int id) {
-        return get_is_object_update_embedded_only_id(get_hla_class_name(), id);
-    }
-
     static void add_federate_name_soft_publish_direct(const std::string &federateName) {
         add_federate_name_soft_publish_direct(get_hla_class_name(), federateName);
     }
@@ -2249,36 +2311,6 @@ public:
     static ObjectReflector::SP fromJson(const std::string &jsonString);
 
 private:
-    static StringIntegerSetSPMap &get_hla_class_name_object_update_embedded_only_id_set_sp_map() {
-        static StringIntegerSetSPMap hlaClassNameObjectUpdateEmbeddedOnlyIdSetSPMap;
-        return hlaClassNameObjectUpdateEmbeddedOnlyIdSetSPMap;
-    }
-
-public:
-    static void add_object_update_embedded_only_id(const std::string &hlaClassName, int id);
-
-    static void remove_object_update_embedded_only_id(const std::string &hlaClassName, int id);
-
-    static const IntegerSetSP &get_object_update_embedded_only_id_set_sp(const std::string &hlaClassName) {
-        static IntegerSetSP defaultIntegerSetSP( new IntegerSet() );
-        StringIntegerSetSPMap::const_iterator simCit =
-          get_hla_class_name_object_update_embedded_only_id_set_sp_map().find(hlaClassName);
-        return simCit == get_hla_class_name_object_update_embedded_only_id_set_sp_map().end() ?
-            defaultIntegerSetSP : simCit->second;
-    }
-
-    static bool get_is_object_update_embedded_only_id(const std::string &hlaClassName, int id) {
-        const IntegerSet &integerSet = *get_object_update_embedded_only_id_set_sp(hlaClassName);
-        return integerSet.find(id) != integerSet.end();
-    }
-
-    static bool get_is_object_update_embedded_only_id(int classId, int id) {
-        IntegerStringMap::const_iterator ismCit = get_class_handle_name_map().find(classId);
-        return ismCit == get_class_handle_name_map().end() ?
-          false : get_is_object_update_embedded_only_id(ismCit->second, id);
-    }
-
-private:
     static StringStringSetSPMap &get_hla_class_name_to_federate_name_soft_publish_direct_set_sp_map() {
         static StringStringSetSPMap hlaClassNameToFederateNameSoftPublishDirectSetMap;
         return hlaClassNameToFederateNameSoftPublishDirectSetMap;
@@ -2409,6 +2441,7 @@ private:
                 return false;
             }
             init(hlaClassName, rti);
+            replay_pub_sub(hlaClassName);
         }
         return true;
     }

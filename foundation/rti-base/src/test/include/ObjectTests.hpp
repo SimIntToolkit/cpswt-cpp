@@ -52,12 +52,14 @@ public:
 private:
     CPPUNIT_TEST_SUITE( ObjectTests );
     CPPUNIT_TEST(objectTest1);
+    CPPUNIT_TEST(publishObjectTest);
     CPPUNIT_TEST_SUITE_END();
 
 public:
     ObjectTests();
 
     void objectTest1();
+    void publishObjectTest();
 };
 
 #endif // _OBJECT_TESTS

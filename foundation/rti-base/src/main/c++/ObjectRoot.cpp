@@ -243,26 +243,114 @@ std::string ObjectRoot::ObjectReflector::toJson() const {
     return stringOutputStream.str();
 }
 
+bool ObjectRoot::PubSubCacheEntry::operator<(const PubSubCacheEntry &other) const {
+    if (_primaryFunctionName < other._primaryFunctionName) {
+        return true;
+    }
+    if (_primaryFunctionName > other._primaryFunctionName) {
+        return false;
+    }
+
+    if (_hlaClassName < other._hlaClassName) {
+        return true;
+    }
+    if (_hlaClassName > other._hlaClassName) {
+        return false;
+    }
+
+    if (_attributeClassName < other._attributeClassName) {
+        return true;
+    }
+    if (_attributeClassName > other._attributeClassName) {
+        return false;
+    }
+
+    if (_attributeName < other._attributeName) {
+        return true;
+    }
+    if (_attributeName > other._attributeName) {
+        return false;
+    }
+
+    return !_publish && other._publish;
+}
+
+void ObjectRoot::add_to_pub_sub_cache(
+        const std::string &callingFunctionName,
+        StringClassAndPropertyNameSetSPMap &stringPubSubAttributeNameSetSPMap,
+        const std::string &hlaClassName,
+        const std::string &attributeClassName,
+        const std::string &attributeName,
+        bool publish,
+        bool insert
+) {
+    if (insert) {
+        if (
+          get_hla_class_name_pub_sub_cache_entry_set_sp_map().find(hlaClassName) ==
+            get_hla_class_name_pub_sub_cache_entry_set_sp_map().end()
+        ) {
+            get_hla_class_name_pub_sub_cache_entry_set_sp_map().emplace(
+              hlaClassName, PubSubCacheEntrySetSP(new PubSubCacheEntrySet()));
+        }
+        PubSubCacheEntrySet &pubSubCacheEntrySet =
+          *get_hla_class_name_pub_sub_cache_entry_set_sp_map()[hlaClassName];
+        pubSubCacheEntrySet.insert(PubSubCacheEntry(
+                callingFunctionName,
+                stringPubSubAttributeNameSetSPMap,
+                hlaClassName,
+                attributeClassName,
+                attributeName,
+                publish
+        ));
+    } else if (
+      get_hla_class_name_pub_sub_cache_entry_set_sp_map().find(hlaClassName) !=
+        get_hla_class_name_pub_sub_cache_entry_set_sp_map().end()
+    ) {
+        PubSubCacheEntrySet &pubSubCacheEntrySet =
+          *get_hla_class_name_pub_sub_cache_entry_set_sp_map()[hlaClassName];
+        pubSubCacheEntrySet.erase(PubSubCacheEntry(
+                callingFunctionName,
+                stringPubSubAttributeNameSetSPMap,
+                hlaClassName,
+                attributeClassName,
+                attributeName,
+                publish
+        ));
+        if (pubSubCacheEntrySet.empty()) {
+            get_hla_class_name_pub_sub_cache_entry_set_sp_map().erase(hlaClassName);
+        }
+    }
+}
+
 void ObjectRoot::pub_sub_class_and_property_name(
-  const StringClassAndPropertyNameSetSPMap &stringClassAndPropertyNameSetSPMap,
+  const std::string &callingFunctionName,
+  StringClassAndPropertyNameSetSPMap &stringClassAndPropertyNameSetSPMap,
   const std::string &hlaClassName,
   const std::string &attributeClassName,
   const std::string &attributeName,
   bool publish,
   bool insert
 ) {
+    if (get_hla_class_name_set().find(hlaClassName) == get_hla_class_name_set().end()) {
+        add_to_pub_sub_cache(
+                callingFunctionName,
+                stringClassAndPropertyNameSetSPMap,
+                hlaClassName,
+                attributeClassName,
+                attributeName,
+                publish,
+                insert
+        );
+        return;
+    }
 
-    std::string prefix = insert ? "" : "un";
-    std::string pubsub = publish ? "publish" : "subscribe";
-    std::string operationName = prefix + pubsub;
     std::string basePrefix = attributeClassName + ".";
 
     StringClassAndPropertyNameSetSPMap::const_iterator samItr =
       stringClassAndPropertyNameSetSPMap.find( hlaClassName );
     if ( samItr == stringClassAndPropertyNameSetSPMap.end() ) {
-        BOOST_LOG_SEV(get_logger(), error) << "Could not " << operationName
-          << " \"" << attributeName << "\" attribute of object class \"" << hlaClassName
-          << "\": class does not exist";
+        BOOST_LOG_SEV(get_logger(), error) << callingFunctionName << "(\"" << hlaClassName << "\", \"" <<
+          attributeClassName << "\", \"" << attributeName << "\"): \"" << hlaClassName << "\" has no attributes";
 
         return;
     }
@@ -271,20 +359,20 @@ void ObjectRoot::pub_sub_class_and_property_name(
       hlaClassName != attributeClassName &&
       (hlaClassName.size() < attributeClassName.size() || hlaClassName.substr(0, basePrefix.length()) != basePrefix)
     ) {
-        BOOST_LOG_SEV(get_logger(), error) << operationName << "_attribute( \""
+        BOOST_LOG_SEV(get_logger(), error) << callingFunctionName << "( \""
           << hlaClassName << "\", \"" << attributeClassName << "\", \"" << attributeName
-          << "\"): the \"" << hlaClassName << "\" class cannot subscribe to attribute of a class (\""
-          << attributeClassName << "\") that is out of its inheritance hierarchy.";
+          << "\"): the \"" << hlaClassName << "\" class cannot access an attribute of class \""
+          << attributeClassName << "\" because it is out of its inheritance hierarchy.";
         return;
     }
 
     ClassAndPropertyNameSP classAndPropertyNameSP = findProperty(attributeClassName, attributeName);
     if (!classAndPropertyNameSP) {
 
-        BOOST_LOG_SEV(get_logger(), error) << "Could not " << operationName
-          << " \"" << attributeName << "\" attribute of object class \"" << hlaClassName
-          << "\": \"" << attributeName << "\" attribute does not exist in the \""
-          << hlaClassName << "\" class or any of its base classes";
+        BOOST_LOG_SEV(get_logger(), error) << callingFunctionName << "( \""
+          << hlaClassName << "\", \"" << attributeClassName << "\", \"" << attributeName
+          << "\"):  \"" << attributeName << "\" attribute does not exist in \"" << attributeClassName
+          << "\" class or any of its base classes";
 
         return;
     }
@@ -937,43 +1025,6 @@ ObjectRoot::ObjectReflector::SP ObjectRoot::fromJson(const std::string &jsonStri
     ObjectReflector::SP objectReflectorSP(new ObjectReflector(objectHandle, className, classAndPropertyNameValueSPMap));
     objectReflectorSP->setFederateSequence(federateSequence);
     return objectReflectorSP;
-}
-
-void ObjectRoot::add_object_update_embedded_only_id(const std::string &hlaClassName, int id) {
-
-   if (get_hla_class_name_set().find(hlaClassName) == get_hla_class_name_set().end()) {
-        BOOST_LOG_SEV(get_logger(), warning) << "add_object_update_embedded_only_id(\""
-          << hlaClassName << ", " << id << ") -- no such object class \""
-          << hlaClassName << "\"";
-        return;
-    }
-
-    StringIntegerSetSPMap::iterator simItr =
-      get_hla_class_name_object_update_embedded_only_id_set_sp_map().find(hlaClassName);
-    if (simItr == get_hla_class_name_object_update_embedded_only_id_set_sp_map().end()) {
-        simItr = get_hla_class_name_object_update_embedded_only_id_set_sp_map().emplace(
-          hlaClassName, IntegerSetSP(new IntegerSet())
-          ).first;
-    }
-
-    IntegerSet &integerSet = *simItr->second;
-    integerSet.insert(id);
-}
-
-void ObjectRoot::remove_object_update_embedded_only_id(const std::string &hlaClassName, int id) {
-
-    StringIntegerSetSPMap::iterator simItr =
-      get_hla_class_name_object_update_embedded_only_id_set_sp_map().find(hlaClassName);
-    if (simItr == get_hla_class_name_object_update_embedded_only_id_set_sp_map().end()) {
-        return;
-    }
-
-    IntegerSet &integerSet = *simItr->second;
-
-    integerSet.erase(id);
-    if (integerSet.empty()) {
-        get_hla_class_name_object_update_embedded_only_id_set_sp_map().erase(hlaClassName);
-    }
 }
 
 void ObjectRoot::add_federate_name_soft_publish_direct(
