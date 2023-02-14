@@ -125,7 +125,6 @@ private:
 
     std::string _federationJsonFileName;
     std::string _federateDynamicMessagingClassesJsonFileName;
-    std::string _rejectSourceFederateIdJsonFileName;
 
     bool _isLateJoiner;
 
@@ -198,12 +197,6 @@ public:
         _federateDynamicMessagingClassesJsonFileName = federateDynamicMessagingClassesJsonFileName;
     }
 
-    void setRejectSourceFederateIdJsonFileName(
-      const std::string &rejectSourceFederateIdJsonFileName
-    ) {
-        _rejectSourceFederateIdJsonFileName = rejectSourceFederateIdJsonFileName;
-    }
-
     bool get_IsLateJoiner( void ) const { return _isLateJoiner; }
 
     void setLookahead( double lookahead ) {
@@ -269,7 +262,6 @@ public:
 
         this->_federationJsonFileName = fedconfig->federationJsonFileName;
         this->_federateDynamicMessagingClassesJsonFileName = fedconfig->federateDynamicMessagingClassesJsonFileName;
-        this->_rejectSourceFederateIdJsonFileName = fedconfig->rejectSourceFederateIdJsonFileName;
 
         this->_timeConstrainedNotEnabled = true;
         this->_timeRegulationNotEnabled = true;
@@ -317,18 +309,8 @@ public:
     }
 
     void initializeDynamicMessaging(
-      std::istream &federationJsonInputStream,
-      std::istream &federateDynamicMessagingClassesJsonInputStream,
-      std::istream &rejectSourceFederateIdJsonInputStream
-    ) {
-        initializeDynamicMessaging(federationJsonInputStream, federateDynamicMessagingClassesJsonInputStream);
-        C2WInteractionRoot::readRejectSourceFederateIdData(rejectSourceFederateIdJsonInputStream);
-    }
-
-    void initializeDynamicMessaging(
       const std::string &federationJsonFileName,
-      const std::string &federateDynamicMessagingClassesJsonFileName,
-      const std::string &rejectSourceFederateIdJsonFileName
+      const std::string &federateDynamicMessagingClassesJsonFileName
     );
 
     void notifyFederationOfJoin();
@@ -735,10 +717,8 @@ private:
       InteractionRoot::SP interactionRootSP, double timestamp
     )
      throw ( RTI::InteractionClassNotKnown, RTI::InteractionParameterNotKnown, RTI::FederateInternalError) {
-        if (
-          !C2WInteractionRoot::is_reject_source_federate_id(interactionRootSP) &&
-          !unmatchingFedFilterProvided(interactionRootSP)
-        ) {
+        if (!unmatchingFedFilterProvided(interactionRootSP)) {
+
             if (interactionRootSP->isInstanceHlaClassDerivedFromHlaClass(EmbeddedMessaging::get_hla_class_name())) {
                 receiveEmbeddedInteraction(boost::static_pointer_cast<EmbeddedMessaging>(interactionRootSP), timestamp);
                 return;
@@ -841,34 +821,9 @@ public:
         ObjectRoot::remove_object(theObject);
     }
 
-private:
-    bool checkNetworkReflect(int theObject) {
-        ObjectRoot::SP objectRootSP = ObjectRoot::get_object(theObject);
-        if (!bool(objectRootSP)) {
-            BOOST_LOG_SEV( get_logger(), warning ) <<
-              "Received \"reflectAttributeValues\" for object handle (" << theObject <<
-              ") that has no corresponding object";
-            return false;
-        }
-        const std::string &hlaClassName = objectRootSP->getInstanceHlaClassName();
-        const ObjectRoot::IntegerSet &objectHandleSet =
-          *ObjectRoot::get_object_update_embedded_only_id_set_sp(hlaClassName);
-        if (objectHandleSet.find(theObject) != objectHandleSet.end()) {
-            BOOST_LOG_SEV( get_logger(), info ) <<
-              "Direct \"reflectAttributeValues\" for Object (" << theObject << ") of class \"" << hlaClassName <<
-                "\" rejected as it should only reflect via EmbeddedMessaging";
-            return true;
-        }
-        return false;
-    }
-
 public:
     virtual void reflectAttributeValues( RTI::ObjectHandle theObject, const RTI::AttributeHandleValuePairSet& theAttributes, const char *theTag )
      throw ( RTI::ObjectNotKnown, RTI::AttributeNotKnown, RTI::FederateOwnsAttributes, RTI::FederateInternalError ) {
-
-        if (checkNetworkReflect(theObject)) {
-            return;
-        }
 
         addObjectReflectorSP( theObject, theAttributes );
 //        createLog(theObject, theAttributes);
@@ -882,10 +837,6 @@ public:
      RTI::EventRetractionHandle theHandle
     )
      throw ( RTI::ObjectNotKnown, RTI::AttributeNotKnown, RTI::FederateOwnsAttributes, RTI::InvalidFederationTime, RTI::FederateInternalError ) {
-
-        if (checkNetworkReflect(theObject)) {
-            return;
-        }
 
         addObjectReflectorSP( theObject, theAttributes, theTime );
 //        RTIfedTime rtitime(theTime);

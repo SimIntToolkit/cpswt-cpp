@@ -112,8 +112,7 @@ void SynchronizedFederate::notifyFederationOfResign() {
 
 void SynchronizedFederate::initializeDynamicMessaging(
   const std::string &federationJsonFileName,
-  const std::string &federateDynamicMessagingClassesJsonFileName,
-  const std::string &rejectSourceFederateIdJsonFileName
+  const std::string &federateDynamicMessagingClassesJsonFileName
 ) {
     if (federationJsonFileName.empty() || federateDynamicMessagingClassesJsonFileName.empty()) {
         initializeMessaging();
@@ -122,20 +121,11 @@ void SynchronizedFederate::initializeDynamicMessaging(
 
     std::ifstream federationJsonInputStream(federationJsonFileName);
     std::ifstream federateDynamicMessagingClassJsonInputStream(federateDynamicMessagingClassesJsonFileName);
-    if (rejectSourceFederateIdJsonFileName.empty()) {
-        initializeDynamicMessaging(
-          federationJsonInputStream,
-          federateDynamicMessagingClassJsonInputStream
-        );
-    } else {
-        std::ifstream rejectSourceFederateIdJsonInputStream(rejectSourceFederateIdJsonFileName);
-        initializeDynamicMessaging(
-          federationJsonInputStream,
-          federateDynamicMessagingClassJsonInputStream,
-          rejectSourceFederateIdJsonInputStream
-        );
-        rejectSourceFederateIdJsonInputStream.close();
-    }
+
+    initializeDynamicMessaging(
+      federationJsonInputStream,
+      federateDynamicMessagingClassJsonInputStream
+    );
 
     federationJsonInputStream.close();
     federateDynamicMessagingClassJsonInputStream.close();
@@ -175,9 +165,7 @@ void SynchronizedFederate::joinFederation() {
 
     std::cout << "done." << std::endl;
 
-    initializeDynamicMessaging(
-      _federationJsonFileName, _federateDynamicMessagingClassesJsonFileName, _rejectSourceFederateIdJsonFileName
-    );
+    initializeDynamicMessaging(_federationJsonFileName, _federateDynamicMessagingClassesJsonFileName);
 
     ensureSimEndSubscription();
 
@@ -473,7 +461,7 @@ void SynchronizedFederate::receiveEmbeddedInteraction(EmbeddedMessaging::SP embe
     }
 
     if (command == "object") {
-        if (!ObjectRoot::get_is_subscribed(hlaClassName) && !ObjectRoot::get_is_soft_subscribed(hlaClassName)) {
+        if (!ObjectRoot::get_is_soft_subscribed(hlaClassName)) {
             BOOST_LOG_SEV( get_logger(), warning ) << "SynchronizedFederate.receiveEmbeddedInteraction: "
               << "object class \"" << hlaClassName << "\" neither subscribed nor soft subscribed";
             return;

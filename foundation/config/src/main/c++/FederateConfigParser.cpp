@@ -113,14 +113,6 @@ void FederateConfigParser::parseJson(std::string configFileName, FederateConfig 
     } catch (pt::ptree_error &e) {
         std::cerr << e.what() << std::endl;
     }
-    try {
-        obj->rejectSourceFederateIdJsonFileName = iroot.get<std::string>(
-          "rejectSourceFederateIdJsonFileName"
-        );
-    } catch (pt::ptree_error &e) {
-        std::cerr << e.what() << std::endl;
-    }
-
 }
 
 FederateConfig* FederateConfigParser::parseArgs(const int argc, char *argv[]) {
@@ -158,11 +150,6 @@ FederateConfig* FederateConfigParser::parseArgs(const int argc, char *argv[]) {
               "federateDynamicMessagingClassesJsonFileName",
               po::value<std::string>()->implicit_value(""),
               "Path of file containing list of dynamic messaging classes for this federate, default:\"\""
-            )
-            (
-              "rejectSourceFederateIdJsonFileName",
-              po::value<std::string>()->implicit_value(""),
-              "Path of file containing map of dynamic interaction classes to lists of source federate ids that cause an instance of each interaction to be rejected, default:\"\""
             );
 
     po::variables_map vm;

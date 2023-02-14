@@ -58,7 +58,6 @@ public:
     double stepSize ;//=1 ;
     std::string federationJsonFileName;
     std::string federateDynamicMessagingClassesJsonFileName;
-    std::string rejectSourceFederateIdJsonFileName;
 
     std::string configFileName ;//= "configfile.json";
 };

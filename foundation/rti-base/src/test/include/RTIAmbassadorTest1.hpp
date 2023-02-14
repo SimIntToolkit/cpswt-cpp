@@ -57,14 +57,17 @@ public:
     }
 
 private:
-    static const ClassNameHandleMap &get_class_name_handle_map_aux();
-    static const ClassHandleNameMap &get_class_handle_name_map_aux();
-
     static int get_new_int_value() {
         static int value = 0;
         return value++;
     }
+
+    static const ClassNameHandleMap &get_interaction_class_name_handle_map_aux();
+    static const ClassHandleNameMap &get_interaction_class_handle_name_map_aux();
     static const ClassAndPropertyNameHandleMap &get_interaction_class_and_property_name_handle_map_aux();
+
+    static const ClassNameHandleMap &get_object_class_name_handle_map_aux();
+    static const ClassHandleNameMap &get_object_class_handle_name_map_aux();
     static const ClassAndPropertyNameHandleMap &get_object_class_and_property_name_handle_map_aux();
 
     static StringSet &get_published_interaction_class_name_set_aux() {
@@ -78,13 +81,13 @@ private:
     }
 
 public:
-    static const ClassNameHandleMap &get_class_name_handle_map() {
-        static const ClassNameHandleMap &classNameHandleMap = get_class_name_handle_map_aux();
+    static const ClassNameHandleMap &get_interaction_class_name_handle_map() {
+        static const ClassNameHandleMap &classNameHandleMap = get_interaction_class_name_handle_map_aux();
         return classNameHandleMap;
     }
 
-    static const ClassHandleNameMap &get_class_handle_name_map() {
-        static const ClassHandleNameMap &classHandleNameMap = get_class_handle_name_map_aux();
+    static const ClassHandleNameMap &get_interaction_class_handle_name_map() {
+        static const ClassHandleNameMap &classHandleNameMap = get_interaction_class_handle_name_map_aux();
         return classHandleNameMap;
     }
 
@@ -92,6 +95,16 @@ public:
         static const ClassAndPropertyNameHandleMap &classAndPropertyNameHandleMap =
           get_interaction_class_and_property_name_handle_map_aux();
         return classAndPropertyNameHandleMap;
+    }
+
+    static const ClassNameHandleMap &get_object_class_name_handle_map() {
+        static const ClassNameHandleMap &classNameHandleMap = get_object_class_name_handle_map_aux();
+        return classNameHandleMap;
+    }
+
+    static const ClassHandleNameMap &get_object_class_handle_name_map() {
+        static const ClassHandleNameMap &classHandleNameMap = get_object_class_handle_name_map_aux();
+        return classHandleNameMap;
     }
 
     static const ClassAndPropertyNameHandleMap &get_object_class_and_property_name_handle_map() {
@@ -114,6 +127,10 @@ public:
     }
 
     RTI::InteractionClassHandle getInteractionClassHandle (const char *theName) throw (
+      RTI::NameNotFound, RTI::FederateNotExecutionMember, RTI::ConcurrentAccessAttempted, RTI::RTIinternalError
+    ) override;
+
+    RTI::InteractionClassHandle getObjectClassHandle (const char *theName) throw (
       RTI::NameNotFound, RTI::FederateNotExecutionMember, RTI::ConcurrentAccessAttempted, RTI::RTIinternalError
     ) override;
 

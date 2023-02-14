@@ -300,22 +300,6 @@ public:
         return ObjectRoot::get_class_name_soft_subscribed_class_and_property_name_set_sp_map()[get_hla_class_name()];
     }
 
-    static void add_object_update_embedded_only_id(int id) {
-        ObjectRoot::add_object_update_embedded_only_id(get_hla_class_name(), id);
-    }
-
-    static void remove_object_update_embedded_only_id(int id) {
-        ObjectRoot::remove_object_update_embedded_only_id(get_hla_class_name(), id);
-    }
-
-    static const IntegerSetSP &get_object_update_embedded_only_id_set_sp() {
-        return ObjectRoot::get_object_update_embedded_only_id_set_sp(get_hla_class_name());
-    }
-
-    static bool get_is_object_update_embedded_only_id(int id) {
-        return ObjectRoot::get_is_object_update_embedded_only_id(get_hla_class_name(), id);
-    }
-
     static void add_federate_name_soft_publish_direct(const std::string &federateName) {
         ObjectRoot::add_federate_name_soft_publish_direct(get_hla_class_name(), federateName);
     }
