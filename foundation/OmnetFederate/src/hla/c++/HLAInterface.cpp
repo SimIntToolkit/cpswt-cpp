@@ -1032,11 +1032,12 @@ void HLAInterface::setup() {
                 ObjectRoot::get_attribute_names(dynamicPublishHlaClassName)
             ) {
                 ObjectRoot::publish_attribute(
-                  dynamicSoftSubscribeHlaClassName,
+                  dynamicPublishHlaClassName,
                   classAndPropertyName.getClassName(),
                   classAndPropertyName.getPropertyName()
                 );
             }
+            ObjectRoot::publish_object(dynamicPublishHlaClassName, getRTI() );
         }
     }
 
@@ -1056,7 +1057,7 @@ void HLAInterface::setup() {
         ) {
             for(
               const ClassAndPropertyName &classAndPropertyName:
-                ObjectRoot::get_attribute_names(dynamicPublishHlaClassName)
+                ObjectRoot::get_attribute_names(dynamicSoftSubscribeHlaClassName)
             ) {
                 ObjectRoot::soft_subscribe_attribute(
                   dynamicSoftSubscribeHlaClassName,

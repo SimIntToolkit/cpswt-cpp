@@ -52,24 +52,28 @@ bool DropRouteFromRoutingTable::static_init() {
     get_hla_class_name_instance_sp_map()[get_hla_class_name()] = instanceSP;
 
     ClassAndPropertyNameSetSP classAndPropertyNameSetSP( new ClassAndPropertyNameSet() );
+
     classAndPropertyNameSetSP->emplace(
         "InteractionRoot.C2WInteractionRoot.ActionBase.OmnetCommand.DropRouteFromRoutingTable", "gatewayAddress"
     );
 
     get_class_and_property_name_initial_value_sp_map()[ClassAndPropertyName( "InteractionRoot.C2WInteractionRoot.ActionBase.OmnetCommand.DropRouteFromRoutingTable", "gatewayAddress" )] =
       ValueSP( new Value( std::string("") ));
+
     classAndPropertyNameSetSP->emplace(
         "InteractionRoot.C2WInteractionRoot.ActionBase.OmnetCommand.DropRouteFromRoutingTable", "interfaceEntry"
     );
 
     get_class_and_property_name_initial_value_sp_map()[ClassAndPropertyName( "InteractionRoot.C2WInteractionRoot.ActionBase.OmnetCommand.DropRouteFromRoutingTable", "interfaceEntry" )] =
       ValueSP( new Value( std::string("") ));
+
     classAndPropertyNameSetSP->emplace(
         "InteractionRoot.C2WInteractionRoot.ActionBase.OmnetCommand.DropRouteFromRoutingTable", "networkAddress"
     );
 
     get_class_and_property_name_initial_value_sp_map()[ClassAndPropertyName( "InteractionRoot.C2WInteractionRoot.ActionBase.OmnetCommand.DropRouteFromRoutingTable", "networkAddress" )] =
       ValueSP( new Value( std::string("") ));
+
     classAndPropertyNameSetSP->emplace(
         "InteractionRoot.C2WInteractionRoot.ActionBase.OmnetCommand.DropRouteFromRoutingTable", "nodeFullPath"
     );

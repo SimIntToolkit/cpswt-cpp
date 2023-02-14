@@ -52,6 +52,7 @@ bool StopModifyToHLAPacketsAttack::static_init() {
     get_hla_class_name_instance_sp_map()[get_hla_class_name()] = instanceSP;
 
     ClassAndPropertyNameSetSP classAndPropertyNameSetSP( new ClassAndPropertyNameSet() );
+
     classAndPropertyNameSetSP->emplace(
         "InteractionRoot.C2WInteractionRoot.ActionBase.OmnetCommand.StopModifyToHLAPacketsAttack", "nodeFullPath"
     );

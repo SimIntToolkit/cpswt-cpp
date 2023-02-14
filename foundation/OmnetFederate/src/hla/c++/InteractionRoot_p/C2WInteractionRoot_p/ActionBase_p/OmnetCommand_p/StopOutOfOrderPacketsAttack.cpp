@@ -52,18 +52,21 @@ bool StopOutOfOrderPacketsAttack::static_init() {
     get_hla_class_name_instance_sp_map()[get_hla_class_name()] = instanceSP;
 
     ClassAndPropertyNameSetSP classAndPropertyNameSetSP( new ClassAndPropertyNameSet() );
+
     classAndPropertyNameSetSP->emplace(
         "InteractionRoot.C2WInteractionRoot.ActionBase.OmnetCommand.StopOutOfOrderPacketsAttack", "dstNetworkAddress"
     );
 
     get_class_and_property_name_initial_value_sp_map()[ClassAndPropertyName( "InteractionRoot.C2WInteractionRoot.ActionBase.OmnetCommand.StopOutOfOrderPacketsAttack", "dstNetworkAddress" )] =
       ValueSP( new Value( std::string("") ));
+
     classAndPropertyNameSetSP->emplace(
         "InteractionRoot.C2WInteractionRoot.ActionBase.OmnetCommand.StopOutOfOrderPacketsAttack", "recordingNodeFullPath"
     );
 
     get_class_and_property_name_initial_value_sp_map()[ClassAndPropertyName( "InteractionRoot.C2WInteractionRoot.ActionBase.OmnetCommand.StopOutOfOrderPacketsAttack", "recordingNodeFullPath" )] =
       ValueSP( new Value( std::string("") ));
+
     classAndPropertyNameSetSP->emplace(
         "InteractionRoot.C2WInteractionRoot.ActionBase.OmnetCommand.StopOutOfOrderPacketsAttack", "srcNetworkAddress"
     );

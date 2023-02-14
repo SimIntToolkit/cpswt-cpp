@@ -52,24 +52,28 @@ bool StartOutOfOrderPacketsAttack::static_init() {
     get_hla_class_name_instance_sp_map()[get_hla_class_name()] = instanceSP;
 
     ClassAndPropertyNameSetSP classAndPropertyNameSetSP( new ClassAndPropertyNameSet() );
+
     classAndPropertyNameSetSP->emplace(
         "InteractionRoot.C2WInteractionRoot.ActionBase.OmnetCommand.StartOutOfOrderPacketsAttack", "dstNetworkAddress"
     );
 
     get_class_and_property_name_initial_value_sp_map()[ClassAndPropertyName( "InteractionRoot.C2WInteractionRoot.ActionBase.OmnetCommand.StartOutOfOrderPacketsAttack", "dstNetworkAddress" )] =
       ValueSP( new Value( std::string("") ));
+
     classAndPropertyNameSetSP->emplace(
         "InteractionRoot.C2WInteractionRoot.ActionBase.OmnetCommand.StartOutOfOrderPacketsAttack", "recordDurationInSecs"
     );
 
     get_class_and_property_name_initial_value_sp_map()[ClassAndPropertyName( "InteractionRoot.C2WInteractionRoot.ActionBase.OmnetCommand.StartOutOfOrderPacketsAttack", "recordDurationInSecs" )] =
       ValueSP( new Value( static_cast<double>(0) ));
+
     classAndPropertyNameSetSP->emplace(
         "InteractionRoot.C2WInteractionRoot.ActionBase.OmnetCommand.StartOutOfOrderPacketsAttack", "recordingNodeFullPath"
     );
 
     get_class_and_property_name_initial_value_sp_map()[ClassAndPropertyName( "InteractionRoot.C2WInteractionRoot.ActionBase.OmnetCommand.StartOutOfOrderPacketsAttack", "recordingNodeFullPath" )] =
       ValueSP( new Value( std::string("") ));
+
     classAndPropertyNameSetSP->emplace(
         "InteractionRoot.C2WInteractionRoot.ActionBase.OmnetCommand.StartOutOfOrderPacketsAttack", "srcNetworkAddress"
     );

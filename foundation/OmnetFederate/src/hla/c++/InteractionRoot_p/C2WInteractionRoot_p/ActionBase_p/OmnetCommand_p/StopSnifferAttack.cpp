@@ -52,18 +52,21 @@ bool StopSnifferAttack::static_init() {
     get_hla_class_name_instance_sp_map()[get_hla_class_name()] = instanceSP;
 
     ClassAndPropertyNameSetSP classAndPropertyNameSetSP( new ClassAndPropertyNameSet() );
+
     classAndPropertyNameSetSP->emplace(
         "InteractionRoot.C2WInteractionRoot.ActionBase.OmnetCommand.StopSnifferAttack", "listenerInterface"
     );
 
     get_class_and_property_name_initial_value_sp_map()[ClassAndPropertyName( "InteractionRoot.C2WInteractionRoot.ActionBase.OmnetCommand.StopSnifferAttack", "listenerInterface" )] =
       ValueSP( new Value( std::string("") ));
+
     classAndPropertyNameSetSP->emplace(
         "InteractionRoot.C2WInteractionRoot.ActionBase.OmnetCommand.StopSnifferAttack", "listenerNodeFullPath"
     );
 
     get_class_and_property_name_initial_value_sp_map()[ClassAndPropertyName( "InteractionRoot.C2WInteractionRoot.ActionBase.OmnetCommand.StopSnifferAttack", "listenerNodeFullPath" )] =
       ValueSP( new Value( std::string("") ));
+
     classAndPropertyNameSetSP->emplace(
         "InteractionRoot.C2WInteractionRoot.ActionBase.OmnetCommand.StopSnifferAttack", "nodeFullPath"
     );

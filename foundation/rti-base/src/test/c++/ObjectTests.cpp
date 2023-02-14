@@ -187,6 +187,18 @@ void ObjectTests::publishObjectTest() {
     ClassAndPropertyName classAndPropertyNameTestDerivedField5(testDerivedFullHlaClassName, "field5");
     classAndPropertyNameTestDerivedSet.emplace(classAndPropertyNameTestDerivedField5);
 
+    ClassAndPropertyNameList testBaseClassAndPropertyNameList =
+            ObjectRoot::get_attribute_names(testBaseFullHlaClassName);
+    ClassAndPropertyNameSet testBaseClassAndPropertyNameSet(
+      testBaseClassAndPropertyNameList.begin(), testBaseClassAndPropertyNameList.end());
+
+    CPPUNIT_ASSERT_EQUAL(testBaseClassAndPropertyNameSet.size(), classAndPropertyNameTestBaseSet.size());
+    for(const ClassAndPropertyName &classAndPropertyName: testBaseClassAndPropertyNameSet) {
+        CPPUNIT_ASSERT(
+          classAndPropertyNameTestBaseSet.find(classAndPropertyName) != classAndPropertyNameTestBaseSet.end()
+        );
+    }
+
     ObjectRoot::publish_attribute(
             testBaseFullHlaClassName,
             classAndPropertyNameTestBaseField1.getClassName(),
