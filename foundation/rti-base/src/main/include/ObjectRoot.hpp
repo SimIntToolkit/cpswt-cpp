@@ -420,6 +420,10 @@ public:
             return ObjectRoot::get_object( _objectHandle );
         }
 
+        void setTime(double time) {
+            _time = time;
+        }
+
         double getTime() const {
             return _time;
         }
@@ -511,6 +515,10 @@ protected:
     //---------------------------------------------------------
 public:
     static ClassAndPropertyNameList get_attribute_names(const std::string &hlaClassName) {
+        if (get_hla_class_name_set().find(hlaClassName) == get_hla_class_name_set().end()) {
+            readFederateDynamicMessageClass(hlaClassName);
+        }
+
        StringClassAndPropertyNameSetSPMap::iterator scmItr =
          get_class_name_class_and_property_name_set_sp_map().find(hlaClassName);
 
@@ -678,7 +686,7 @@ public:
     static SP create_object(const std::string &hlaClassName) {
         StringInstanceSPMap::iterator cimItr = get_hla_class_name_instance_sp_map().find(hlaClassName);
         return cimItr == get_hla_class_name_instance_sp_map().end()
-            ? get_hla_class_name_set().find(hlaClassName) == get_hla_class_name_set().end()
+            ? get_class_name_handle_map().find(hlaClassName) == get_class_name_handle_map().end()
               ? SP() : SP( new ObjectRoot( hlaClassName ) )
             : cimItr->second->createObject();
     }
@@ -686,7 +694,7 @@ public:
     static SP create_object(const std::string &hlaClassName, const RTIfedTime &rtiFedTime) {
         StringInstanceSPMap::iterator cimItr = get_hla_class_name_instance_sp_map().find( hlaClassName );
         return cimItr == get_hla_class_name_instance_sp_map().end()
-          ? get_hla_class_name_set().find(hlaClassName) == get_hla_class_name_set().end()
+          ? get_class_name_handle_map().find(hlaClassName) == get_class_name_handle_map().end()
             ? SP() : SP( new ObjectRoot( hlaClassName, rtiFedTime ) )
           : cimItr->second->createObject(rtiFedTime);
     }
@@ -696,7 +704,7 @@ public:
     ) {
         StringInstanceSPMap::iterator cimItr = get_hla_class_name_instance_sp_map().find( hlaClassName );
         return cimItr == get_hla_class_name_instance_sp_map().end()
-          ? get_hla_class_name_set().find(hlaClassName) == get_hla_class_name_set().end()
+          ? get_class_name_handle_map().find(hlaClassName) == get_class_name_handle_map().end()
             ? SP() : SP( new ObjectRoot( hlaClassName, propertyMap ) )
           : cimItr->second->createObject( propertyMap );
     }
@@ -708,7 +716,7 @@ public:
     ) {
         StringInstanceSPMap::iterator cimItr = get_hla_class_name_instance_sp_map().find( hlaClassName );
         return cimItr == get_hla_class_name_instance_sp_map().end()
-          ? get_hla_class_name_set().find(hlaClassName) == get_hla_class_name_set().end()
+          ? get_class_name_handle_map().find(hlaClassName) == get_class_name_handle_map().end()
             ? SP() : SP( new ObjectRoot( hlaClassName, propertyMap, rtiFedTime ) )
           : cimItr->second->createObject( propertyMap, rtiFedTime );
     }
@@ -2435,10 +2443,12 @@ public:
 
 private:
     static bool loadDynamicHlaClass(const std::string &hlaClassName, RTI::RTIambassador *rti) {
-        if (get_hla_class_name_set().find(hlaClassName) == get_hla_class_name_set().end()) {
-            readFederateDynamicMessageClass(hlaClassName);
+        if (get_class_name_handle_map().find(hlaClassName) == get_class_name_handle_map().end()) {
             if (get_hla_class_name_set().find(hlaClassName) == get_hla_class_name_set().end()) {
-                return false;
+                readFederateDynamicMessageClass(hlaClassName);
+                if (get_hla_class_name_set().find(hlaClassName) == get_hla_class_name_set().end()) {
+                    return false;
+                }
             }
             init(hlaClassName, rti);
             replay_pub_sub(hlaClassName);

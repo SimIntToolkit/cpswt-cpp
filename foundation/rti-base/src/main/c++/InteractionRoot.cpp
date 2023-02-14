@@ -338,7 +338,7 @@ void InteractionRoot::unsubscribe_interaction(const std::string &hlaClassName, R
 void InteractionRoot::initializeProperties(const std::string &hlaClassName) {
     federateAppendedToFederateSequence = false;
     setInstanceHlaClassName(hlaClassName);
-    if (get_hla_class_name_set().find(hlaClassName) == get_hla_class_name_set().end()) {
+    if (get_class_name_handle_map().find(hlaClassName) == get_class_name_handle_map().end()) {
         BOOST_LOG_SEV(get_logger(), error)
           << "InteractionRoot( const std::string &hlaClassName ): hlaClassName \"" << hlaClassName
           << "\" is not defined -- creating dummy interaction with fictitious type \"" << hlaClassName
@@ -589,7 +589,7 @@ InteractionRoot::SP InteractionRoot::fromJson(const std::string &jsonString) {
 void InteractionRoot::add_federate_name_soft_publish(
   const std::string &hlaClassName, const std::string &federateName
 ) {
-    if (get_hla_class_name_set().find(hlaClassName) == get_hla_class_name_set().end()) {
+    if (get_class_name_handle_map().find(hlaClassName) == get_class_name_handle_map().end()) {
         BOOST_LOG_SEV(get_logger(), warning) << "add_federate_name_soft_publish(\"" << hlaClassName << "\", \""
           << federateName << "\") -- no such interaction class \"" << hlaClassName << "\"";
         return;

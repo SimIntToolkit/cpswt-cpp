@@ -331,7 +331,7 @@ void ObjectRoot::pub_sub_class_and_property_name(
   bool publish,
   bool insert
 ) {
-    if (get_hla_class_name_set().find(hlaClassName) == get_hla_class_name_set().end()) {
+    if (get_class_name_handle_map().find(hlaClassName) == get_class_name_handle_map().end()) {
         add_to_pub_sub_cache(
                 callingFunctionName,
                 stringClassAndPropertyNameSetSPMap,
@@ -763,7 +763,7 @@ void ObjectRoot::requestUpdate( RTI::RTIambassador *rti ) {
 
 void ObjectRoot::initializeProperties(const std::string &hlaClassName) {
     setInstanceHlaClassName(hlaClassName);
-    if (get_hla_class_name_set().find(hlaClassName) == get_hla_class_name_set().end()) {
+    if (get_class_name_handle_map().find(hlaClassName) == get_class_name_handle_map().end()) {
         BOOST_LOG_SEV(get_logger(), error)
           << "ObjectRoot( const std::string &hlaClassName ): hlaClassName \"" << hlaClassName
           << "\" is not defined -- creating dummy object with fictitious type \"" << hlaClassName
@@ -1030,7 +1030,7 @@ ObjectRoot::ObjectReflector::SP ObjectRoot::fromJson(const std::string &jsonStri
 void ObjectRoot::add_federate_name_soft_publish_direct(
   const std::string &hlaClassName, const std::string &federateName
 ) {
-   if (get_hla_class_name_set().find(hlaClassName) == get_hla_class_name_set().end()) {
+   if (get_class_name_handle_map().find(hlaClassName) == get_class_name_handle_map().end()) {
         BOOST_LOG_SEV(get_logger(), warning) << "add_federate_name_soft_publish_direct(\"" << hlaClassName
           << ", \"" << federateName << "\") -- no such object class \"" << hlaClassName << "\"";
         return;
@@ -1067,7 +1067,7 @@ void ObjectRoot::remove_federate_name_soft_publish_direct(
 void ObjectRoot::add_federate_name_soft_publish(
   const std::string &hlaClassName, const std::string &federateName
 ) {
-    if (get_hla_class_name_set().find(hlaClassName) == get_hla_class_name_set().end()) {
+    if (get_class_name_handle_map().find(hlaClassName) == get_class_name_handle_map().end()) {
         BOOST_LOG_SEV(get_logger(), warning) << "add_federate_name_soft_publish(\"" << hlaClassName << "\", \""
           << federateName << "\") -- no such object class \"" << hlaClassName << "\"";
         return;
