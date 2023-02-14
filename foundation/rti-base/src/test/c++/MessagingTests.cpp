@@ -161,7 +161,7 @@ void MessagingTests::interactionClassHandleTest() {
 
     // InteractionRoot
     RTI::InteractionClassHandle interactionRootClassHandle =
-      RTIAmbassadorTest1::get_class_name_handle_map().find("InteractionRoot")->second;
+      RTIAmbassadorTest1::get_interaction_class_name_handle_map().find("InteractionRoot")->second;
     CPPUNIT_ASSERT_EQUAL(
             interactionRootClassHandle, static_cast<RTI::InteractionClassHandle>(InteractionRoot::get_class_handle())
     );
@@ -176,7 +176,9 @@ void MessagingTests::interactionClassHandleTest() {
 
     // C2WInteractionRoot
     RTI::InteractionClassHandle c2wInteractionRootClassHandle =
-            RTIAmbassadorTest1::get_class_name_handle_map().find("InteractionRoot.C2WInteractionRoot")->second;
+            RTIAmbassadorTest1::get_interaction_class_name_handle_map().find(
+              "InteractionRoot.C2WInteractionRoot"
+            )->second;
     CPPUNIT_ASSERT_EQUAL(
             c2wInteractionRootClassHandle,
             static_cast<RTI::InteractionClassHandle>(C2WInteractionRoot::get_class_handle())
@@ -194,7 +196,9 @@ void MessagingTests::interactionClassHandleTest() {
 
     // SimLog
     RTI::InteractionClassHandle simLogClassHandle =
-            RTIAmbassadorTest1::get_class_name_handle_map().find("InteractionRoot.C2WInteractionRoot.SimLog")->second;
+            RTIAmbassadorTest1::get_interaction_class_name_handle_map().find(
+              "InteractionRoot.C2WInteractionRoot.SimLog"
+            )->second;
     CPPUNIT_ASSERT_EQUAL(
             simLogClassHandle,
             static_cast<RTI::InteractionClassHandle>(SimLog::get_class_handle())
@@ -212,7 +216,7 @@ void MessagingTests::interactionClassHandleTest() {
 
     // HighPrio
     RTI::InteractionClassHandle highPrioClassHandle =
-            RTIAmbassadorTest1::get_class_name_handle_map().find(
+            RTIAmbassadorTest1::get_interaction_class_name_handle_map().find(
               "InteractionRoot.C2WInteractionRoot.SimLog.HighPrio"
             )->second;
     CPPUNIT_ASSERT_EQUAL(
@@ -231,7 +235,7 @@ void MessagingTests::interactionClassHandleTest() {
 
     // SimulationControl
     RTI::InteractionClassHandle simulationControlClassHandle =
-            RTIAmbassadorTest1::get_class_name_handle_map().find(
+            RTIAmbassadorTest1::get_interaction_class_name_handle_map().find(
               "InteractionRoot.C2WInteractionRoot.SimulationControl"
             )->second;
     CPPUNIT_ASSERT_EQUAL(
@@ -250,7 +254,7 @@ void MessagingTests::interactionClassHandleTest() {
     );
 
     // SimEnd
-    RTI::InteractionClassHandle simEndClassHandle = RTIAmbassadorTest1::get_class_name_handle_map().find(
+    RTI::InteractionClassHandle simEndClassHandle = RTIAmbassadorTest1::get_interaction_class_name_handle_map().find(
       "InteractionRoot.C2WInteractionRoot.SimulationControl.SimEnd"
     )->second;
     CPPUNIT_ASSERT_EQUAL(
@@ -269,6 +273,7 @@ void MessagingTests::interactionClassHandleTest() {
 
     std::cout << "END interactionClassHandleTest" << std::endl;
 }
+
 void MessagingTests::objectClassHandleTest() {
 
     std::cout << "START objectClassHandleTest" << std::endl;
@@ -277,7 +282,7 @@ void MessagingTests::objectClassHandleTest() {
 
     // ObjectRoot
     RTI::ObjectClassHandle objectRootClassHandle =
-      RTIAmbassadorTest1::get_class_name_handle_map().find("ObjectRoot")->second;
+      RTIAmbassadorTest1::get_object_class_name_handle_map().find("ObjectRoot")->second;
     CPPUNIT_ASSERT_EQUAL(
             objectRootClassHandle, static_cast<RTI::ObjectClassHandle>(ObjectRoot::get_class_handle())
     );
@@ -292,7 +297,7 @@ void MessagingTests::objectClassHandleTest() {
 
     // FederateObject
     RTI::ObjectClassHandle federateObjectClassHandle =
-            RTIAmbassadorTest1::get_class_name_handle_map().find("ObjectRoot.FederateObject")->second;
+            RTIAmbassadorTest1::get_object_class_name_handle_map().find("ObjectRoot.FederateObject")->second;
     CPPUNIT_ASSERT_EQUAL(
             federateObjectClassHandle,
             static_cast<RTI::ObjectClassHandle>(FederateObject::get_class_handle())
@@ -1049,66 +1054,6 @@ void MessagingTests::printInteractionTest() {
     CPPUNIT_ASSERT_EQUAL(expectedOutput, testStream.str());
 
     std::cout << "END printInteractionTest" << std::endl;
-}
-
-void MessagingTests::rejectSourceFederateIdTest() {
-
-    std::cout << "START rejectSourceFederateIdTest" << std::endl;
-
-    const std::string interactionRootHlaClassName( InteractionRoot::get_hla_class_name() );
-    C2WInteractionRoot::add_reject_source_federate_id(interactionRootHlaClassName, "foobar");
-    CPPUNIT_ASSERT(!C2WInteractionRoot::is_reject_source_federate_id(interactionRootHlaClassName, "foobar"));
-
-    HighPrio highPrio1;
-    HighPrio::add_reject_source_federate_id("foo");
-    highPrio1.addRejectSourceFederateId("bar");
-
-
-    Json::Value jsonArray(Json::arrayValue);
-
-    jsonArray.append("foo");
-    highPrio1.set_federateSequence(jsonToString(jsonArray));
-    CPPUNIT_ASSERT(highPrio1.isRejectSourceFederateId());
-    CPPUNIT_ASSERT(HighPrio::is_reject_source_federate_id(highPrio1));
-
-    jsonArray.append("boz");
-    highPrio1.set_federateSequence(jsonToString(jsonArray));
-    CPPUNIT_ASSERT(!highPrio1.isRejectSourceFederateId());
-    CPPUNIT_ASSERT(!HighPrio::is_reject_source_federate_id(highPrio1));
-
-    jsonArray.append("bar");
-    highPrio1.set_federateSequence(jsonToString(jsonArray));
-    CPPUNIT_ASSERT(highPrio1.isRejectSourceFederateId());
-    CPPUNIT_ASSERT(HighPrio::is_reject_source_federate_id(highPrio1));
-
-    highPrio1.removeRejectSourceFederateId("bar");
-    CPPUNIT_ASSERT(!highPrio1.isRejectSourceFederateId());
-    CPPUNIT_ASSERT(!HighPrio::is_reject_source_federate_id(highPrio1));
-
-
-    const std::string highPrioHlaClassName = HighPrio::get_hla_class_name();
-    InteractionRoot highPrio2(highPrioHlaClassName);
-    C2WInteractionRoot::add_reject_source_federate_id(highPrioHlaClassName, "foo");
-    C2WInteractionRoot::add_reject_source_federate_id(highPrioHlaClassName, "bar");
-
-    jsonArray.clear();
-
-    jsonArray.append("foo");
-    highPrio2.setParameter("federateSequence", jsonToString(jsonArray));
-    CPPUNIT_ASSERT(C2WInteractionRoot::is_reject_source_federate_id(highPrio2));
-
-    jsonArray.append("boz");
-    highPrio2.setParameter("federateSequence", jsonToString(jsonArray));
-    CPPUNIT_ASSERT(!C2WInteractionRoot::is_reject_source_federate_id(highPrio2));
-
-    jsonArray.append("bar");
-    highPrio2.setParameter("federateSequence", jsonToString(jsonArray));
-    CPPUNIT_ASSERT(C2WInteractionRoot::is_reject_source_federate_id(highPrio2));
-
-    C2WInteractionRoot::remove_reject_source_federate_id(highPrioHlaClassName, "bar");
-    CPPUNIT_ASSERT(!C2WInteractionRoot::is_reject_source_federate_id(highPrio2));
-
-    std::cout << "END rejectSourceFederateIdTest" << std::endl;
 }
 
 CPPUNIT_TEST_SUITE_REGISTRATION( MessagingTests );

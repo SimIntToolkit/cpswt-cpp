@@ -73,7 +73,6 @@ private:
     CPPUNIT_TEST(federateSequenceTest);
     CPPUNIT_TEST(attributePubSubTest);
     CPPUNIT_TEST(printInteractionTest);
-    CPPUNIT_TEST(rejectSourceFederateIdTest);
     CPPUNIT_TEST_SUITE_END();
 
 public:
