@@ -469,6 +469,7 @@ void SynchronizedFederate::receiveEmbeddedInteraction(EmbeddedMessaging::SP embe
 
         ObjectRoot::ObjectReflector::SP objectReflectorSP =
           ObjectRoot::fromJson(embeddedMessagingSP->get_messagingJson());
+        objectReflectorSP->setTime(embeddedMessagingSP->getTime());
         objectReflectorSP->setFederateSequence(federateSequence);
 
         const ClassAndPropertyNameSet &attributeClassAndPropertyNameSet =
