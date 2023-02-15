@@ -195,6 +195,9 @@ public:
         }
     }
 
+protected:
+    static void common_init(const std::string &hlaClassName);
+
 private:
     std::string _instanceHlaClassName;
     
@@ -447,6 +450,11 @@ protected:
     static StringSet &get_hla_class_name_set() {
         static StringSet hlaClassNameSet;
         return hlaClassNameSet;
+    }
+
+    static ClassAndPropertyNameSet &get_complete_class_and_property_name_set() {
+        static ClassAndPropertyNameSet classAndPropertyNameSet;
+        return classAndPropertyNameSet;
     }
 
     //--------------------------------------------------------------------------
@@ -909,89 +917,6 @@ public:
     }
 
 private:
-    class PubSubCacheEntry {
-    private:
-        const std::string _callingFunctionName;
-        const std::string _primaryFunctionName;
-        StringClassAndPropertyNameSetSPMap &_stringClassAndPropertyNameSetSPMap;
-        const std::string _hlaClassName;
-        const std::string _attributeClassName;
-        const std::string _attributeName;
-        bool _publish;
-
-        std::string getPrimaryFunctionName(std::string callingFunctionName) {
-            int position = callingFunctionName.find("un");
-            if (position != std::string::npos) {
-              callingFunctionName.replace(position, 2, "");
-            }
-            return callingFunctionName;
-        }
-
-    public:
-        PubSubCacheEntry(
-                const std::string &callingFunctionName,
-                StringClassAndPropertyNameSetSPMap &stringClassAndPropertyNameSetSPMap,
-                const std::string &hlaClassName,
-                const std::string &attributeClassName,
-                const std::string &attributeName,
-                bool publish
-        ) : _callingFunctionName(callingFunctionName),
-            _primaryFunctionName(getPrimaryFunctionName(callingFunctionName)),
-            _stringClassAndPropertyNameSetSPMap(stringClassAndPropertyNameSetSPMap),
-            _hlaClassName(hlaClassName),
-            _attributeClassName(attributeClassName),
-            _attributeName(attributeName),
-            _publish(publish) { }
-
-        void replay() const {
-            pub_sub_class_and_property_name(
-                    _callingFunctionName,
-                    _stringClassAndPropertyNameSetSPMap,
-                    _hlaClassName,
-                    _attributeClassName,
-                    _attributeName,
-                    _publish,
-                    true
-            );
-        }
-
-        bool operator<(const PubSubCacheEntry &other) const;
-    };
-
-    typedef std::set<PubSubCacheEntry> PubSubCacheEntrySet;
-    typedef boost::shared_ptr<PubSubCacheEntrySet> PubSubCacheEntrySetSP;
-    typedef std::map<std::string, PubSubCacheEntrySetSP> StringPubSubCacheEntrySetSPMap;
-
-    static StringPubSubCacheEntrySetSPMap &get_hla_class_name_pub_sub_cache_entry_set_sp_map() {
-        static StringPubSubCacheEntrySetSPMap hlaClassNamePubSubCacheEntrySetSPMap;
-        return hlaClassNamePubSubCacheEntrySetSPMap;
-    }
-
-    static void add_to_pub_sub_cache(
-            const std::string &callingFunctionName,
-            StringClassAndPropertyNameSetSPMap &stringPubSubAttributeNameSetSPMap,
-            const std::string &hlaClassName,
-            const std::string &attributeClassName,
-            const std::string &attributeName,
-            bool publish,
-            bool insert
-    );
-
-    static void replay_pub_sub(const std::string &hlaClassName) {
-        if (
-          get_hla_class_name_pub_sub_cache_entry_set_sp_map().find(hlaClassName) !=
-            get_hla_class_name_pub_sub_cache_entry_set_sp_map().end()
-        ) {
-            for(
-              const PubSubCacheEntry &pubSubCacheEntry:
-                *get_hla_class_name_pub_sub_cache_entry_set_sp_map()[hlaClassName]
-            ) {
-                pubSubCacheEntry.replay();
-            }
-            get_hla_class_name_pub_sub_cache_entry_set_sp_map().erase(hlaClassName);
-        }
-    }
-
     static void pub_sub_class_and_property_name(
       const std::string &callingFunctionName,
       StringClassAndPropertyNameSetSPMap &stringClassAndPropertyNameSetSPMap,
@@ -2451,7 +2376,6 @@ private:
                 }
             }
             init(hlaClassName, rti);
-            replay_pub_sub(hlaClassName);
         }
         return true;
     }

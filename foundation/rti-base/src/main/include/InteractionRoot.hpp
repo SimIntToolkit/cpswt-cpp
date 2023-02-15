@@ -191,6 +191,9 @@ public:
         }
     }
 
+protected:
+    static void common_init(const std::string &hlaClassName);
+
 private:
     std::string _instanceHlaClassName;
     
@@ -242,6 +245,11 @@ protected:
     static StringSet &get_hla_class_name_set() {
         static StringSet hlaClassNameSet;
         return hlaClassNameSet;
+    }
+
+    static ClassAndPropertyNameSet &get_complete_class_and_property_name_set() {
+        static ClassAndPropertyNameSet classAndPropertyNameSet;
+        return classAndPropertyNameSet;
     }
 
     //--------------------------------------------------------------------------

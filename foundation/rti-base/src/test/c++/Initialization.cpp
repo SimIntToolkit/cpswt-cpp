@@ -127,6 +127,8 @@ void Initialization::interaction_root_dynamic_init() {
             "    \"interactions\": [\n" +
             "        \"InteractionRoot.TestBase\",\n" +
             "        \"InteractionRoot.TestBase.TestDerived\"\n" +
+            "    ],\n" +
+            "    \"objects\": [\n" +
             "    ]\n" +
             "}\n";
 
