@@ -212,11 +212,6 @@ void ObjectTests::publishObjectTest() {
 
     ClassAndPropertyNameSetSP testBasePublishedClassAndPropertyNameSetSP =
             ObjectRoot::get_published_class_and_property_name_set_sp(testBaseFullHlaClassName);
-    CPPUNIT_ASSERT(testBasePublishedClassAndPropertyNameSetSP->empty());
-
-    ObjectRoot::publish_object(testBaseFullHlaClassName, RTIAmbassadorTest1::get_rti_ambassador_1_ptr());
-    testBasePublishedClassAndPropertyNameSetSP =
-            ObjectRoot::get_published_class_and_property_name_set_sp(testBaseFullHlaClassName);
 
     CPPUNIT_ASSERT_EQUAL(
       testBasePublishedClassAndPropertyNameSetSP->size(), classAndPropertyNameTestBaseSet.size()
@@ -226,6 +221,8 @@ void ObjectTests::publishObjectTest() {
           classAndPropertyNameTestBaseSet.find(classAndPropertyName) != classAndPropertyNameTestBaseSet.end()
         );
     }
+
+    ObjectRoot::publish_object(testBaseFullHlaClassName, RTIAmbassadorTest1::get_rti_ambassador_1_ptr());
 
     ObjectRoot::publish_attribute(
             testDerivedFullHlaClassName,
@@ -255,11 +252,6 @@ void ObjectTests::publishObjectTest() {
 
     ClassAndPropertyNameSetSP testDerivedPublishedClassAndPropertyNameSetSP =
             ObjectRoot::get_published_class_and_property_name_set_sp(testDerivedFullHlaClassName);
-    CPPUNIT_ASSERT(testDerivedPublishedClassAndPropertyNameSetSP->empty());
-
-    ObjectRoot::publish_object(testDerivedFullHlaClassName, RTIAmbassadorTest1::get_rti_ambassador_1_ptr());
-    testDerivedPublishedClassAndPropertyNameSetSP =
-            ObjectRoot::get_published_class_and_property_name_set_sp(testDerivedFullHlaClassName);
 
     CPPUNIT_ASSERT_EQUAL(
       testDerivedPublishedClassAndPropertyNameSetSP->size(), classAndPropertyNameTestDerivedSet.size()
@@ -269,6 +261,8 @@ void ObjectTests::publishObjectTest() {
           classAndPropertyNameTestDerivedSet.find(classAndPropertyName) != classAndPropertyNameTestDerivedSet.end()
         );
     }
+
+    ObjectRoot::publish_object(testDerivedFullHlaClassName, RTIAmbassadorTest1::get_rti_ambassador_1_ptr());
 
     std::cout << "END publishObjectTest" << std::endl;
 }
