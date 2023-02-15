@@ -195,6 +195,9 @@ public:
         }
     }
 
+protected:
+    static void common_init(const std::string &hlaClassName);
+
 private:
     std::string _instanceHlaClassName;
     
@@ -420,6 +423,10 @@ public:
             return ObjectRoot::get_object( _objectHandle );
         }
 
+        void setTime(double time) {
+            _time = time;
+        }
+
         double getTime() const {
             return _time;
         }
@@ -443,6 +450,11 @@ protected:
     static StringSet &get_hla_class_name_set() {
         static StringSet hlaClassNameSet;
         return hlaClassNameSet;
+    }
+
+    static ClassAndPropertyNameSet &get_complete_class_and_property_name_set() {
+        static ClassAndPropertyNameSet classAndPropertyNameSet;
+        return classAndPropertyNameSet;
     }
 
     //--------------------------------------------------------------------------
@@ -511,6 +523,10 @@ protected:
     //---------------------------------------------------------
 public:
     static ClassAndPropertyNameList get_attribute_names(const std::string &hlaClassName) {
+        if (get_hla_class_name_set().find(hlaClassName) == get_hla_class_name_set().end()) {
+            readFederateDynamicMessageClass(hlaClassName);
+        }
+
        StringClassAndPropertyNameSetSPMap::iterator scmItr =
          get_class_name_class_and_property_name_set_sp_map().find(hlaClassName);
 
@@ -678,7 +694,7 @@ public:
     static SP create_object(const std::string &hlaClassName) {
         StringInstanceSPMap::iterator cimItr = get_hla_class_name_instance_sp_map().find(hlaClassName);
         return cimItr == get_hla_class_name_instance_sp_map().end()
-            ? get_hla_class_name_set().find(hlaClassName) == get_hla_class_name_set().end()
+            ? get_class_name_handle_map().find(hlaClassName) == get_class_name_handle_map().end()
               ? SP() : SP( new ObjectRoot( hlaClassName ) )
             : cimItr->second->createObject();
     }
@@ -686,7 +702,7 @@ public:
     static SP create_object(const std::string &hlaClassName, const RTIfedTime &rtiFedTime) {
         StringInstanceSPMap::iterator cimItr = get_hla_class_name_instance_sp_map().find( hlaClassName );
         return cimItr == get_hla_class_name_instance_sp_map().end()
-          ? get_hla_class_name_set().find(hlaClassName) == get_hla_class_name_set().end()
+          ? get_class_name_handle_map().find(hlaClassName) == get_class_name_handle_map().end()
             ? SP() : SP( new ObjectRoot( hlaClassName, rtiFedTime ) )
           : cimItr->second->createObject(rtiFedTime);
     }
@@ -696,7 +712,7 @@ public:
     ) {
         StringInstanceSPMap::iterator cimItr = get_hla_class_name_instance_sp_map().find( hlaClassName );
         return cimItr == get_hla_class_name_instance_sp_map().end()
-          ? get_hla_class_name_set().find(hlaClassName) == get_hla_class_name_set().end()
+          ? get_class_name_handle_map().find(hlaClassName) == get_class_name_handle_map().end()
             ? SP() : SP( new ObjectRoot( hlaClassName, propertyMap ) )
           : cimItr->second->createObject( propertyMap );
     }
@@ -708,7 +724,7 @@ public:
     ) {
         StringInstanceSPMap::iterator cimItr = get_hla_class_name_instance_sp_map().find( hlaClassName );
         return cimItr == get_hla_class_name_instance_sp_map().end()
-          ? get_hla_class_name_set().find(hlaClassName) == get_hla_class_name_set().end()
+          ? get_class_name_handle_map().find(hlaClassName) == get_class_name_handle_map().end()
             ? SP() : SP( new ObjectRoot( hlaClassName, propertyMap, rtiFedTime ) )
           : cimItr->second->createObject( propertyMap, rtiFedTime );
     }
@@ -902,7 +918,8 @@ public:
 
 private:
     static void pub_sub_class_and_property_name(
-      const StringClassAndPropertyNameSetSPMap &stringClassAndPropertyNameSetSPMap,
+      const std::string &callingFunctionName,
+      StringClassAndPropertyNameSetSPMap &stringClassAndPropertyNameSetSPMap,
       const std::string &hlaClassName,
       const std::string &attributeClassName,
       const std::string &attributeName,
@@ -915,7 +932,7 @@ public:
       const std::string &hlaClassName, const std::string &attributeClassName, const std::string &attributeName
     ) {
         pub_sub_class_and_property_name(
-          get_class_name_published_class_and_property_name_set_sp_map(),
+          "publish_attribute", get_class_name_published_class_and_property_name_set_sp_map(),
           hlaClassName, attributeClassName, attributeName, true, true
         );
     }
@@ -928,7 +945,7 @@ public:
       const std::string &hlaClassName, const std::string &attributeClassName, const std::string &attributeName
     ) {
         pub_sub_class_and_property_name(
-          get_class_name_published_class_and_property_name_set_sp_map(),
+          "unpublish_attribute", get_class_name_published_class_and_property_name_set_sp_map(),
           hlaClassName, attributeClassName, attributeName, true, false
         );
     }
@@ -950,9 +967,9 @@ protected:
         return classNameSubscribedClassAndPropertyNameSetSPMap;
     }
 
-    //---------------------------------------------------------
+    //----------------------------------------------------------
     // METHODS THAT USE CLASS-NAME SUBSCRIBED-ATTRIBUTE-NAME SET
-    //---------------------------------------------------------
+    //----------------------------------------------------------
 public:
     static const ClassAndPropertyNameSetSP &get_subscribed_class_and_property_name_set_sp(
       const std::string &hlaClassName
@@ -969,9 +986,10 @@ public:
       const std::string &hlaClassName, const std::string &attributeClassName, const std::string &attributeName
     ) {
         pub_sub_class_and_property_name(
-          get_class_name_subscribed_class_and_property_name_set_sp_map(),
+          "subscribe_attribute", get_class_name_subscribed_class_and_property_name_set_sp_map(),
           hlaClassName, attributeClassName, attributeName, false, true
         );
+        soft_unsubscribe_attribute(hlaClassName, attributeClassName, attributeName);
     }
 
     static void subscribe_attribute(const std::string &hlaClassName, const std::string &attributeName) {
@@ -982,7 +1000,7 @@ public:
       const std::string &hlaClassName, const std::string &attributeClassName, const std::string &attributeName
     ) {
         pub_sub_class_and_property_name(
-          get_class_name_subscribed_class_and_property_name_set_sp_map(),
+          "unsubscribe_attribute", get_class_name_subscribed_class_and_property_name_set_sp_map(),
           hlaClassName, attributeClassName, attributeName, false, false
         );
     }
@@ -994,6 +1012,82 @@ public:
     //---------------------------------------------
     // END CLASS-NAME SUBSCRIBED-ATTRIBUTE-NAME SET
     //---------------------------------------------
+
+    //----------------------------------------------
+    // CLASS-NAME SOFT-SUBSCRIBED-ATTRIBUTE-NAME SET
+    //----------------------------------------------
+protected:
+    static StringClassAndPropertyNameSetSPMap &get_class_name_soft_subscribed_class_and_property_name_set_sp_map() {
+        static StringClassAndPropertyNameSetSPMap classNameSoftSubscribedClassAndPropertyNameSetSPMap;
+        return classNameSoftSubscribedClassAndPropertyNameSetSPMap;
+    }
+
+    //---------------------------------------------------------------
+    // METHODS THAT USE CLASS-NAME SOFT-SUBSCRIBED-ATTRIBUTE-NAME SET
+    //---------------------------------------------------------------
+public:
+    static const ClassAndPropertyNameSetSP &get_soft_subscribed_class_and_property_name_set_sp(
+      const std::string &hlaClassName
+    ) {
+        static ClassAndPropertyNameSetSP classAndPropertyNameSetSP( new ClassAndPropertyNameSet() );
+        StringClassAndPropertyNameSetSPMap::const_iterator scmCit =
+          get_class_name_soft_subscribed_class_and_property_name_set_sp_map().find( hlaClassName );
+
+        return scmCit == get_class_name_soft_subscribed_class_and_property_name_set_sp_map().end()
+          ? classAndPropertyNameSetSP : scmCit->second;
+    }
+
+    static void soft_subscribe_attribute(
+      const std::string &hlaClassName, const std::string &attributeClassName, const std::string &attributeName
+    ) {
+        pub_sub_class_and_property_name(
+          "soft_subscribe_attribute", get_class_name_soft_subscribed_class_and_property_name_set_sp_map(),
+          hlaClassName, attributeClassName, attributeName, false, true
+        );
+        unsubscribe_attribute(hlaClassName, attributeClassName, attributeName);
+    }
+
+    static void soft_subscribe_attribute(const std::string &hlaClassName, const std::string &attributeName) {
+        soft_subscribe_attribute(hlaClassName, hlaClassName, attributeName);
+    }
+
+    static bool is_soft_subscribed_attribute(
+      const std::string &className, const std::string &attributeClassName, const std::string &attributeName
+    ) {
+        ClassAndPropertyName classAndPropertyName(attributeClassName, attributeName);
+
+        StringClassAndPropertyNameSetSPMap::const_iterator scmCit =
+          get_class_name_soft_subscribed_class_and_property_name_set_sp_map().find(className);
+
+        if (scmCit == get_class_name_soft_subscribed_class_and_property_name_set_sp_map().end()) {
+            return false;
+        }
+
+        const ClassAndPropertyNameSet &classAndPropertyNameSet = *scmCit->second;
+
+        return classAndPropertyNameSet.find(classAndPropertyName) != classAndPropertyNameSet.end();
+    }
+
+    static bool is_aoft_subscribed_attribute(const std::string &className, const std::string &attributeName) {
+        return is_soft_subscribed_attribute(className, className, attributeName);
+    }
+
+    static void soft_unsubscribe_attribute(
+      const std::string &hlaClassName, const std::string &attributeClassName, const std::string &attributeName
+    ) {
+        pub_sub_class_and_property_name(
+          "soft_unsubscribe_attribute", get_class_name_soft_subscribed_class_and_property_name_set_sp_map(),
+          hlaClassName, attributeClassName, attributeName, false, false
+        );
+    }
+
+    static void soft_unsubscribe_attribute(const std::string &hlaClassName, const std::string &attributeName) {
+        soft_unsubscribe_attribute(hlaClassName, hlaClassName, attributeName);
+    }
+
+    //--------------------------------------------------
+    // END CLASS-NAME SOFT-SUBSCRIBED-ATTRIBUTE-NAME SET
+    //--------------------------------------------------
 
     //--------------------------------------------
     // CLASS-AND-PROPERTY-NAME PROPERTY-HANDLE MAP
@@ -1700,20 +1794,8 @@ public:
         return get_class_name_subscribed_class_and_property_name_set_sp_map()[get_hla_class_name()];
     }
 
-    static void add_object_update_embedded_only_id(int id) {
-        add_object_update_embedded_only_id(get_hla_class_name(), id);
-    }
-
-    static void remove_object_update_embedded_only_id(int id) {
-        remove_object_update_embedded_only_id(get_hla_class_name(), id);
-    }
-
-    static const IntegerSetSP &get_object_update_embedded_only_id_set_sp() {
-        return get_object_update_embedded_only_id_set_sp(get_hla_class_name());
-    }
-
-    static bool get_is_object_update_embedded_only_id(int id) {
-        return get_is_object_update_embedded_only_id(get_hla_class_name(), id);
+    static ClassAndPropertyNameSetSP get_soft_subscribed_attribute_name_set_sp() {
+        return get_class_name_soft_subscribed_class_and_property_name_set_sp_map()[get_hla_class_name()];
     }
 
     static void add_federate_name_soft_publish_direct(const std::string &federateName) {
@@ -2097,6 +2179,10 @@ public:
         return get_subscribed_class_and_property_name_set_sp( getInstanceHlaClassName() );
     }
 
+    ClassAndPropertyNameSetSP getSoftSubscribedClassAndPropertyNameSetSP() {
+        return get_soft_subscribed_class_and_property_name_set_sp( getInstanceHlaClassName() );
+    }
+
     /**
      * Publishes the object class of this instance of the class for a federate.
      * Polymorphic equalivalent of publish_object static method.
@@ -2156,36 +2242,6 @@ public:
     }
 
     static ObjectReflector::SP fromJson(const std::string &jsonString);
-
-private:
-    static StringIntegerSetSPMap &get_hla_class_name_object_update_embedded_only_id_set_sp_map() {
-        static StringIntegerSetSPMap hlaClassNameObjectUpdateEmbeddedOnlyIdSetSPMap;
-        return hlaClassNameObjectUpdateEmbeddedOnlyIdSetSPMap;
-    }
-
-public:
-    static void add_object_update_embedded_only_id(const std::string &hlaClassName, int id);
-
-    static void remove_object_update_embedded_only_id(const std::string &hlaClassName, int id);
-
-    static const IntegerSetSP &get_object_update_embedded_only_id_set_sp(const std::string &hlaClassName) {
-        static IntegerSetSP defaultIntegerSetSP( new IntegerSet() );
-        StringIntegerSetSPMap::const_iterator simCit =
-          get_hla_class_name_object_update_embedded_only_id_set_sp_map().find(hlaClassName);
-        return simCit == get_hla_class_name_object_update_embedded_only_id_set_sp_map().end() ?
-            defaultIntegerSetSP : simCit->second;
-    }
-
-    static bool get_is_object_update_embedded_only_id(const std::string &hlaClassName, int id) {
-        const IntegerSet &integerSet = *get_object_update_embedded_only_id_set_sp(hlaClassName);
-        return integerSet.find(id) != integerSet.end();
-    }
-
-    static bool get_is_object_update_embedded_only_id(int classId, int id) {
-        IntegerStringMap::const_iterator ismCit = get_class_handle_name_map().find(classId);
-        return ismCit == get_class_handle_name_map().end() ?
-          false : get_is_object_update_embedded_only_id(ismCit->second, id);
-    }
 
 private:
     static StringStringSetSPMap &get_hla_class_name_to_federate_name_soft_publish_direct_set_sp_map() {
@@ -2312,10 +2368,12 @@ public:
 
 private:
     static bool loadDynamicHlaClass(const std::string &hlaClassName, RTI::RTIambassador *rti) {
-        if (get_hla_class_name_set().find(hlaClassName) == get_hla_class_name_set().end()) {
-            readFederateDynamicMessageClass(hlaClassName);
+        if (get_class_name_handle_map().find(hlaClassName) == get_class_name_handle_map().end()) {
             if (get_hla_class_name_set().find(hlaClassName) == get_hla_class_name_set().end()) {
-                return false;
+                readFederateDynamicMessageClass(hlaClassName);
+                if (get_hla_class_name_set().find(hlaClassName) == get_hla_class_name_set().end()) {
+                    return false;
+                }
             }
             init(hlaClassName, rti);
         }

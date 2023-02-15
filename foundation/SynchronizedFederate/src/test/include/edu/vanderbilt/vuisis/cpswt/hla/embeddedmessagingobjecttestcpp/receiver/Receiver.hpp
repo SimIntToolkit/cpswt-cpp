@@ -28,74 +28,79 @@
  * OR MODIFICATIONS.
  */
 
-#ifndef ORG_CPSWT_HLA_EMBEDDEDMESSAGINGOBJECTCPPTEST_SENDER_CLASS_CLASS
-#define ORG_CPSWT_HLA_EMBEDDEDMESSAGINGOBJECTCPPTEST_SENDER_CLASS_CLASS
+#ifndef ORG_CPSWT_HLA_EMBEDDEDMESSAGINGOBJECTTESTCPP_RECEIVER_CLASS_CLASS
+#define ORG_CPSWT_HLA_EMBEDDEDMESSAGINGOBJECTTESTCPP_RECEIVER_CLASS_CLASS
 
 
-#include "edu/vanderbilt/vuisis/cpswt/hla/embeddedmessagingobjectcpptest/sender/SenderBase.hpp"
+#include "edu/vanderbilt/vuisis/cpswt/hla/embeddedmessagingobjecttestcpp/receiver/ReceiverBase.hpp"
 #include "FederateConfigParser.h"
 
+#include <boost/shared_ptr.hpp>
 
 namespace edu {
  namespace vanderbilt {
   namespace vuisis {
    namespace cpswt {
     namespace hla {
-     namespace embeddedmessagingobjectcpptest {
-      namespace sender {
+     namespace embeddedmessagingobjecttestcpp {
+      namespace receiver {
 
-class Sender: public SenderBase {
+class Receiver: public ReceiverBase {
 
 using InteractionRoot = ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot;
 using C2WInteractionRoot = ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot;
 
+//    private final static Logger log = LogManager.getLogger();
 public:
     typedef ::edu::vanderbilt::vuisis::cpswt::hla::ObjectRoot_p::TestObject TestObject;
-//    private final static Logger log = LogManager.getLogger();
-
+    typedef boost::shared_ptr<TestObject> TestObjectSP;
 private:
     double m_currentTime;
 
-    TestObject TestObject_0;
-
 public:
-    Sender(FederateConfig *federateConfig);
+    Receiver(FederateConfig *federateConfig);
 
-    virtual ~Sender() throw (RTI::FederateInternalError) {}
+    virtual ~Receiver() throw (RTI::FederateInternalError) {}
 
 private:
 
-public:
-    typedef SenderBase Super;
+    TestObjectSP _testObjectSP;
 
-    class SenderATRCallback : public ATRCallback {
+    void handleObjectClass_ObjectRoot_TestObject(ObjectRoot::SP objectRootSP);
+
+    void checkReceivedSubscriptions();
+
+public:
+    typedef ReceiverBase Super;
+
+    class ReceiverATRCallback : public ATRCallback {
         private:
-            Sender &m_federateInstance;
+            Receiver &m_federateInstance;
         public:
-            SenderATRCallback(Sender &federateInstance): m_federateInstance(federateInstance) {}
+            ReceiverATRCallback(Receiver &federateInstance): m_federateInstance(federateInstance) {}
 
             virtual void execute( void ) {
                 m_federateInstance.execute();
             }
 
             virtual SP clone() {
-                return SP(new SenderATRCallback(*this));
+                return SP(new ReceiverATRCallback(*this));
             }
     };
 
-    TestObject &getTestObject() {
-        return TestObject_0;
+    TestObjectSP getTestObjectSP() {
+        return _testObjectSP;
     }
 
     void initialize();
     void execute();
 };
-      } // NAMESPACE "sender"
-     } // NAMESPACE "embeddedmessagingobjectcpptest"
+      } // NAMESPACE "receiver"
+     } // NAMESPACE "embeddedmessagingobjecttestcpp"
     } // NAMESPACE "hla"
    } // NAMESPACE "cpswt"
   } // NAMESPACE "vuisis"
  } // NAMESPACE "vanderbilt"
 } // NAMESPACE "edu"
 
-#endif // ORG_CPSWT_HLA_EMBEDDEDMESSAGINGOBJECTCPPTEST_SENDER_CLASS_CLASS
+#endif // ORG_CPSWT_HLA_EMBEDDEDMESSAGINGOBJECTTESTCPP_RECEIVER_CLASS_CLASS

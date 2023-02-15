@@ -49,60 +49,70 @@ bool TestObject::static_init() {
     get_hla_class_name_instance_sp_map()[get_hla_class_name()] = instanceSP;
 
     ClassAndPropertyNameSetSP classAndPropertyNameSetSP( new ClassAndPropertyNameSet() );
+
     classAndPropertyNameSetSP->emplace(
         "ObjectRoot.TestObject", "BooleanValue1"
     );
 
     get_class_and_property_name_initial_value_sp_map()[ClassAndPropertyName( "ObjectRoot.TestObject", "BooleanValue1" )] =
       ValueSP( new Value( false ));
+
     classAndPropertyNameSetSP->emplace(
         "ObjectRoot.TestObject", "BooleanValue2"
     );
 
     get_class_and_property_name_initial_value_sp_map()[ClassAndPropertyName( "ObjectRoot.TestObject", "BooleanValue2" )] =
       ValueSP( new Value( false ));
+
     classAndPropertyNameSetSP->emplace(
         "ObjectRoot.TestObject", "ByteValue"
     );
 
     get_class_and_property_name_initial_value_sp_map()[ClassAndPropertyName( "ObjectRoot.TestObject", "ByteValue" )] =
       ValueSP( new Value( static_cast<char>(0) ));
+
     classAndPropertyNameSetSP->emplace(
         "ObjectRoot.TestObject", "CharValue"
     );
 
     get_class_and_property_name_initial_value_sp_map()[ClassAndPropertyName( "ObjectRoot.TestObject", "CharValue" )] =
       ValueSP( new Value( static_cast<char>(0) ));
+
     classAndPropertyNameSetSP->emplace(
         "ObjectRoot.TestObject", "DoubleValue"
     );
 
     get_class_and_property_name_initial_value_sp_map()[ClassAndPropertyName( "ObjectRoot.TestObject", "DoubleValue" )] =
       ValueSP( new Value( static_cast<double>(0) ));
+
     classAndPropertyNameSetSP->emplace(
         "ObjectRoot.TestObject", "FloatValue"
     );
 
     get_class_and_property_name_initial_value_sp_map()[ClassAndPropertyName( "ObjectRoot.TestObject", "FloatValue" )] =
       ValueSP( new Value( static_cast<bool>(0) ));
+
     classAndPropertyNameSetSP->emplace(
         "ObjectRoot.TestObject", "IntValue"
     );
 
     get_class_and_property_name_initial_value_sp_map()[ClassAndPropertyName( "ObjectRoot.TestObject", "IntValue" )] =
       ValueSP( new Value( static_cast<int>(0) ));
+
     classAndPropertyNameSetSP->emplace(
         "ObjectRoot.TestObject", "LongValue"
     );
 
     get_class_and_property_name_initial_value_sp_map()[ClassAndPropertyName( "ObjectRoot.TestObject", "LongValue" )] =
       ValueSP( new Value( static_cast<long>(0) ));
+
     classAndPropertyNameSetSP->emplace(
         "ObjectRoot.TestObject", "ShortValue"
     );
 
     get_class_and_property_name_initial_value_sp_map()[ClassAndPropertyName( "ObjectRoot.TestObject", "ShortValue" )] =
       ValueSP( new Value( static_cast<short>(0) ));
+
     classAndPropertyNameSetSP->emplace(
         "ObjectRoot.TestObject", "StringValue"
     );
@@ -113,6 +123,10 @@ bool TestObject::static_init() {
     // ADD THIS CLASS'S _classAndPropertyNameSet TO _classNamePropertyNameSetMap DEFINED
     // IN ObjectRoot
     get_class_name_class_and_property_name_set_sp_map()[get_hla_class_name()] = classAndPropertyNameSetSP;
+
+    get_complete_class_and_property_name_set().insert(
+      classAndPropertyNameSetSP->begin(), classAndPropertyNameSetSP->end()
+    );
 
     ClassAndPropertyNameSetSP allClassAndPropertyNameSetSP( new ClassAndPropertyNameSet() );
 
@@ -158,6 +172,7 @@ bool TestObject::static_init() {
     // IN ObjectRoot
     get_class_name_all_class_and_property_name_set_sp_map()[get_hla_class_name()] = allClassAndPropertyNameSetSP;
 
+    common_init(get_hla_class_name());
     return true;
 }
 

@@ -241,11 +241,15 @@ public:
         ObjectRoot::publish_object( get_hla_class_name(), rti );
     }
 
+    static bool get_is_published() {
+        return ObjectRoot::get_is_published(get_hla_class_name());
+    }
+
     /**
      * Unpublishes the edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.BaseObjectClass_p.DerivedObjectClass object class for a federate.
      *
      * @param rti handle to the Local RTI Component, usu. obtained through the
-     *            {@link SynchronizedFederate#getLRC()} call
+     *            {@link SynchronizedFederate#getRTI()} call
      */
     static void unpublish_object(RTI::RTIambassador *rti) {
         ObjectRoot::unpublish_object( get_hla_class_name(), rti);
@@ -260,6 +264,18 @@ public:
         ObjectRoot::subscribe_object( get_hla_class_name(), rti );
     }
 
+    static bool get_is_subscribed() {
+        return ObjectRoot::get_is_subscribed(get_hla_class_name());
+    }
+
+    static void soft_subscribe_object(RTI::RTIambassador *rti) {
+        ObjectRoot::soft_subscribe_object(get_hla_class_name(), rti);
+    }
+
+    static bool get_is_soft_subscribed() {
+        return ObjectRoot::get_is_soft_subscribed(get_hla_class_name());
+    }
+
     /**
      * Unsubscribes a federate from the edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.BaseObjectClass_p.DerivedObjectClass object class.
      *
@@ -269,12 +285,40 @@ public:
         ObjectRoot::unsubscribe_object( get_hla_class_name(), rti );
     }
 
+    static void soft_unsubscribe_object(RTI::RTIambassador *rti) {
+        ObjectRoot::soft_unsubscribe_object(get_hla_class_name(), rti);
+    }
+
     static ClassAndPropertyNameSetSP get_published_attribute_name_set_sp() {
         return ObjectRoot::get_class_name_published_class_and_property_name_set_sp_map()[get_hla_class_name()];
     }
 
     static ClassAndPropertyNameSetSP get_subscribed_attribute_name_set_sp() {
         return ObjectRoot::get_class_name_subscribed_class_and_property_name_set_sp_map()[get_hla_class_name()];
+    }
+
+    static ClassAndPropertyNameSetSP get_soft_subscribed_attribute_name_set_sp() {
+        return ObjectRoot::get_class_name_soft_subscribed_class_and_property_name_set_sp_map()[get_hla_class_name()];
+    }
+
+    static void add_federate_name_soft_publish_direct(const std::string &federateName) {
+        ObjectRoot::add_federate_name_soft_publish_direct(get_hla_class_name(), federateName);
+    }
+
+    static void remove_federate_name_soft_publish_direct(const std::string &federateName) {
+        ObjectRoot::remove_federate_name_soft_publish_direct(get_hla_class_name(), federateName);
+    }
+
+    static const StringSetSP &get_federate_name_soft_publish_direct_set() {
+        return ObjectRoot::get_federate_name_soft_publish_direct_set_sp(get_hla_class_name());
+    }
+
+    static void add_federate_name_soft_publish(const std::string &networkFederateName) {
+        ObjectRoot::add_federate_name_soft_publish(get_hla_class_name(), networkFederateName);
+    }
+
+    static void remove_federate_name_soft_publish(const std::string &networkFederateName) {
+        ObjectRoot::remove_federate_name_soft_publish(get_hla_class_name(), networkFederateName);
     }
 
     //-----------------------------------------------------
@@ -516,52 +560,96 @@ public:
         unsubscribe_attribute(get_hla_class_name(), attributeName);
     }
 
+    static void soft_subscribe_attribute(const std::string &attributeClass, const std::string &attributeName) {
+        ::edu::vanderbilt::vuisis::cpswt::hla::ObjectRoot::soft_subscribe_attribute(
+          get_hla_class_name(), attributeClass, attributeName
+        );
+    }
+
+    static void soft_subscribe_attribute(const std::string &attributeName) {
+        soft_subscribe_attribute(get_hla_class_name(), attributeName);
+    }
+
+    static void soft_unsubscribe_attribute(const std::string &attributeClass, const std::string &attributeName) {
+        ::edu::vanderbilt::vuisis::cpswt::hla::ObjectRoot::soft_unsubscribe_attribute(
+          get_hla_class_name(), attributeClass, attributeName
+        );
+    }
+
+    static void soft_unsubscribe_attribute(const std::string &attributeName) {
+        soft_unsubscribe_attribute(get_hla_class_name(), attributeName);
+    }
+
     /**
-    * Publishes the "string_attribute1" attribute of the attribute's containing object
+    * Publishes the "int_attribute1" attribute of the attribute's containing object
     * class for a federate.
-    * Note:  This method only marks the "string_attribute1" attribute for publication.
+    * Note:  This method only marks the "int_attribute1" attribute for publication.
     * To actually publish the attribute, the federate must (re)publish its containing
     * object class.
     * (using <objectClassName>.publish_object( RTIambassador *rti ) ).
     */
-    static void publish_string_attribute1_attribute() {
-        publish_attribute( get_hla_class_name(), "string_attribute1" );
+    static void publish_int_attribute1_attribute() {
+        publish_attribute( get_hla_class_name(), "int_attribute1" );
     }
 
     /**
-    * Unpublishes the "string_attribute1" attribute of the attribute's containing object
+    * Unpublishes the "int_attribute1" attribute of the attribute's containing object
     * class for a federate.
-    * Note:  This method only marks the "string_attribute1" attribute for unpublication.
+    * Note:  This method only marks the "int_attribute1" attribute for unpublication.
     * To actually publish the attribute, the federate must (re)publish its containing
     * object class.
     * (using <objectClassName>.publish_object( RTIambassador *rti ) ).
     */
-    static void unpublish_string_attribute1_attribute() {
-        unpublish_attribute( get_hla_class_name(), "string_attribute1" );
+    static void unpublish_int_attribute1_attribute() {
+        unpublish_attribute( get_hla_class_name(), "int_attribute1" );
     }
 
     /**
-    * Subscribes a federate to the "string_attribute1" attribute of the attribute's
+    * Subscribes a federate to the "int_attribute1" attribute of the attribute's
     * containing object class.
-    * Note:  This method only marks the "string_attribute1" attribute for subscription.
+    * Note:  This method only marks the "int_attribute1" attribute for subscription.
     * To actually subscribe to the attribute, the federate must (re)subscribe to its
     * containing object class.
     * (using <objectClassName>.subscribe_object( RTIambassador *rti ) ).
     */
-    static void subscribe_string_attribute1_attribute() {
-        subscribe_attribute( get_hla_class_name(), "string_attribute1" );
+    static void subscribe_int_attribute1_attribute() {
+        subscribe_attribute( get_hla_class_name(), "int_attribute1" );
     }
 
     /**
-    * Unsubscribes a federate from the "string_attribute1" attribute of the attribute's
+    * Unsubscribes a federate from the "int_attribute1" attribute of the attribute's
     * containing object class.
-    * Note:  This method only marks the "string_attribute1" attribute for unsubscription.
+    * Note:  This method only marks the "int_attribute1" attribute for unsubscription.
     * To actually unsubscribe to the attribute, the federate must (re)subscribe to its
     * containing object class.
     * (using <objectClassName>.subscribe_object( RTIambassador *rti ) ).
     */
-    static void unsubscribe_string_attribute1_attribute() {
-        unsubscribe_attribute( get_hla_class_name(), "string_attribute1" );
+    static void unsubscribe_int_attribute1_attribute() {
+        unsubscribe_attribute( get_hla_class_name(), "int_attribute1" );
+    }
+
+    /**
+    * Soft subscribes a federate to the "int_attribute1" attribute of the attribute's
+    * containing object class.
+    * Note:  This method only marks the "int_attribute1" attribute for soft subscription.
+    * To actually soft subscribe to the attribute, the federate must (re)subscribe to its
+    * containing object class.
+    * (using <objectClassName>.soft_subscribe_object( RTIambassador rti ) ).
+    */
+    static void soft_subscribe_int_attribute1_attribute() {
+        soft_subscribe_attribute(get_hla_class_name(), "int_attribute1");
+    }
+
+    /**
+    * Soft unsubscribes a federate from the "int_attribute1" attribute of the attribute's
+    * containing object class.
+    * Note:  This method only marks the "int_attribute1" attribute for soft unsubscription.
+    * To actually soft unsubscribe to the attribute, the federate must (re)subscribe to its
+    * containing object class.
+    * (using <objectClassName>.unsubscribe_object( RTIambassador rti ) ).
+    */
+    static void soft_unsubscribe_int_attribute1_attribute() {
+        soft_unsubscribe_attribute(get_hla_class_name(), "int_attribute1");
     }
 
     /**
@@ -613,6 +701,102 @@ public:
     }
 
     /**
+    * Soft subscribes a federate to the "int_attribute2" attribute of the attribute's
+    * containing object class.
+    * Note:  This method only marks the "int_attribute2" attribute for soft subscription.
+    * To actually soft subscribe to the attribute, the federate must (re)subscribe to its
+    * containing object class.
+    * (using <objectClassName>.soft_subscribe_object( RTIambassador rti ) ).
+    */
+    static void soft_subscribe_int_attribute2_attribute() {
+        soft_subscribe_attribute(get_hla_class_name(), "int_attribute2");
+    }
+
+    /**
+    * Soft unsubscribes a federate from the "int_attribute2" attribute of the attribute's
+    * containing object class.
+    * Note:  This method only marks the "int_attribute2" attribute for soft unsubscription.
+    * To actually soft unsubscribe to the attribute, the federate must (re)subscribe to its
+    * containing object class.
+    * (using <objectClassName>.unsubscribe_object( RTIambassador rti ) ).
+    */
+    static void soft_unsubscribe_int_attribute2_attribute() {
+        soft_unsubscribe_attribute(get_hla_class_name(), "int_attribute2");
+    }
+
+    /**
+    * Publishes the "string_attribute1" attribute of the attribute's containing object
+    * class for a federate.
+    * Note:  This method only marks the "string_attribute1" attribute for publication.
+    * To actually publish the attribute, the federate must (re)publish its containing
+    * object class.
+    * (using <objectClassName>.publish_object( RTIambassador *rti ) ).
+    */
+    static void publish_string_attribute1_attribute() {
+        publish_attribute( get_hla_class_name(), "string_attribute1" );
+    }
+
+    /**
+    * Unpublishes the "string_attribute1" attribute of the attribute's containing object
+    * class for a federate.
+    * Note:  This method only marks the "string_attribute1" attribute for unpublication.
+    * To actually publish the attribute, the federate must (re)publish its containing
+    * object class.
+    * (using <objectClassName>.publish_object( RTIambassador *rti ) ).
+    */
+    static void unpublish_string_attribute1_attribute() {
+        unpublish_attribute( get_hla_class_name(), "string_attribute1" );
+    }
+
+    /**
+    * Subscribes a federate to the "string_attribute1" attribute of the attribute's
+    * containing object class.
+    * Note:  This method only marks the "string_attribute1" attribute for subscription.
+    * To actually subscribe to the attribute, the federate must (re)subscribe to its
+    * containing object class.
+    * (using <objectClassName>.subscribe_object( RTIambassador *rti ) ).
+    */
+    static void subscribe_string_attribute1_attribute() {
+        subscribe_attribute( get_hla_class_name(), "string_attribute1" );
+    }
+
+    /**
+    * Unsubscribes a federate from the "string_attribute1" attribute of the attribute's
+    * containing object class.
+    * Note:  This method only marks the "string_attribute1" attribute for unsubscription.
+    * To actually unsubscribe to the attribute, the federate must (re)subscribe to its
+    * containing object class.
+    * (using <objectClassName>.subscribe_object( RTIambassador *rti ) ).
+    */
+    static void unsubscribe_string_attribute1_attribute() {
+        unsubscribe_attribute( get_hla_class_name(), "string_attribute1" );
+    }
+
+    /**
+    * Soft subscribes a federate to the "string_attribute1" attribute of the attribute's
+    * containing object class.
+    * Note:  This method only marks the "string_attribute1" attribute for soft subscription.
+    * To actually soft subscribe to the attribute, the federate must (re)subscribe to its
+    * containing object class.
+    * (using <objectClassName>.soft_subscribe_object( RTIambassador rti ) ).
+    */
+    static void soft_subscribe_string_attribute1_attribute() {
+        soft_subscribe_attribute(get_hla_class_name(), "string_attribute1");
+    }
+
+    /**
+    * Soft unsubscribes a federate from the "string_attribute1" attribute of the attribute's
+    * containing object class.
+    * Note:  This method only marks the "string_attribute1" attribute for soft unsubscription.
+    * To actually soft unsubscribe to the attribute, the federate must (re)subscribe to its
+    * containing object class.
+    * (using <objectClassName>.unsubscribe_object( RTIambassador rti ) ).
+    */
+    static void soft_unsubscribe_string_attribute1_attribute() {
+        soft_unsubscribe_attribute(get_hla_class_name(), "string_attribute1");
+    }
+
+    /**
     * Publishes the "string_attribute2" attribute of the attribute's containing object
     * class for a federate.
     * Note:  This method only marks the "string_attribute2" attribute for publication.
@@ -661,51 +845,27 @@ public:
     }
 
     /**
-    * Publishes the "int_attribute1" attribute of the attribute's containing object
-    * class for a federate.
-    * Note:  This method only marks the "int_attribute1" attribute for publication.
-    * To actually publish the attribute, the federate must (re)publish its containing
-    * object class.
-    * (using <objectClassName>.publish_object( RTIambassador *rti ) ).
+    * Soft subscribes a federate to the "string_attribute2" attribute of the attribute's
+    * containing object class.
+    * Note:  This method only marks the "string_attribute2" attribute for soft subscription.
+    * To actually soft subscribe to the attribute, the federate must (re)subscribe to its
+    * containing object class.
+    * (using <objectClassName>.soft_subscribe_object( RTIambassador rti ) ).
     */
-    static void publish_int_attribute1_attribute() {
-        publish_attribute( get_hla_class_name(), "int_attribute1" );
+    static void soft_subscribe_string_attribute2_attribute() {
+        soft_subscribe_attribute(get_hla_class_name(), "string_attribute2");
     }
 
     /**
-    * Unpublishes the "int_attribute1" attribute of the attribute's containing object
-    * class for a federate.
-    * Note:  This method only marks the "int_attribute1" attribute for unpublication.
-    * To actually publish the attribute, the federate must (re)publish its containing
-    * object class.
-    * (using <objectClassName>.publish_object( RTIambassador *rti ) ).
+    * Soft unsubscribes a federate from the "string_attribute2" attribute of the attribute's
+    * containing object class.
+    * Note:  This method only marks the "string_attribute2" attribute for soft unsubscription.
+    * To actually soft unsubscribe to the attribute, the federate must (re)subscribe to its
+    * containing object class.
+    * (using <objectClassName>.unsubscribe_object( RTIambassador rti ) ).
     */
-    static void unpublish_int_attribute1_attribute() {
-        unpublish_attribute( get_hla_class_name(), "int_attribute1" );
-    }
-
-    /**
-    * Subscribes a federate to the "int_attribute1" attribute of the attribute's
-    * containing object class.
-    * Note:  This method only marks the "int_attribute1" attribute for subscription.
-    * To actually subscribe to the attribute, the federate must (re)subscribe to its
-    * containing object class.
-    * (using <objectClassName>.subscribe_object( RTIambassador *rti ) ).
-    */
-    static void subscribe_int_attribute1_attribute() {
-        subscribe_attribute( get_hla_class_name(), "int_attribute1" );
-    }
-
-    /**
-    * Unsubscribes a federate from the "int_attribute1" attribute of the attribute's
-    * containing object class.
-    * Note:  This method only marks the "int_attribute1" attribute for unsubscription.
-    * To actually unsubscribe to the attribute, the federate must (re)subscribe to its
-    * containing object class.
-    * (using <objectClassName>.subscribe_object( RTIambassador *rti ) ).
-    */
-    static void unsubscribe_int_attribute1_attribute() {
-        unsubscribe_attribute( get_hla_class_name(), "int_attribute1" );
+    static void soft_unsubscribe_string_attribute2_attribute() {
+        soft_unsubscribe_attribute(get_hla_class_name(), "string_attribute2");
     }
 
     //-------------
