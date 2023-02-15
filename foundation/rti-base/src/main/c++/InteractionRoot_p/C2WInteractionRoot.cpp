@@ -105,53 +105,6 @@ C2WInteractionRoot::StringList C2WInteractionRoot::get_federate_sequence_list_au
     return get_federate_sequence_list(federateSequence);
 }
 
-void C2WInteractionRoot::add_reject_source_federate_id(const std::string &hlaClassName, const std::string &federateId) {
-    std::string prefix = std::string("InteractionRoot.C2WInteractionRoot") + ".";
-    if (
-      hlaClassName == "InteractionRoot.C2WInteractionRoot" ||
-      (
-        hlaClassName.substr(0, prefix.size()) == prefix &&
-        get_hla_class_name_set().find(hlaClassName) != get_hla_class_name_set().end()
-      )
-    ) {
-        if (
-          get_hla_class_name_to_reject_source_federate_id_set_sp_map().find(hlaClassName) ==
-          get_hla_class_name_to_reject_source_federate_id_set_sp_map().end()
-        ) {
-            get_hla_class_name_to_reject_source_federate_id_set_sp_map().emplace(
-              hlaClassName, StringSetSP( new StringSet() )
-            );
-        }
-        get_hla_class_name_to_reject_source_federate_id_set_sp_map()[hlaClassName]->insert(federateId);
-    }
-}
-
-bool C2WInteractionRoot::is_reject_source_federate_id(
-  const std::string &hlaClassName, const std::string &federateId
-) {
-    if (
-      get_hla_class_name_to_reject_source_federate_id_set_sp_map().find(hlaClassName) ==
-      get_hla_class_name_to_reject_source_federate_id_set_sp_map().end()
-    ) {
-        return false;
-    }
-
-    StringSet &rejectSourceFederateIdSet =
-      *get_hla_class_name_to_reject_source_federate_id_set_sp_map()[hlaClassName];
-    return rejectSourceFederateIdSet.find(federateId) != rejectSourceFederateIdSet.end();
-}
-
-void C2WInteractionRoot::remove_reject_source_federate_id(
-  const std::string &hlaClassName, const std::string &federateId
-) {
-    if (
-      get_hla_class_name_to_reject_source_federate_id_set_sp_map().find(hlaClassName) !=
-      get_hla_class_name_to_reject_source_federate_id_set_sp_map().end()
-    ) {
-        get_hla_class_name_to_reject_source_federate_id_set_sp_map()[hlaClassName]->erase(federateId);
-    }
-}
-
 bool C2WInteractionRoot::static_init_var = C2WInteractionRoot::static_init();
 
 bool C2WInteractionRoot::static_init() {
@@ -165,18 +118,21 @@ bool C2WInteractionRoot::static_init() {
     get_hla_class_name_instance_sp_map()[get_hla_class_name()] = instanceSP;
 
     ClassAndPropertyNameSetSP classAndPropertyNameSetSP( new ClassAndPropertyNameSet() );
+
     classAndPropertyNameSetSP->emplace(
         "InteractionRoot.C2WInteractionRoot", "actualLogicalGenerationTime"
     );
 
     get_class_and_property_name_initial_value_sp_map()[ClassAndPropertyName( "InteractionRoot.C2WInteractionRoot", "actualLogicalGenerationTime" )] =
       ValueSP( new Value( static_cast<double>(0) ));
+
     classAndPropertyNameSetSP->emplace(
         "InteractionRoot.C2WInteractionRoot", "federateFilter"
     );
 
     get_class_and_property_name_initial_value_sp_map()[ClassAndPropertyName( "InteractionRoot.C2WInteractionRoot", "federateFilter" )] =
       ValueSP( new Value( std::string("") ));
+
     classAndPropertyNameSetSP->emplace(
         "InteractionRoot.C2WInteractionRoot", "federateSequence"
     );
@@ -187,6 +143,10 @@ bool C2WInteractionRoot::static_init() {
     // ADD THIS CLASS'S _classAndPropertyNameSet TO _classNamePropertyNameSetMap DEFINED
     // IN InteractionRoot
     get_class_name_class_and_property_name_set_sp_map()[get_hla_class_name()] = classAndPropertyNameSetSP;
+
+    get_complete_class_and_property_name_set().insert(
+      classAndPropertyNameSetSP->begin(), classAndPropertyNameSetSP->end()
+    );
 
     ClassAndPropertyNameSetSP allClassAndPropertyNameSetSP( new ClassAndPropertyNameSet() );
 
@@ -204,6 +164,7 @@ bool C2WInteractionRoot::static_init() {
     // IN InteractionRoot
     get_class_name_all_class_and_property_name_set_sp_map()[get_hla_class_name()] = allClassAndPropertyNameSetSP;
 
+    common_init(get_hla_class_name());
     return true;
 }
 

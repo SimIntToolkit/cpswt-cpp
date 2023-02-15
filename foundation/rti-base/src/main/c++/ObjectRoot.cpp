@@ -125,39 +125,51 @@ void ObjectRoot::init(const std::string &hlaClassName, RTI::RTIambassador *rtiAm
             }
         }
 
-        //-------------------------------------------------------
-        // INITIALIZE ALL CLASSES TO NOT-PUBLISHED NOT-SUBSCRIBED
-        //-------------------------------------------------------
-        get_class_name_publish_status_map()[localHlaClassName] = false;
-        get_class_name_subscribe_status_map()[localHlaClassName] = false;
-        get_class_name_soft_subscribe_status_map()[localHlaClassName] = false;
         //------------------------------------------------------------------------------------------------------
         // FOR OBJECTS, INITIALIZE
         // - _classNamePublishedAttributeHandleSetMap (get_class_name_published_attribute_handle_set_sp_map())
         // - _classNameSubscribedAttributeHandleSetMap (get_class_name_subscribed_attribute_handle_set_sp_map())
-        // - _classNamePublishedAttributeNameSetMap (get_class_name_published_attribute_name_set_sp_map())
-        // - _classNameSubscribedAttributeNameSetMap (get_class_name_subscribed_attribute_name_set_sp_map())
-        //
-        // EACH hlaClassName INITIALLY HAS
-        // - NO PUBLISHED ATTRIBUTE HANDLES/NAMES
-        // - NO SUBSCRIBED ATTRIBUTE HANDLES/NAMES
         //------------------------------------------------------------------------------------------------------
         AttributeHandleSetSP publishedAttributeHandleSetSP(
           RTI::AttributeHandleSetFactory::create( 0 )
         );
-        get_class_name_published_attribute_handle_set_sp_map()[hlaClassName] = publishedAttributeHandleSetSP;
+        get_class_name_published_attribute_handle_set_sp_map()[localHlaClassName] = publishedAttributeHandleSetSP;
 
         AttributeHandleSetSP subscribedAttributeHandleSetSP(
           RTI::AttributeHandleSetFactory::create( 0 )
         );
-        get_class_name_subscribed_attribute_handle_set_sp_map()[hlaClassName] = subscribedAttributeHandleSetSP;
-
-        ClassAndPropertyNameSetSP publishedAttributeNameSetSP(new ClassAndPropertyNameSet());
-        get_class_name_published_class_and_property_name_set_sp_map()[hlaClassName] = publishedAttributeNameSetSP;
-
-        ClassAndPropertyNameSetSP subscribedAttributeNameSetSP(new ClassAndPropertyNameSet());
-        get_class_name_subscribed_class_and_property_name_set_sp_map()[hlaClassName] = subscribedAttributeNameSetSP;
+        get_class_name_subscribed_attribute_handle_set_sp_map()[localHlaClassName] = subscribedAttributeHandleSetSP;
     }
+}
+
+void ObjectRoot::common_init(const std::string &hlaClassName) {
+
+    //-------------------------------------------------------
+    // INITIALIZE ALL CLASSES TO NOT-PUBLISHED NOT-SUBSCRIBED
+    //-------------------------------------------------------
+    get_class_name_publish_status_map()[hlaClassName] = false;
+    get_class_name_subscribe_status_map()[hlaClassName] = false;
+    get_class_name_soft_subscribe_status_map()[hlaClassName] = false;
+
+    //------------------------------------------------------------------------------------------------------
+    // FOR OBJECTS, INITIALIZE
+    // - _classNamePublishedAttributeNameSetMap (get_class_name_published_attribute_name_set_sp_map())
+    // - _classNameSubscribedAttributeNameSetMap (get_class_name_subscribed_attribute_name_set_sp_map())
+    // - _classNameSoftSubscribedAttributeNameSetMap (get_class_name_soft_subscribed_attribute_name_set_sp_map())
+    //
+    // EACH hlaClassName INITIALLY HAS
+    // - NO PUBLISHED ATTRIBUTE HANDLES/NAMES
+    // - NO SUBSCRIBED ATTRIBUTE HANDLES/NAMES
+    //------------------------------------------------------------------------------------------------------
+    ClassAndPropertyNameSetSP publishedAttributeNameSetSP(new ClassAndPropertyNameSet());
+    get_class_name_published_class_and_property_name_set_sp_map()[hlaClassName] = publishedAttributeNameSetSP;
+
+    ClassAndPropertyNameSetSP subscribedAttributeNameSetSP(new ClassAndPropertyNameSet());
+    get_class_name_subscribed_class_and_property_name_set_sp_map()[hlaClassName] = subscribedAttributeNameSetSP;
+
+    ClassAndPropertyNameSetSP softSubscribedAttributeNameSetSP(new ClassAndPropertyNameSet());
+    get_class_name_soft_subscribed_class_and_property_name_set_sp_map()[hlaClassName] =
+      softSubscribedAttributeNameSetSP;
 }
 
 ObjectRoot::ClassAndPropertyNameValueSPMap ObjectRoot::getClassAndPropertyNameValueSPMap(
@@ -240,25 +252,25 @@ std::string ObjectRoot::ObjectReflector::toJson() const {
 }
 
 void ObjectRoot::pub_sub_class_and_property_name(
-  const StringClassAndPropertyNameSetSPMap &stringClassAndPropertyNameSetSPMap,
+  const std::string &callingFunctionName,
+  StringClassAndPropertyNameSetSPMap &stringClassAndPropertyNameSetSPMap,
   const std::string &hlaClassName,
   const std::string &attributeClassName,
   const std::string &attributeName,
   bool publish,
   bool insert
 ) {
+    if (get_hla_class_name_set().find(hlaClassName) == get_hla_class_name_set().end()) {
+        readFederateDynamicMessageClass(hlaClassName);
+    }
 
-    std::string prefix = insert ? "" : "un";
-    std::string pubsub = publish ? "publish" : "subscribe";
-    std::string operationName = prefix + pubsub;
     std::string basePrefix = attributeClassName + ".";
 
     StringClassAndPropertyNameSetSPMap::const_iterator samItr =
       stringClassAndPropertyNameSetSPMap.find( hlaClassName );
     if ( samItr == stringClassAndPropertyNameSetSPMap.end() ) {
-        BOOST_LOG_SEV(get_logger(), error) << "Could not " << operationName
-          << " \"" << attributeName << "\" attribute of object class \"" << hlaClassName
-          << "\": class does not exist";
+        BOOST_LOG_SEV(get_logger(), error) << callingFunctionName << "(\"" << hlaClassName << "\", \"" <<
+          attributeClassName << "\", \"" << attributeName << "\"): \"" << hlaClassName << "\" has no attributes";
 
         return;
     }
@@ -267,20 +279,20 @@ void ObjectRoot::pub_sub_class_and_property_name(
       hlaClassName != attributeClassName &&
       (hlaClassName.size() < attributeClassName.size() || hlaClassName.substr(0, basePrefix.length()) != basePrefix)
     ) {
-        BOOST_LOG_SEV(get_logger(), error) << operationName << "_attribute( \""
+        BOOST_LOG_SEV(get_logger(), error) << callingFunctionName << "( \""
           << hlaClassName << "\", \"" << attributeClassName << "\", \"" << attributeName
-          << "\"): the \"" << hlaClassName << "\" class cannot subscribe to attribute of a class (\""
-          << attributeClassName << "\") that is out of its inheritance hierarchy.";
+          << "\"): the \"" << hlaClassName << "\" class cannot access an attribute of class \""
+          << attributeClassName << "\" because it is out of its inheritance hierarchy.";
         return;
     }
 
     ClassAndPropertyNameSP classAndPropertyNameSP = findProperty(attributeClassName, attributeName);
     if (!classAndPropertyNameSP) {
 
-        BOOST_LOG_SEV(get_logger(), error) << "Could not " << operationName
-          << " \"" << attributeName << "\" attribute of object class \"" << hlaClassName
-          << "\": \"" << attributeName << "\" attribute does not exist in the \""
-          << hlaClassName << "\" class or any of its base classes";
+        BOOST_LOG_SEV(get_logger(), error) << callingFunctionName << "( \""
+          << hlaClassName << "\", \"" << attributeClassName << "\", \"" << attributeName
+          << "\"):  \"" << attributeName << "\" attribute does not exist in \"" << attributeClassName
+          << "\" class or any of its base classes";
 
         return;
     }
@@ -303,7 +315,7 @@ ClassAndPropertyNameSP ObjectRoot::findProperty(
         std::string localClassName = boost::algorithm::join(classNameComponents, ".");
 
         ClassAndPropertyName key(localClassName, propertyName);
-        if (get_class_and_property_name_handle_map().find(key) != get_class_and_property_name_handle_map().end()) {
+        if (get_complete_class_and_property_name_set().find(key) != get_complete_class_and_property_name_set().end()) {
             return ClassAndPropertyNameSP(new ClassAndPropertyName(key));
         }
 
@@ -671,7 +683,7 @@ void ObjectRoot::requestUpdate( RTI::RTIambassador *rti ) {
 
 void ObjectRoot::initializeProperties(const std::string &hlaClassName) {
     setInstanceHlaClassName(hlaClassName);
-    if (get_hla_class_name_set().find(hlaClassName) == get_hla_class_name_set().end()) {
+    if (get_class_name_handle_map().find(hlaClassName) == get_class_name_handle_map().end()) {
         BOOST_LOG_SEV(get_logger(), error)
           << "ObjectRoot( const std::string &hlaClassName ): hlaClassName \"" << hlaClassName
           << "\" is not defined -- creating dummy object with fictitious type \"" << hlaClassName
@@ -722,10 +734,15 @@ bool ObjectRoot::static_init() {
     // IN ObjectRoot
     get_class_name_class_and_property_name_set_sp_map()[get_hla_class_name()] = classAndPropertyNameSetSP;
 
+    get_complete_class_and_property_name_set().insert(
+      classAndPropertyNameSetSP->begin(), classAndPropertyNameSetSP->end()
+    );
+
     ClassAndPropertyNameSetSP allClassAndPropertyNameSetSP( new ClassAndPropertyNameSet() );// ADD THIS CLASS'S _allClassAndPropertyNameSet TO _classNameAllPropertyNameSetMap DEFINED
     // IN ObjectRoot
     get_class_name_all_class_and_property_name_set_sp_map()[get_hla_class_name()] = allClassAndPropertyNameSetSP;
 
+    common_init(get_hla_class_name());
     return true;
 }
 
@@ -855,12 +872,12 @@ ObjectRoot::ObjectReflector::SP ObjectRoot::fromJson(const std::string &jsonStri
     std::string federateSequence = topLevelJSONObject["federateSequence"].asString();
 
     StringClassAndPropertyNameSetSPMap::const_iterator scmItr =
-      get_class_name_subscribed_class_and_property_name_set_sp_map().find( className );
-    if (scmItr == get_class_name_subscribed_class_and_property_name_set_sp_map().end()) {
+      get_class_name_soft_subscribed_class_and_property_name_set_sp_map().find( className );
+    if (scmItr == get_class_name_soft_subscribed_class_and_property_name_set_sp_map().end()) {
         BOOST_LOG_SEV(get_logger(), error) << "fromJson:  no class \"" << className << "\" is defined";
         return ObjectReflector::SP();
     }
-    ClassAndPropertyNameSet &subscribedAttributeNameSet = *scmItr->second;
+    ClassAndPropertyNameSet &softSubscribedAttributeNameSet = *scmItr->second;
 
     ClassAndPropertyNameValueSPMap classAndPropertyNameValueSPMap;
 
@@ -871,7 +888,7 @@ ObjectRoot::ObjectReflector::SP ObjectRoot::fromJson(const std::string &jsonStri
         const std::string memberName(*mbrCit);
         ClassAndPropertyName classAndPropertyName(memberName);
 
-        if (subscribedAttributeNameSet.find(classAndPropertyName) == subscribedAttributeNameSet.end()) {
+        if (softSubscribedAttributeNameSet.find(classAndPropertyName) == softSubscribedAttributeNameSet.end()) {
             // LOG ERROR
             continue;
         }
@@ -935,47 +952,10 @@ ObjectRoot::ObjectReflector::SP ObjectRoot::fromJson(const std::string &jsonStri
     return objectReflectorSP;
 }
 
-void ObjectRoot::add_object_update_embedded_only_id(const std::string &hlaClassName, int id) {
-
-   if (get_hla_class_name_set().find(hlaClassName) == get_hla_class_name_set().end()) {
-        BOOST_LOG_SEV(get_logger(), warning) << "add_object_update_embedded_only_id(\""
-          << hlaClassName << ", " << id << ") -- no such object class \""
-          << hlaClassName << "\"";
-        return;
-    }
-
-    StringIntegerSetSPMap::iterator simItr =
-      get_hla_class_name_object_update_embedded_only_id_set_sp_map().find(hlaClassName);
-    if (simItr == get_hla_class_name_object_update_embedded_only_id_set_sp_map().end()) {
-        simItr = get_hla_class_name_object_update_embedded_only_id_set_sp_map().emplace(
-          hlaClassName, IntegerSetSP(new IntegerSet())
-          ).first;
-    }
-
-    IntegerSet &integerSet = *simItr->second;
-    integerSet.insert(id);
-}
-
-void ObjectRoot::remove_object_update_embedded_only_id(const std::string &hlaClassName, int id) {
-
-    StringIntegerSetSPMap::iterator simItr =
-      get_hla_class_name_object_update_embedded_only_id_set_sp_map().find(hlaClassName);
-    if (simItr == get_hla_class_name_object_update_embedded_only_id_set_sp_map().end()) {
-        return;
-    }
-
-    IntegerSet &integerSet = *simItr->second;
-
-    integerSet.erase(id);
-    if (integerSet.empty()) {
-        get_hla_class_name_object_update_embedded_only_id_set_sp_map().erase(hlaClassName);
-    }
-}
-
 void ObjectRoot::add_federate_name_soft_publish_direct(
   const std::string &hlaClassName, const std::string &federateName
 ) {
-   if (get_hla_class_name_set().find(hlaClassName) == get_hla_class_name_set().end()) {
+   if (get_class_name_handle_map().find(hlaClassName) == get_class_name_handle_map().end()) {
         BOOST_LOG_SEV(get_logger(), warning) << "add_federate_name_soft_publish_direct(\"" << hlaClassName
           << ", \"" << federateName << "\") -- no such object class \"" << hlaClassName << "\"";
         return;
@@ -1012,7 +992,7 @@ void ObjectRoot::remove_federate_name_soft_publish_direct(
 void ObjectRoot::add_federate_name_soft_publish(
   const std::string &hlaClassName, const std::string &federateName
 ) {
-    if (get_hla_class_name_set().find(hlaClassName) == get_hla_class_name_set().end()) {
+    if (get_class_name_handle_map().find(hlaClassName) == get_class_name_handle_map().end()) {
         BOOST_LOG_SEV(get_logger(), warning) << "add_federate_name_soft_publish(\"" << hlaClassName << "\", \""
           << federateName << "\") -- no such object class \"" << hlaClassName << "\"";
         return;
@@ -1110,6 +1090,10 @@ void ObjectRoot::readFederateDynamicMessageClass(const std::string &hlaClassName
         }
 
         get_class_name_class_and_property_name_set_sp_map()[localHlaClassName] = classAndPropertyNameSetSP;
+
+        get_complete_class_and_property_name_set().insert(
+          classAndPropertyNameSet.begin(), classAndPropertyNameSet.end()
+        );
     }
 
     for(const std::string &localHlaClassName: localHlaClassNameSet) {
@@ -1131,6 +1115,8 @@ void ObjectRoot::readFederateDynamicMessageClass(const std::string &hlaClassName
         }
 
         get_class_name_all_class_and_property_name_set_sp_map()[localHlaClassName] = allClassAndPropertyNameSetSP;
+
+        common_init(localHlaClassName);
     }
 }
 

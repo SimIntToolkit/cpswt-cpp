@@ -156,6 +156,7 @@ void HLAInterface::initializeFederateSequenceToMessagingInfoMap(const std::strin
         std::string receivingFullHlaClassName( fsmCit.key().asString() );
 
         _dynamicSoftSubscribeFullHlaClassNameSet.insert( receivingFullHlaClassName );
+        _dynamicPublishFullHlaClassNameSet.insert( receivingFullHlaClassName );
 
         Json::Value federateSequenceMessagingInfoArray = federate_sequence_to_messaging_info_json[ receivingFullHlaClassName ];
 
@@ -356,7 +357,8 @@ void HLAInterface::processInteractions() {
         // IS INTERACTION ONE THAT MIGHT BE PROPAGATED THROUGH THE SIMULATED NETWORK?
         if ( interactionRootSP->isDynamicInstance() ) {
 
-//            std::cerr << "Interaction \"" << interactionRootSP->getInstanceHlaClassName() << "\" is dynamic" << std::endl;
+            std::cerr << "Interaction \"" << interactionRootSP->getInstanceHlaClassName() << "\" is dynamic" << std::endl;
+            std::cout << "Interaction: " << *interactionRootSP << std::endl << std::endl;
 
             // GET FULL HLA CLASS NAME OF INTERACTION
             std::string instanceHlaClassName = interactionRootSP->getInstanceHlaClassName();
@@ -859,6 +861,8 @@ void HLAInterface::receiveInteraction(
     }
 
     InteractionRoot::SP interactionRootSP = InteractionRoot::create_interaction( theInteraction, theParameters, theTime );
+std::cout << "receiveInteration (with time): " << std::endl;
+std::cout << *interactionRootSP << std::endl << std::endl;
     C2WInteractionRoot::SP c2wInteractionRootSP = boost::dynamic_pointer_cast< C2WInteractionRoot >( interactionRootSP );
 
     // Filter interaction if src/origin fed requirements (if any) are met
@@ -882,6 +886,8 @@ void HLAInterface::receiveInteraction(
  throw ( RTI::InteractionClassNotKnown, RTI::InteractionParameterNotKnown, RTI::FederateInternalError ) {
 
     InteractionRoot::SP interactionRootSP = InteractionRoot::create_interaction( theInteraction, theParameters );
+std::cout << "receiveInteration (without time): " << std::endl;
+std::cout << *interactionRootSP << std::endl << std::endl;
     C2WInteractionRoot::SP c2wInteractionRootSP = boost::dynamic_pointer_cast< C2WInteractionRoot >( interactionRootSP );
     if (  c2wInteractionRootSP != 0 && SubscribedInteractionFilter::get_singleton().filterC2WInteraction( getFederateId(), c2wInteractionRootSP )  ) {
         return;
@@ -919,7 +925,6 @@ void HLAInterface::initialize(int stage) {
 
         setFederationJsonFileName( par( "federation_json_file_name" ).stringValue() );
         setFederateDynamicMessagingClassesJsonFileName( par( "dynamic_messaging_classes_json_file_name" ).stringValue() );
-        setRejectSourceFederateIdJsonFileName( par( "reject_source_federate_id_json_file_name").stringValue() );
 
         std::string federateHostConfigJsonFileName = par( "federate_host_config_json_file_name" ).stringValue();
 
@@ -1013,7 +1018,27 @@ void HLAInterface::setup() {
     InteractionRoot::subscribe_interaction(EmbeddedMessaging::get_hla_class_name() + "." + getFederateType(), getRTI());
 
     for(const std::string &dynamicPublishHlaClassName: _dynamicPublishFullHlaClassNameSet) {
-        InteractionRoot::publish_interaction(dynamicPublishHlaClassName, getRTI() );
+        if (
+          dynamicPublishHlaClassName == "InteractionRoot" ||
+          dynamicPublishHlaClassName.find("InteractionRoot.") == 0
+        ) {
+            InteractionRoot::publish_interaction(dynamicPublishHlaClassName, getRTI() );
+        } else if (
+          dynamicPublishHlaClassName == "ObjectRoot" ||
+          dynamicPublishHlaClassName.find("ObjectRoot.") == 0
+        ) {
+            for(
+              const ClassAndPropertyName &classAndPropertyName:
+                ObjectRoot::get_attribute_names(dynamicPublishHlaClassName)
+            ) {
+                ObjectRoot::publish_attribute(
+                  dynamicPublishHlaClassName,
+                  classAndPropertyName.getClassName(),
+                  classAndPropertyName.getPropertyName()
+                );
+            }
+            ObjectRoot::publish_object(dynamicPublishHlaClassName, getRTI() );
+        }
     }
 
     for(const std::string &dynamicSubscribeHlaClassName: _dynamicSubscribeFullHlaClassNameSet) {
@@ -1030,6 +1055,16 @@ void HLAInterface::setup() {
           dynamicSoftSubscribeHlaClassName == "ObjectRoot" ||
           dynamicSoftSubscribeHlaClassName.find("ObjectRoot.") == 0
         ) {
+            for(
+              const ClassAndPropertyName &classAndPropertyName:
+                ObjectRoot::get_attribute_names(dynamicSoftSubscribeHlaClassName)
+            ) {
+                ObjectRoot::soft_subscribe_attribute(
+                  dynamicSoftSubscribeHlaClassName,
+                  classAndPropertyName.getClassName(),
+                  classAndPropertyName.getPropertyName()
+                );
+            }
             ObjectRoot::soft_subscribe_object(dynamicSoftSubscribeHlaClassName, getRTI() );
         }
     }
@@ -1141,9 +1176,11 @@ void HLAInterface::handleMessage( omnetpp::cMessage* msg ) {
         if (interactionRootSP) {
             std::string receivingFederateName(hlaMsg->getReceiverFederateName());
             sendInteraction(*interactionRootSP, receivingFederateName, getCurrentTime() + getLookahead());
+std::cout << "Sending interaction: " << *interactionRootSP << std::endl << std::endl;
         } else if (objectReflectorSP) {
             std::string receivingFederateName(hlaMsg->getReceiverFederateName());
             sendInteraction(*objectReflectorSP, receivingFederateName, getCurrentTime() + getLookahead());
+std::cout << "Sending object reflector: " << *objectReflectorSP << std::endl << std::endl;
         } else {
             std::cerr << "No pointer" << std::endl;
         }

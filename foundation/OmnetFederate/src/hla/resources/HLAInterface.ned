@@ -41,7 +41,6 @@ simple HLAInterface {
         string dynamic_messaging_classes_json_file_name;
         string federate_host_config_json_file_name;
         string federate_sequence_to_messaging_info_json_file_name;
-        string reject_source_federate_id_json_file_name;
         string federation_name;
         string federate_name = default( "OmnetFederate" );
         double federate_step_size = default( 0.1 );

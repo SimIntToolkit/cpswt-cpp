@@ -28,7 +28,12 @@
  * OR MODIFICATIONS.
  */
 
-#include "edu/vanderbilt/vuisis/cpswt/hla/embeddedmessagingobjectcpptest/sender/Sender.hpp"
+#ifndef ORG_CPSWT_HLA_EMBEDDEDMESSAGINGOBJECTTESTCPP_SENDER_CLASS_CLASS
+#define ORG_CPSWT_HLA_EMBEDDEDMESSAGINGOBJECTTESTCPP_SENDER_CLASS_CLASS
+
+
+#include "edu/vanderbilt/vuisis/cpswt/hla/embeddedmessagingobjecttestcpp/sender/SenderBase.hpp"
+#include "FederateConfigParser.h"
 
 
 namespace edu {
@@ -36,48 +41,61 @@ namespace edu {
   namespace vuisis {
    namespace cpswt {
     namespace hla {
-     namespace embeddedmessagingobjectcpptest {
+     namespace embeddedmessagingobjecttestcpp {
       namespace sender {
 
-Sender::Sender(FederateConfig *federateConfig): Super(federateConfig) {
-    //////////////////////////////////////////////////////
-    // TODO register object instances after super(args) //
-    //////////////////////////////////////////////////////
-    registerObject(TestObject_0);
-}
+class Sender: public SenderBase {
 
-void Sender::initialize( void ) {
-    m_currentTime = 0;
-    if ( this->get_IsLateJoiner() ) {
-        m_currentTime = getLBTS() - getLookahead();
-        disableTimeRegulation();
+using InteractionRoot = ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot;
+using C2WInteractionRoot = ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot;
+
+public:
+    typedef ::edu::vanderbilt::vuisis::cpswt::hla::ObjectRoot_p::TestObject TestObject;
+//    private final static Logger log = LogManager.getLogger();
+
+private:
+    double m_currentTime;
+
+    TestObject TestObject_0;
+
+public:
+    Sender(FederateConfig *federateConfig);
+
+    virtual ~Sender() throw (RTI::FederateInternalError) {}
+
+private:
+
+public:
+    typedef SenderBase Super;
+
+    class SenderATRCallback : public ATRCallback {
+        private:
+            Sender &m_federateInstance;
+        public:
+            SenderATRCallback(Sender &federateInstance): m_federateInstance(federateInstance) {}
+
+            virtual void execute( void ) {
+                m_federateInstance.execute();
+            }
+
+            virtual SP clone() {
+                return SP(new SenderATRCallback(*this));
+            }
+    };
+
+    TestObject &getTestObject() {
+        return TestObject_0;
     }
-    SenderATRCallback advanceTimeRequest(*this);
-    putAdvanceTimeRequest(m_currentTime, advanceTimeRequest);
-    if ( !this->get_IsLateJoiner() ) {
-        readyToPopulate();
-        readyToRun();
-    }
-}
 
-void Sender::execute() {
-
-    TestObject_0.set_BooleanValue1(false);
-    TestObject_0.set_BooleanValue2(true);
-    TestObject_0.set_ByteValue(42);
-    TestObject_0.set_CharValue('X');
-    TestObject_0.set_DoubleValue(2.7181);
-    TestObject_0.set_FloatValue(3.14f);
-    TestObject_0.set_IntValue(1000000);
-    TestObject_0.set_ShortValue(300);
-    TestObject_0.set_LongValue(1000000000000000000L);
-    TestObject_0.set_StringValue("Hello");
-    updateAttributeValues(TestObject_0, 0.0);
-}
+    void initialize();
+    void execute();
+};
       } // NAMESPACE "sender"
-     } // NAMESPACE "embeddedmessagingobjectcpptest"
+     } // NAMESPACE "embeddedmessagingobjecttestcpp"
     } // NAMESPACE "hla"
    } // NAMESPACE "cpswt"
   } // NAMESPACE "vuisis"
  } // NAMESPACE "vanderbilt"
 } // NAMESPACE "edu"
+
+#endif // ORG_CPSWT_HLA_EMBEDDEDMESSAGINGOBJECTTESTCPP_SENDER_CLASS_CLASS

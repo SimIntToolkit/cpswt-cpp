@@ -112,8 +112,7 @@ void SynchronizedFederate::notifyFederationOfResign() {
 
 void SynchronizedFederate::initializeDynamicMessaging(
   const std::string &federationJsonFileName,
-  const std::string &federateDynamicMessagingClassesJsonFileName,
-  const std::string &rejectSourceFederateIdJsonFileName
+  const std::string &federateDynamicMessagingClassesJsonFileName
 ) {
     if (federationJsonFileName.empty() || federateDynamicMessagingClassesJsonFileName.empty()) {
         initializeMessaging();
@@ -122,20 +121,11 @@ void SynchronizedFederate::initializeDynamicMessaging(
 
     std::ifstream federationJsonInputStream(federationJsonFileName);
     std::ifstream federateDynamicMessagingClassJsonInputStream(federateDynamicMessagingClassesJsonFileName);
-    if (rejectSourceFederateIdJsonFileName.empty()) {
-        initializeDynamicMessaging(
-          federationJsonInputStream,
-          federateDynamicMessagingClassJsonInputStream
-        );
-    } else {
-        std::ifstream rejectSourceFederateIdJsonInputStream(rejectSourceFederateIdJsonFileName);
-        initializeDynamicMessaging(
-          federationJsonInputStream,
-          federateDynamicMessagingClassJsonInputStream,
-          rejectSourceFederateIdJsonInputStream
-        );
-        rejectSourceFederateIdJsonInputStream.close();
-    }
+
+    initializeDynamicMessaging(
+      federationJsonInputStream,
+      federateDynamicMessagingClassJsonInputStream
+    );
 
     federationJsonInputStream.close();
     federateDynamicMessagingClassJsonInputStream.close();
@@ -175,9 +165,7 @@ void SynchronizedFederate::joinFederation() {
 
     std::cout << "done." << std::endl;
 
-    initializeDynamicMessaging(
-      _federationJsonFileName, _federateDynamicMessagingClassesJsonFileName, _rejectSourceFederateIdJsonFileName
-    );
+    initializeDynamicMessaging(_federationJsonFileName, _federateDynamicMessagingClassesJsonFileName);
 
     ensureSimEndSubscription();
 
@@ -223,32 +211,6 @@ void SynchronizedFederate::sendInteraction(
 
 void SynchronizedFederate::registerObject(ObjectRoot &objectRoot) {
     objectRoot.registerObject(getRTI());
-
-    if (objectRoot.getFederateNameSoftPublishDirectSetSP()->size() > 0) {
-        for (const std::string &federateName : *objectRoot.getFederateNameSoftPublishDirectSetSP()) {
-            const std::string embeddedMessagingHlaClassName =
-              EmbeddedMessaging::get_hla_class_name() + "." + federateName;
-            InteractionRoot::SP embeddedMessagingDirectSP(new InteractionRoot(embeddedMessagingHlaClassName));
-
-            embeddedMessagingDirectSP->setParameter("command", "discover");
-            embeddedMessagingDirectSP->setParameter("hlaClassName", objectRoot.getInstanceHlaClassName());
-
-            Json::Value topLevelJSONObject(Json::objectValue);
-
-            topLevelJSONObject["object_handle"] = objectRoot.getObjectHandle();
-
-            Json::StreamWriterBuilder streamWriterBuilder;
-            streamWriterBuilder["commandStyle"] = "None";
-            streamWriterBuilder["indentation"] = "    ";
-            std::unique_ptr<Json::StreamWriter> streamWriterUPtr(streamWriterBuilder.newStreamWriter());
-            std::ostringstream stringOutputStream;
-            streamWriterUPtr->write(topLevelJSONObject, &stringOutputStream);
-
-            embeddedMessagingDirectSP->setParameter("messagingJson", stringOutputStream.str());
-
-            sendInteraction(*embeddedMessagingDirectSP);
-        }
-    }
 }
 
 void SynchronizedFederate::sendInteraction(
@@ -483,25 +445,6 @@ void SynchronizedFederate::receiveEmbeddedInteraction(EmbeddedMessaging::SP embe
     const std::string hlaClassName = embeddedMessagingSP->get_hlaClassName();
     const std::string federateSequence = embeddedMessagingSP->get_federateSequence();
 
-    if (command == "discover") {
-        std::istringstream jsonInputStream(embeddedMessagingSP->get_messagingJson());
-
-        Json::Value jsonObject;
-        jsonInputStream >> jsonObject;
-
-        int objectHandle = jsonObject["object_handle"].asInt();
-        if (
-          ObjectRoot::get_object_hla_class_name_set().find(hlaClassName) ==
-            ObjectRoot::get_object_hla_class_name_set().end()
-        ) {
-            BOOST_LOG_SEV( get_logger(), error ) << "SynchronizedFederate.receiveEmbeddedInteraction: "
-              << "Bad class name \"" << hlaClassName << "\" on discover";
-            return;
-        }
-        ObjectRoot::add_object_update_embedded_only_id(hlaClassName, objectHandle);
-        return;
-    }
-
     if (command == "interaction") {
         if (!InteractionRoot::get_is_soft_subscribed(hlaClassName)) {
             BOOST_LOG_SEV( get_logger(), warning ) << "SynchronizedFederate.receiveEmbeddedInteraction: "
@@ -518,7 +461,7 @@ void SynchronizedFederate::receiveEmbeddedInteraction(EmbeddedMessaging::SP embe
     }
 
     if (command == "object") {
-        if (!ObjectRoot::get_is_subscribed(hlaClassName) && !ObjectRoot::get_is_soft_subscribed(hlaClassName)) {
+        if (!ObjectRoot::get_is_soft_subscribed(hlaClassName)) {
             BOOST_LOG_SEV( get_logger(), warning ) << "SynchronizedFederate.receiveEmbeddedInteraction: "
               << "object class \"" << hlaClassName << "\" neither subscribed nor soft subscribed";
             return;
@@ -526,10 +469,11 @@ void SynchronizedFederate::receiveEmbeddedInteraction(EmbeddedMessaging::SP embe
 
         ObjectRoot::ObjectReflector::SP objectReflectorSP =
           ObjectRoot::fromJson(embeddedMessagingSP->get_messagingJson());
+        objectReflectorSP->setTime(embeddedMessagingSP->getTime());
         objectReflectorSP->setFederateSequence(federateSequence);
 
         const ClassAndPropertyNameSet &attributeClassAndPropertyNameSet =
-          *ObjectRoot::get_subscribed_class_and_property_name_set_sp(objectReflectorSP->getHlaClassName());
+          *ObjectRoot::get_soft_subscribed_class_and_property_name_set_sp(objectReflectorSP->getHlaClassName());
 
         ObjectRoot::ClassAndPropertyNameValueSPMap &classAndPropertyNameValueSPMap =
           objectReflectorSP->getClassAndPropertyNameValueSPMap();

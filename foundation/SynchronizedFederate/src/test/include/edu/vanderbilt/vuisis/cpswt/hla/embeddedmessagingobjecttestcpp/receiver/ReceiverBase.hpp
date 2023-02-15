@@ -28,8 +28,8 @@
  * OR MODIFICATIONS.
  */
 
-#ifndef ORG_CPSWT_HLA_EMBEDDEDMESSAGINGOBJECTCPPTEST_SENDER_CLASS_BASE_CLASS
-#define ORG_CPSWT_HLA_EMBEDDEDMESSAGINGOBJECTCPPTEST_SENDER_CLASS_BASE_CLASS
+#ifndef EDU_VANDERBILT_VUISIS_CPSWT_HLA_EMBEDDEDMESSAGINGOBJECTTESTCPP_RECEIVER_CLASS_BASE_CLASS
+#define EDU_VANDERBILT_VUISIS_CPSWT_HLA_EMBEDDEDMESSAGINGOBJECTTESTCPP_RECEIVER_CLASS_BASE_CLASS
 
 #define BOOST_LOG_DYN_LINK
 
@@ -47,7 +47,6 @@
 #include "FederateConfigParser.h"
 
 
-#include "InteractionRoot_p/C2WInteractionRoot_p/EmbeddedMessaging_p/OmnetFederate.hpp"
 #include "InteractionRoot_p/C2WInteractionRoot_p/EmbeddedMessaging_p/Receiver.hpp"
 #include "ObjectRoot_p/TestObject.hpp"
 
@@ -57,8 +56,8 @@ namespace edu {
   namespace vuisis {
    namespace cpswt {
     namespace hla {
-     namespace embeddedmessagingobjectcpptest {
-      namespace sender {
+     namespace embeddedmessagingobjecttestcpp {
+      namespace receiver {
 
 BOOST_LOG_ATTRIBUTE_KEYWORD(federateName, "FederateName", std::string);
 BOOST_LOG_ATTRIBUTE_KEYWORD(messagingClassName, "MessagingClassName", std::string);
@@ -73,7 +72,7 @@ namespace expr = boost::log::expressions;
 
 using namespace logging::trivial;
 
-class SenderBase: public SynchronizedFederateMockRTI {
+class ReceiverBase: public SynchronizedFederateMockRTI {
 
 using InteractionRoot = ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot;
 using C2WInteractionRoot = ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot;
@@ -89,7 +88,7 @@ private:
 
         // ADD FEDERATE NAME ATTRIBUTE TO ALL LOG MESSAGES
         logging::core::get()->add_global_attribute("FederateName", attrs::constant< std::string >(
-          "Sender"
+          "Receiver"
         ));
 
         // ADD SINK TO LOG FILE NAMED AFTER FEDERATE
@@ -97,7 +96,7 @@ private:
         static boost::shared_ptr< text_sink > fileSink = boost::make_shared< text_sink >();
 
         fileSink->locked_backend()->add_stream(
-          boost::make_shared< std::ofstream >("Sender.log")
+          boost::make_shared< std::ofstream >("Receiver.log")
         );
 
         fileSink->set_formatter(
@@ -123,7 +122,7 @@ public:
 
     typedef std::vector<std::string> ArgVector;
 
-    virtual ~SenderBase() { }
+    virtual ~ReceiverBase() { }
 
 private:
     SubscribedInteractionFilter _subscribedInteractionFilter;
@@ -132,13 +131,7 @@ protected:
     void init();
 
 public:
-    SenderBase(FederateConfig *federateConfig);
-
-    ::edu::vanderbilt::vuisis::cpswt::hla::ObjectRoot_p::TestObject::SP create_ObjectRoot_TestObject() {
-        ::edu::vanderbilt::vuisis::cpswt::hla::ObjectRoot_p::TestObject::SP objectSP =
-            ::edu::vanderbilt::vuisis::cpswt::hla::ObjectRoot_p::TestObject::create();
-        return objectSP;
-    }
+    ReceiverBase(FederateConfig *federateConfig);
 
     virtual void receiveInteraction(
       RTI::InteractionClassHandle interactionClassHandle,
@@ -163,12 +156,12 @@ public:
       RTI::FederateInternalError
     );
 };
-      } // NAMESPACE "sender"
-     } // NAMESPACE "embeddedmessagingobjectcpptest"
+      } // NAMESPACE "receiver"
+     } // NAMESPACE "embeddedmessagingobjecttestcpp"
     } // NAMESPACE "hla"
    } // NAMESPACE "cpswt"
   } // NAMESPACE "vuisis"
  } // NAMESPACE "vanderbilt"
 } // NAMESPACE "edu"
 
-#endif // ORG_CPSWT_HLA_EMBEDDEDMESSAGINGOBJECTCPPTEST_SENDER_CLASS_BASE_CLASS
+#endif // ORG_CPSWT_HLA_EMBEDDEDMESSAGINGOBJECTTESTCPP_RECEIVER_CLASS_BASE_CLASS
