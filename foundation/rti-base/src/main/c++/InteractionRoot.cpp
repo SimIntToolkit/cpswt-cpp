@@ -124,14 +124,17 @@ void InteractionRoot::init(const std::string &hlaClassName, RTI::RTIambassador *
                 }
             }
         }
-
-        //-------------------------------------------------------
-        // INITIALIZE ALL CLASSES TO NOT-PUBLISHED NOT-SUBSCRIBED
-        //-------------------------------------------------------
-        get_class_name_publish_status_map()[localHlaClassName] = false;
-        get_class_name_subscribe_status_map()[localHlaClassName] = false;
-        get_class_name_soft_subscribe_status_map()[localHlaClassName] = false;
     }
+}
+
+void InteractionRoot::common_init(const std::string &hlaClassName) {
+
+    //-------------------------------------------------------
+    // INITIALIZE ALL CLASSES TO NOT-PUBLISHED NOT-SUBSCRIBED
+    //-------------------------------------------------------
+    get_class_name_publish_status_map()[hlaClassName] = false;
+    get_class_name_subscribe_status_map()[hlaClassName] = false;
+    get_class_name_soft_subscribe_status_map()[hlaClassName] = false;
 }
 
 ClassAndPropertyNameSP InteractionRoot::findProperty(
@@ -145,7 +148,7 @@ ClassAndPropertyNameSP InteractionRoot::findProperty(
         std::string localClassName = boost::algorithm::join(classNameComponents, ".");
 
         ClassAndPropertyName key(localClassName, propertyName);
-        if (get_class_and_property_name_handle_map().find(key) != get_class_and_property_name_handle_map().end()) {
+        if (get_complete_class_and_property_name_set().find(key) != get_complete_class_and_property_name_set().end()) {
             return ClassAndPropertyNameSP(new ClassAndPropertyName(key));
         }
 
@@ -338,7 +341,7 @@ void InteractionRoot::unsubscribe_interaction(const std::string &hlaClassName, R
 void InteractionRoot::initializeProperties(const std::string &hlaClassName) {
     federateAppendedToFederateSequence = false;
     setInstanceHlaClassName(hlaClassName);
-    if (get_hla_class_name_set().find(hlaClassName) == get_hla_class_name_set().end()) {
+    if (get_class_name_handle_map().find(hlaClassName) == get_class_name_handle_map().end()) {
         BOOST_LOG_SEV(get_logger(), error)
           << "InteractionRoot( const std::string &hlaClassName ): hlaClassName \"" << hlaClassName
           << "\" is not defined -- creating dummy interaction with fictitious type \"" << hlaClassName
@@ -389,10 +392,15 @@ bool InteractionRoot::static_init() {
     // IN InteractionRoot
     get_class_name_class_and_property_name_set_sp_map()[get_hla_class_name()] = classAndPropertyNameSetSP;
 
+    get_complete_class_and_property_name_set().insert(
+      classAndPropertyNameSetSP->begin(), classAndPropertyNameSetSP->end()
+    );
+
     ClassAndPropertyNameSetSP allClassAndPropertyNameSetSP( new ClassAndPropertyNameSet() );// ADD THIS CLASS'S _allClassAndPropertyNameSet TO _classNameAllPropertyNameSetMap DEFINED
     // IN InteractionRoot
     get_class_name_all_class_and_property_name_set_sp_map()[get_hla_class_name()] = allClassAndPropertyNameSetSP;
 
+    common_init(get_hla_class_name());
     return true;
 }
 
@@ -589,7 +597,7 @@ InteractionRoot::SP InteractionRoot::fromJson(const std::string &jsonString) {
 void InteractionRoot::add_federate_name_soft_publish(
   const std::string &hlaClassName, const std::string &federateName
 ) {
-    if (get_hla_class_name_set().find(hlaClassName) == get_hla_class_name_set().end()) {
+    if (get_class_name_handle_map().find(hlaClassName) == get_class_name_handle_map().end()) {
         BOOST_LOG_SEV(get_logger(), warning) << "add_federate_name_soft_publish(\"" << hlaClassName << "\", \""
           << federateName << "\") -- no such interaction class \"" << hlaClassName << "\"";
         return;
@@ -692,6 +700,10 @@ void InteractionRoot::readFederateDynamicMessageClass(const std::string &hlaClas
         }
 
         get_class_name_class_and_property_name_set_sp_map()[localHlaClassName] = classAndPropertyNameSetSP;
+
+        get_complete_class_and_property_name_set().insert(
+          classAndPropertyNameSet.begin(), classAndPropertyNameSet.end()
+        );
     }
 
     for(const std::string &localHlaClassName: localHlaClassNameSet) {
@@ -713,6 +725,8 @@ void InteractionRoot::readFederateDynamicMessageClass(const std::string &hlaClas
         }
 
         get_class_name_all_class_and_property_name_set_sp_map()[localHlaClassName] = allClassAndPropertyNameSetSP;
+
+        common_init(localHlaClassName);
     }
 }
 

@@ -518,45 +518,6 @@ public:
         return  get_source_federate_id(*this);
     }
 
-private:
-    static std::map<std::string, StringSetSP> &get_hla_class_name_to_reject_source_federate_id_set_sp_map() {
-        static std::map< std::string, StringSetSP> hla_class_name_to_reject_source_federate_id_set_sp_map;
-        return hla_class_name_to_reject_source_federate_id_set_sp_map;
-    }
-
-public:
-    static void add_reject_source_federate_id(const std::string &hlaClassName, const std::string &federateId);
-
-    void addRejectSourceFederateId(const std::string &federateId) {
-        add_reject_source_federate_id(getInstanceHlaClassName(), federateId);
-    }
-
-    static bool is_reject_source_federate_id(const std::string &hlaClassName, const std::string &federateId);
-
-    static bool is_reject_source_federate_id(
-      ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot &interactionRoot
-    ) {
-        return is_reject_source_federate_id(
-          interactionRoot.getInstanceHlaClassName(), get_source_federate_id(interactionRoot)
-        );
-    }
-
-    static bool is_reject_source_federate_id(
-      ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot::SP &interactionRootSP
-    ) {
-        return is_reject_source_federate_id(*interactionRootSP);
-    }
-
-    bool isRejectSourceFederateId() {
-        return is_reject_source_federate_id(*this);
-    }
-
-    static void remove_reject_source_federate_id(const std::string &hlaClassName, const std::string &federateId);
-
-    void removeRejectSourceFederateId(const std::string &federateId) {
-        remove_reject_source_federate_id(getInstanceHlaClassName(), federateId);
-    }
-
     // THIS METHOD ACTS AS AN ERROR DETECTOR -- ALL INSTANCES OF C2WInteractionRoot
     // SHOULD HAVE A NON-EMPTY JSON-ARRAY VALUE FOR THEIR federateSequence PARAMETER.
     void sendInteraction( RTI::RTIambassador *rtiAmbassador, double time ) override {
@@ -577,40 +538,6 @@ public:
             return;
         }
         Super::sendInteraction( rtiAmbassador );
-    }
-
-    static void readRejectSourceFederateIdData(const std::string &rejectSourceFederateIdJsonFileString) {
-        std::ifstream rejectSourceFederateIdInputFileStream( rejectSourceFederateIdJsonFileString );
-        readRejectSourceFederateIdData(rejectSourceFederateIdInputFileStream);
-        rejectSourceFederateIdInputFileStream.close();
-    }
-
-    static void readRejectSourceFederateIdData(std::istream &rejectSourceFederateIdInputFileStream) {
-        Json::Value rejectSourceFederateIdData;
-        rejectSourceFederateIdInputFileStream >> rejectSourceFederateIdData;
-
-        for(
-          Json::Value::const_iterator sfdCit = rejectSourceFederateIdData.begin() ;
-          sfdCit != rejectSourceFederateIdData.end() ;
-          ++sfdCit
-        ) {
-            const std::string &hlaClassName = sfdCit.key().asString();
-            for(Json::Value federateId: *sfdCit) {
-                add_reject_source_federate_id(hlaClassName, federateId.asString());
-            }
-        }
-    }
-
-    static void add_reject_source_federate_id(const std::string &federateId) {
-        add_reject_source_federate_id(get_hla_class_name(), federateId);
-    }
-
-    static bool is_reject_source_federate_id(const std::string &federateId) {
-        return is_reject_source_federate_id(get_hla_class_name(), federateId);
-    }
-
-    static void remove_reject_source_federate_id(const std::string &federateId) {
-        remove_reject_source_federate_id(get_hla_class_name(), federateId);
     }
 
     //-------------

@@ -39,7 +39,7 @@
 using InteractionRoot = ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot;
 using ObjectRoot = ::edu::vanderbilt::vuisis::cpswt::hla::ObjectRoot;
 
-const RTIAmbassadorTest1::ClassNameHandleMap &RTIAmbassadorTest1::get_class_name_handle_map_aux() {
+const RTIAmbassadorTest1::ClassNameHandleMap &RTIAmbassadorTest1::get_interaction_class_name_handle_map_aux() {
     static ClassNameHandleMap classNameHandleMap;
 
     int handleValue = 0;
@@ -98,8 +98,8 @@ const RTIAmbassadorTest1::ClassNameHandleMap &RTIAmbassadorTest1::get_class_name
     return classNameHandleMap;
 }
 
-const RTIAmbassadorTest1::ClassHandleNameMap &RTIAmbassadorTest1::get_class_handle_name_map_aux() {
-    const ClassNameHandleMap &classNameHandleMap = get_class_name_handle_map();
+const RTIAmbassadorTest1::ClassHandleNameMap &RTIAmbassadorTest1::get_interaction_class_handle_name_map_aux() {
+    const ClassNameHandleMap &classNameHandleMap = get_interaction_class_name_handle_map();
 
     static ClassHandleNameMap classHandleNameMap;
     for(
@@ -157,7 +157,7 @@ const RTIAmbassadorTest1::ClassAndPropertyNameHandleMap
 
     interactionClassAndPropertyNameHandleMap[
             ClassAndPropertyName("InteractionRoot.TestBase", "field1")
-    ] =get_new_int_value();
+    ] = get_new_int_value();
     interactionClassAndPropertyNameHandleMap[
             ClassAndPropertyName("InteractionRoot.TestBase", "field2")
     ] = get_new_int_value();
@@ -172,6 +172,26 @@ const RTIAmbassadorTest1::ClassAndPropertyNameHandleMap
     ] = get_new_int_value();
 
     return interactionClassAndPropertyNameHandleMap;
+}
+
+const RTIAmbassadorTest1::ClassNameHandleMap &RTIAmbassadorTest1::get_object_class_name_handle_map_aux() {
+    static ClassNameHandleMap classNameHandleMap;
+
+    int handleValue = 0;
+
+    classNameHandleMap["ObjectRoot"] =
+      static_cast<RTI::ObjectClassHandle>(handleValue++);
+
+    classNameHandleMap["ObjectRoot.FederateObject"] =
+      static_cast<RTI::ObjectClassHandle>(handleValue++);
+
+    classNameHandleMap["ObjectRoot.TestBase"] =
+      static_cast<RTI::ObjectClassHandle>(handleValue++);
+
+    classNameHandleMap["ObjectRoot.TestBase.TestDerived"] =
+      static_cast<RTI::ObjectClassHandle>(handleValue++);
+
+    return classNameHandleMap;
 }
 
 const RTIAmbassadorTest1::ClassAndPropertyNameHandleMap
@@ -192,13 +212,28 @@ const RTIAmbassadorTest1::ClassAndPropertyNameHandleMap
     return objectClassAndPropertyNameHandleMap;
 }
 
+const RTIAmbassadorTest1::ClassHandleNameMap &RTIAmbassadorTest1::get_object_class_handle_name_map_aux() {
+    const ClassNameHandleMap &classNameHandleMap = get_object_class_name_handle_map();
+
+    static ClassHandleNameMap classHandleNameMap;
+    for(
+      ClassNameHandleMap::const_iterator chmCit = classNameHandleMap.begin() ;
+      chmCit != classNameHandleMap.end() ;
+      ++chmCit
+    ) {
+        classHandleNameMap[chmCit->second] = chmCit->first;
+    }
+
+    return classHandleNameMap;
+}
+
 // 10.6
 RTI::InteractionClassHandle RTIAmbassadorTest1::getInteractionClassHandle(const char *theName) throw (
   RTI::NameNotFound, RTI::FederateNotExecutionMember, RTI::ConcurrentAccessAttempted, RTI::RTIinternalError
 ) {
-    ClassNameHandleMap::const_iterator chmCit = get_class_name_handle_map().find(theName);
+    ClassNameHandleMap::const_iterator chmCit = get_interaction_class_name_handle_map().find(theName);
 
-    return chmCit == get_class_name_handle_map().end() ?
+    return chmCit == get_interaction_class_name_handle_map().end() ?
       std::numeric_limits<RTI::InteractionClassHandle>::max() : chmCit->second;
 }
 
@@ -214,6 +249,15 @@ RTI::ParameterHandle RTIAmbassadorTest1::getParameterHandle(
     std::string hlaClassName = InteractionRoot::get_hla_class_name(whichClass);
     ClassAndPropertyName classAndPropertyName(hlaClassName, std::string(theName));
     return get_interaction_class_and_property_name_handle_map().find(classAndPropertyName)->second;
+}
+
+RTI::InteractionClassHandle RTIAmbassadorTest1::getObjectClassHandle(const char *theName) throw (
+  RTI::NameNotFound, RTI::FederateNotExecutionMember, RTI::ConcurrentAccessAttempted, RTI::RTIinternalError
+) {
+    ClassNameHandleMap::const_iterator chmCit = get_object_class_name_handle_map().find(theName);
+
+    return chmCit == get_object_class_name_handle_map().end() ?
+      std::numeric_limits<RTI::ObjectClassHandle>::max() : chmCit->second;
 }
 
 RTI::AttributeHandle RTIAmbassadorTest1::getAttributeHandle(
@@ -238,7 +282,7 @@ void RTIAmbassadorTest1::publishInteractionClass(RTI::InteractionClassHandle the
   RTI::RestoreInProgress,
   RTI::RTIinternalError
 ) {
-    const std::string &interactionName = get_class_handle_name_map().find(theInteraction)->second;
+    const std::string &interactionName = get_interaction_class_handle_name_map().find(theInteraction)->second;
     get_published_interaction_class_name_set_aux().insert(interactionName);
 }
 
@@ -251,7 +295,7 @@ throw (
   RTI::RestoreInProgress,
   RTI::RTIinternalError
 ) {
-    const std::string &interactionName = get_class_handle_name_map().find(theInteraction)->second;
+    const std::string &interactionName = get_interaction_class_handle_name_map().find(theInteraction)->second;
     get_subscribed_interaction_class_name_set_aux().insert(interactionName);
 }
 

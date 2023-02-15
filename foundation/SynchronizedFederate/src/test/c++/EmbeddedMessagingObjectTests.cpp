@@ -1,6 +1,7 @@
 #include "EmbeddedMessagingObjectTests.hpp"
-#include "edu/vanderbilt/vuisis/cpswt/hla/embeddedmessagingobjectcpptest/sender/Sender.hpp"
-#include "edu/vanderbilt/vuisis/cpswt/hla/embeddedmessagingobjectcpptest/receiver/Receiver.hpp"
+#include "edu/vanderbilt/vuisis/cpswt/hla/embeddedmessagingobjecttestcpp/sender/Sender.hpp"
+#include "edu/vanderbilt/vuisis/cpswt/hla/embeddedmessagingobjecttestcpp/receiver/Receiver.hpp"
+#include <cmath>
 
 #include <boost/lexical_cast.hpp>
 
@@ -10,8 +11,8 @@ typedef ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteraction
 typedef ::edu::vanderbilt::vuisis::cpswt::hla::ObjectRoot ObjectRoot;
 typedef ::edu::vanderbilt::vuisis::cpswt::hla::ObjectRoot_p::TestObject TestObject;
 
-typedef ::edu::vanderbilt::vuisis::cpswt::hla::embeddedmessagingobjectcpptest::sender::Sender Sender;
-typedef ::edu::vanderbilt::vuisis::cpswt::hla::embeddedmessagingobjectcpptest::receiver::Receiver Receiver;
+typedef ::edu::vanderbilt::vuisis::cpswt::hla::embeddedmessagingobjecttestcpp::sender::Sender Sender;
+typedef ::edu::vanderbilt::vuisis::cpswt::hla::embeddedmessagingobjecttestcpp::receiver::Receiver Receiver;
 
 
 void EmbeddedMessagingObjectTests::testObjectNetworkPropagation() {
@@ -25,9 +26,6 @@ void EmbeddedMessagingObjectTests::testObjectNetworkPropagation() {
     //
     // CLASS HANDLES FOR FEDERATE-SPECIFIC EmbeddedMessaging INTERACTIONS
     //
-    int embeddedMessagingReceiverInteractionClassHandle = InteractionRoot::get_class_handle(
-            EmbeddedMessaging::get_hla_class_name() + ".Receiver"
-    );
     int embeddedMessagingOmnetFederateInteractionClassHandle = InteractionRoot::get_class_handle(
             EmbeddedMessaging::get_hla_class_name() + ".OmnetFederate"
     );
@@ -64,61 +62,8 @@ void EmbeddedMessagingObjectTests::testObjectNetworkPropagation() {
     CPPUNIT_ASSERT_EQUAL(TestObject::get_class_handle(), objectClassHandle);
 
     // ALSO WHEN SENDER WAS CREATED, IT SENT OUT 2 INTERACTIONS
-    // * ONE FederateJoinInteraction
-    // * ONE EmbeddedMessaging.Receiver INTERACTION TO TELL THE RECEIVER ONLY TO RECEIVE ATTRIBUTE
-    //   UPDATES FOR THE OBJECT THROUGH A NETWORK (I.E. NOT DIRECTLY FROM THE RTI).
-    CPPUNIT_ASSERT_EQUAL(2, static_cast<int>(sentInteractionDataSPList.size()));
-
-    // ONLY INTERESTED IN THE EmbeddedMessaging.Receiver INTERACTION
-    RTIAmbassadorTest2::SentInteractionDataSP objectUpdatesOnlyThroughNetworkInteractionDataSP =
-            sentInteractionDataSPList.back();
-    RTIAmbassadorTest2::SentInteractionData &objectUpdatesOnlyThroughNetworkInteractionData =
-      *objectUpdatesOnlyThroughNetworkInteractionDataSP;
-
-    // MAKE SURE CLASS HANDLE OF SENT EmbeddedMessaging.Receiver INTERACTION IS FOR
-    // EmbeddedMessaging.Receiver CLASS
-    int embeddedMessagingReceiverInteractionDataClassHandle =
-            objectUpdatesOnlyThroughNetworkInteractionData.getInteractionClassHandle();
-    CPPUNIT_ASSERT_EQUAL(
-            embeddedMessagingReceiverInteractionClassHandle, embeddedMessagingReceiverInteractionDataClassHandle
-    );
-
-    // CREATE A LOCAL INTERACTION INSTANCE FROM THE INTERACTION DATA OF THE SENT EmbeddedMessagingReceiver
-    // INTERACTION
-    const RTI::ParameterHandleValuePairSet &embeddedMessagingDiscoverParameterHandleValuePairSet =
-            objectUpdatesOnlyThroughNetworkInteractionData.getParameterHandleValuePairSet();
-    InteractionRoot::SP localEmbeddedMessagingReceiverInteractionRootSP = InteractionRoot::create_interaction(
-            embeddedMessagingReceiverInteractionDataClassHandle, embeddedMessagingDiscoverParameterHandleValuePairSet
-    );
-
-    // CAST THE LOCAL INTERACTION TO EmbeddedInteraction.Receiver
-    edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::EmbeddedMessaging_p::Receiver::SP
-      localEmbeddedMessagingReceiverInteractionSP =
-        boost::dynamic_pointer_cast<
-          edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::EmbeddedMessaging_p::Receiver
-        >(localEmbeddedMessagingReceiverInteractionRootSP);
-
-    // MAKE SURE THE CREATED LOCAL INTERACTION IS OF TYPE EmbeddedInteraction.Receiver
-    CPPUNIT_ASSERT(localEmbeddedMessagingReceiverInteractionSP);
-
-    edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::EmbeddedMessaging_p::Receiver
-      &localEmbeddedMessagingReceiverInteraction = *localEmbeddedMessagingReceiverInteractionSP;
-
-    // command FOR EmbeddedInteraction.Receiver INTERACTION SHOULD BE "discover"
-    CPPUNIT_ASSERT_EQUAL(localEmbeddedMessagingReceiverInteraction.get_command(), std::string("discover"));
-    // hlaClassName FOR EmbeddedInteraction.Receiver INTERACTION SHOULD BE for TestOBject
-    CPPUNIT_ASSERT_EQUAL(
-            localEmbeddedMessagingReceiverInteraction.get_hlaClassName(), TestObject::get_hla_class_name())
-    ;
-
-    // messagingJson SHOULD CONTAIN THE OBJECT HANDLE FOR THE OBJECT REGISTERED BY THE SENDER
-    std::istringstream jsonInputStream(localEmbeddedMessagingReceiverInteraction.get_messagingJson());
-
-    Json::Value jsonObject;
-    jsonInputStream >> jsonObject;
-
-    CPPUNIT_ASSERT_EQUAL(jsonObject["object_handle"].asInt(), sender.getTestObject().getObjectHandle());
-    CPPUNIT_ASSERT_EQUAL(jsonObject["object_handle"].asInt(), objectHandle);
+    // * FederateJoinInteraction
+    CPPUNIT_ASSERT_EQUAL(1, static_cast<int>(sentInteractionDataSPList.size()));
 
     // THROW AWAY INTERACTION DATA SENT BY SENDER UP TO THIS POINT -- ALREADY TESTED
     sentInteractionDataSPList.clear();
@@ -142,15 +87,15 @@ void EmbeddedMessagingObjectTests::testObjectNetworkPropagation() {
 
     // ReflectedAttributes SHOULD BE PRESENT IN THE UPDATED-OBJECT DATA, AND SHOULD ONLY
     // CONTAIN DATA FOR 7 ATTRIBUTE -- THE NUMBER THAT ARE PUBLISHED.
-    CPPUNIT_ASSERT_EQUAL(7, static_cast<int>(updatedObjectData.getAttributeHandleValuePairSet().size()));
+    CPPUNIT_ASSERT_EQUAL(8, static_cast<int>(updatedObjectData.getAttributeHandleValuePairSet().size()));
 
     // CREATE A LOCAL OBJECT INSTANCE FROM THE OBJECT-DATA THAT WAS SENT OUT FROM THE "updateAttributes"
     // CALL
-    ObjectRoot::SP localTestObjectObjectRootSP =
+    ObjectRoot::SP localTestObjectRootSP =
             ObjectRoot::create_object(objectClassHandle, updatedObjectData.getAttributeHandleValuePairSet());
 
     TestObject::SP localTestObjectSP =
-        boost::dynamic_pointer_cast<TestObject>(localTestObjectObjectRootSP);
+        boost::dynamic_pointer_cast<TestObject>(localTestObjectRootSP);
 
     // THE LOCAL OBJECT SHOULD BE A TestObject
     CPPUNIT_ASSERT(localTestObjectSP);
@@ -163,14 +108,14 @@ void EmbeddedMessagingObjectTests::testObjectNetworkPropagation() {
     CPPUNIT_ASSERT_EQUAL(senderTestObject.get_BooleanValue2(), localTestObject.get_BooleanValue2());
     CPPUNIT_ASSERT_EQUAL(senderTestObject.get_ByteValue(), localTestObject.get_ByteValue());
     CPPUNIT_ASSERT_EQUAL(senderTestObject.get_CharValue(), localTestObject.get_CharValue());
-    CPPUNIT_ASSERT_DOUBLES_EQUAL(senderTestObject.get_DoubleValue(), localTestObject.get_DoubleValue(), 0.001);
     CPPUNIT_ASSERT_DOUBLES_EQUAL(senderTestObject.get_FloatValue(), localTestObject.get_FloatValue(), 0.001);
     CPPUNIT_ASSERT_EQUAL(senderTestObject.get_IntValue(), localTestObject.get_IntValue());
+    CPPUNIT_ASSERT_EQUAL(senderTestObject.get_LongValue(), localTestObject.get_LongValue());
+    CPPUNIT_ASSERT_EQUAL(senderTestObject.get_ShortValue(), localTestObject.get_ShortValue());
 
     // THE ATTRIBUTES THAT ARE *NOT* PUBLISHED FOR THE REGISTERED OBJECT SHOULD *NOT* HAVE THE SAME VALUES
     // AS THE CORRESPONDING ATTRIBUTES IN THE LOCAL OBJECT
-    CPPUNIT_ASSERT(senderTestObject.get_LongValue() != localTestObject.get_LongValue());
-    CPPUNIT_ASSERT(senderTestObject.get_ShortValue() != localTestObject.get_ShortValue());
+    CPPUNIT_ASSERT(fabs(senderTestObject.get_DoubleValue() - localTestObject.get_DoubleValue()) > 0.001);
     CPPUNIT_ASSERT(senderTestObject.get_StringValue() != localTestObject.get_StringValue());
 
     // WHEN THE SENDER CALLED "updateAttributes" FOR THE REGISTERED OBJECT, IT SHOULD ALSO HAVE
@@ -197,7 +142,7 @@ void EmbeddedMessagingObjectTests::testObjectNetworkPropagation() {
     // CREATE A LOCAL INSTANCE OF THE INTERACTION ASSOCIATED WITH THE ATTRIBUTES UPDATE
     InteractionRoot::SP localEmbeddedMessagingOmnetFederateInteractionRootSP = InteractionRoot::create_interaction(
             updateAttributesEmbeddedMessagingOmnetFederateClassHandle,
-           updatedAttributesEmbeddedMessagingOmnetFederateData.getParameterHandleValuePairSet()
+            updatedAttributesEmbeddedMessagingOmnetFederateData.getParameterHandleValuePairSet()
     );
 
     edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::EmbeddedMessaging_p::OmnetFederate::SP
@@ -230,7 +175,7 @@ void EmbeddedMessagingObjectTests::testObjectNetworkPropagation() {
     Json::Value objectReflectorJsonPropertiesMap = objectReflectorJson["properties"];
 
     // THE messagingJson SHOULD BE FOR ALL OF THE PUBLISHED ATTRIBUTES
-    CPPUNIT_ASSERT_EQUAL(7, static_cast<int>(objectReflectorJsonPropertiesMap.size()));
+    CPPUNIT_ASSERT_EQUAL(8, static_cast<int>(objectReflectorJsonPropertiesMap.size()));
 
     // GET ClassAndPropertyNameValueMap FOR THE senderTestObject
     const ObjectRoot::ClassAndPropertyNameValueSPMap &senderClassAndPropertyNameValueSPMap =
@@ -241,7 +186,7 @@ void EmbeddedMessagingObjectTests::testObjectNetworkPropagation() {
             *TestObject::get_published_attribute_name_set_sp();
 
     // testObjectClassAndPropertyNameSet SHOULD HAVE 7 MEMBERS
-    CPPUNIT_ASSERT_EQUAL(7, static_cast<int>(testObjectPublishedAttributeSet.size()));
+    CPPUNIT_ASSERT_EQUAL(8, static_cast<int>(testObjectPublishedAttributeSet.size()));
 
     // MAKE SURE objectReflector HAS SAME JSON-ENCODED ATTRIBUTE VALUES AS VALUES OF ATTRIBUTES
     // FOR senderTestObject
@@ -275,21 +220,31 @@ void EmbeddedMessagingObjectTests::testObjectNetworkPropagation() {
     Receiver::ReceiverATRCallback advanceTimeRequest(receiver);
     receiver.putAdvanceTimeRequest(0, advanceTimeRequest);
 
-    // ALSO HAVE THE RECEIVER RECEIVE THE EmbeddedMessaging.Receiver INTERACTION THAT TELLS IS TO IGNORE
-    // ATTRIBUTE UPDATES FOR THE TestObject WHEN RECEIVED DIRECTLY FROM THE RTI, AND ONLY RECEIVE
-    // THEM THROUGH EmbeddedMessaging
-    receiver.receiveInteraction(
-            embeddedMessagingReceiverInteractionDataClassHandle,
-            embeddedMessagingDiscoverParameterHandleValuePairSet,
-            nullptr
-    );
+    ObjectRoot::AttributeHandleSet &attributeHandleSet = *TestObject::get_subscribed_attribute_handle_set_sp();
+    CPPUNIT_ASSERT_EQUAL(4, static_cast<int>(attributeHandleSet.size()));
 
-    CPPUNIT_ASSERT(!receiver.getTestObjectSP());
+    ObjectRoot::PropertyHandleValuePairSetSP subscribedAttributeHandleValuePairSetSP(
+      RTI::AttributeSetFactory::create( attributeHandleSet.size() )
+    );
+    ObjectRoot::PropertyHandleValuePairSet &subscribedAttributeHandleValuePairSet =
+      *subscribedAttributeHandleValuePairSetSP;
+
+    const ObjectRoot::PropertyHandleValuePairSet &publishedAttributeHandleValuePairSet =
+      updatedObjectData.getAttributeHandleValuePairSet();
+
+    RTI::ULong valueLength;
+    for(int ix = 0 ; ix < publishedAttributeHandleValuePairSet.size() ; ++ix) {
+        int attributeHandle = publishedAttributeHandleValuePairSet.getHandle(ix);
+        if (attributeHandleSet.isMember(attributeHandle)) {
+            char *value = publishedAttributeHandleValuePairSet.getValuePointer( ix, valueLength );
+            subscribedAttributeHandleValuePairSet.add(attributeHandle, value, valueLength);
+        }
+    }
 
     // TRY TO UPDATE OBJECT IN RECEIVER DIRECTLY FROM RTI
     receiver.reflectAttributeValues(
             objectHandle,
-            updatedObjectData.getAttributeHandleValuePairSet(),
+            subscribedAttributeHandleValuePairSet,
             updatedObjectData.getRTIfedTime(),
             nullptr,
             RTI::EventRetractionHandle()
@@ -298,9 +253,29 @@ void EmbeddedMessagingObjectTests::testObjectNetworkPropagation() {
     // THE Receiver SHOULD IGNORE THE "reflectAttributeValues" CALL ABOVE, SO PERFORMED THE ACTIONS ASSOCIATED T
     receiver.execute();
 
-    // THE RECEIVER SHOULD *STILL* Not HAVE THE TestObject YET AS IT SHOULD NOT ACCEPT UPDATES FOR THE OBJECT
-    // DIRECTLY FROM THE RTI
-    CPPUNIT_ASSERT(!receiver.getTestObjectSP());
+    // THE RECEIVER SHOULD NOW HAVE THE OBJECT
+    CPPUNIT_ASSERT(receiver.getTestObjectSP());
+
+    TestObject &receivedTestObject = *receiver.getTestObjectSP();
+    // NOT SUBSCRIBED BY Receiver, SO receivedTestObject.get_BooleanValue1() HAS DEFAULT VALUE OF false,
+    // BUT localTestObject.get_BooleanValue1 IS INCIDENTALLY false
+    CPPUNIT_ASSERT_EQUAL(receivedTestObject.get_BooleanValue1(), localTestObject.get_BooleanValue1());
+    // NOT PUBLISHED BY Sender, SO BOTH HAVE DEFAULT VALUE
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(receivedTestObject.get_DoubleValue(), localTestObject.get_DoubleValue(), 0.001);
+    // NOT SUBSCRIBED BY Receiver
+    CPPUNIT_ASSERT(fabs(receivedTestObject.get_FloatValue() - localTestObject.get_FloatValue()) > 0.001);
+    // NOT PUBLISHED BY Sender, SO BOTH HAVE DEFAULT VALUE
+    CPPUNIT_ASSERT_EQUAL(receivedTestObject.get_StringValue(), localTestObject.get_StringValue());
+
+    // BOTH PUBLISHED BY SENDER AND SUBSCRIBED BY RECEIVER
+    CPPUNIT_ASSERT_EQUAL(receivedTestObject.get_BooleanValue2(), localTestObject.get_BooleanValue2());
+    CPPUNIT_ASSERT_EQUAL(receivedTestObject.get_ByteValue(), localTestObject.get_ByteValue());
+    CPPUNIT_ASSERT_EQUAL(receivedTestObject.get_CharValue(), localTestObject.get_CharValue());
+
+    // THESE ARE UPDATED THROUGH THE NETWORK, SO NOT RECEIVED YET
+    CPPUNIT_ASSERT(receivedTestObject.get_IntValue() != localTestObject.get_IntValue());
+    CPPUNIT_ASSERT(receivedTestObject.get_LongValue() != localTestObject.get_LongValue());
+    CPPUNIT_ASSERT(receivedTestObject.get_ShortValue() != localTestObject.get_ShortValue());
 
     // SEND THE RECEIVER THE EmbeddedMessaging.Receiver INTERACTION THAT CONTAINS THE ATTRIBUTES UPDATE
     // FOR THE DISCOVERED OBJECT
@@ -316,24 +291,23 @@ void EmbeddedMessagingObjectTests::testObjectNetworkPropagation() {
     // AND MAKE THE INSTANCE ACCESSIBLE THROUGH ITS getTestObject() METHOD
     receiver.execute();
 
-    // THE RECEIVER SHOULD NOW HAVE THE OBJECT
-    TestObject::SP receivedTestObjectSP = receiver.getTestObjectSP();
-    CPPUNIT_ASSERT(receivedTestObjectSP);
+    // NOT SUBSCRIBED BY Receiver, SO receivedTestObject.get_BooleanValue1() HAS DEFAULT VALUE OF false,
+    // BUT localTestObject.get_BooleanValue1 IS INCIDENTALLY false
+    CPPUNIT_ASSERT_EQUAL(receivedTestObject.get_BooleanValue1(), localTestObject.get_BooleanValue1());
+    // NOT PUBLISHED BY Sender, SO BOTH HAVE DEFAULT VALUE
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(receivedTestObject.get_DoubleValue(), localTestObject.get_DoubleValue(), 0.001);
+    // NOT SUBSCRIBED BY Receiver
+    CPPUNIT_ASSERT(fabs(receivedTestObject.get_FloatValue() - localTestObject.get_FloatValue()) > 0.001);
+    // NOT PUBLISHED BY Sender, SO BOTH HAVE DEFAULT VALUE
+    CPPUNIT_ASSERT_EQUAL(receivedTestObject.get_StringValue(), localTestObject.get_StringValue());
 
-    TestObject &receivedTestObject = *receivedTestObjectSP;
-    CPPUNIT_ASSERT(!receivedTestObject.get_BooleanValue1());
-    CPPUNIT_ASSERT(!receivedTestObject.get_BooleanValue2());
-
-    CPPUNIT_ASSERT(senderTestObject.get_ByteValue() != receivedTestObject.get_ByteValue());
-
-    CPPUNIT_ASSERT_EQUAL(senderTestObject.get_CharValue(), receivedTestObject.get_CharValue());
-    CPPUNIT_ASSERT_DOUBLES_EQUAL(senderTestObject.get_DoubleValue(), receivedTestObject.get_DoubleValue(), 0.001);
-    CPPUNIT_ASSERT_DOUBLES_EQUAL(senderTestObject.get_FloatValue(), receivedTestObject.get_FloatValue(), 0.001);
-    CPPUNIT_ASSERT_EQUAL(senderTestObject.get_IntValue(), receivedTestObject.get_IntValue());
-
-    CPPUNIT_ASSERT(senderTestObject.get_LongValue() != receivedTestObject.get_LongValue());
-    CPPUNIT_ASSERT(senderTestObject.get_ShortValue() != receivedTestObject.get_ShortValue());
-    CPPUNIT_ASSERT(senderTestObject.get_StringValue() != receivedTestObject.get_StringValue());
+    // BOTH PUBLISHED BY SENDER AND SUBSCRIBED BY RECEIVER
+    CPPUNIT_ASSERT_EQUAL(receivedTestObject.get_BooleanValue2(), localTestObject.get_BooleanValue2());
+    CPPUNIT_ASSERT_EQUAL(receivedTestObject.get_ByteValue(), localTestObject.get_ByteValue());
+    CPPUNIT_ASSERT_EQUAL(receivedTestObject.get_CharValue(), localTestObject.get_CharValue());
+    CPPUNIT_ASSERT_EQUAL(receivedTestObject.get_IntValue(), localTestObject.get_IntValue());
+    CPPUNIT_ASSERT_EQUAL(receivedTestObject.get_LongValue(), localTestObject.get_LongValue());
+    CPPUNIT_ASSERT_EQUAL(receivedTestObject.get_ShortValue(), localTestObject.get_ShortValue());
 }
 
 CPPUNIT_TEST_SUITE_REGISTRATION( EmbeddedMessagingObjectTests );

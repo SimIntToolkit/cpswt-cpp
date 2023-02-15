@@ -50,6 +50,75 @@ void Initialization::interaction_root_dynamic_init() {
             "                 \"ParameterType\": \"double\"\n" +
             "             }\n" +
             "        }\n" +
+            "    },\n" +
+            "    \"objects\": {\n" +
+            "        \"ObjectRoot\": {},\n" +
+            "        \"ObjectRoot.TestBase\": {\n" +
+            "             \"field1\": {\n" +
+            "                 \"Delivery\": \"reliable\",\n" +
+            "                 \"Hidden\": false,\n" +
+            "                 \"Order\": \"timestamp\",\n" +
+            "                 \"ParameterType\": \"String\"\n" +
+            "             },\n" +
+            "             \"field2\": {\n" +
+            "                 \"Delivery\": \"reliable\",\n" +
+            "                 \"Hidden\": false,\n" +
+            "                 \"Order\": \"timestamp\",\n" +
+            "                 \"ParameterType\": \"int\"\n" +
+            "             }\n" +
+            "        },\n" +
+            "        \"ObjectRoot.TestBase.TestDerived\": {\n" +
+            "             \"field3\": {\n" +
+            "                 \"Delivery\": \"reliable\",\n" +
+            "                 \"Hidden\": false,\n" +
+            "                 \"Order\": \"timestamp\",\n" +
+            "                 \"ParameterType\": \"boolean\"\n" +
+            "             },\n" +
+            "             \"field4\": {\n" +
+            "                 \"Delivery\": \"reliable\",\n" +
+            "                 \"Hidden\": false,\n" +
+            "                 \"Order\": \"timestamp\",\n" +
+            "                 \"ParameterType\": \"long\"\n" +
+            "             },\n" +
+            "             \"field5\": {\n" +
+            "                 \"Delivery\": \"reliable\",\n" +
+            "                 \"Hidden\": false,\n" +
+            "                 \"Order\": \"timestamp\",\n" +
+            "                 \"ParameterType\": \"double\"\n" +
+            "             },\n" +
+            "             \"field6\": {\n" +
+            "                 \"Delivery\": \"reliable\",\n" +
+            "                 \"Hidden\": false,\n" +
+            "                 \"Order\": \"timestamp\",\n" +
+            "                 \"ParameterType\": \"byte\"\n" +
+            "             },\n" +
+            "             \"field7\": {\n" +
+            "                 \"Delivery\": \"reliable\",\n" +
+            "                 \"Hidden\": false,\n" +
+            "                 \"Order\": \"timestamp\",\n" +
+            "                 \"ParameterType\": \"char\"\n" +
+            "             }\n" +
+            "        },\n" +
+            "        \"ObjectRoot.OtherClass\": {\n" +
+            "             \"field1\": {\n" +
+            "                 \"Delivery\": \"reliable\",\n" +
+            "                 \"Hidden\": false,\n" +
+            "                 \"Order\": \"timestamp\",\n" +
+            "                 \"ParameterType\": \"boolean\"\n" +
+            "             },\n" +
+            "             \"field2\": {\n" +
+            "                 \"Delivery\": \"reliable\",\n" +
+            "                 \"Hidden\": false,\n" +
+            "                 \"Order\": \"timestamp\",\n" +
+            "                 \"ParameterType\": \"long\"\n" +
+            "             },\n" +
+            "             \"field3\": {\n" +
+            "                 \"Delivery\": \"reliable\",\n" +
+            "                 \"Hidden\": false,\n" +
+            "                 \"Order\": \"timestamp\",\n" +
+            "                 \"ParameterType\": \"double\"\n" +
+            "             }\n" +
+            "        }\n" +
             "    }\n" +
             "}\n";
 
@@ -58,12 +127,18 @@ void Initialization::interaction_root_dynamic_init() {
             "    \"interactions\": [\n" +
             "        \"InteractionRoot.TestBase\",\n" +
             "        \"InteractionRoot.TestBase.TestDerived\"\n" +
+            "    ],\n" +
+            "    \"objects\": [\n" +
             "    ]\n" +
             "}\n";
 
     std::istringstream federationJsonInputStream(federationJson);
     std::istringstream dynamicMessagingTypesInputStream(dynamicMessageTypes);
     InteractionRoot::loadDynamicClassFederationData(federationJsonInputStream, dynamicMessagingTypesInputStream);
+
+    federationJsonInputStream.seekg(0);
+    dynamicMessagingTypesInputStream.seekg(0);
+    ObjectRoot::loadDynamicClassFederationData(federationJsonInputStream, dynamicMessagingTypesInputStream);
 }
 
 void Initialization::init_1() {

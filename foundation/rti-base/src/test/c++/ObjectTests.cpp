@@ -53,6 +53,8 @@ ObjectTests::ObjectTests() : CppUnit::TestCase() {
 
 void ObjectTests::objectTest1() {
 
+    std::cout << "START objectTest1" << std::endl;
+
     // MAKE SURE ATTRIBUTES ARE PUBLISHED
     FederateObject::publish_FederateHandle_attribute();
     FederateObject::publish_FederateHost_attribute();
@@ -139,7 +141,130 @@ void ObjectTests::objectTest1() {
     CPPUNIT_ASSERT_EQUAL(2, federateObject2.get_FederateHandle());
     CPPUNIT_ASSERT_EQUAL(std::string("localhost"), federateObject2.get_FederateHost());
     CPPUNIT_ASSERT_EQUAL(std::string("foobar"), federateObject2.get_FederateType());
+
+    std::cout << "END objectTest1" << std::endl;
 }
 
-CPPUNIT_TEST_SUITE_REGISTRATION( ObjectTests );
+void ObjectTests::publishObjectTest() {
+
+    std::cout << "START publishObjectTest" << std::endl;
+
+    typedef boost::shared_ptr<ClassAndPropertyNameSet> ClassAndPropertyNameSetSP;
+
+    const std::string testBaseFullHlaClassName = "ObjectRoot.TestBase";
+    const std::string testDerivedFullHlaClassName = "ObjectRoot.TestBase.TestDerived";
+
+    std::map<std::string, ClassAndPropertyNameSetSP> localHlaClassNameAttributeHandleSetSPMap;
+
+
+    ClassAndPropertyNameSetSP classAndPropertyNameTestBaseSetSP( new ClassAndPropertyNameSet() );
+    localHlaClassNameAttributeHandleSetSPMap.emplace(testBaseFullHlaClassName, classAndPropertyNameTestBaseSetSP);
+
+    ClassAndPropertyNameSet &classAndPropertyNameTestBaseSet =
+      *localHlaClassNameAttributeHandleSetSPMap[testBaseFullHlaClassName];
+
+    ClassAndPropertyName classAndPropertyNameTestBaseField1(testBaseFullHlaClassName, "field1");
+    classAndPropertyNameTestBaseSet.emplace(classAndPropertyNameTestBaseField1);
+
+    ClassAndPropertyName classAndPropertyNameTestBaseField2(testBaseFullHlaClassName, "field2");
+    classAndPropertyNameTestBaseSet.emplace(classAndPropertyNameTestBaseField2);
+
+
+    ClassAndPropertyNameSetSP classAndPropertyNameTestDerivedSetSP(new ClassAndPropertyNameSet());
+    localHlaClassNameAttributeHandleSetSPMap.emplace(testDerivedFullHlaClassName, classAndPropertyNameTestDerivedSetSP);
+
+    ClassAndPropertyNameSet &classAndPropertyNameTestDerivedSet =
+      *localHlaClassNameAttributeHandleSetSPMap[testDerivedFullHlaClassName];
+
+    classAndPropertyNameTestDerivedSet.emplace(classAndPropertyNameTestBaseField1);
+
+    ClassAndPropertyName classAndPropertyNameTestDerivedField3(testDerivedFullHlaClassName, "field3");
+    classAndPropertyNameTestDerivedSet.emplace(classAndPropertyNameTestDerivedField3);
+
+    ClassAndPropertyName classAndPropertyNameTestDerivedField4(testDerivedFullHlaClassName, "field4");
+    // DO NOT ADD classAndPropertyNameTestDerivedField4 TO classAndPropertyNameTestDerivedSet
+
+    ClassAndPropertyName classAndPropertyNameTestDerivedField5(testDerivedFullHlaClassName, "field5");
+    classAndPropertyNameTestDerivedSet.emplace(classAndPropertyNameTestDerivedField5);
+
+    ClassAndPropertyNameList testBaseClassAndPropertyNameList =
+            ObjectRoot::get_attribute_names(testBaseFullHlaClassName);
+    ClassAndPropertyNameSet testBaseClassAndPropertyNameSet(
+      testBaseClassAndPropertyNameList.begin(), testBaseClassAndPropertyNameList.end());
+
+    CPPUNIT_ASSERT_EQUAL(testBaseClassAndPropertyNameSet.size(), classAndPropertyNameTestBaseSet.size());
+    for(const ClassAndPropertyName &classAndPropertyName: testBaseClassAndPropertyNameSet) {
+        CPPUNIT_ASSERT(
+          classAndPropertyNameTestBaseSet.find(classAndPropertyName) != classAndPropertyNameTestBaseSet.end()
+        );
+    }
+
+    ObjectRoot::publish_attribute(
+            testBaseFullHlaClassName,
+            classAndPropertyNameTestBaseField1.getClassName(),
+            classAndPropertyNameTestBaseField1.getPropertyName()
+    );
+    ObjectRoot::publish_attribute(
+            testBaseFullHlaClassName,
+            classAndPropertyNameTestBaseField2.getClassName(),
+            classAndPropertyNameTestBaseField2.getPropertyName()
+    );
+
+    ClassAndPropertyNameSetSP testBasePublishedClassAndPropertyNameSetSP =
+            ObjectRoot::get_published_class_and_property_name_set_sp(testBaseFullHlaClassName);
+
+    CPPUNIT_ASSERT_EQUAL(
+      testBasePublishedClassAndPropertyNameSetSP->size(), classAndPropertyNameTestBaseSet.size()
+    );
+    for(const ClassAndPropertyName &classAndPropertyName : *testBasePublishedClassAndPropertyNameSetSP) {
+        CPPUNIT_ASSERT(
+          classAndPropertyNameTestBaseSet.find(classAndPropertyName) != classAndPropertyNameTestBaseSet.end()
+        );
+    }
+
+    ObjectRoot::publish_object(testBaseFullHlaClassName, RTIAmbassadorTest1::get_rti_ambassador_1_ptr());
+
+    ObjectRoot::publish_attribute(
+            testDerivedFullHlaClassName,
+            classAndPropertyNameTestBaseField1.getClassName(),
+            classAndPropertyNameTestBaseField1.getPropertyName()
+    );
+    ObjectRoot::publish_attribute(
+            testDerivedFullHlaClassName,
+            classAndPropertyNameTestDerivedField3.getClassName(),
+            classAndPropertyNameTestDerivedField3.getPropertyName()
+    );
+    ObjectRoot::publish_attribute(
+            testDerivedFullHlaClassName,
+            classAndPropertyNameTestDerivedField4.getClassName(),
+            classAndPropertyNameTestDerivedField4.getPropertyName()
+    );
+    ObjectRoot::unpublish_attribute(
+            testDerivedFullHlaClassName,
+            classAndPropertyNameTestDerivedField4.getClassName(),
+            classAndPropertyNameTestDerivedField4.getPropertyName()
+    );
+    ObjectRoot::publish_attribute(
+            testDerivedFullHlaClassName,
+            classAndPropertyNameTestDerivedField5.getClassName(),
+            classAndPropertyNameTestDerivedField5.getPropertyName()
+    );
+
+    ClassAndPropertyNameSetSP testDerivedPublishedClassAndPropertyNameSetSP =
+            ObjectRoot::get_published_class_and_property_name_set_sp(testDerivedFullHlaClassName);
+
+    CPPUNIT_ASSERT_EQUAL(
+      testDerivedPublishedClassAndPropertyNameSetSP->size(), classAndPropertyNameTestDerivedSet.size()
+    );
+    for(const ClassAndPropertyName &classAndPropertyName : *testDerivedPublishedClassAndPropertyNameSetSP) {
+        CPPUNIT_ASSERT(
+          classAndPropertyNameTestDerivedSet.find(classAndPropertyName) != classAndPropertyNameTestDerivedSet.end()
+        );
+    }
+
+    ObjectRoot::publish_object(testDerivedFullHlaClassName, RTIAmbassadorTest1::get_rti_ambassador_1_ptr());
+
+    std::cout << "END publishObjectTest" << std::endl;
+}
+
 CPPUNIT_TEST_SUITE_REGISTRATION( ObjectTests );
