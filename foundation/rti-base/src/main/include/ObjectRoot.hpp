@@ -430,6 +430,8 @@ public:
         double getTime() const {
             return _time;
         }
+
+        explicit operator std::string() const;
     };
 
     class ObjectReflectorSPComparator {
@@ -2379,6 +2381,9 @@ private:
         }
         return true;
     }
+
+public:
+    explicit operator std::string() const;
 };
     } // NAMESPACE "hla"
    } // NAMESPACE "cpswt"
@@ -2386,16 +2391,50 @@ private:
  } // NAMESPACE "vanderbilt"
 } // NAMESPACE "edu"
 
-std::ostream &operator<<( std::ostream &os, const ::edu::vanderbilt::vuisis::cpswt::hla::ObjectRoot &messaging );
-inline std::ostream &operator<<( std::ostream &os, ::edu::vanderbilt::vuisis::cpswt::hla::ObjectRoot::SP messagingSP ) {
-    return os << *messagingSP;
+inline std::ostream &operator<<(
+  std::ostream &os, const ::edu::vanderbilt::vuisis::cpswt::hla::ObjectRoot &messaging
+) {
+    return os << static_cast<std::string>(messaging);
+}
+inline std::ostream &operator<<(
+  std::ostream &os, ::edu::vanderbilt::vuisis::cpswt::hla::ObjectRoot::SP messagingSP
+) {
+    return os << static_cast<std::string>(*messagingSP);
 }
 
-std::ostream &operator<<( std::ostream &os, const ::edu::vanderbilt::vuisis::cpswt::hla::ObjectRoot::ObjectReflector &objectReflector );
+inline boost::log::formatting_ostream& operator<<(
+  boost::log::formatting_ostream& os, const ::edu::vanderbilt::vuisis::cpswt::hla::ObjectRoot &messaging
+) {
+    return os << static_cast<std::string>(messaging);
+}
+inline boost::log::formatting_ostream &operator<<(
+  boost::log::formatting_ostream &os, ::edu::vanderbilt::vuisis::cpswt::hla::ObjectRoot::SP messagingSP
+) {
+    return os << static_cast<std::string>(*messagingSP);
+}
+
+inline std::ostream &operator<<(
+  std::ostream &os, const ::edu::vanderbilt::vuisis::cpswt::hla::ObjectRoot::ObjectReflector &objectReflector
+) {
+    return os << static_cast<std::string>(objectReflector);
+}
 inline std::ostream &operator<<(
   std::ostream &os, ::edu::vanderbilt::vuisis::cpswt::hla::ObjectRoot::ObjectReflector::SP objectReflectorSP
 ) {
-    return os << *objectReflectorSP;
+    return os << static_cast<std::string>(*objectReflectorSP);
+}
+
+inline boost::log::formatting_ostream &operator<<(
+  boost::log::formatting_ostream &os,
+  const ::edu::vanderbilt::vuisis::cpswt::hla::ObjectRoot::ObjectReflector &objectReflector
+) {
+    return os << static_cast<std::string>(objectReflector);
+}
+inline boost::log::formatting_ostream &operator<<(
+  boost::log::formatting_ostream &os,
+  ::edu::vanderbilt::vuisis::cpswt::hla::ObjectRoot::ObjectReflector::SP objectReflectorSP
+) {
+    return os << static_cast<std::string>(*objectReflectorSP);
 }
 
 #endif // _OBJECT_ROOT
