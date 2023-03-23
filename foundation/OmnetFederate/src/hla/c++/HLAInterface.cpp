@@ -48,7 +48,9 @@
 Define_Module(HLAInterface);
 
 
-using AddRouteToRoutingTable = ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::OmnetCommand_p::AddRouteToRoutingTable;
+using AddRouteToRoutingTable =
+  ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::OmnetCommand_p
+    ::AddRouteToRoutingTable;
 using DropRouteFromRoutingTable = ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::OmnetCommand_p::DropRouteFromRoutingTable;
 
 using CommandExecutionStatus = ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::CommandExecutionStatus;
@@ -136,14 +138,20 @@ void HLAInterface::initializeFederateHostConfigMap(const std::string &federateHo
     federateHostConfigJsonInputStream >> federate_host_config_json;
     federateHostConfigJsonInputStream.close();
 
-    for( Json::Value::const_iterator fcmCit = federate_host_config_json.begin() ; fcmCit != federate_host_config_json.end() ; ++fcmCit ) {
+    for(
+      Json::Value::const_iterator fcmCit = federate_host_config_json.begin() ;
+      fcmCit != federate_host_config_json.end() ;
+      ++fcmCit
+    ) {
         std::string federateName = fcmCit.key().asString();
         Json::Value hostConfig = federate_host_config_json[ federateName ];
         _federateNameToHostConfigMap.emplace(federateName, hostConfig);
     }
 }
 
-void HLAInterface::initializeFederateSequenceToMessagingInfoMap(const std::string &federateSequenceToMessagingInfoJsonFileName) {
+void HLAInterface::initializeFederateSequenceToMessagingInfoMap(
+  const std::string &federateSequenceToMessagingInfoJsonFileName
+) {
 
     Json::Value federate_sequence_to_messaging_info_json;
 
@@ -151,14 +159,19 @@ void HLAInterface::initializeFederateSequenceToMessagingInfoMap(const std::strin
     federateSequenceToMessagingInfoJsonInputStream >> federate_sequence_to_messaging_info_json;
     federateSequenceToMessagingInfoJsonInputStream.close();
 
-    for( Json::Value::const_iterator fsmCit = federate_sequence_to_messaging_info_json.begin() ; fsmCit != federate_sequence_to_messaging_info_json.end() ; ++fsmCit ) {
+    for(
+      Json::Value::const_iterator fsmCit = federate_sequence_to_messaging_info_json.begin() ;
+      fsmCit != federate_sequence_to_messaging_info_json.end() ;
+      ++fsmCit
+    ) {
 
         std::string receivingFullHlaClassName( fsmCit.key().asString() );
 
         _dynamicSoftSubscribeFullHlaClassNameSet.insert( receivingFullHlaClassName );
         _dynamicPublishFullHlaClassNameSet.insert( receivingFullHlaClassName );
 
-        Json::Value federateSequenceMessagingInfoArray = federate_sequence_to_messaging_info_json[ receivingFullHlaClassName ];
+        Json::Value federateSequenceMessagingInfoArray =
+          federate_sequence_to_messaging_info_json[ receivingFullHlaClassName ];
 
         FederateSequenceMessagingInfoVectorMap federateSequenceMessagingInfoVectorMap;
 
@@ -193,12 +206,15 @@ void HLAInterface::initializeFederateSequenceToMessagingInfoMap(const std::strin
             federateSequenceMessagingInfoVectorMap.emplace(federateSequenceList, messagingInfoVector);
         }
 
-        _messagingFederateSequenceMessagingInfoVectorMap[ receivingFullHlaClassName ] = federateSequenceMessagingInfoVectorMap;
+        _messagingFederateSequenceMessagingInfoVectorMap[ receivingFullHlaClassName ] =
+          federateSequenceMessagingInfoVectorMap;
     }
 
 }
 
-void HLAInterface::populateHlaMsg(HlaMsg &hlaMsg, const std::string &sendingFederateName, const std::string &receivingFederateName) {
+void HLAInterface::populateHlaMsg(
+  HlaMsg &hlaMsg, const std::string &sendingFederateName, const std::string &receivingFederateName
+) {
 
     {
         const FederateHostConfig &federateHostConfig = _federateNameToHostConfigMap[ sendingFederateName ];
@@ -226,15 +242,18 @@ void HLAInterface::processMessaging(
     const ObjectReflector::SP &objectReflectorSP
 ) {
 
-    MessagingFederateSequenceMessagingInfoVectorMap::const_iterator mfmCit = _messagingFederateSequenceMessagingInfoVectorMap.find( hlaClassName );
+    MessagingFederateSequenceMessagingInfoVectorMap::const_iterator mfmCit =
+      _messagingFederateSequenceMessagingInfoVectorMap.find( hlaClassName );
     if ( mfmCit == _messagingFederateSequenceMessagingInfoVectorMap.end() ) {
-        std::cerr << "No entry for HLA class \"" << hlaClassName << "\" in _messagingFederateSequenceMessagingInfoVectorMap: skipping ..." << std::endl;
+        BOOST_LOG_SEV(get_logger(), warning) << "No entry for HLA class \"" << hlaClassName
+          << "\" in _messagingFederateSequenceMessagingInfoVectorMap: skipping ...";
         return;
     }
 
     // IF FEDERATE SEQUENCE IS EMPTY, SOMETHING IS WRONG
     if ( federateSequenceList.empty() ) {
-        std::cerr << "FederateSequence for instance of HLA class \"" << hlaClassName << "\" is empty: skipping ..." << std::endl;
+        BOOST_LOG_SEV(get_logger(), warning) << "FederateSequence for instance of HLA class \""
+          << hlaClassName << "\" is empty: skipping ...";
         return;
     }
 
@@ -242,7 +261,8 @@ void HLAInterface::processMessaging(
     std::string sendingFederateName( federateSequenceList.back() );
     FederateNameToHostConfigMap::const_iterator fhmCit = _federateNameToHostConfigMap.find(sendingFederateName);
     if ( fhmCit == _federateNameToHostConfigMap.end() ) {
-        std::cerr << "Name of sending federate \"" << sendingFederateName << "\" not found in federate-host-config table: skipping ..." << std::endl;
+        BOOST_LOG_SEV(get_logger(), warning) << "Name of sending federate \"" << sendingFederateName
+          << "\" not found in federate-host-config table: skipping ...";
         return;
     }
     const FederateSequenceMessagingInfoVectorMap &federateSequenceMessagingInfoVectorMap = mfmCit->second;
@@ -277,25 +297,34 @@ void HLAInterface::processMessaging(
 
     // IF NOT THERE, REPORT
     if ( fmmCit == federateSequenceMessagingInfoVectorMap.end() ) {
-        std::cerr << "No entry for federateSequence [ ";
+        std::string message = "No entry for federateSequence [ ";
         bool first = true;
-        for( StringList::const_iterator fslCit = federateSequenceList.begin() ; fslCit != federateSequenceList.end() ; ++fslCit ) {
+        for(
+          StringList::const_iterator fslCit = federateSequenceList.begin() ;
+          fslCit != federateSequenceList.end() ;
+          ++fslCit
+        ) {
             if (first) {
                 first = false;
             } else {
-                std::cerr << ", ";
+                message += ", ";
             }
 
-            std::cerr << "\"" << *fslCit << "\"";
+            message += "\"" + *fslCit + "\"";
         }
-        std::cerr << " ] for HLA class \"" << hlaClassName << "\": skipping ...";
+        message += " ] for HLA class \"" + hlaClassName + "\": skipping ...";
+        BOOST_LOG_SEV(get_logger(), warning) << message;
         return;
     }
 
     const MessagingInfoVector &messagingInfoVector = fmmCit->second;
 
     // OTHERWISE, TRANSLATE RECEIVED INTERACTION TO FEDERATE-SPECIFIC INTERACTIONS AND SEND THROUGH NETWORK
-    for( MessagingInfoVector::const_iterator mivCit = messagingInfoVector.begin() ; mivCit != messagingInfoVector.end() ; ++mivCit ) {
+    for(
+      MessagingInfoVector::const_iterator mivCit = messagingInfoVector.begin() ;
+      mivCit != messagingInfoVector.end() ;
+      ++mivCit
+    ) {
 
         const MessagingInfo &messagingInfo( *mivCit );
 
@@ -304,7 +333,8 @@ void HLAInterface::processMessaging(
         // MAKE SURE THERE IS A HOST FOR THE RECEIVING FEDERATE
         FederateNameToHostConfigMap::const_iterator fhmCit = _federateNameToHostConfigMap.find(publishFederateName);
         if ( fhmCit == _federateNameToHostConfigMap.end() ) {
-            std::cerr << "Name of receiving federate \"" << publishFederateName << "\" not found in federate-host-config table: skipping ..." << std::endl;
+            BOOST_LOG_SEV(get_logger(), warning) << "Name of receiving federate \"" << publishFederateName
+              << "\" not found in federate-host-config table: skipping ...";
             continue;
         }
 
@@ -335,11 +365,10 @@ void HLAInterface::processMessaging(
         if ( udpAppWrapperModule != 0 ) {
            sendDirect( packet, udpAppWrapperModule, "hlaIn" );
         } else {
-            std::cerr << "WARNING:  HLAInterface:  could not find module corresponding to (hostname,appName) = (" <<
-             hlaMsgPtr->getSenderHost() << "," << hlaMsgPtr->getSenderHostApp() << ")" << std::endl;
-            std::cerr << "Current modules are: " << std::endl;
-            std::cerr << AttackCoordinator::getSingleton().listAppSpecProperties();
-            std::cerr << std::endl;
+            BOOST_LOG_SEV(get_logger(), warning)
+              << "HLAInterface:  could not find module corresponding to (hostname,appName) = ("
+              << hlaMsgPtr->getSenderHost() << "," << hlaMsgPtr->getSenderHostApp() << ")\nCurrent modules are: "
+              << AttackCoordinator::getSingleton().listAppSpecProperties();
         }
     }
 
@@ -350,15 +379,17 @@ void HLAInterface::processInteractions() {
     InteractionRoot::SP interactionRootSP;
     while(  ( interactionRootSP = getNextInteraction() ) != 0  ) {
 
-        std::cerr << "Processing interaction of type \"" << interactionRootSP->getInstanceHlaClassName() << "\"" << std::endl;
+        BOOST_LOG_SEV(get_logger(), severity_level::info) << "Processing interaction of type \""
+          << interactionRootSP->getInstanceHlaClassName() << "\"";
 
         int classHandle = interactionRootSP->getClassHandle();
 
         // IS INTERACTION ONE THAT MIGHT BE PROPAGATED THROUGH THE SIMULATED NETWORK?
         if ( interactionRootSP->isDynamicInstance() ) {
 
-            std::cerr << "Interaction \"" << interactionRootSP->getInstanceHlaClassName() << "\" is dynamic" << std::endl;
-            std::cout << "Interaction: " << *interactionRootSP << std::endl << std::endl;
+            BOOST_LOG_SEV(get_logger(), severity_level::info) << "Interaction \""
+              << interactionRootSP->getInstanceHlaClassName() << "\" is dynamic";
+            BOOST_LOG_SEV(get_logger(), severity_level::info) << "Interaction: " << interactionRootSP;
 
             // GET FULL HLA CLASS NAME OF INTERACTION
             std::string instanceHlaClassName = interactionRootSP->getInstanceHlaClassName();
@@ -394,7 +425,8 @@ void HLAInterface::processInteractions() {
 
 
         if (  StartDelayNodeAttack::match( classHandle )  ) {
-            StartDelayNodeAttack::SP startDelayNodeAttackSP = boost::static_pointer_cast< StartDelayNodeAttack >( interactionRootSP );
+            StartDelayNodeAttack::SP startDelayNodeAttackSP =
+              boost::static_pointer_cast< StartDelayNodeAttack >( interactionRootSP );
 
             std::string nodeFullPath = startDelayNodeAttackSP->get_nodeFullPath();
             float mean = startDelayNodeAttackSP->get_delayMean();
@@ -406,7 +438,8 @@ void HLAInterface::processInteractions() {
 
 
         if (  StopDelayNodeAttack::match( classHandle )  ) {
-            StopDelayNodeAttack::SP stopDelayNodeAttackSP = boost::static_pointer_cast< StopDelayNodeAttack >( interactionRootSP );
+            StopDelayNodeAttack::SP stopDelayNodeAttackSP =
+              boost::static_pointer_cast< StopDelayNodeAttack >( interactionRootSP );
 
             std::string nodeFullPath = stopDelayNodeAttackSP->get_nodeFullPath();
 
@@ -416,8 +449,11 @@ void HLAInterface::processInteractions() {
 
 
         if (  StartSnifferAttack::match( classHandle )  ) {
-            StartSnifferAttack::SP startSnifferAttackSP = boost::static_pointer_cast< StartSnifferAttack >( interactionRootSP );
+            StartSnifferAttack::SP startSnifferAttackSP =
+              boost::static_pointer_cast< StartSnifferAttack >( interactionRootSP );
 
+            BOOST_LOG_SEV(get_logger(), severity_level::info) << "Received START SNIFFER ATTACK: "
+              << startSnifferAttackSP;
             std::string nodeFullPath = startSnifferAttackSP->get_nodeFullPath();
 
             SnifferAttackMsg *snifferAttackMsg = new SnifferAttackMsg;
@@ -429,15 +465,19 @@ void HLAInterface::processInteractions() {
             if ( cModulePtr != 0 ) {
                 sendDirect(  snifferAttackMsg, cModulePtr, "hlaIn"  );
             } else {
-                std::cout << "WARNING:  StartSnifferAttack:  NO MODULE FOR NODE \"" << nodeFullPath << "\"" << std::endl;
-                std::cout << "Current modules are:" << std::endl;
-                std::cout << AttackCoordinator::getSingleton().listIPModuleProperties() << std::endl;
+                BOOST_LOG_SEV(get_logger(), warning) << "StartSnifferAttack:  NO MODULE FOR NODE \""
+                  << nodeFullPath << "\".  Current modules are:  "
+                  << AttackCoordinator::getSingleton().listIPModuleProperties();
             }
             continue;
         }
 
         if (  StopSnifferAttack::match( classHandle )  ) {
-            StopSnifferAttack::SP stopSnifferAttackSP = boost::static_pointer_cast< StopSnifferAttack >( interactionRootSP );
+            StopSnifferAttack::SP stopSnifferAttackSP =
+              boost::static_pointer_cast< StopSnifferAttack >( interactionRootSP );
+
+            BOOST_LOG_SEV(get_logger(), severity_level::info) << "Received STOP SNIFFER ATTACK: "
+              << stopSnifferAttackSP;
 
             std::string nodeFullPath = stopSnifferAttackSP->get_nodeFullPath();
 
@@ -450,15 +490,19 @@ void HLAInterface::processInteractions() {
             if ( cModulePtr != 0 ) {
                 sendDirect(  snifferAttackMsg, cModulePtr, "hlaIn"  );
             } else {
-                std::cout << "WARNING:  StopSnifferAttack:  NO MODULE FOR NODE \"" << nodeFullPath << "\"" << std::endl;
-                std::cout << "Current modules are:" << std::endl;
-                std::cout << AttackCoordinator::getSingleton().listIPModuleProperties() << std::endl;
+                BOOST_LOG_SEV(get_logger(), warning) << "StopSnifferAttack:  NO MODULE FOR NODE \""
+                  << nodeFullPath << "\".  Current modules are:  "
+                  << AttackCoordinator::getSingleton().listIPModuleProperties();
             }
             continue;
         }
 
         if (  StartNetworkFilterAttack::match( classHandle )  ) {
-            StartNetworkFilterAttack::SP startNetworkFilterAttackSP = boost::static_pointer_cast< StartNetworkFilterAttack >( interactionRootSP );
+            StartNetworkFilterAttack::SP startNetworkFilterAttackSP =
+              boost::static_pointer_cast< StartNetworkFilterAttack >( interactionRootSP );
+
+            BOOST_LOG_SEV(get_logger(), severity_level::info) << "Received START NETWORK FILTER ATTACK: "
+              << startNetworkFilterAttackSP;
 
             std::string recordingNodeFullPath = startNetworkFilterAttackSP->get_recordingNodeFullPath();
 
@@ -471,13 +515,18 @@ void HLAInterface::processInteractions() {
             if ( cModulePtr != 0 ) {
                 sendDirect(  filterAttackMsg, cModulePtr, "hlaIn"  );
             } else {
-                std::cout << "WARNING:  StartNetworkFilterAttack:  NO MODULE FOR NODE \"" << recordingNodeFullPath << "\"" << std::endl;
+                BOOST_LOG_SEV(get_logger(), warning) << "StartNetworkFilterAttack:  NO MODULE FOR NODE \""
+                  << recordingNodeFullPath << "\"";
             }
             continue;
         }
 
         if (  StopNetworkFilterAttack::match( classHandle )  ) {
-            StopNetworkFilterAttack::SP stopNetworkFilterAttackSP = boost::static_pointer_cast< StopNetworkFilterAttack >( interactionRootSP );
+            StopNetworkFilterAttack::SP stopNetworkFilterAttackSP =
+              boost::static_pointer_cast< StopNetworkFilterAttack >( interactionRootSP );
+
+            BOOST_LOG_SEV(get_logger(), severity_level::info) << "Received STOP NETWORK FILTER ATTACK: "
+              << stopNetworkFilterAttackSP;
 
             std::string recordingNodeFullPath = stopNetworkFilterAttackSP->get_recordingNodeFullPath();
 
@@ -490,13 +539,18 @@ void HLAInterface::processInteractions() {
             if ( cModulePtr != 0 ) {
                 sendDirect(  filterAttackMsg, cModulePtr, "hlaIn"  );
             } else {
-                std::cout << "WARNING:  StopNetworkFilterAttack:  NO MODULE FOR NODE \"" << recordingNodeFullPath << "\"" << std::endl;
+                BOOST_LOG_SEV(get_logger(), warning) << "StopNetworkFilterAttack:  NO MODULE FOR NODE \""
+                  << recordingNodeFullPath << "\"";
             }
             continue;
         }
 
         if (  StartNetworkIPFirewall::match( classHandle )  ) {
-            StartNetworkIPFirewall::SP startNetworkIPFirewallSP = boost::static_pointer_cast< StartNetworkIPFirewall >( interactionRootSP );
+            StartNetworkIPFirewall::SP startNetworkIPFirewallSP =
+              boost::static_pointer_cast< StartNetworkIPFirewall >( interactionRootSP );
+
+            BOOST_LOG_SEV(get_logger(), severity_level::info) << "Received START NETWORK IP FIREWALL: "
+              << startNetworkIPFirewallSP;
 
             std::string nodeFullPath = startNetworkIPFirewallSP->get_nodeFullPath();
 
@@ -509,13 +563,18 @@ void HLAInterface::processInteractions() {
             if ( cModulePtr != 0 ) {
                 sendDirect(  ipFirewallMsg, cModulePtr, "hlaIn"  );
             } else {
-                std::cout << "WARNING:  StartNetworkIPFirewall:  NO MODULE FOR NODE \"" << nodeFullPath << "\"" << std::endl;
+                BOOST_LOG_SEV(get_logger(), warning) << "StartNetworkIPFirewall:  NO MODULE FOR NODE \""
+                  << nodeFullPath << "\"";
             }
             continue;
         }
 
         if (  StopNetworkIPFirewall::match( classHandle )  ) {
-            StopNetworkIPFirewall::SP stopNetworkIPFirewallSP = boost::static_pointer_cast< StopNetworkIPFirewall >( interactionRootSP );
+            StopNetworkIPFirewall::SP stopNetworkIPFirewallSP =
+              boost::static_pointer_cast< StopNetworkIPFirewall >( interactionRootSP );
+
+            BOOST_LOG_SEV(get_logger(), severity_level::info) << "Received STOP NETWORK IP FIREWALL: "
+              << stopNetworkIPFirewallSP;
 
             std::string nodeFullPath = stopNetworkIPFirewallSP->get_nodeFullPath();
 
@@ -528,58 +587,93 @@ void HLAInterface::processInteractions() {
             if ( cModulePtr != 0 ) {
                 sendDirect(  ipFirewallMsg, cModulePtr, "hlaIn"  );
             } else {
-                std::cout << "WARNING:  StopNetworkIPFirewall:  NO MODULE FOR NODE \"" << nodeFullPath << "\"" << std::endl;
+                BOOST_LOG_SEV(get_logger(), warning) << "StopNetworkIPFirewall:  NO MODULE FOR NODE \""
+                  << nodeFullPath << "\"";
             }
             continue;
         }
 
         if (  StartDisableNetworkAttack::match( classHandle )  ) {
 
-            StartDisableNetworkAttack::SP startDisableNetworkAttackSP = boost::static_pointer_cast< StartDisableNetworkAttack >( interactionRootSP );
+            StartDisableNetworkAttack::SP startDisableNetworkAttackSP =
+              boost::static_pointer_cast< StartDisableNetworkAttack >( interactionRootSP );
+
+            BOOST_LOG_SEV(get_logger(), severity_level::info) << "Received START DISABLE NETWORK ATTACK: "
+              << startDisableNetworkAttackSP;
 
             std::string networkAddressStr = startDisableNetworkAttackSP->get_networkAddress();
 
             AttackCoordinator::NetworkAddress networkAddress( networkAddressStr );
             AttackCoordinator::CModuleSet cModuleSet = AttackCoordinator::getSingleton().getCModuleSet(networkAddress);
 
-            for( AttackCoordinator::CModuleSet::iterator cmsItr = cModuleSet.begin() ; cmsItr != cModuleSet.end() ; ++cmsItr ) {
-                NetworkAttackMsg *networkAttackMsg = new NetworkAttackMsg;
-                networkAttackMsg->setNetworkAddress( networkAddressStr.c_str() );
-                networkAttackMsg->setEnable( true );
+            if (cModuleSet.empty()) {
+                BOOST_LOG_SEV(get_logger(), warning) << "StartDisableNetworkAttack:  CModuleSet for network \""
+                  << networkAddressStr << "\" is empty.";
+            } else {
+                for(
+                  AttackCoordinator::CModuleSet::iterator cmsItr = cModuleSet.begin() ;
+                  cmsItr != cModuleSet.end() ;
+                  ++cmsItr
+                ) {
+                    NetworkAttackMsg *networkAttackMsg = new NetworkAttackMsg;
+                    networkAttackMsg->setNetworkAddress( networkAddressStr.c_str() );
+                    networkAttackMsg->setEnable( true );
 
-                sendDirect(  networkAttackMsg, *cmsItr, "hlaIn"  );
+                    sendDirect(  networkAttackMsg, *cmsItr, "hlaIn"  );
+                }
             }
 
             continue;
         }
 
         if (  StopDisableNetworkAttack::match( classHandle )  ) {
-            StopDisableNetworkAttack::SP stopDisableNetworkAttackSP = boost::static_pointer_cast< StopDisableNetworkAttack >( interactionRootSP );
+            StopDisableNetworkAttack::SP stopDisableNetworkAttackSP =
+              boost::static_pointer_cast< StopDisableNetworkAttack >( interactionRootSP );
+
+            BOOST_LOG_SEV(get_logger(), severity_level::info) << "Received STOP DISABLE NETWORK ATTACK: "
+              << stopDisableNetworkAttackSP;
 
             std::string networkAddressStr = stopDisableNetworkAttackSP->get_networkAddress();
 
             AttackCoordinator::NetworkAddress networkAddress( networkAddressStr );
             AttackCoordinator::CModuleSet cModuleSet = AttackCoordinator::getSingleton().getCModuleSet(networkAddress);
 
-            for( AttackCoordinator::CModuleSet::iterator cmsItr = cModuleSet.begin() ; cmsItr != cModuleSet.end() ; ++cmsItr ) {
-                NetworkAttackMsg *networkAttackMsg = new NetworkAttackMsg;
-                networkAttackMsg->setNetworkAddress( networkAddressStr.c_str() );
-                networkAttackMsg->setEnable( false );
+            if (cModuleSet.empty()) {
+                BOOST_LOG_SEV(get_logger(), warning) << "StopDisableNetworkAttack:  CModuleSet for network \""
+                  << networkAddressStr << "\" is empty.";
+            } else {
+                for(
+                  AttackCoordinator::CModuleSet::iterator cmsItr = cModuleSet.begin() ;
+                  cmsItr != cModuleSet.end() ;
+                  ++cmsItr
+                ) {
+                    NetworkAttackMsg *networkAttackMsg = new NetworkAttackMsg;
+                    networkAttackMsg->setNetworkAddress( networkAddressStr.c_str() );
+                    networkAttackMsg->setEnable( false );
 
-                sendDirect(  networkAttackMsg, *cmsItr, "hlaIn"  );
+                    sendDirect(  networkAttackMsg, *cmsItr, "hlaIn"  );
+                }
             }
 
             continue;
         }
 
         if (  RecordPacketsForReplayAttack::match( classHandle )  ) {
-            RecordPacketsForReplayAttack::SP recordPacketsForReplayAttackSP = boost::static_pointer_cast< RecordPacketsForReplayAttack >( interactionRootSP );
+            RecordPacketsForReplayAttack::SP recordPacketsForReplayAttackSP =
+              boost::static_pointer_cast< RecordPacketsForReplayAttack >( interactionRootSP );
+
+            BOOST_LOG_SEV(get_logger(), severity_level::info) << "Received RECORD PACKETS FOR REPLAY ATTACK: "
+              << recordPacketsForReplayAttackSP;
 
             std::string nodeFullPath = recordPacketsForReplayAttackSP->get_recordingNodeFullPath();
 
             RecordReplayAttackMsg *recordReplayAttackMsg = new RecordReplayAttackMsg;
-            recordReplayAttackMsg->setSourceNetworkAddress( recordPacketsForReplayAttackSP->get_srcNetworkAddress().c_str() );
-            recordReplayAttackMsg->setDestinationNetworkAddress( recordPacketsForReplayAttackSP->get_dstNetworkAddress().c_str() );
+            recordReplayAttackMsg->setSourceNetworkAddress(
+              recordPacketsForReplayAttackSP->get_srcNetworkAddress().c_str()
+            );
+            recordReplayAttackMsg->setDestinationNetworkAddress(
+              recordPacketsForReplayAttackSP->get_dstNetworkAddress().c_str()
+            );
             recordReplayAttackMsg->setRecordDuration( recordPacketsForReplayAttackSP->get_recordDurationInSecs() );
             recordReplayAttackMsg->setEnable( true );
 
@@ -587,19 +681,26 @@ void HLAInterface::processInteractions() {
             if ( cModulePtr != 0 ) {
                 sendDirect(  recordReplayAttackMsg, cModulePtr, "hlaIn"  );
             } else {
-                std::cout << "WARNING:  RecordPacketsForReplayAttack:  NO MODULE FOR NODE \"" << nodeFullPath << "\"" << std::endl;
+                BOOST_LOG_SEV(get_logger(), warning) << "RecordPacketsForReplayAttack:  NO MODULE FOR NODE \""
+                  << nodeFullPath << "\"";
             }
             continue;
         }
 
         if (  TerminateReplayAttack::match( classHandle )  ) {
-            TerminateReplayAttack::SP terminateReplayAttackSP = boost::static_pointer_cast< TerminateReplayAttack >( interactionRootSP );
+            TerminateReplayAttack::SP terminateReplayAttackSP =
+              boost::static_pointer_cast< TerminateReplayAttack >( interactionRootSP );
+
+            BOOST_LOG_SEV(get_logger(), severity_level::info) << "Received TERMINATE REPLAY ATTACK: "
+              << terminateReplayAttackSP;
 
             std::string nodeFullPath = terminateReplayAttackSP->get_recordingNodeFullPath();
 
             RecordReplayAttackMsg *recordReplayAttackMsg = new RecordReplayAttackMsg;
             recordReplayAttackMsg->setSourceNetworkAddress( terminateReplayAttackSP->get_srcNetworkAddress().c_str() );
-            recordReplayAttackMsg->setDestinationNetworkAddress( terminateReplayAttackSP->get_dstNetworkAddress().c_str() );
+            recordReplayAttackMsg->setDestinationNetworkAddress(
+              terminateReplayAttackSP->get_dstNetworkAddress().c_str()
+            );
             recordReplayAttackMsg->setRecordDuration( -1 );
             recordReplayAttackMsg->setEnable( false );
 
@@ -607,13 +708,18 @@ void HLAInterface::processInteractions() {
             if ( cModulePtr != 0 ) {
                 sendDirect(  recordReplayAttackMsg, cModulePtr, "hlaIn"  );
             } else {
-                std::cout << "WARNING:  TerminateReplayAttack:  NO MODULE FOR NODE \"" << nodeFullPath << "\"" << std::endl;
+                BOOST_LOG_SEV(get_logger(), warning) << "TerminateReplayAttack:  NO MODULE FOR NODE \""
+                  << nodeFullPath << "\"";
             }
             continue;
         }
 
         if (  StartReplayAttack::match( classHandle )  ) {
-            StartReplayAttack::SP startReplayAttackSP = boost::static_pointer_cast< StartReplayAttack >( interactionRootSP );
+            StartReplayAttack::SP startReplayAttackSP =
+              boost::static_pointer_cast< StartReplayAttack >( interactionRootSP );
+
+            BOOST_LOG_SEV(get_logger(), severity_level::info) << "Received START REPLAY ATTACK: "
+              << startReplayAttackSP;
 
             std::string nodeFullPath = startReplayAttackSP->get_recordingNodeFullPath();
 
@@ -626,13 +732,18 @@ void HLAInterface::processInteractions() {
             if ( cModulePtr != 0 ) {
                 sendDirect(  replayAttackMsg, cModulePtr, "hlaIn"  );
             } else {
-                std::cout << "WARNING:  StartReplayAttack:  NO MODULE FOR NODE \"" << nodeFullPath << "\"" << std::endl;
+                BOOST_LOG_SEV(get_logger(), warning) << "StartReplayAttack:  NO MODULE FOR NODE \""
+                  << nodeFullPath << "\"";
             }
             continue;
         }
 
         if (  CeaseReplayAttack::match( classHandle )  ) {
-            CeaseReplayAttack::SP ceaseReplayAttackSP = boost::static_pointer_cast< CeaseReplayAttack >( interactionRootSP );
+            CeaseReplayAttack::SP ceaseReplayAttackSP =
+              boost::static_pointer_cast< CeaseReplayAttack >( interactionRootSP );
+
+            BOOST_LOG_SEV(get_logger(), severity_level::info) << "Received CEASE REPLAY ATTACK: "
+              << ceaseReplayAttackSP;
 
             std::string nodeFullPath = ceaseReplayAttackSP->get_recordingNodeFullPath();
 
@@ -645,19 +756,28 @@ void HLAInterface::processInteractions() {
             if ( cModulePtr != 0 ) {
                 sendDirect(  replayAttackMsg, cModulePtr, "hlaIn"  );
             } else {
-                std::cout << "WARNING:  CeaseReplayAttack:  NO MODULE FOR NODE \"" << nodeFullPath << "\"" << std::endl;
+                BOOST_LOG_SEV(get_logger(), warning) << "CeaseReplayAttack:  NO MODULE FOR NODE \""
+                  << nodeFullPath << "\"";
             }
             continue;
         }
 
         if (  StartOutOfOrderPacketsAttack::match( classHandle )  ) {
-            StartOutOfOrderPacketsAttack::SP startOutOfOrderPacketsAttackSP = boost::static_pointer_cast< StartOutOfOrderPacketsAttack >( interactionRootSP );
+            StartOutOfOrderPacketsAttack::SP startOutOfOrderPacketsAttackSP =
+              boost::static_pointer_cast< StartOutOfOrderPacketsAttack >( interactionRootSP );
+
+            BOOST_LOG_SEV(get_logger(), severity_level::info) << "Received START OUT-OF-ORDER PACKETS ATTACK: "
+              << startOutOfOrderPacketsAttackSP;
 
             std::string nodeFullPath = startOutOfOrderPacketsAttackSP->get_recordingNodeFullPath();
 
             OutOfOrderAttackMsg *outOfOrderAttackMsg = new OutOfOrderAttackMsg;
-            outOfOrderAttackMsg->setSourceNetworkAddress( startOutOfOrderPacketsAttackSP->get_srcNetworkAddress().c_str() );
-            outOfOrderAttackMsg->setDestinationNetworkAddress( startOutOfOrderPacketsAttackSP->get_dstNetworkAddress().c_str() );
+            outOfOrderAttackMsg->setSourceNetworkAddress(
+              startOutOfOrderPacketsAttackSP->get_srcNetworkAddress().c_str()
+            );
+            outOfOrderAttackMsg->setDestinationNetworkAddress(
+              startOutOfOrderPacketsAttackSP->get_dstNetworkAddress().c_str()
+            );
             outOfOrderAttackMsg->setRecordDuration( startOutOfOrderPacketsAttackSP->get_recordDurationInSecs() );
             outOfOrderAttackMsg->setPlay( true );
 
@@ -665,19 +785,28 @@ void HLAInterface::processInteractions() {
             if ( cModulePtr != 0 ) {
                 sendDirect(  outOfOrderAttackMsg, cModulePtr, "hlaIn"  );
             } else {
-                std::cout << "WARNING:  StartOutOfOrderPacketsAttack:  NO MODULE FOR NODE \"" << nodeFullPath << "\"" << std::endl;
+                BOOST_LOG_SEV(get_logger(), warning) << "StartOutOfOrderPacketsAttack:  NO MODULE FOR NODE \""
+                  << nodeFullPath << "\"";
             }
             continue;
         }
 
         if (  StopOutOfOrderPacketsAttack::match( classHandle )  ) {
-            StopOutOfOrderPacketsAttack::SP stopOutOfOrderPacketsAttackSP = boost::static_pointer_cast< StopOutOfOrderPacketsAttack >( interactionRootSP );
+            StopOutOfOrderPacketsAttack::SP stopOutOfOrderPacketsAttackSP =
+              boost::static_pointer_cast< StopOutOfOrderPacketsAttack >( interactionRootSP );
+
+            BOOST_LOG_SEV(get_logger(), severity_level::info) << "Received STOP OUT-OF-ORDER PACKETS ATTACK: "
+              << stopOutOfOrderPacketsAttackSP;
 
             std::string nodeFullPath = stopOutOfOrderPacketsAttackSP->get_recordingNodeFullPath();
 
             OutOfOrderAttackMsg *outOfOrderAttackMsg = new OutOfOrderAttackMsg;
-            outOfOrderAttackMsg->setSourceNetworkAddress( stopOutOfOrderPacketsAttackSP->get_srcNetworkAddress().c_str() );
-            outOfOrderAttackMsg->setDestinationNetworkAddress( stopOutOfOrderPacketsAttackSP->get_dstNetworkAddress().c_str() );
+            outOfOrderAttackMsg->setSourceNetworkAddress(
+              stopOutOfOrderPacketsAttackSP->get_srcNetworkAddress().c_str()
+            );
+            outOfOrderAttackMsg->setDestinationNetworkAddress(
+              stopOutOfOrderPacketsAttackSP->get_dstNetworkAddress().c_str()
+            );
             outOfOrderAttackMsg->setRecordDuration( -1 );
             outOfOrderAttackMsg->setPlay( false );
 
@@ -685,21 +814,27 @@ void HLAInterface::processInteractions() {
             if ( cModulePtr != 0 ) {
                 sendDirect(  outOfOrderAttackMsg, cModulePtr, "hlaIn"  );
             } else {
-                std::cout << "WARNING:  StopOutOfOrderPacketsAttack:  NO MODULE FOR NODE \"" << nodeFullPath << "\"" << std::endl;
+                BOOST_LOG_SEV(get_logger(), warning) << "StopOutOfOrderPacketsAttack:  NO MODULE FOR NODE \""
+                  << nodeFullPath << "\"";
             }
             continue;
         }
 
         if ( AddRouteToRoutingTable::match( classHandle ) ) {
             AddRouteToRoutingTable::SP addRouteToRoutingTableSP =
-             boost::static_pointer_cast< AddRouteToRoutingTable >( interactionRootSP );
+              boost::static_pointer_cast< AddRouteToRoutingTable >( interactionRootSP );
+
+            BOOST_LOG_SEV(get_logger(), severity_level::info) << "Received ADD ROUTE TO ROUTING TABLE: "
+              << addRouteToRoutingTableSP;
 
             std::string nodeFullPath = addRouteToRoutingTableSP->get_nodeFullPath();
             std::string interfaceEntry = addRouteToRoutingTableSP->get_interfaceEntry();
             AttackCoordinator::NetworkAddress networkAddress( addRouteToRoutingTableSP->get_networkAddress() );
             AttackCoordinator::NetworkAddress gatewayAddress( addRouteToRoutingTableSP->get_gatewayAddress() );
 
-            AttackCoordinator::RouteEntrySP routeEntrySP = AttackCoordinator::getSingleton().createRouteEntrySP( nodeFullPath, interfaceEntry, networkAddress, gatewayAddress );
+            AttackCoordinator::RouteEntrySP routeEntrySP = AttackCoordinator::getSingleton().createRouteEntrySP(
+              nodeFullPath, interfaceEntry, networkAddress, gatewayAddress
+            );
 
             AddRouteEntryMsg *addRouteEntryMsg = new AddRouteEntryMsg;
             addRouteEntryMsg->setRouteEntrySP( routeEntrySP );
@@ -708,7 +843,8 @@ void HLAInterface::processInteractions() {
             if ( cModulePtr != 0 ) {
                 sendDirect( addRouteEntryMsg, cModulePtr, "hlaIn" );
             } else {
-                std::cout << "WARNING:  AddRouteToRoutingTable:  NO MODULE FOR NODE \"" << nodeFullPath << "\"" << std::endl;
+                BOOST_LOG_SEV(get_logger(), warning) << "AddRouteToRoutingTable:  NO MODULE FOR NODE \""
+                  << nodeFullPath << "\"";
             }
             continue;
         }
@@ -717,12 +853,17 @@ void HLAInterface::processInteractions() {
             DropRouteFromRoutingTable::SP dropRouteFromRoutingTableSP =
              boost::static_pointer_cast< DropRouteFromRoutingTable >( interactionRootSP );
 
+            BOOST_LOG_SEV(get_logger(), severity_level::info) << "Received DROP ROUTE FROM ROUTING TABLE: "
+              << dropRouteFromRoutingTableSP;
+
             std::string nodeFullPath = dropRouteFromRoutingTableSP->get_nodeFullPath();
             std::string interfaceEntry = dropRouteFromRoutingTableSP->get_interfaceEntry();
             AttackCoordinator::NetworkAddress networkAddress( dropRouteFromRoutingTableSP->get_networkAddress() );
             AttackCoordinator::NetworkAddress gatewayAddress( dropRouteFromRoutingTableSP->get_gatewayAddress() );
 
-            AttackCoordinator::RouteEntrySP routeEntrySP = AttackCoordinator::getSingleton().createRouteEntrySP( nodeFullPath, interfaceEntry, networkAddress, gatewayAddress );
+            AttackCoordinator::RouteEntrySP routeEntrySP = AttackCoordinator::getSingleton().createRouteEntrySP(
+              nodeFullPath, interfaceEntry, networkAddress, gatewayAddress
+            );
 
             DropRouteEntryMsg *dropRouteEntryMsg = new DropRouteEntryMsg;
             dropRouteEntryMsg->setRouteEntrySP( routeEntrySP );
@@ -731,7 +872,8 @@ void HLAInterface::processInteractions() {
             if ( cModulePtr != 0 ) {
                 sendDirect( dropRouteEntryMsg, cModulePtr, "hlaIn" );
             } else {
-                std::cout << "WARNING:  DropRouteFromRoutingTable:  NO MODULE FOR NODE \"" << nodeFullPath << "\"" << std::endl;
+                BOOST_LOG_SEV(get_logger(), warning) << "DropRouteFromRoutingTable:  NO MODULE FOR NODE \""
+                  << nodeFullPath << "\"";
             }
             continue;
         }
@@ -739,6 +881,9 @@ void HLAInterface::processInteractions() {
         if ( StartModifyToHLAPacketsAttack::match( classHandle ) ) {
             StartModifyToHLAPacketsAttack::SP startModifyToHLAPacketsAttackSP =
              boost::static_pointer_cast< StartModifyToHLAPacketsAttack >( interactionRootSP );
+
+            BOOST_LOG_SEV(get_logger(), severity_level::info) << "Received START MODIFY TO HLA PACKETS ATTACK: "
+              << startModifyToHLAPacketsAttackSP;
 
             std::string nodeFullPath = startModifyToHLAPacketsAttackSP->get_nodeFullPath();
 
@@ -750,6 +895,9 @@ void HLAInterface::processInteractions() {
             StopModifyToHLAPacketsAttack::SP stopModifyToHLAPacketsAttackSP =
              boost::static_pointer_cast< StopModifyToHLAPacketsAttack >( interactionRootSP );
 
+            BOOST_LOG_SEV(get_logger(), severity_level::info) << "Received STOP MODIFY TO HLA PACKETS ATTACK: "
+              << stopModifyToHLAPacketsAttackSP;
+
             std::string nodeFullPath = stopModifyToHLAPacketsAttackSP->get_nodeFullPath();
 
             AttackCoordinator::getSingleton().setModifyToHLAPackets( nodeFullPath, false );
@@ -759,6 +907,9 @@ void HLAInterface::processInteractions() {
         if ( StartModifyFromHLAPacketsAttack::match( classHandle ) ) {
             StartModifyFromHLAPacketsAttack::SP startModifyFromHLAPacketsAttackSP =
              boost::static_pointer_cast< StartModifyFromHLAPacketsAttack >( interactionRootSP );
+
+            BOOST_LOG_SEV(get_logger(), severity_level::info) << "Received START MODIFY FROM HLA PACKETS ATTACK: "
+              << startModifyFromHLAPacketsAttackSP;
 
             std::string nodeFullPath = startModifyFromHLAPacketsAttackSP->get_nodeFullPath();
 
@@ -770,6 +921,9 @@ void HLAInterface::processInteractions() {
             StopModifyFromHLAPacketsAttack::SP stopModifyFromHLAPacketsAttackSP =
              boost::static_pointer_cast< StopModifyFromHLAPacketsAttack >( interactionRootSP );
 
+            BOOST_LOG_SEV(get_logger(), severity_level::info) << "Received STOP MODIFY FROM HLA PACKETS ATTACK: "
+              << stopModifyFromHLAPacketsAttackSP;
+
             std::string nodeFullPath = stopModifyFromHLAPacketsAttackSP->get_nodeFullPath();
 
             AttackCoordinator::getSingleton().setModifyFromHLAPackets( nodeFullPath, false );
@@ -779,6 +933,9 @@ void HLAInterface::processInteractions() {
         if ( StartIntegrityAttack::match( classHandle ) ) {
             StartIntegrityAttack::SP startIntegrityAttackSP =
              boost::static_pointer_cast< StartIntegrityAttack >( interactionRootSP );
+
+            BOOST_LOG_SEV(get_logger(), severity_level::info) << "Received START INTEGRITY ATTACK: "
+              << startIntegrityAttackSP;
 
             std::string nodeFullPath = startIntegrityAttackSP->get_nodeFullPath();
 
@@ -800,6 +957,9 @@ void HLAInterface::processInteractions() {
             StopIntegrityAttack::SP stopIntegrityAttackSP =
              boost::static_pointer_cast< StopIntegrityAttack >( interactionRootSP );
 
+            BOOST_LOG_SEV(get_logger(), severity_level::info) << "Received STOP INTEGRITY ATTACK: "
+              << stopIntegrityAttackSP;
+
             std::string nodeFullPath = stopIntegrityAttackSP->get_nodeFullPath();
             AttackCoordinator::getSingleton().disableIntegrityAttack( nodeFullPath );
             continue;
@@ -809,9 +969,8 @@ void HLAInterface::processInteractions() {
         // PROCESSING FOR ATTACK-DIRECTIVE INTERACTIONS
         //
 
-        std::cerr << "ERROR:  HLAInterface:  received unexpected interaction:" << std::endl;
-        std::cerr << *interactionRootSP << std::endl << std::endl;
-
+        BOOST_LOG_SEV(get_logger(), warning) << "HLAInterface:  received unexpected interaction: "
+          << interactionRootSP;
     }
 
 }
@@ -825,8 +984,8 @@ void HLAInterface::processObjectReflectors() {
 
         // GET FULL HLA CLASS NAME OF INTERACTION
         std::string hlaClassName = objectReflectorSP->getHlaClassName();
-std::cout << "Received reflector for \"" << hlaClassName << "\"" << std::endl;
-std::cout << "Reflector: " << objectReflectorSP << std::endl;
+        BOOST_LOG_SEV(get_logger(), severity_level::info) << "Received reflector for \"" << hlaClassName << "\": "
+          << "Reflector: " << objectReflectorSP;
         // IS THIS CLASS NAME ONE THAT COULD BE PROPAGATED?
         // IF SO, CHECK SEQUENCE OF FEDERATES IT CAME TRHOUGH
         StringList federateSequenceList(
@@ -851,27 +1010,28 @@ void HLAInterface::receiveInteraction(
  const RTI::FedTime& theTime,
  const char *theTag,
  RTI::EventRetractionHandle theHandle
-)
- throw ( RTI::InteractionClassNotKnown, RTI::InteractionParameterNotKnown, RTI::InvalidFederationTime, RTI::FederateInternalError ) {
-
+) throw (
+ RTI::InteractionClassNotKnown,
+ RTI::InteractionParameterNotKnown,
+ RTI::InvalidFederationTime,
+ RTI::FederateInternalError
+) {
     static bool notPrinted = true;
     if ( notPrinted ) {
-        std::cerr << AttackCoordinator::getSingleton().listAppSpecProperties() << std::endl;
+        BOOST_LOG_SEV(get_logger(), severity_level::info) << AttackCoordinator::getSingleton().listAppSpecProperties();
         notPrinted = false;
     }
 
-    InteractionRoot::SP interactionRootSP = InteractionRoot::create_interaction( theInteraction, theParameters, theTime );
-std::cout << "receiveInteration (with time): " << std::endl;
-std::cout << *interactionRootSP << std::endl << std::endl;
-    C2WInteractionRoot::SP c2wInteractionRootSP = boost::dynamic_pointer_cast< C2WInteractionRoot >( interactionRootSP );
+    InteractionRoot::SP interactionRootSP = InteractionRoot::create_interaction(theInteraction, theParameters, theTime);
+    C2WInteractionRoot::SP c2wInteractionRootSP = boost::dynamic_pointer_cast< C2WInteractionRoot >(interactionRootSP);
 
     // Filter interaction if src/origin fed requirements (if any) are met
-    if (  c2wInteractionRootSP != 0 && SubscribedInteractionFilter::get_singleton().filterC2WInteraction( getFederateId(), c2wInteractionRootSP )  ) {
+    if (
+      c2wInteractionRootSP != 0 &&
+        SubscribedInteractionFilter::get_singleton().filterC2WInteraction(getFederateId(), c2wInteractionRootSP)
+    ) {
         return;
     }
-
-    //std::cerr << "Received interaction with timestamp " << boost::lexical_cast< std::string >(  static_cast< RTIfedTime >( theTime ).getTime()  ) << " at federate time " <<
-    // boost::lexical_cast< std::string >( getCurrentTime() ) <<  std::endl;
 
     Super::receiveInteraction( theInteraction, theParameters, theTime, theTag, theHandle );
 
@@ -885,17 +1045,16 @@ void HLAInterface::receiveInteraction(
 )
  throw ( RTI::InteractionClassNotKnown, RTI::InteractionParameterNotKnown, RTI::FederateInternalError ) {
 
-    InteractionRoot::SP interactionRootSP = InteractionRoot::create_interaction( theInteraction, theParameters );
-std::cout << "receiveInteration (without time): " << std::endl;
-std::cout << *interactionRootSP << std::endl << std::endl;
-    C2WInteractionRoot::SP c2wInteractionRootSP = boost::dynamic_pointer_cast< C2WInteractionRoot >( interactionRootSP );
-    if (  c2wInteractionRootSP != 0 && SubscribedInteractionFilter::get_singleton().filterC2WInteraction( getFederateId(), c2wInteractionRootSP )  ) {
+    InteractionRoot::SP interactionRootSP = InteractionRoot::create_interaction(theInteraction, theParameters);
+    C2WInteractionRoot::SP c2wInteractionRootSP = boost::dynamic_pointer_cast< C2WInteractionRoot >(interactionRootSP);
+    if (
+      c2wInteractionRootSP != 0 &&
+      SubscribedInteractionFilter::get_singleton().filterC2WInteraction(getFederateId(), c2wInteractionRootSP)
+    ) {
         return;
     }
 
-    // std::cerr << "Received interaction at federate time " << boost::lexical_cast< std::string >( getCurrentTime() ) <<  std::endl;
-
-    Super::receiveInteraction( theInteraction, theParameters, theTag );
+    Super::receiveInteraction(theInteraction, theParameters, theTag);
 
     hlaArrival();
 }
@@ -924,13 +1083,14 @@ void HLAInterface::initialize(int stage) {
         setLookahead(par( "federate_lookahead" ).doubleValue());
 
         setFederationJsonFileName( par( "federation_json_file_name" ).stringValue() );
-        setFederateDynamicMessagingClassesJsonFileName( par( "dynamic_messaging_classes_json_file_name" ).stringValue() );
+        setFederateDynamicMessagingClassesJsonFileName(par("dynamic_messaging_classes_json_file_name").stringValue());
 
-        std::string federateHostConfigJsonFileName = par( "federate_host_config_json_file_name" ).stringValue();
+        std::string federateHostConfigJsonFileName = par("federate_host_config_json_file_name").stringValue();
 
         initializeFederateHostConfigMap(federateHostConfigJsonFileName);
 
-        std::string federateSequenceToMessagingInfoJsonFileName = par("federate_sequence_to_messaging_info_json_file_name").stringValue();
+        std::string federateSequenceToMessagingInfoJsonFileName =
+          par("federate_sequence_to_messaging_info_json_file_name").stringValue();
 
         initializeFederateSequenceToMessagingInfoMap(federateSequenceToMessagingInfoJsonFileName);
 
@@ -938,8 +1098,8 @@ void HLAInterface::initialize(int stage) {
     }
 
     if ( stage == inet::INITSTAGE_LAST ) {
-        std::cerr << "AppSpecProperties:" << std::endl;
-        std::cerr << AttackCoordinator::getSingleton().listAppSpecProperties() << std::endl;
+        BOOST_LOG_SEV(get_logger(), severity_level::info) << "AppSpecProperties:"
+          << AttackCoordinator::getSingleton().listAppSpecProperties();
     }
 }
 
@@ -1114,11 +1274,11 @@ void HLAInterface::setup() {
 //    }
 
     // set up dataflows
-    std::cout << "sending \"ready to populate\"" << std::endl;
+    BOOST_LOG_SEV(get_logger(), severity_level::info) << "Execution at \"ready to populate\" synchronization point";
     readyToPopulate();
-    std::cout << "sending \"ready to run\"" << std::endl;
+    BOOST_LOG_SEV(get_logger(), severity_level::info) << "Execution at \"ready to run\" synchronization point";
     readyToRun();
-    std::cout << "Past synchronization points." << std::endl;
+    BOOST_LOG_SEV(get_logger(), severity_level::info) << "All synchronization points achieved";
 
     // Keep a message in the queue so the simulation doesn't end too soon
     _keepAliveMsg = new omnetpp::cMessage( "keepAlive" );
@@ -1161,7 +1321,8 @@ void HLAInterface::handleMessage( omnetpp::cMessage* msg ) {
     if ( msgName == getHlaMessageLabel().c_str() ) {
         inet::Packet* packet = dynamic_cast< inet::Packet * > ( msg );
         if ( packet == nullptr ) {
-            std::cerr << "WARNING:  HLAInterace received message of name \"" << getHlaMessageLabel() << "\" but received message is not an inet::Packet:  ignoring." << std::endl;
+            BOOST_LOG_SEV(get_logger(), warning) << "HLAInterace received message of name \"" << getHlaMessageLabel()
+              << "\" but received message is not an inet::Packet:  ignoring.";
             cancelAndDelete( msg );
             return;
         }
@@ -1175,24 +1336,20 @@ void HLAInterface::handleMessage( omnetpp::cMessage* msg ) {
         ObjectReflector::SP objectReflectorSP = hlaMsg->getObjectReflectorSP();
         if (interactionRootSP) {
             std::string receivingFederateName(hlaMsg->getReceiverFederateName());
+            BOOST_LOG_SEV(get_logger(), severity_level::info) << "HLAInterface sending interaction to HLA: "
+              << interactionRootSP;
             sendInteraction(*interactionRootSP, receivingFederateName, getCurrentTime() + getLookahead());
-std::cout << "Sending interaction: " << *interactionRootSP << std::endl << std::endl;
         } else if (objectReflectorSP) {
             std::string receivingFederateName(hlaMsg->getReceiverFederateName());
             sendInteraction(*objectReflectorSP, receivingFederateName, getCurrentTime() + getLookahead());
-std::cout << "Sending object reflector: " << *objectReflectorSP << std::endl << std::endl;
+            BOOST_LOG_SEV(get_logger(), severity_level::info) << "HLAInterface sending object reflector to HLA: "
+              << objectReflectorSP;
         } else {
-            std::cerr << "No pointer" << std::endl;
+            BOOST_LOG_SEV(get_logger(), warning) << "HLAInterface unable to send messaing to HLA:  Bad Pointer";
         }
-        // std::cerr << "Sending interaction with timestamp " << boost::lexical_cast< std::string >( timestamp ) << std::endl;
-//    } else if ( msgKind == OBJECT ) {
-//        ObjectMsg *objectMsgPtr = static_cast< ObjectMsg * >( msg );
-//        ObjectRootSP objectRootSP = objectMsgPtr->getObjectRootSP();
-//        objectRootSP->registerObject( getRTI() ); // NOP IF ALREADY REGISTERED.
-//        objectRootSP->updateAttributeValues( getRTI(), timestamp );
     } else {
-        std::cerr << "ERROR:  HLAInterface:  Unexpected message received (name,kind):  (" <<
-         msgName << "," << msg->getKind() << ")" << std::endl << std::endl;
+        BOOST_LOG_SEV(get_logger(), warning) << "HLAInterface:  Unexpected message received (name,kind):  ("
+          << msgName << "," << msg->getKind() << ")";
     }
 
     cancelAndDelete( msg );

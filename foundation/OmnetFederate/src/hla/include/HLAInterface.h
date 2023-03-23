@@ -47,6 +47,17 @@
 
 #include <jsoncpp/json/json.h>
 
+#include <boost/log/expressions/keyword.hpp>
+#include <boost/log/trivial.hpp>
+#include <boost/log/sources/severity_logger.hpp>
+#include <boost/log/attributes.hpp>
+#include <boost/log/utility/setup/common_attributes.hpp>
+
+namespace logging = boost::log;
+namespace logging_source = boost::log::sources;
+namespace attrs = boost::log::attributes;
+
+using namespace logging::trivial;
 
 class HLAInterface : public omnetpp::cSimpleModule, public SynchronizedFederate {
 
@@ -54,6 +65,8 @@ using ObjectRoot = ::edu::vanderbilt::vuisis::cpswt::hla::ObjectRoot;
 using C2WInteractionRoot = ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot;
 
 public:
+    typedef logging_source::severity_logger< severity_level > severity_logger;
+
 	typedef SynchronizedFederate Super;
 	enum MessageType { INTERACTION, OBJECT };
 
@@ -62,7 +75,23 @@ public:
 	// HLAInterface CAN ACCESS IP MODULES OF HOSTS USING THE FOLLOWING CODE */
 	//
 
+private:
+    static severity_logger &get_logger_aux() {
+        static severity_logger logger;
+        logger.add_attribute("MessagingClassName", attrs::constant< std::string >(
+          "InteractionRoot"
+        ));
+
+        logging::add_common_attributes();
+        return logger;
+    }
+
 public:
+    static severity_logger &get_logger() {
+        static severity_logger &logger = get_logger_aux();
+        return logger;
+    }
+
 	static const std::string &getHlaMessageLabel() {
 	    static std::string hlaMessageLabel("Hla+Msg");
 	    return hlaMessageLabel;
@@ -137,7 +166,8 @@ private:
 
 	static void setInstancePtr( HLAInterface *hlaInterfacePtr ) {
 		if ( getHLAInterfacePtr() != 0 ) {
-			std::cerr << "WARNING!  MULTIPLE INSTANCES OF THE HLAInterface CLASS DETECTED.  ALL BUT THE FIRST ARE IGNORED." << std::endl;
+            BOOST_LOG_SEV(get_logger(), warning) <<
+              "MULTIPLE INSTANCES OF THE HLAInterface CLASS DETECTED.  ALL BUT THE FIRST ARE IGNORED.";
 			return;
 		}
 		getHLAInterfacePtr() = hlaInterfacePtr;
