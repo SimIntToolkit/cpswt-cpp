@@ -61,6 +61,13 @@ bool StartReplayAttack::static_init() {
       ValueSP( new Value( std::string("") ));
 
     classAndPropertyNameSetSP->emplace(
+        "InteractionRoot.C2WInteractionRoot.ActionBase.OmnetCommand.StartReplayAttack", "recordingId"
+    );
+
+    get_class_and_property_name_initial_value_sp_map()[ClassAndPropertyName( "InteractionRoot.C2WInteractionRoot.ActionBase.OmnetCommand.StartReplayAttack", "recordingId" )] =
+      ValueSP( new Value( std::string("") ));
+
+    classAndPropertyNameSetSP->emplace(
         "InteractionRoot.C2WInteractionRoot.ActionBase.OmnetCommand.StartReplayAttack", "recordingNodeFullPath"
     );
 
@@ -86,6 +93,10 @@ bool StartReplayAttack::static_init() {
 
     allClassAndPropertyNameSetSP->emplace(
         "InteractionRoot.C2WInteractionRoot.ActionBase.OmnetCommand.StartReplayAttack", "dstNetworkAddress"
+    );
+
+    allClassAndPropertyNameSetSP->emplace(
+        "InteractionRoot.C2WInteractionRoot.ActionBase.OmnetCommand.StartReplayAttack", "recordingId"
     );
 
     allClassAndPropertyNameSetSP->emplace(

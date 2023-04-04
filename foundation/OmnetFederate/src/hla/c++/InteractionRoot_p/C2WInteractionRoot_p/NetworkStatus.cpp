@@ -28,7 +28,7 @@
  * OR MODIFICATIONS.
  */
 
-#include "InteractionRoot_p/C2WInteractionRoot_p/ActionBase_p/OmnetCommand_p/StopNetworkFilterAttack.hpp"
+#include "InteractionRoot_p/C2WInteractionRoot_p/NetworkStatus.hpp"
 namespace edu {
  namespace vanderbilt {
   namespace vuisis {
@@ -36,42 +36,26 @@ namespace edu {
     namespace hla {
      namespace InteractionRoot_p {
       namespace C2WInteractionRoot_p {
-       namespace ActionBase_p {
-        namespace OmnetCommand_p {
 
-bool StopNetworkFilterAttack::static_init_var = StopNetworkFilterAttack::static_init();
+bool NetworkStatus::static_init_var = NetworkStatus::static_init();
 
-bool StopNetworkFilterAttack::static_init() {
-    BOOST_LOG_SEV(get_logger(), info) << "Class \"::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::OmnetCommand_p::StopNetworkFilterAttack\" loaded.";
+bool NetworkStatus::static_init() {
+    BOOST_LOG_SEV(get_logger(), info) << "Class \"::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::NetworkStatus\" loaded.";
 
     // ADD THIS CLASS TO THE _classNameSet DEFINED IN InteractionRoot
     get_hla_class_name_set().insert(get_hla_class_name());
 
     InteractionRoot::NoInstanceInit noInstanceInit;
-    SP instanceSP = SP( new StopNetworkFilterAttack(noInstanceInit) );
+    SP instanceSP = SP( new NetworkStatus(noInstanceInit) );
     get_hla_class_name_instance_sp_map()[get_hla_class_name()] = instanceSP;
 
     ClassAndPropertyNameSetSP classAndPropertyNameSetSP( new ClassAndPropertyNameSet() );
 
     classAndPropertyNameSetSP->emplace(
-        "InteractionRoot.C2WInteractionRoot.ActionBase.OmnetCommand.StopNetworkFilterAttack", "dstNetworkAddress"
+        "InteractionRoot.C2WInteractionRoot.NetworkStatus", "networkStatusJson"
     );
 
-    get_class_and_property_name_initial_value_sp_map()[ClassAndPropertyName( "InteractionRoot.C2WInteractionRoot.ActionBase.OmnetCommand.StopNetworkFilterAttack", "dstNetworkAddress" )] =
-      ValueSP( new Value( std::string("") ));
-
-    classAndPropertyNameSetSP->emplace(
-        "InteractionRoot.C2WInteractionRoot.ActionBase.OmnetCommand.StopNetworkFilterAttack", "nodeFullPath"
-    );
-
-    get_class_and_property_name_initial_value_sp_map()[ClassAndPropertyName( "InteractionRoot.C2WInteractionRoot.ActionBase.OmnetCommand.StopNetworkFilterAttack", "nodeFullPath" )] =
-      ValueSP( new Value( std::string("") ));
-
-    classAndPropertyNameSetSP->emplace(
-        "InteractionRoot.C2WInteractionRoot.ActionBase.OmnetCommand.StopNetworkFilterAttack", "srcNetworkAddress"
-    );
-
-    get_class_and_property_name_initial_value_sp_map()[ClassAndPropertyName( "InteractionRoot.C2WInteractionRoot.ActionBase.OmnetCommand.StopNetworkFilterAttack", "srcNetworkAddress" )] =
+    get_class_and_property_name_initial_value_sp_map()[ClassAndPropertyName( "InteractionRoot.C2WInteractionRoot.NetworkStatus", "networkStatusJson" )] =
       ValueSP( new Value( std::string("") ));
 
     // ADD THIS CLASS'S _classAndPropertyNameSet TO _classNamePropertyNameSetMap DEFINED
@@ -85,19 +69,7 @@ bool StopNetworkFilterAttack::static_init() {
     ClassAndPropertyNameSetSP allClassAndPropertyNameSetSP( new ClassAndPropertyNameSet() );
 
     allClassAndPropertyNameSetSP->emplace(
-        "InteractionRoot.C2WInteractionRoot.ActionBase.OmnetCommand.StopNetworkFilterAttack", "dstNetworkAddress"
-    );
-
-    allClassAndPropertyNameSetSP->emplace(
-        "InteractionRoot.C2WInteractionRoot.ActionBase.OmnetCommand.StopNetworkFilterAttack", "nodeFullPath"
-    );
-
-    allClassAndPropertyNameSetSP->emplace(
-        "InteractionRoot.C2WInteractionRoot.ActionBase.OmnetCommand.StopNetworkFilterAttack", "srcNetworkAddress"
-    );
-
-    allClassAndPropertyNameSetSP->emplace(
-        "InteractionRoot.C2WInteractionRoot.ActionBase.OmnetCommand", "uniqueCommandID"
+        "InteractionRoot.C2WInteractionRoot.NetworkStatus", "networkStatusJson"
     );
 
     allClassAndPropertyNameSetSP->emplace(
@@ -118,8 +90,6 @@ bool StopNetworkFilterAttack::static_init() {
     return true;
 }
 
-        } // NAMESPACE "OmnetCommand_p"
-       } // NAMESPACE "ActionBase_p"
       } // NAMESPACE "C2WInteractionRoot_p"
      } // NAMESPACE "InteractionRoot_p"
     } // NAMESPACE "hla"

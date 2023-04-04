@@ -52,6 +52,7 @@
 #include <boost/log/sources/severity_logger.hpp>
 #include <boost/log/attributes.hpp>
 #include <boost/log/utility/setup/common_attributes.hpp>
+#include <boost/log/utility/setup/console.hpp>
 
 namespace logging = boost::log;
 namespace logging_source = boost::log::sources;
@@ -79,10 +80,11 @@ private:
     static severity_logger &get_logger_aux() {
         static severity_logger logger;
         logger.add_attribute("MessagingClassName", attrs::constant< std::string >(
-          "InteractionRoot"
+          "HLAInterface"
         ));
 
         logging::add_common_attributes();
+        logging::add_console_log(std::cout, logging::keywords::auto_flush = true);
         return logger;
     }
 

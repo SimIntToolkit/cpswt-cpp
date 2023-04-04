@@ -124,6 +124,96 @@ std::string AttackCoordinator::listAppSpecProperties( void ) {
     return retval;
 }
 
+std::string AttackCoordinator::getStatus() {
+
+    inet::Topology topology;
+
+    topology.extractFromNetwork(&predicate);
+
+    NodeFullPathToNodeDataMap nodeFullPathToNodeDataMap;
+
+    int numNodes = topology.getNumNodes();
+    for(int ix = 0 ; ix < numNodes ; ++ix) {
+        inet::Topology::Node *node = topology.getNode(ix);
+        omnetpp::cModule *module = node->getModule();
+
+        std::string nodeFullPath = module->getFullPath();
+
+        NodeData nodeData;
+        omnetpp::cModuleType *moduleType = module->getModuleType();
+        nodeData.nodeTypeFullName = moduleType->getFullName();
+
+        int numOutLinks = node->getNumOutLinks();
+        for(int jx = 0 ; jx < numOutLinks ; ++jx) {
+            inet::Topology::LinkOut *linkOut = node->getLinkOut(jx);
+            inet::Topology::Node *otherNode = linkOut->getRemoteNode();
+            omnetpp::cModule *otherModule = otherNode->getModule();
+
+            std::string otherNodeFullPath = otherModule->getFullPath();
+            if (otherNodeFullPath != nodeFullPath) {
+                nodeData.connectedNodeFullNameSet.emplace(otherNodeFullPath);
+            }
+        }
+
+        nodeFullPathToNodeDataMap.emplace(nodeFullPath, nodeData);
+    }
+
+    NodeFullPathToNodeDataMap::iterator mnmItr = nodeFullPathToNodeDataMap.begin();
+    while(mnmItr != nodeFullPathToNodeDataMap.end()) {
+        const std::string &nodeFullPath = mnmItr->first;
+
+        const NodeData &nodeData = mnmItr->second;
+        const std::string &nodeTypeFullName = nodeData.nodeTypeFullName;
+        if (get_pass_through_node_type_set().find(nodeTypeFullName) != get_pass_through_node_type_set().end()) {
+            const StringSet &connectedNodeFullNameSet = nodeData.connectedNodeFullNameSet;
+
+            for(
+              NodeFullPathToNodeDataMap::iterator otrMnmItr = nodeFullPathToNodeDataMap.begin() ;
+              otrMnmItr != nodeFullPathToNodeDataMap.end() ;
+              ++otrMnmItr
+            ) {
+                if (otrMnmItr == mnmItr) {
+                    continue;
+                }
+                std::string otherNodeFullPath = otrMnmItr->first;
+
+                NodeData &otherNodeData = otrMnmItr->second;
+                StringSet &otherConnectedNodeFullNameSet = otherNodeData.connectedNodeFullNameSet;
+                if (otherConnectedNodeFullNameSet.find(nodeFullPath) != otherConnectedNodeFullNameSet.end()) {
+
+                    otherConnectedNodeFullNameSet.insert(
+                      connectedNodeFullNameSet.begin(), connectedNodeFullNameSet.end()
+                    );
+                    otherConnectedNodeFullNameSet.erase(nodeFullPath);
+                    otherConnectedNodeFullNameSet.erase(otherNodeFullPath);
+                }
+            }
+            NodeFullPathToNodeDataMap::iterator ersMnmItr = mnmItr;
+            ++mnmItr;
+            nodeFullPathToNodeDataMap.erase(nodeFullPath);
+        } else {
+            ++mnmItr;
+        }
+    }
+
+    Json::Value jsonNodeFullPathToNodeDataMap(Json::ValueType::objectValue);
+    for(
+      NodeFullPathToNodeDataMap::iterator mnmItr = nodeFullPathToNodeDataMap.begin() ;
+      mnmItr != nodeFullPathToNodeDataMap.end() ;
+      ++mnmItr
+    ) {
+        jsonNodeFullPathToNodeDataMap[mnmItr->first] = mnmItr->second.toJsonValue(mnmItr->first);
+    }
+
+    Json::StreamWriterBuilder streamWriterBuilder;
+    streamWriterBuilder["commentStyle"] = "None";
+    streamWriterBuilder["indentation"] = "    ";
+    std::unique_ptr<Json::StreamWriter> streamWriterUPtr(streamWriterBuilder.newStreamWriter());
+    std::ostringstream stringOutputStream;
+    streamWriterUPtr->write(jsonNodeFullPathToNodeDataMap, &stringOutputStream);
+    return stringOutputStream.str();
+}
+
 std::ostream &operator<<( std::ostream &os, const AttackCoordinator::NetworkAddress &networkAddress ) {
     std::string output;
 

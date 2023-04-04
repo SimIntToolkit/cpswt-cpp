@@ -28,8 +28,8 @@
  * OR MODIFICATIONS.
  */
 
-#ifndef _edu_vanderbilt_vuisis_cpswt_hla_InteractionRoot_p_C2WInteractionRoot_p_ActionBase_p_OmnetCommand_p_TerminateReplayAttack_CLASS
-#define _edu_vanderbilt_vuisis_cpswt_hla_InteractionRoot_p_C2WInteractionRoot_p_ActionBase_p_OmnetCommand_p_TerminateReplayAttack_CLASS
+#ifndef _edu_vanderbilt_vuisis_cpswt_hla_InteractionRoot_p_C2WInteractionRoot_p_ActionBase_p_OmnetCommand_p_TakeOwnership_CLASS
+#define _edu_vanderbilt_vuisis_cpswt_hla_InteractionRoot_p_C2WInteractionRoot_p_ActionBase_p_OmnetCommand_p_TakeOwnership_CLASS
 
 #include "InteractionRoot_p/C2WInteractionRoot_p/ActionBase_p/OmnetCommand.hpp"
 #include "C2WException.hpp"
@@ -47,17 +47,17 @@ namespace edu {
        namespace ActionBase_p {
         namespace OmnetCommand_p {
 
-class TerminateReplayAttack : public ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::OmnetCommand {
+class TakeOwnership : public ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::OmnetCommand {
 public:
 //    using ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot;
     typedef ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::OmnetCommand Super;
-    typedef boost::shared_ptr< TerminateReplayAttack > SP;
+    typedef boost::shared_ptr< TakeOwnership > SP;
 
 private:
     static severity_logger &get_logger_aux() {
         static severity_logger logger;
         logger.add_attribute("MessagingClassName", attrs::constant< std::string >(
-          "InteractionRoot.C2WInteractionRoot.ActionBase.OmnetCommand.TerminateReplayAttack"
+          "InteractionRoot.C2WInteractionRoot.ActionBase.OmnetCommand.TakeOwnership"
         ));
 
         logging::add_common_attributes();
@@ -76,7 +76,7 @@ public:
     // ----------------------------------------------------------------------------
 
     /**
-     * Returns the fully-qualified (dot-delimited) name of the ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::OmnetCommand_p::TerminateReplayAttack interaction class.
+     * Returns the fully-qualified (dot-delimited) name of the ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::OmnetCommand_p::TakeOwnership interaction class.
      * Note: As this is a static method, it is NOT polymorphic, and so, if called on
      * a reference will return the name of the class pertaining to the reference,
      * rather than the name of the class for the instance referred to by the reference.
@@ -85,7 +85,7 @@ public:
      * @return the fully-qualified Java class name for this interaction class
      */
     static const std::string &get_cpp_class_name() {
-        static const std::string cppClassName("::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::OmnetCommand_p::TerminateReplayAttack");
+        static const std::string cppClassName("::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::OmnetCommand_p::TakeOwnership");
         return cppClassName;
     }
 
@@ -101,7 +101,7 @@ public:
 
     /**
      * Returns the simple name (the last name in the dot-delimited fully-qualified
-     * class name) of the edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.ActionBase_p.OmnetCommand_p.TerminateReplayAttack interaction class.
+     * class name) of the edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.ActionBase_p.OmnetCommand_p.TakeOwnership interaction class.
      *
      * @return the name of this interaction class
      */
@@ -111,7 +111,7 @@ public:
 
     /**
      * Returns the fully-qualified (dot-delimited) hla class name of the
-     * InteractionRoot.C2WInteractionRoot.ActionBase.OmnetCommand.TerminateReplayAttack interaction class.
+     * InteractionRoot.C2WInteractionRoot.ActionBase.OmnetCommand.TakeOwnership interaction class.
      * Note: As this is a static method, it is NOT polymorphic, and so, if called on
      * a reference will return the federation name of the class pertaining to the reference,
      * rather than the name of the class for the instance referred to by the reference.
@@ -120,7 +120,7 @@ public:
      * @return the fully-qualified federation (HLA) class name for this interaction class
      */
     static const std::string &get_hla_class_name() {
-        static const std::string hlaClassName("InteractionRoot.C2WInteractionRoot.ActionBase.OmnetCommand.TerminateReplayAttack");
+        static const std::string hlaClassName("InteractionRoot.C2WInteractionRoot.ActionBase.OmnetCommand.TakeOwnership");
         return hlaClassName;
     }
 
@@ -136,7 +136,7 @@ public:
 
     /**
      * Returns a sorted list containing the names of all of the non-hidden parameters in the
-     * edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.ActionBase_p.OmnetCommand_p.TerminateReplayAttack interaction class.
+     * edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.ActionBase_p.OmnetCommand_p.TakeOwnership interaction class.
      * The property names are paired with name of the hla class in which they are defined in a
      * ClassAndPropertyName POJO.
      * Note: As this is a static method, it is NOT polymorphic, and so, if called on
@@ -154,7 +154,7 @@ public:
 
     /**
      * Returns a sorted list containing the names of all of the parameters in the
-     * edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.ActionBase_p.OmnetCommand_p.TerminateReplayAttack interaction class.
+     * edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.ActionBase_p.OmnetCommand_p.TakeOwnership interaction class.
      * The property names are paired with name of the hla class in which they are defined in a
      * ClassAndPropertyName POJO.
      * Note: As this is a static method, it is NOT polymorphic, and so, if called on
@@ -186,7 +186,7 @@ public:
     // THIS CODE IS STATIC BECAUSE IT IS CLASS-DEPENDENT AND NOT INSTANCE-DEPENDENT
     // ----------------------------------------------------------------------------
     /**
-     * Returns the handle (RTI assigned) of the edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.ActionBase_p.OmnetCommand_p.TerminateReplayAttack interaction class.
+     * Returns the handle (RTI assigned) of the edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.ActionBase_p.OmnetCommand_p.TakeOwnership interaction class.
      * Note: As this is a static method, it is NOT polymorphic, and so, if called on
      * a reference will return the handle of the class pertaining to the reference,
      * rather than the handle of the class for the instance referred to by the reference.
@@ -200,7 +200,7 @@ public:
 
     /**
      * Returns the handle of an parameter (RTI assigned) of
-     * this interaction class (i.e. "edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.ActionBase_p.OmnetCommand_p.TerminateReplayAttack") given the parameter's name.
+     * this interaction class (i.e. "edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.ActionBase_p.OmnetCommand_p.TakeOwnership") given the parameter's name.
      *
      * @param propertyName name of parameter
      * @return the handle (RTI assigned) of the parameter "propertyName" of interaction class "hlaClassName"
@@ -219,7 +219,7 @@ public:
     //-------------------------------------------------
 
     /**
-     * Publishes the edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.ActionBase_p.OmnetCommand_p.TerminateReplayAttack interaction class for a federate.
+     * Publishes the edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.ActionBase_p.OmnetCommand_p.TakeOwnership interaction class for a federate.
      *
      * @param rti handle to the Local RTI Component
      */
@@ -232,7 +232,7 @@ public:
     }
 
     /**
-     * Unpublishes the edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.ActionBase_p.OmnetCommand_p.TerminateReplayAttack interaction class for a federate.
+     * Unpublishes the edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.ActionBase_p.OmnetCommand_p.TakeOwnership interaction class for a federate.
      *
      * @param rti handle to the Local RTI Component, usu. obtained through the
      *            {@link SynchronizedFederate#getRTI()} call
@@ -242,7 +242,7 @@ public:
     }
 
 /**
- * Subscribes a federate to the edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.ActionBase_p.OmnetCommand_p.TerminateReplayAttack interaction class.
+ * Subscribes a federate to the edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.ActionBase_p.OmnetCommand_p.TakeOwnership interaction class.
  *
  * @param rti handle to the Local RTI Component
  */
@@ -263,7 +263,7 @@ public:
     }
 
     /**
-     * Unsubscribes a federate from the edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.ActionBase_p.OmnetCommand_p.TerminateReplayAttack interaction class.
+     * Unsubscribes a federate from the edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.ActionBase_p.OmnetCommand_p.TakeOwnership interaction class.
      *
      * @param rti handle to the Local RTI Component
      */
@@ -289,12 +289,12 @@ public:
 
     /**
      * Return true if "handle" is equal to the handle (RTI assigned) of this class
-     * (that is, the edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.ActionBase_p.OmnetCommand_p.TerminateReplayAttack interaction class).
+     * (that is, the edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.ActionBase_p.OmnetCommand_p.TakeOwnership interaction class).
      *
      * @param handle handle to compare to the value of the handle (RTI assigned) of
-     * this class (the edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.ActionBase_p.OmnetCommand_p.TerminateReplayAttack interaction class).
+     * this class (the edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.ActionBase_p.OmnetCommand_p.TakeOwnership interaction class).
      * @return "true" if "handle" matches the value of the handle of this class
-     * (that is, the edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.ActionBase_p.OmnetCommand_p.TerminateReplayAttack interaction class).
+     * (that is, the edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.ActionBase_p.OmnetCommand_p.TakeOwnership interaction class).
      */
     static bool match(int handle) {
         return handle == get_class_handle();
@@ -310,67 +310,45 @@ public:
 
 
     /**
-     * Set the value of the "dstNetworkAddress" parameter to "value" for this parameter.
+     * Set the value of the "nodeFullPath" parameter to "value" for this parameter.
      *
-     * @param value the new value for the "dstNetworkAddress" parameter
+     * @param value the new value for the "nodeFullPath" parameter
      */
-    void set_dstNetworkAddress(const std::string & newValue) {
-        ClassAndPropertyName key(get_hla_class_name(), "dstNetworkAddress");
+    void set_nodeFullPath(const std::string & newValue) {
+        ClassAndPropertyName key(get_hla_class_name(), "nodeFullPath");
         Value &value(*_classAndPropertyNameValueSPMap[key]);
         value.setValue(newValue);
     }
 
     /**
-     * Returns the value of the "dstNetworkAddress" parameter of this interaction.
+     * Returns the value of the "nodeFullPath" parameter of this interaction.
      *
-     * @return the value of the "dstNetworkAddress" parameter
+     * @return the value of the "nodeFullPath" parameter
      */
-    std::string get_dstNetworkAddress() {
-        ClassAndPropertyName key(get_hla_class_name(), "dstNetworkAddress");
+    std::string get_nodeFullPath() {
+        ClassAndPropertyName key(get_hla_class_name(), "nodeFullPath");
         return static_cast<std::string>(*_classAndPropertyNameValueSPMap[key]);
     }
 
 
     /**
-     * Set the value of the "recordingNodeFullPath" parameter to "value" for this parameter.
+     * Set the value of the "ownerId" parameter to "value" for this parameter.
      *
-     * @param value the new value for the "recordingNodeFullPath" parameter
+     * @param value the new value for the "ownerId" parameter
      */
-    void set_recordingNodeFullPath(const std::string & newValue) {
-        ClassAndPropertyName key(get_hla_class_name(), "recordingNodeFullPath");
+    void set_ownerId(const std::string & newValue) {
+        ClassAndPropertyName key(get_hla_class_name(), "ownerId");
         Value &value(*_classAndPropertyNameValueSPMap[key]);
         value.setValue(newValue);
     }
 
     /**
-     * Returns the value of the "recordingNodeFullPath" parameter of this interaction.
+     * Returns the value of the "ownerId" parameter of this interaction.
      *
-     * @return the value of the "recordingNodeFullPath" parameter
+     * @return the value of the "ownerId" parameter
      */
-    std::string get_recordingNodeFullPath() {
-        ClassAndPropertyName key(get_hla_class_name(), "recordingNodeFullPath");
-        return static_cast<std::string>(*_classAndPropertyNameValueSPMap[key]);
-    }
-
-
-    /**
-     * Set the value of the "srcNetworkAddress" parameter to "value" for this parameter.
-     *
-     * @param value the new value for the "srcNetworkAddress" parameter
-     */
-    void set_srcNetworkAddress(const std::string & newValue) {
-        ClassAndPropertyName key(get_hla_class_name(), "srcNetworkAddress");
-        Value &value(*_classAndPropertyNameValueSPMap[key]);
-        value.setValue(newValue);
-    }
-
-    /**
-     * Returns the value of the "srcNetworkAddress" parameter of this interaction.
-     *
-     * @return the value of the "srcNetworkAddress" parameter
-     */
-    std::string get_srcNetworkAddress() {
-        ClassAndPropertyName key(get_hla_class_name(), "srcNetworkAddress");
+    std::string get_ownerId() {
+        ClassAndPropertyName key(get_hla_class_name(), "ownerId");
         return static_cast<std::string>(*_classAndPropertyNameValueSPMap[key]);
     }
 
@@ -383,11 +361,11 @@ public:
     //--------------------------
 public:
     static SP create() {
-        return SP(new TerminateReplayAttack());
+        return SP(new TakeOwnership());
     }
 
     static InteractionRoot::SP create_interaction() {
-        return SP(new TerminateReplayAttack());
+        return SP(new TakeOwnership());
     }
 
     virtual InteractionRoot::SP createInteraction() {
@@ -395,11 +373,11 @@ public:
     }
 
     static SP create(const RTIfedTime &rtiFedTime) {
-        return SP(new TerminateReplayAttack(rtiFedTime));
+        return SP(new TakeOwnership(rtiFedTime));
     }
 
     static InteractionRoot::SP create_interaction(const RTIfedTime &rtiFedTime) {
-        return SP(new TerminateReplayAttack(rtiFedTime));
+        return SP(new TakeOwnership(rtiFedTime));
     }
 
     virtual InteractionRoot::SP createInteraction(const RTIfedTime &rtiFedTime) {
@@ -409,13 +387,13 @@ public:
     static SP create(
       const RTI::ParameterHandleValuePairSet &propertyMap
     ) {
-        return SP(new TerminateReplayAttack(propertyMap));
+        return SP(new TakeOwnership(propertyMap));
     }
 
     static InteractionRoot::SP create_interaction(
       const RTI::ParameterHandleValuePairSet &propertyMap
     ) {
-        return SP(new TerminateReplayAttack(propertyMap));
+        return SP(new TakeOwnership(propertyMap));
     }
 
     virtual InteractionRoot::SP createInteraction(
@@ -427,13 +405,13 @@ public:
     static SP create(
       const RTI::ParameterHandleValuePairSet &propertyMap, const RTIfedTime &rtiFedTime
     ) {
-        return SP(new TerminateReplayAttack(propertyMap, rtiFedTime));
+        return SP(new TakeOwnership(propertyMap, rtiFedTime));
     }
 
     static InteractionRoot::SP create_interaction(
       const RTI::ParameterHandleValuePairSet &propertyMap, const RTIfedTime &rtiFedTime
     ) {
-        return SP(new TerminateReplayAttack(propertyMap, rtiFedTime));
+        return SP(new TakeOwnership(propertyMap, rtiFedTime));
     }
 
     virtual InteractionRoot::SP createInteraction(
@@ -442,7 +420,7 @@ public:
     }
 
     virtual InteractionRoot::SP cloneInteraction() {
-        return InteractionRoot::SP( new TerminateReplayAttack( *this )  );
+        return InteractionRoot::SP( new TakeOwnership( *this )  );
     }
 
     //------------------------------
@@ -453,27 +431,27 @@ public:
     // CONSTRUCTORS
     //-------------
 public:
-    TerminateReplayAttack() : Super( get_hla_class_name() ) { }
+    TakeOwnership() : Super( get_hla_class_name() ) { }
 
-    TerminateReplayAttack( const PropertyHandleValuePairSet &propertyMap ) : Super( get_hla_class_name(), propertyMap ) { }
+    TakeOwnership( const PropertyHandleValuePairSet &propertyMap ) : Super( get_hla_class_name(), propertyMap ) { }
 
-    TerminateReplayAttack( const RTIfedTime &rtiFedTime ) : Super( get_hla_class_name(), rtiFedTime ) { }
+    TakeOwnership( const RTIfedTime &rtiFedTime ) : Super( get_hla_class_name(), rtiFedTime ) { }
 
-    TerminateReplayAttack(const PropertyHandleValuePairSet &propertyMap, const RTIfedTime &rtiFedTime) :
+    TakeOwnership(const PropertyHandleValuePairSet &propertyMap, const RTIfedTime &rtiFedTime) :
        Super( get_hla_class_name(), propertyMap, rtiFedTime ) { }
 
 protected:
-    TerminateReplayAttack(InteractionRoot::NoInstanceInit &noInstanceInit) : Super(noInstanceInit) { }
+    TakeOwnership(InteractionRoot::NoInstanceInit &noInstanceInit) : Super(noInstanceInit) { }
 
-    TerminateReplayAttack( const std::string &hlaClassName ) : Super( hlaClassName ) { }
+    TakeOwnership( const std::string &hlaClassName ) : Super( hlaClassName ) { }
 
-    TerminateReplayAttack( const std::string &hlaClassName, const PropertyHandleValuePairSet &propertyMap ) :
+    TakeOwnership( const std::string &hlaClassName, const PropertyHandleValuePairSet &propertyMap ) :
       Super( hlaClassName, propertyMap ) { }
 
-    TerminateReplayAttack( const std::string &hlaClassName, const RTIfedTime &rtiFedTime ) :
+    TakeOwnership( const std::string &hlaClassName, const RTIfedTime &rtiFedTime ) :
       Super( hlaClassName, rtiFedTime ) { }
 
-    TerminateReplayAttack(
+    TakeOwnership(
       const std::string &hlaClassName, const PropertyHandleValuePairSet &propertyMap, const RTIfedTime &rtiFedTime
     ) : Super( hlaClassName, propertyMap, rtiFedTime ) { }
 
@@ -488,8 +466,8 @@ protected:
  } // NAMESPACE "vanderbilt"
 } // NAMESPACE "edu"
 
-inline std::ostream &operator<<( std::ostream &os, ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::OmnetCommand_p::TerminateReplayAttack::SP messagingSP ) {
+inline std::ostream &operator<<( std::ostream &os, ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::OmnetCommand_p::TakeOwnership::SP messagingSP ) {
     return os << *messagingSP;
 }
 
-#endif // _edu_vanderbilt_vuisis_cpswt_hla_InteractionRoot_p_C2WInteractionRoot_p_ActionBase_p_OmnetCommand_p_TerminateReplayAttack_CLASS
+#endif // _edu_vanderbilt_vuisis_cpswt_hla_InteractionRoot_p_C2WInteractionRoot_p_ActionBase_p_OmnetCommand_p_TakeOwnership_CLASS

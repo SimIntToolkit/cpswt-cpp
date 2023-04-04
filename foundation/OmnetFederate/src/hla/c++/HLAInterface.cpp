@@ -48,70 +48,125 @@
 Define_Module(HLAInterface);
 
 
-using AddRouteToRoutingTable =
-  ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::OmnetCommand_p
-    ::AddRouteToRoutingTable;
-using DropRouteFromRoutingTable = ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::OmnetCommand_p::DropRouteFromRoutingTable;
+using AddRouteToRoutingTable = ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p
+  ::ActionBase_p::OmnetCommand_p::AddRouteToRoutingTable;
+using DropRouteFromRoutingTable = ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p
+  ::ActionBase_p::OmnetCommand_p::DropRouteFromRoutingTable;
 
-using CommandExecutionStatus = ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::CommandExecutionStatus;
+using CommandExecutionStatus = ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p
+  ::ActionBase_p::CommandExecutionStatus;
 
 // USED IN HEADER FILE
 //using C2WInteractionRoot = ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot;
 
-using NetworkPacket = ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::NetworkPacket;
-using EmbeddedMessaging = ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::EmbeddedMessaging;
+using EmbeddedMessaging = ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p
+  ::EmbeddedMessaging;
 
-using OmnetCommand = ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::OmnetCommand;
+using OmnetCommand = ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p
+  ::ActionBase_p::OmnetCommand;
 
 using ObjectReflector = ::edu::vanderbilt::vuisis::cpswt::hla::ObjectRoot::ObjectReflector;
 
-using RecordPacketsForReplayAttack = ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::OmnetCommand_p::RecordPacketsForReplayAttack;
-using CeaseReplayAttack = ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::OmnetCommand_p::CeaseReplayAttack;
+using AddRouteToRoutingTable = ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p
+  ::ActionBase_p::OmnetCommand_p::AddRouteToRoutingTable;
+using DropRouteFromRoutingTable = ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p
+  ::ActionBase_p::OmnetCommand_p::DropRouteFromRoutingTable;
 
-using StartDataInjectionAttack = ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::OmnetCommand_p::AttacksNotYetImplemented_p::StartDataInjectionAttack;
-using StopDataInjectionAttack = ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::OmnetCommand_p::AttacksNotYetImplemented_p::StopDataInjectionAttack;
+using StartDataInjectionAttack = ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p
+  ::ActionBase_p::OmnetCommand_p::AttacksNotYetImplemented_p::StartDataInjectionAttack;
+using StopDataInjectionAttack = ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p
+  ::ActionBase_p::OmnetCommand_p::AttacksNotYetImplemented_p::StopDataInjectionAttack;
 
-using StartDelayNodeAttack = ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::OmnetCommand_p::StartDelayNodeAttack;
-using StopDelayNodeAttack = ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::OmnetCommand_p::StopDelayNodeAttack;
+using StartDNSPoisoningAttack = ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p
+  ::ActionBase_p::OmnetCommand_p::AttacksNotYetImplemented_p::StartDNSPoisoningAttack;
+using StopDNSPoisoningAttack = ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p
+  ::ActionBase_p::OmnetCommand_p::AttacksNotYetImplemented_p::StopDNSPoisoningAttack;
 
-using StartDisableNetworkAttack = ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::OmnetCommand_p::StartDisableNetworkAttack;
-using StopDisableNetworkAttack = ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::OmnetCommand_p::StopDisableNetworkAttack;
+using StartLinkAttack = ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p
+  ::ActionBase_p::OmnetCommand_p::AttacksNotYetImplemented_p::StartLinkAttack;
+using StopLinkAttack = ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p
+  ::ActionBase_p::OmnetCommand_p::AttacksNotYetImplemented_p::StopLinkAttack;
 
-using StartDNSPoisoningAttack = ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::OmnetCommand_p::AttacksNotYetImplemented_p::StartDNSPoisoningAttack;
-using StopDNSPoisoningAttack = ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::OmnetCommand_p::AttacksNotYetImplemented_p::StopDNSPoisoningAttack;
+using StartMasqueradingAttack = ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p
+  ::ActionBase_p::OmnetCommand_p::AttacksNotYetImplemented_p::StartMasqueradingAttack;
+using StopMasqueradingAttack = ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p
+  ::ActionBase_p::OmnetCommand_p::AttacksNotYetImplemented_p::StopMasqueradingAttack;
 
-using StartIntegrityAttack = ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::OmnetCommand_p::StartIntegrityAttack;
-using StopIntegrityAttack = ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::OmnetCommand_p::StopIntegrityAttack;
+using BecomeObservable = ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p
+  ::ActionBase_p::OmnetCommand_p::BecomeObservable;
+using BecomeNotObservable = ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p
+  ::ActionBase_p::OmnetCommand_p::BecomeNotObservable;
 
-using StartLinkAttack = ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::OmnetCommand_p::AttacksNotYetImplemented_p::StartLinkAttack;
-using StopLinkAttack = ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::OmnetCommand_p::AttacksNotYetImplemented_p::StopLinkAttack;
+using StartDelayNodeAttack = ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p
+  ::ActionBase_p::OmnetCommand_p::StartDelayNodeAttack;
+using StopDelayNodeAttack = ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p
+  ::ActionBase_p::OmnetCommand_p::StopDelayNodeAttack;
 
-using StartMasqueradingAttack = ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::OmnetCommand_p::AttacksNotYetImplemented_p::StartMasqueradingAttack;
-using StopMasqueradingAttack = ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::OmnetCommand_p::AttacksNotYetImplemented_p::StopMasqueradingAttack;
+using StartDisableNetworkAttack = ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p
+  ::ActionBase_p::OmnetCommand_p::StartDisableNetworkAttack;
+using StopDisableNetworkAttack = ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p
+  ::ActionBase_p::OmnetCommand_p::StopDisableNetworkAttack;
 
-using StartModifyFromHLAPacketsAttack = ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::OmnetCommand_p::StartModifyFromHLAPacketsAttack;
-using StopModifyFromHLAPacketsAttack = ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::OmnetCommand_p::StopModifyFromHLAPacketsAttack;
+using StartIntegrityAttack = ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p
+  ::ActionBase_p::OmnetCommand_p::StartIntegrityAttack;
+using StopIntegrityAttack = ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p
+  ::ActionBase_p::OmnetCommand_p::StopIntegrityAttack;
 
-using StartModifyToHLAPacketsAttack = ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::OmnetCommand_p::StartModifyToHLAPacketsAttack;
-using StopModifyToHLAPacketsAttack = ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::OmnetCommand_p::StopModifyToHLAPacketsAttack;
+using StartModifyFromHLAPacketsAttack = ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p
+  ::ActionBase_p::OmnetCommand_p::StartModifyFromHLAPacketsAttack;
+using StopModifyFromHLAPacketsAttack = ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p
+  ::ActionBase_p::OmnetCommand_p::StopModifyFromHLAPacketsAttack;
 
-using StartNetworkFilterAttack = ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::OmnetCommand_p::StartNetworkFilterAttack;
-using StopNetworkFilterAttack = ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::OmnetCommand_p::StopNetworkFilterAttack;
+using StartModifyToHLAPacketsAttack = ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p
+  ::ActionBase_p::OmnetCommand_p::StartModifyToHLAPacketsAttack;
+using StopModifyToHLAPacketsAttack = ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p
+  ::ActionBase_p::OmnetCommand_p::StopModifyToHLAPacketsAttack;
 
-using StartNetworkIPFirewall = ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::OmnetCommand_p::StartNetworkIPFirewall;
-using StopNetworkIPFirewall = ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::OmnetCommand_p::StopNetworkIPFirewall;
+using StartNetworkFilterAttack = ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p
+  ::ActionBase_p::OmnetCommand_p::StartNetworkFilterAttack;
+using StopNetworkFilterAttack = ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p
+  ::ActionBase_p::OmnetCommand_p::StopNetworkFilterAttack;
 
-using StartNodeAttack = ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::OmnetCommand_p::StartNodeAttack;
-using StopNodeAttack = ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::OmnetCommand_p::StopNodeAttack;
+using StartNetworkIPFirewall = ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p
+  ::ActionBase_p::OmnetCommand_p::StartNetworkIPFirewall;
+using StopNetworkIPFirewall = ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p
+  ::ActionBase_p::OmnetCommand_p::StopNetworkIPFirewall;
 
-using StartOutOfOrderPacketsAttack = ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::OmnetCommand_p::StartOutOfOrderPacketsAttack;
-using StopOutOfOrderPacketsAttack = ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::OmnetCommand_p::StopOutOfOrderPacketsAttack;
+using StartNodeAttack = ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p
+  ::ActionBase_p::OmnetCommand_p::StartNodeAttack;
+using StopNodeAttack = ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p
+  ::ActionBase_p::OmnetCommand_p::StopNodeAttack;
 
-using StartReplayAttack = ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::OmnetCommand_p::StartReplayAttack;
-using TerminateReplayAttack = ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::OmnetCommand_p::TerminateReplayAttack;
+using StartOutOfOrderPacketsAttack = ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p
+  ::ActionBase_p::OmnetCommand_p::StartOutOfOrderPacketsAttack;
+using StopOutOfOrderPacketsAttack = ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p
+  ::ActionBase_p::OmnetCommand_p::StopOutOfOrderPacketsAttack;
 
-using StartSnifferAttack = ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::OmnetCommand_p::StartSnifferAttack;
-using StopSnifferAttack = ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::OmnetCommand_p::StopSnifferAttack;
+using StartReplayAttack = ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p
+  ::ActionBase_p::OmnetCommand_p::StartReplayAttack;
+using StopReplayAttack = ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p
+  ::ActionBase_p::OmnetCommand_p::StopReplayAttack;
+
+using StartSnifferAttack = ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p
+  ::ActionBase_p::OmnetCommand_p::StartSnifferAttack;
+using StopSnifferAttack = ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p
+  ::ActionBase_p::OmnetCommand_p::StopSnifferAttack;
+
+using StartRecordingPacketsForReplayAttack = ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p
+  ::C2WInteractionRoot_p::ActionBase_p::OmnetCommand_p::StartRecordingPacketsForReplayAttack;
+using StopRecordingPacketsForReplayAttack = ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p
+  ::C2WInteractionRoot_p::ActionBase_p::OmnetCommand_p::StopRecordingPacketsForReplayAttack;
+using EraseRecordedPacketsForReplayAttack = ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p
+  ::C2WInteractionRoot_p::ActionBase_p::OmnetCommand_p::EraseRecordedPacketsForReplayAttack;
+
+using TakeOwnership = ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p
+  ::ActionBase_p::OmnetCommand_p::TakeOwnership;
+using LoseOwnership = ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p
+  ::ActionBase_p::OmnetCommand_p::LoseOwnership;
+
+using NetworkStatus = ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::NetworkStatus;
+using NetworkStatusRequest = ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p
+  ::NetworkStatusRequest;
 
 
 void HLAInterface::FederateHostConfig::assignFromJson(const Json::Value &jsonValue) {
@@ -403,6 +458,35 @@ void HLAInterface::processInteractions() {
             continue;
         }
 
+        if (  NetworkStatusRequest::match( classHandle) ) {
+            NetworkStatus networkStatus;
+            networkStatus.set_networkStatusJson(AttackCoordinator::getSingleton().getStatus());
+            networkStatus.set_actualLogicalGenerationTime(getCurrentTime());
+            networkStatus.set_federateFilter("");
+            sendInteraction(networkStatus);
+            continue;
+        }
+
+        if (  BecomeObservable::match( classHandle )) {
+            BecomeObservable::SP becomeObservableSP = boost::static_pointer_cast<BecomeObservable>(interactionRootSP);
+
+            std::string nodeFullPath = becomeObservableSP->get_nodeFullPath();
+            std::string observerId = becomeObservableSP->get_observerId();
+
+            AttackCoordinator::getSingleton().setObservable(nodeFullPath, observerId, true);
+            continue;
+        }
+
+        if (  BecomeNotObservable::match( classHandle )) {
+            BecomeNotObservable::SP becomeNotObservableSP = \
+              boost::static_pointer_cast<BecomeNotObservable>(interactionRootSP);
+
+            std::string nodeFullPath = becomeNotObservableSP->get_nodeFullPath();
+            std::string observerId = becomeNotObservableSP->get_observerId();
+
+            AttackCoordinator::getSingleton().setObservable(nodeFullPath, observerId, false);
+            continue;
+        }
 
         if (  StartNodeAttack::match( classHandle )  ) {
             StartNodeAttack::SP startNodeAttackSP = boost::static_pointer_cast< StartNodeAttack >( interactionRootSP );
@@ -504,7 +588,7 @@ void HLAInterface::processInteractions() {
             BOOST_LOG_SEV(get_logger(), severity_level::info) << "Received START NETWORK FILTER ATTACK: "
               << startNetworkFilterAttackSP;
 
-            std::string recordingNodeFullPath = startNetworkFilterAttackSP->get_recordingNodeFullPath();
+            std::string recordingNodeFullPath = startNetworkFilterAttackSP->get_nodeFullPath();
 
             FilterAttackMsg *filterAttackMsg = new FilterAttackMsg;
             filterAttackMsg->setSourceNetworkAddress( startNetworkFilterAttackSP->get_srcNetworkAddress().c_str() );
@@ -528,7 +612,7 @@ void HLAInterface::processInteractions() {
             BOOST_LOG_SEV(get_logger(), severity_level::info) << "Received STOP NETWORK FILTER ATTACK: "
               << stopNetworkFilterAttackSP;
 
-            std::string recordingNodeFullPath = stopNetworkFilterAttackSP->get_recordingNodeFullPath();
+            std::string recordingNodeFullPath = stopNetworkFilterAttackSP->get_nodeFullPath();
 
             FilterAttackMsg *filterAttackMsg = new FilterAttackMsg;
             filterAttackMsg->setSourceNetworkAddress( stopNetworkFilterAttackSP->get_srcNetworkAddress().c_str() );
@@ -658,23 +742,23 @@ void HLAInterface::processInteractions() {
             continue;
         }
 
-        if (  RecordPacketsForReplayAttack::match( classHandle )  ) {
-            RecordPacketsForReplayAttack::SP recordPacketsForReplayAttackSP =
-              boost::static_pointer_cast< RecordPacketsForReplayAttack >( interactionRootSP );
+        if (  StartRecordingPacketsForReplayAttack::match( classHandle )  ) {
+            StartRecordingPacketsForReplayAttack::SP startRecordingPacketsForReplayAttackSP =
+              boost::static_pointer_cast< StartRecordingPacketsForReplayAttack >( interactionRootSP );
 
             BOOST_LOG_SEV(get_logger(), severity_level::info) << "Received RECORD PACKETS FOR REPLAY ATTACK: "
-              << recordPacketsForReplayAttackSP;
+              << startRecordingPacketsForReplayAttackSP;
 
-            std::string nodeFullPath = recordPacketsForReplayAttackSP->get_recordingNodeFullPath();
+            std::string nodeFullPath = startRecordingPacketsForReplayAttackSP->get_recordingNodeFullPath();
 
             RecordReplayAttackMsg *recordReplayAttackMsg = new RecordReplayAttackMsg;
             recordReplayAttackMsg->setSourceNetworkAddress(
-              recordPacketsForReplayAttackSP->get_srcNetworkAddress().c_str()
+              startRecordingPacketsForReplayAttackSP->get_srcNetworkAddress().c_str()
             );
             recordReplayAttackMsg->setDestinationNetworkAddress(
-              recordPacketsForReplayAttackSP->get_dstNetworkAddress().c_str()
+              startRecordingPacketsForReplayAttackSP->get_dstNetworkAddress().c_str()
             );
-            recordReplayAttackMsg->setRecordDuration( recordPacketsForReplayAttackSP->get_recordDurationInSecs() );
+            recordReplayAttackMsg->setRecordDuration( 0 );
             recordReplayAttackMsg->setEnable( true );
 
             cModule *cModulePtr = AttackCoordinator::getSingleton().getIPModule( nodeFullPath );
@@ -687,19 +771,19 @@ void HLAInterface::processInteractions() {
             continue;
         }
 
-        if (  TerminateReplayAttack::match( classHandle )  ) {
-            TerminateReplayAttack::SP terminateReplayAttackSP =
-              boost::static_pointer_cast< TerminateReplayAttack >( interactionRootSP );
+        if (  StopRecordingPacketsForReplayAttack::match( classHandle )  ) {
+            StopRecordingPacketsForReplayAttack::SP stopRecordingPacketsForReplayAttackSP =
+              boost::static_pointer_cast< StopRecordingPacketsForReplayAttack >( interactionRootSP );
 
             BOOST_LOG_SEV(get_logger(), severity_level::info) << "Received TERMINATE REPLAY ATTACK: "
-              << terminateReplayAttackSP;
+              << stopRecordingPacketsForReplayAttackSP;
 
-            std::string nodeFullPath = terminateReplayAttackSP->get_recordingNodeFullPath();
+            std::string nodeFullPath = stopRecordingPacketsForReplayAttackSP->get_recordingNodeFullPath();
 
             RecordReplayAttackMsg *recordReplayAttackMsg = new RecordReplayAttackMsg;
-            recordReplayAttackMsg->setSourceNetworkAddress( terminateReplayAttackSP->get_srcNetworkAddress().c_str() );
+            recordReplayAttackMsg->setSourceNetworkAddress( stopRecordingPacketsForReplayAttackSP->get_srcNetworkAddress().c_str() );
             recordReplayAttackMsg->setDestinationNetworkAddress(
-              terminateReplayAttackSP->get_dstNetworkAddress().c_str()
+              stopRecordingPacketsForReplayAttackSP->get_dstNetworkAddress().c_str()
             );
             recordReplayAttackMsg->setRecordDuration( -1 );
             recordReplayAttackMsg->setEnable( false );
@@ -738,29 +822,29 @@ void HLAInterface::processInteractions() {
             continue;
         }
 
-        if (  CeaseReplayAttack::match( classHandle )  ) {
-            CeaseReplayAttack::SP ceaseReplayAttackSP =
-              boost::static_pointer_cast< CeaseReplayAttack >( interactionRootSP );
-
-            BOOST_LOG_SEV(get_logger(), severity_level::info) << "Received CEASE REPLAY ATTACK: "
-              << ceaseReplayAttackSP;
-
-            std::string nodeFullPath = ceaseReplayAttackSP->get_recordingNodeFullPath();
-
-            ReplayAttackMsg *replayAttackMsg = new ReplayAttackMsg;
-            replayAttackMsg->setSourceNetworkAddress( ceaseReplayAttackSP->get_srcNetworkAddress().c_str() );
-            replayAttackMsg->setDestinationNetworkAddress( ceaseReplayAttackSP->get_dstNetworkAddress().c_str() );
-            replayAttackMsg->setPlay( false );
-
-            cModule *cModulePtr = AttackCoordinator::getSingleton().getIPModule( nodeFullPath );
-            if ( cModulePtr != 0 ) {
-                sendDirect(  replayAttackMsg, cModulePtr, "hlaIn"  );
-            } else {
-                BOOST_LOG_SEV(get_logger(), warning) << "CeaseReplayAttack:  NO MODULE FOR NODE \""
-                  << nodeFullPath << "\"";
-            }
-            continue;
-        }
+//        if (  CeaseReplayAttack::match( classHandle )  ) {
+//            CeaseReplayAttack::SP ceaseReplayAttackSP =
+//              boost::static_pointer_cast< CeaseReplayAttack >( interactionRootSP );
+//
+//            BOOST_LOG_SEV(get_logger(), severity_level::info) << "Received CEASE REPLAY ATTACK: "
+//              << ceaseReplayAttackSP;
+//
+//            std::string nodeFullPath = ceaseReplayAttackSP->get_recordingNodeFullPath();
+//
+//            ReplayAttackMsg *replayAttackMsg = new ReplayAttackMsg;
+//            replayAttackMsg->setSourceNetworkAddress( ceaseReplayAttackSP->get_srcNetworkAddress().c_str() );
+//            replayAttackMsg->setDestinationNetworkAddress( ceaseReplayAttackSP->get_dstNetworkAddress().c_str() );
+//            replayAttackMsg->setPlay( false );
+//
+//            cModule *cModulePtr = AttackCoordinator::getSingleton().getIPModule( nodeFullPath );
+//            if ( cModulePtr != 0 ) {
+//                sendDirect(  replayAttackMsg, cModulePtr, "hlaIn"  );
+//            } else {
+//                BOOST_LOG_SEV(get_logger(), warning) << "CeaseReplayAttack:  NO MODULE FOR NODE \""
+//                  << nodeFullPath << "\"";
+//            }
+//            continue;
+//        }
 
         if (  StartOutOfOrderPacketsAttack::match( classHandle )  ) {
             StartOutOfOrderPacketsAttack::SP startOutOfOrderPacketsAttackSP =
@@ -769,7 +853,7 @@ void HLAInterface::processInteractions() {
             BOOST_LOG_SEV(get_logger(), severity_level::info) << "Received START OUT-OF-ORDER PACKETS ATTACK: "
               << startOutOfOrderPacketsAttackSP;
 
-            std::string nodeFullPath = startOutOfOrderPacketsAttackSP->get_recordingNodeFullPath();
+            std::string nodeFullPath = startOutOfOrderPacketsAttackSP->get_nodeFullPath();
 
             OutOfOrderAttackMsg *outOfOrderAttackMsg = new OutOfOrderAttackMsg;
             outOfOrderAttackMsg->setSourceNetworkAddress(
@@ -798,7 +882,7 @@ void HLAInterface::processInteractions() {
             BOOST_LOG_SEV(get_logger(), severity_level::info) << "Received STOP OUT-OF-ORDER PACKETS ATTACK: "
               << stopOutOfOrderPacketsAttackSP;
 
-            std::string nodeFullPath = stopOutOfOrderPacketsAttackSP->get_recordingNodeFullPath();
+            std::string nodeFullPath = stopOutOfOrderPacketsAttackSP->get_nodeFullPath();
 
             OutOfOrderAttackMsg *outOfOrderAttackMsg = new OutOfOrderAttackMsg;
             outOfOrderAttackMsg->setSourceNetworkAddress(
@@ -965,6 +1049,26 @@ void HLAInterface::processInteractions() {
             continue;
         }
 
+        if (  TakeOwnership::match( classHandle )) {
+            TakeOwnership::SP takeOwnershipSP = boost::static_pointer_cast<TakeOwnership>(interactionRootSP);
+
+            std::string nodeFullPath = takeOwnershipSP->get_nodeFullPath();
+            std::string ownerId = takeOwnershipSP->get_ownerId();
+
+            AttackCoordinator::getSingleton().setOwnership(nodeFullPath, ownerId, true);
+            continue;
+        }
+
+        if (  LoseOwnership::match( classHandle )) {
+            LoseOwnership::SP loseOwnershipSP = boost::static_pointer_cast<LoseOwnership>(interactionRootSP);
+
+            std::string nodeFullPath = loseOwnershipSP->get_nodeFullPath();
+            std::string ownerId = loseOwnershipSP->get_ownerId();
+
+            AttackCoordinator::getSingleton().setOwnership(nodeFullPath, ownerId, false);
+            continue;
+        }
+
         //
         // PROCESSING FOR ATTACK-DIRECTIVE INTERACTIONS
         //
@@ -1100,6 +1204,7 @@ void HLAInterface::initialize(int stage) {
     if ( stage == inet::INITSTAGE_LAST ) {
         BOOST_LOG_SEV(get_logger(), severity_level::info) << "AppSpecProperties:"
           << AttackCoordinator::getSingleton().listAppSpecProperties();
+        BOOST_LOG_SEV(get_logger(), severity_level::info) << AttackCoordinator::getSingleton().getStatus();
     }
 }
 
@@ -1133,47 +1238,43 @@ void HLAInterface::setup() {
     enableAsynchronousDelivery();
 
     // publish interactions
-    NetworkPacket::publish_interaction( getRTI() );
     CommandExecutionStatus::publish_interaction( getRTI() );
 
+    NetworkStatus::publish_interaction( getRTI() );
+
     // subscribe interactions
-    StartNodeAttack::subscribe_interaction( getRTI() );
-    StartLinkAttack::subscribe_interaction( getRTI() );
-    NetworkPacket::subscribe_interaction( getRTI() );
+    AddRouteToRoutingTable::subscribe_interaction( getRTI() );
+    DropRouteFromRoutingTable::subscribe_interaction( getRTI() );
+    BecomeObservable::subscribe_interaction( getRTI() );
+    BecomeNotObservable::subscribe_interaction( getRTI() );
+    StartDelayNodeAttack::subscribe_interaction( getRTI() );
+    StopDelayNodeAttack::subscribe_interaction( getRTI() );
     StartDisableNetworkAttack::subscribe_interaction( getRTI() );
     StopDisableNetworkAttack::subscribe_interaction( getRTI() );
-    StopNodeAttack::subscribe_interaction( getRTI() );
-    StopLinkAttack::subscribe_interaction( getRTI() );
-    StartDataInjectionAttack::subscribe_interaction( getRTI() );
-    StopDataInjectionAttack::subscribe_interaction( getRTI() );
-    StartSnifferAttack::subscribe_interaction( getRTI() );
-    StopSnifferAttack::subscribe_interaction( getRTI() );
-    StartMasqueradingAttack::subscribe_interaction( getRTI() );
-    StopMasqueradingAttack::subscribe_interaction( getRTI() );
-    CeaseReplayAttack::subscribe_interaction( getRTI() );
-    RecordPacketsForReplayAttack::subscribe_interaction( getRTI() );
-    StopDNSPoisoningAttack::subscribe_interaction( getRTI() );
-    StartDNSPoisoningAttack::subscribe_interaction( getRTI() );
-    OmnetCommand::subscribe_interaction( getRTI() );
-    StartReplayAttack::subscribe_interaction( getRTI() );
-    TerminateReplayAttack::subscribe_interaction( getRTI() );
-    StopOutOfOrderPacketsAttack::subscribe_interaction( getRTI() );
-    StartOutOfOrderPacketsAttack::subscribe_interaction( getRTI() );
-    DropRouteFromRoutingTable::subscribe_interaction( getRTI() );
-    AddRouteToRoutingTable::subscribe_interaction( getRTI() );
-    StartNetworkFilterAttack::subscribe_interaction( getRTI() );
-    StopNetworkFilterAttack::subscribe_interaction( getRTI() );
-    StopDelayNodeAttack::subscribe_interaction( getRTI() );
-    StartDelayNodeAttack::subscribe_interaction( getRTI() );
+    StartIntegrityAttack::subscribe_interaction( getRTI() );
+    StopIntegrityAttack::subscribe_interaction( getRTI() );
     StartModifyFromHLAPacketsAttack::subscribe_interaction( getRTI() );
     StopModifyFromHLAPacketsAttack::subscribe_interaction( getRTI() );
     StartModifyToHLAPacketsAttack::subscribe_interaction( getRTI() );
     StopModifyToHLAPacketsAttack::subscribe_interaction( getRTI() );
-    StartIntegrityAttack::subscribe_interaction( getRTI() );
-    StopIntegrityAttack::subscribe_interaction( getRTI() );
-
+    StartNetworkFilterAttack::subscribe_interaction( getRTI() );
+    StopNetworkFilterAttack::subscribe_interaction( getRTI() );
     StartNetworkIPFirewall::subscribe_interaction( getRTI() );
     StopNetworkIPFirewall::subscribe_interaction( getRTI() );
+    StartNodeAttack::subscribe_interaction( getRTI() );
+    StopNodeAttack::subscribe_interaction( getRTI() );
+    StartOutOfOrderPacketsAttack::subscribe_interaction( getRTI() );
+    StopOutOfOrderPacketsAttack::subscribe_interaction( getRTI() );
+    StartRecordingPacketsForReplayAttack::subscribe_interaction( getRTI() );
+    StopRecordingPacketsForReplayAttack::subscribe_interaction( getRTI() );
+    EraseRecordedPacketsForReplayAttack::subscribe_interaction( getRTI() );
+    StartReplayAttack::subscribe_interaction( getRTI() );
+    StopReplayAttack::subscribe_interaction( getRTI() );
+    StartSnifferAttack::subscribe_interaction( getRTI() );
+    StopSnifferAttack::subscribe_interaction( getRTI() );
+    TakeOwnership::subscribe_interaction( getRTI() );
+    LoseOwnership::subscribe_interaction( getRTI() );
+    NetworkStatusRequest::subscribe_interaction( getRTI() );
 
     InteractionRoot::subscribe_interaction(EmbeddedMessaging::get_hla_class_name() + "." + getFederateType(), getRTI());
 
@@ -1235,12 +1336,10 @@ void HLAInterface::setup() {
     //subscribe objects
 
 //    if ( !dbname.empty() ) {
-//        NetworkPacket::enablePublishLog("NetworkPacket", "OmnetFederate", "NORMAL", _logLevel);
 //        CommandExecutionStatus::enablePublishLog("CommandExecutionStatus", "OmnetFederate", "NORMAL", _logLevel);
 //
 //        StartNodeAttack::enableSubscribeLog("StartNodeAttack", "OmnetFederate", "NORMAL", _logLevel);
 //        StartLinkAttack::enableSubscribeLog("StartLinkAttack", "OmnetFederate", "NORMAL", _logLevel);
-//        NetworkPacket::enableSubscribeLog("NetworkPacket", "OmnetFederate", "NORMAL", _logLevel);
 //        StartDisableNetworkAttack::enableSubscribeLog("StartDisableNetworkAttack", "OmnetFederate", "NORMAL", _logLevel);
 //        StopDisableNetworkAttack::enableSubscribeLog("StopDisableNetworkAttack", "OmnetFederate", "NORMAL", _logLevel);
 //        StopNodeAttack::enableSubscribeLog("StopNodeAttack", "OmnetFederate", "NORMAL", _logLevel);

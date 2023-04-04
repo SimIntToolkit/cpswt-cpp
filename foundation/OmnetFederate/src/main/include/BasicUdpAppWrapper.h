@@ -34,7 +34,7 @@
 #include <omnetpp.h>
 #include "BasicUdpApp.h"
 #include "AttackCoordinator.h"
-#include <InteractionRoot_p/C2WInteractionRoot_p/ActionBase_p/NetworkPacket.hpp>
+#include "InteractionRoot_p/C2WInteractionRoot.hpp"
 #include <ObjectRoot.hpp>
 
 /**
@@ -46,7 +46,6 @@ public:
     using C2WInteractionRoot = ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot;
     using ObjectRoot = ::edu::vanderbilt::vuisis::cpswt::hla::ObjectRoot;
     using ObjectReflector = ObjectRoot::ObjectReflector;
-    using NetworkPacket = ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::NetworkPacket;
 
 	typedef BasicUdpApp Super;
 

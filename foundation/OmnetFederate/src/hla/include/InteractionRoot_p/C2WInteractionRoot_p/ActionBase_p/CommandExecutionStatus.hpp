@@ -226,11 +226,15 @@ public:
         InteractionRoot::publish_interaction( get_hla_class_name(), rti );
     }
 
+    static bool get_is_published() {
+        return InteractionRoot::get_is_published(get_hla_class_name());
+    }
+
     /**
      * Unpublishes the edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.ActionBase_p.CommandExecutionStatus interaction class for a federate.
      *
      * @param rti handle to the Local RTI Component, usu. obtained through the
-     *            {@link SynchronizedFederate#getLRC()} call
+     *            {@link SynchronizedFederate#getRTI()} call
      */
     static void unpublish_interaction(RTI::RTIambassador *rti) {
         InteractionRoot::unpublish_interaction( get_hla_class_name(), rti);
@@ -245,6 +249,18 @@ public:
         InteractionRoot::subscribe_interaction( get_hla_class_name(), rti );
     }
 
+    static bool get_is_subscribed() {
+        return InteractionRoot::get_is_subscribed(get_hla_class_name());
+    }
+
+    static void soft_subscribe_interaction(RTI::RTIambassador *rti) {
+        InteractionRoot::soft_subscribe_interaction(get_hla_class_name(), rti);
+    }
+
+    static bool get_is_soft_subscribed() {
+        return InteractionRoot::get_is_soft_subscribed(get_hla_class_name());
+    }
+
     /**
      * Unsubscribes a federate from the edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.ActionBase_p.CommandExecutionStatus interaction class.
      *
@@ -252,6 +268,18 @@ public:
      */
     static void unsubscribe_interaction(RTI::RTIambassador *rti) {
         InteractionRoot::unsubscribe_interaction( get_hla_class_name(), rti );
+    }
+
+    static void soft_unsubscribe_interaction(RTI::RTIambassador *rti) {
+        InteractionRoot::soft_unsubscribe_interaction(get_hla_class_name(), rti);
+    }
+
+    static void add_federate_name_soft_publish(const std::string &networkFederateName) {
+        InteractionRoot::add_federate_name_soft_publish(get_hla_class_name(), networkFederateName);
+    }
+
+    static void remove_federate_name_soft_publish(const std::string &networkFederateName) {
+        InteractionRoot::remove_federate_name_soft_publish(get_hla_class_name(), networkFederateName);
     }
 
     //-----------------------------------------------------
@@ -269,6 +297,10 @@ public:
      */
     static bool match(int handle) {
         return handle == get_class_handle();
+    }
+
+    static int get_num_parameters() {
+        return get_class_name_all_class_and_property_name_set_sp_map()[get_hla_class_name()]->size();
     }
 
     //------------------------------

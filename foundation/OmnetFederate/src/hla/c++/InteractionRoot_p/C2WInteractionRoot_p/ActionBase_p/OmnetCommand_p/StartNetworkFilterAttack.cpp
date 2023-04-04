@@ -61,10 +61,10 @@ bool StartNetworkFilterAttack::static_init() {
       ValueSP( new Value( std::string("") ));
 
     classAndPropertyNameSetSP->emplace(
-        "InteractionRoot.C2WInteractionRoot.ActionBase.OmnetCommand.StartNetworkFilterAttack", "recordingNodeFullPath"
+        "InteractionRoot.C2WInteractionRoot.ActionBase.OmnetCommand.StartNetworkFilterAttack", "nodeFullPath"
     );
 
-    get_class_and_property_name_initial_value_sp_map()[ClassAndPropertyName( "InteractionRoot.C2WInteractionRoot.ActionBase.OmnetCommand.StartNetworkFilterAttack", "recordingNodeFullPath" )] =
+    get_class_and_property_name_initial_value_sp_map()[ClassAndPropertyName( "InteractionRoot.C2WInteractionRoot.ActionBase.OmnetCommand.StartNetworkFilterAttack", "nodeFullPath" )] =
       ValueSP( new Value( std::string("") ));
 
     classAndPropertyNameSetSP->emplace(
@@ -89,7 +89,7 @@ bool StartNetworkFilterAttack::static_init() {
     );
 
     allClassAndPropertyNameSetSP->emplace(
-        "InteractionRoot.C2WInteractionRoot.ActionBase.OmnetCommand.StartNetworkFilterAttack", "recordingNodeFullPath"
+        "InteractionRoot.C2WInteractionRoot.ActionBase.OmnetCommand.StartNetworkFilterAttack", "nodeFullPath"
     );
 
     allClassAndPropertyNameSetSP->emplace(

@@ -28,10 +28,10 @@
  * OR MODIFICATIONS.
  */
 
-#ifndef _edu_vanderbilt_vuisis_cpswt_hla_InteractionRoot_p_C2WInteractionRoot_p_ActionBase_p_NetworkPacket_CLASS
-#define _edu_vanderbilt_vuisis_cpswt_hla_InteractionRoot_p_C2WInteractionRoot_p_ActionBase_p_NetworkPacket_CLASS
+#ifndef _edu_vanderbilt_vuisis_cpswt_hla_InteractionRoot_p_C2WInteractionRoot_p_ActionBase_p_OmnetCommand_p_BecomeNotObservable_CLASS
+#define _edu_vanderbilt_vuisis_cpswt_hla_InteractionRoot_p_C2WInteractionRoot_p_ActionBase_p_OmnetCommand_p_BecomeNotObservable_CLASS
 
-#include "InteractionRoot_p/C2WInteractionRoot_p/ActionBase.hpp"
+#include "InteractionRoot_p/C2WInteractionRoot_p/ActionBase_p/OmnetCommand.hpp"
 #include "C2WException.hpp"
 
 #include <boost/unordered_set.hpp>
@@ -45,18 +45,19 @@ namespace edu {
      namespace InteractionRoot_p {
       namespace C2WInteractionRoot_p {
        namespace ActionBase_p {
+        namespace OmnetCommand_p {
 
-class NetworkPacket : public ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase {
+class BecomeNotObservable : public ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::OmnetCommand {
 public:
 //    using ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot;
-    typedef ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase Super;
-    typedef boost::shared_ptr< NetworkPacket > SP;
+    typedef ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::OmnetCommand Super;
+    typedef boost::shared_ptr< BecomeNotObservable > SP;
 
 private:
     static severity_logger &get_logger_aux() {
         static severity_logger logger;
         logger.add_attribute("MessagingClassName", attrs::constant< std::string >(
-          "InteractionRoot.C2WInteractionRoot.ActionBase.NetworkPacket"
+          "InteractionRoot.C2WInteractionRoot.ActionBase.OmnetCommand.BecomeNotObservable"
         ));
 
         logging::add_common_attributes();
@@ -75,7 +76,7 @@ public:
     // ----------------------------------------------------------------------------
 
     /**
-     * Returns the fully-qualified (dot-delimited) name of the ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::NetworkPacket interaction class.
+     * Returns the fully-qualified (dot-delimited) name of the ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::OmnetCommand_p::BecomeNotObservable interaction class.
      * Note: As this is a static method, it is NOT polymorphic, and so, if called on
      * a reference will return the name of the class pertaining to the reference,
      * rather than the name of the class for the instance referred to by the reference.
@@ -84,7 +85,7 @@ public:
      * @return the fully-qualified Java class name for this interaction class
      */
     static const std::string &get_cpp_class_name() {
-        static const std::string cppClassName("::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::NetworkPacket");
+        static const std::string cppClassName("::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::OmnetCommand_p::BecomeNotObservable");
         return cppClassName;
     }
 
@@ -100,7 +101,7 @@ public:
 
     /**
      * Returns the simple name (the last name in the dot-delimited fully-qualified
-     * class name) of the edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.ActionBase_p.NetworkPacket interaction class.
+     * class name) of the edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.ActionBase_p.OmnetCommand_p.BecomeNotObservable interaction class.
      *
      * @return the name of this interaction class
      */
@@ -110,7 +111,7 @@ public:
 
     /**
      * Returns the fully-qualified (dot-delimited) hla class name of the
-     * InteractionRoot.C2WInteractionRoot.ActionBase.NetworkPacket interaction class.
+     * InteractionRoot.C2WInteractionRoot.ActionBase.OmnetCommand.BecomeNotObservable interaction class.
      * Note: As this is a static method, it is NOT polymorphic, and so, if called on
      * a reference will return the federation name of the class pertaining to the reference,
      * rather than the name of the class for the instance referred to by the reference.
@@ -119,7 +120,7 @@ public:
      * @return the fully-qualified federation (HLA) class name for this interaction class
      */
     static const std::string &get_hla_class_name() {
-        static const std::string hlaClassName("InteractionRoot.C2WInteractionRoot.ActionBase.NetworkPacket");
+        static const std::string hlaClassName("InteractionRoot.C2WInteractionRoot.ActionBase.OmnetCommand.BecomeNotObservable");
         return hlaClassName;
     }
 
@@ -135,7 +136,7 @@ public:
 
     /**
      * Returns a sorted list containing the names of all of the non-hidden parameters in the
-     * edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.ActionBase_p.NetworkPacket interaction class.
+     * edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.ActionBase_p.OmnetCommand_p.BecomeNotObservable interaction class.
      * The property names are paired with name of the hla class in which they are defined in a
      * ClassAndPropertyName POJO.
      * Note: As this is a static method, it is NOT polymorphic, and so, if called on
@@ -153,7 +154,7 @@ public:
 
     /**
      * Returns a sorted list containing the names of all of the parameters in the
-     * edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.ActionBase_p.NetworkPacket interaction class.
+     * edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.ActionBase_p.OmnetCommand_p.BecomeNotObservable interaction class.
      * The property names are paired with name of the hla class in which they are defined in a
      * ClassAndPropertyName POJO.
      * Note: As this is a static method, it is NOT polymorphic, and so, if called on
@@ -185,7 +186,7 @@ public:
     // THIS CODE IS STATIC BECAUSE IT IS CLASS-DEPENDENT AND NOT INSTANCE-DEPENDENT
     // ----------------------------------------------------------------------------
     /**
-     * Returns the handle (RTI assigned) of the edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.ActionBase_p.NetworkPacket interaction class.
+     * Returns the handle (RTI assigned) of the edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.ActionBase_p.OmnetCommand_p.BecomeNotObservable interaction class.
      * Note: As this is a static method, it is NOT polymorphic, and so, if called on
      * a reference will return the handle of the class pertaining to the reference,
      * rather than the handle of the class for the instance referred to by the reference.
@@ -199,7 +200,7 @@ public:
 
     /**
      * Returns the handle of an parameter (RTI assigned) of
-     * this interaction class (i.e. "edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.ActionBase_p.NetworkPacket") given the parameter's name.
+     * this interaction class (i.e. "edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.ActionBase_p.OmnetCommand_p.BecomeNotObservable") given the parameter's name.
      *
      * @param propertyName name of parameter
      * @return the handle (RTI assigned) of the parameter "propertyName" of interaction class "hlaClassName"
@@ -218,7 +219,7 @@ public:
     //-------------------------------------------------
 
     /**
-     * Publishes the edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.ActionBase_p.NetworkPacket interaction class for a federate.
+     * Publishes the edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.ActionBase_p.OmnetCommand_p.BecomeNotObservable interaction class for a federate.
      *
      * @param rti handle to the Local RTI Component
      */
@@ -231,7 +232,7 @@ public:
     }
 
     /**
-     * Unpublishes the edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.ActionBase_p.NetworkPacket interaction class for a federate.
+     * Unpublishes the edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.ActionBase_p.OmnetCommand_p.BecomeNotObservable interaction class for a federate.
      *
      * @param rti handle to the Local RTI Component, usu. obtained through the
      *            {@link SynchronizedFederate#getRTI()} call
@@ -241,7 +242,7 @@ public:
     }
 
 /**
- * Subscribes a federate to the edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.ActionBase_p.NetworkPacket interaction class.
+ * Subscribes a federate to the edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.ActionBase_p.OmnetCommand_p.BecomeNotObservable interaction class.
  *
  * @param rti handle to the Local RTI Component
  */
@@ -262,7 +263,7 @@ public:
     }
 
     /**
-     * Unsubscribes a federate from the edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.ActionBase_p.NetworkPacket interaction class.
+     * Unsubscribes a federate from the edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.ActionBase_p.OmnetCommand_p.BecomeNotObservable interaction class.
      *
      * @param rti handle to the Local RTI Component
      */
@@ -288,12 +289,12 @@ public:
 
     /**
      * Return true if "handle" is equal to the handle (RTI assigned) of this class
-     * (that is, the edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.ActionBase_p.NetworkPacket interaction class).
+     * (that is, the edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.ActionBase_p.OmnetCommand_p.BecomeNotObservable interaction class).
      *
      * @param handle handle to compare to the value of the handle (RTI assigned) of
-     * this class (the edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.ActionBase_p.NetworkPacket interaction class).
+     * this class (the edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.ActionBase_p.OmnetCommand_p.BecomeNotObservable interaction class).
      * @return "true" if "handle" matches the value of the handle of this class
-     * (that is, the edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.ActionBase_p.NetworkPacket interaction class).
+     * (that is, the edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.ActionBase_p.OmnetCommand_p.BecomeNotObservable interaction class).
      */
     static bool match(int handle) {
         return handle == get_class_handle();
@@ -309,221 +310,45 @@ public:
 
 
     /**
-     * Set the value of the "data" parameter to "value" for this parameter.
+     * Set the value of the "nodeFullPath" parameter to "value" for this parameter.
      *
-     * @param value the new value for the "data" parameter
+     * @param value the new value for the "nodeFullPath" parameter
      */
-    void set_data(const std::string & newValue) {
-        ClassAndPropertyName key(get_hla_class_name(), "data");
+    void set_nodeFullPath(const std::string & newValue) {
+        ClassAndPropertyName key(get_hla_class_name(), "nodeFullPath");
         Value &value(*_classAndPropertyNameValueSPMap[key]);
         value.setValue(newValue);
     }
 
     /**
-     * Returns the value of the "data" parameter of this interaction.
+     * Returns the value of the "nodeFullPath" parameter of this interaction.
      *
-     * @return the value of the "data" parameter
+     * @return the value of the "nodeFullPath" parameter
      */
-    std::string get_data() {
-        ClassAndPropertyName key(get_hla_class_name(), "data");
+    std::string get_nodeFullPath() {
+        ClassAndPropertyName key(get_hla_class_name(), "nodeFullPath");
         return static_cast<std::string>(*_classAndPropertyNameValueSPMap[key]);
     }
 
 
     /**
-     * Set the value of the "numBytes" parameter to "value" for this parameter.
+     * Set the value of the "observerId" parameter to "value" for this parameter.
      *
-     * @param value the new value for the "numBytes" parameter
+     * @param value the new value for the "observerId" parameter
      */
-    void set_numBytes(int newValue) {
-        ClassAndPropertyName key(get_hla_class_name(), "numBytes");
+    void set_observerId(const std::string & newValue) {
+        ClassAndPropertyName key(get_hla_class_name(), "observerId");
         Value &value(*_classAndPropertyNameValueSPMap[key]);
         value.setValue(newValue);
     }
 
     /**
-     * Returns the value of the "numBytes" parameter of this interaction.
+     * Returns the value of the "observerId" parameter of this interaction.
      *
-     * @return the value of the "numBytes" parameter
+     * @return the value of the "observerId" parameter
      */
-    int get_numBytes() {
-        ClassAndPropertyName key(get_hla_class_name(), "numBytes");
-        return static_cast<int>(*_classAndPropertyNameValueSPMap[key]);
-    }
-
-
-    /**
-     * Set the value of the "packetType" parameter to "value" for this parameter.
-     *
-     * @param value the new value for the "packetType" parameter
-     */
-    void set_packetType(const std::string & newValue) {
-        ClassAndPropertyName key(get_hla_class_name(), "packetType");
-        Value &value(*_classAndPropertyNameValueSPMap[key]);
-        value.setValue(newValue);
-    }
-
-    /**
-     * Returns the value of the "packetType" parameter of this interaction.
-     *
-     * @return the value of the "packetType" parameter
-     */
-    std::string get_packetType() {
-        ClassAndPropertyName key(get_hla_class_name(), "packetType");
-        return static_cast<std::string>(*_classAndPropertyNameValueSPMap[key]);
-    }
-
-
-    /**
-     * Set the value of the "receiverAppIndex" parameter to "value" for this parameter.
-     *
-     * @param value the new value for the "receiverAppIndex" parameter
-     */
-    void set_receiverAppIndex(int newValue) {
-        ClassAndPropertyName key(get_hla_class_name(), "receiverAppIndex");
-        Value &value(*_classAndPropertyNameValueSPMap[key]);
-        value.setValue(newValue);
-    }
-
-    /**
-     * Returns the value of the "receiverAppIndex" parameter of this interaction.
-     *
-     * @return the value of the "receiverAppIndex" parameter
-     */
-    int get_receiverAppIndex() {
-        ClassAndPropertyName key(get_hla_class_name(), "receiverAppIndex");
-        return static_cast<int>(*_classAndPropertyNameValueSPMap[key]);
-    }
-
-
-    /**
-     * Set the value of the "receiverAppInterface" parameter to "value" for this parameter.
-     *
-     * @param value the new value for the "receiverAppInterface" parameter
-     */
-    void set_receiverAppInterface(const std::string & newValue) {
-        ClassAndPropertyName key(get_hla_class_name(), "receiverAppInterface");
-        Value &value(*_classAndPropertyNameValueSPMap[key]);
-        value.setValue(newValue);
-    }
-
-    /**
-     * Returns the value of the "receiverAppInterface" parameter of this interaction.
-     *
-     * @return the value of the "receiverAppInterface" parameter
-     */
-    std::string get_receiverAppInterface() {
-        ClassAndPropertyName key(get_hla_class_name(), "receiverAppInterface");
-        return static_cast<std::string>(*_classAndPropertyNameValueSPMap[key]);
-    }
-
-
-    /**
-     * Set the value of the "receiverHost" parameter to "value" for this parameter.
-     *
-     * @param value the new value for the "receiverHost" parameter
-     */
-    void set_receiverHost(const std::string & newValue) {
-        ClassAndPropertyName key(get_hla_class_name(), "receiverHost");
-        Value &value(*_classAndPropertyNameValueSPMap[key]);
-        value.setValue(newValue);
-    }
-
-    /**
-     * Returns the value of the "receiverHost" parameter of this interaction.
-     *
-     * @return the value of the "receiverHost" parameter
-     */
-    std::string get_receiverHost() {
-        ClassAndPropertyName key(get_hla_class_name(), "receiverHost");
-        return static_cast<std::string>(*_classAndPropertyNameValueSPMap[key]);
-    }
-
-
-    /**
-     * Set the value of the "receiverHostApp" parameter to "value" for this parameter.
-     *
-     * @param value the new value for the "receiverHostApp" parameter
-     */
-    void set_receiverHostApp(const std::string & newValue) {
-        ClassAndPropertyName key(get_hla_class_name(), "receiverHostApp");
-        Value &value(*_classAndPropertyNameValueSPMap[key]);
-        value.setValue(newValue);
-    }
-
-    /**
-     * Returns the value of the "receiverHostApp" parameter of this interaction.
-     *
-     * @return the value of the "receiverHostApp" parameter
-     */
-    std::string get_receiverHostApp() {
-        ClassAndPropertyName key(get_hla_class_name(), "receiverHostApp");
-        return static_cast<std::string>(*_classAndPropertyNameValueSPMap[key]);
-    }
-
-
-    /**
-     * Set the value of the "senderAppIndex" parameter to "value" for this parameter.
-     *
-     * @param value the new value for the "senderAppIndex" parameter
-     */
-    void set_senderAppIndex(int newValue) {
-        ClassAndPropertyName key(get_hla_class_name(), "senderAppIndex");
-        Value &value(*_classAndPropertyNameValueSPMap[key]);
-        value.setValue(newValue);
-    }
-
-    /**
-     * Returns the value of the "senderAppIndex" parameter of this interaction.
-     *
-     * @return the value of the "senderAppIndex" parameter
-     */
-    int get_senderAppIndex() {
-        ClassAndPropertyName key(get_hla_class_name(), "senderAppIndex");
-        return static_cast<int>(*_classAndPropertyNameValueSPMap[key]);
-    }
-
-
-    /**
-     * Set the value of the "senderHost" parameter to "value" for this parameter.
-     *
-     * @param value the new value for the "senderHost" parameter
-     */
-    void set_senderHost(const std::string & newValue) {
-        ClassAndPropertyName key(get_hla_class_name(), "senderHost");
-        Value &value(*_classAndPropertyNameValueSPMap[key]);
-        value.setValue(newValue);
-    }
-
-    /**
-     * Returns the value of the "senderHost" parameter of this interaction.
-     *
-     * @return the value of the "senderHost" parameter
-     */
-    std::string get_senderHost() {
-        ClassAndPropertyName key(get_hla_class_name(), "senderHost");
-        return static_cast<std::string>(*_classAndPropertyNameValueSPMap[key]);
-    }
-
-
-    /**
-     * Set the value of the "senderHostApp" parameter to "value" for this parameter.
-     *
-     * @param value the new value for the "senderHostApp" parameter
-     */
-    void set_senderHostApp(const std::string & newValue) {
-        ClassAndPropertyName key(get_hla_class_name(), "senderHostApp");
-        Value &value(*_classAndPropertyNameValueSPMap[key]);
-        value.setValue(newValue);
-    }
-
-    /**
-     * Returns the value of the "senderHostApp" parameter of this interaction.
-     *
-     * @return the value of the "senderHostApp" parameter
-     */
-    std::string get_senderHostApp() {
-        ClassAndPropertyName key(get_hla_class_name(), "senderHostApp");
+    std::string get_observerId() {
+        ClassAndPropertyName key(get_hla_class_name(), "observerId");
         return static_cast<std::string>(*_classAndPropertyNameValueSPMap[key]);
     }
 
@@ -536,11 +361,11 @@ public:
     //--------------------------
 public:
     static SP create() {
-        return SP(new NetworkPacket());
+        return SP(new BecomeNotObservable());
     }
 
     static InteractionRoot::SP create_interaction() {
-        return SP(new NetworkPacket());
+        return SP(new BecomeNotObservable());
     }
 
     virtual InteractionRoot::SP createInteraction() {
@@ -548,11 +373,11 @@ public:
     }
 
     static SP create(const RTIfedTime &rtiFedTime) {
-        return SP(new NetworkPacket(rtiFedTime));
+        return SP(new BecomeNotObservable(rtiFedTime));
     }
 
     static InteractionRoot::SP create_interaction(const RTIfedTime &rtiFedTime) {
-        return SP(new NetworkPacket(rtiFedTime));
+        return SP(new BecomeNotObservable(rtiFedTime));
     }
 
     virtual InteractionRoot::SP createInteraction(const RTIfedTime &rtiFedTime) {
@@ -562,13 +387,13 @@ public:
     static SP create(
       const RTI::ParameterHandleValuePairSet &propertyMap
     ) {
-        return SP(new NetworkPacket(propertyMap));
+        return SP(new BecomeNotObservable(propertyMap));
     }
 
     static InteractionRoot::SP create_interaction(
       const RTI::ParameterHandleValuePairSet &propertyMap
     ) {
-        return SP(new NetworkPacket(propertyMap));
+        return SP(new BecomeNotObservable(propertyMap));
     }
 
     virtual InteractionRoot::SP createInteraction(
@@ -580,13 +405,13 @@ public:
     static SP create(
       const RTI::ParameterHandleValuePairSet &propertyMap, const RTIfedTime &rtiFedTime
     ) {
-        return SP(new NetworkPacket(propertyMap, rtiFedTime));
+        return SP(new BecomeNotObservable(propertyMap, rtiFedTime));
     }
 
     static InteractionRoot::SP create_interaction(
       const RTI::ParameterHandleValuePairSet &propertyMap, const RTIfedTime &rtiFedTime
     ) {
-        return SP(new NetworkPacket(propertyMap, rtiFedTime));
+        return SP(new BecomeNotObservable(propertyMap, rtiFedTime));
     }
 
     virtual InteractionRoot::SP createInteraction(
@@ -595,7 +420,7 @@ public:
     }
 
     virtual InteractionRoot::SP cloneInteraction() {
-        return InteractionRoot::SP( new NetworkPacket( *this )  );
+        return InteractionRoot::SP( new BecomeNotObservable( *this )  );
     }
 
     //------------------------------
@@ -606,31 +431,32 @@ public:
     // CONSTRUCTORS
     //-------------
 public:
-    NetworkPacket() : Super( get_hla_class_name() ) { }
+    BecomeNotObservable() : Super( get_hla_class_name() ) { }
 
-    NetworkPacket( const PropertyHandleValuePairSet &propertyMap ) : Super( get_hla_class_name(), propertyMap ) { }
+    BecomeNotObservable( const PropertyHandleValuePairSet &propertyMap ) : Super( get_hla_class_name(), propertyMap ) { }
 
-    NetworkPacket( const RTIfedTime &rtiFedTime ) : Super( get_hla_class_name(), rtiFedTime ) { }
+    BecomeNotObservable( const RTIfedTime &rtiFedTime ) : Super( get_hla_class_name(), rtiFedTime ) { }
 
-    NetworkPacket(const PropertyHandleValuePairSet &propertyMap, const RTIfedTime &rtiFedTime) :
+    BecomeNotObservable(const PropertyHandleValuePairSet &propertyMap, const RTIfedTime &rtiFedTime) :
        Super( get_hla_class_name(), propertyMap, rtiFedTime ) { }
 
 protected:
-    NetworkPacket(InteractionRoot::NoInstanceInit &noInstanceInit) : Super(noInstanceInit) { }
+    BecomeNotObservable(InteractionRoot::NoInstanceInit &noInstanceInit) : Super(noInstanceInit) { }
 
-    NetworkPacket( const std::string &hlaClassName ) : Super( hlaClassName ) { }
+    BecomeNotObservable( const std::string &hlaClassName ) : Super( hlaClassName ) { }
 
-    NetworkPacket( const std::string &hlaClassName, const PropertyHandleValuePairSet &propertyMap ) :
+    BecomeNotObservable( const std::string &hlaClassName, const PropertyHandleValuePairSet &propertyMap ) :
       Super( hlaClassName, propertyMap ) { }
 
-    NetworkPacket( const std::string &hlaClassName, const RTIfedTime &rtiFedTime ) :
+    BecomeNotObservable( const std::string &hlaClassName, const RTIfedTime &rtiFedTime ) :
       Super( hlaClassName, rtiFedTime ) { }
 
-    NetworkPacket(
+    BecomeNotObservable(
       const std::string &hlaClassName, const PropertyHandleValuePairSet &propertyMap, const RTIfedTime &rtiFedTime
     ) : Super( hlaClassName, propertyMap, rtiFedTime ) { }
 
 };
+        } // NAMESPACE "OmnetCommand_p"
        } // NAMESPACE "ActionBase_p"
       } // NAMESPACE "C2WInteractionRoot_p"
      } // NAMESPACE "InteractionRoot_p"
@@ -640,8 +466,8 @@ protected:
  } // NAMESPACE "vanderbilt"
 } // NAMESPACE "edu"
 
-inline std::ostream &operator<<( std::ostream &os, ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::NetworkPacket::SP messagingSP ) {
+inline std::ostream &operator<<( std::ostream &os, ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::OmnetCommand_p::BecomeNotObservable::SP messagingSP ) {
     return os << *messagingSP;
 }
 
-#endif // _edu_vanderbilt_vuisis_cpswt_hla_InteractionRoot_p_C2WInteractionRoot_p_ActionBase_p_NetworkPacket_CLASS
+#endif // _edu_vanderbilt_vuisis_cpswt_hla_InteractionRoot_p_C2WInteractionRoot_p_ActionBase_p_OmnetCommand_p_BecomeNotObservable_CLASS

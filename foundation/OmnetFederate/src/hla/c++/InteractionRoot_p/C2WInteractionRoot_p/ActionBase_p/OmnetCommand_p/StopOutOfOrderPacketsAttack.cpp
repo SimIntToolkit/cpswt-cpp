@@ -61,10 +61,10 @@ bool StopOutOfOrderPacketsAttack::static_init() {
       ValueSP( new Value( std::string("") ));
 
     classAndPropertyNameSetSP->emplace(
-        "InteractionRoot.C2WInteractionRoot.ActionBase.OmnetCommand.StopOutOfOrderPacketsAttack", "recordingNodeFullPath"
+        "InteractionRoot.C2WInteractionRoot.ActionBase.OmnetCommand.StopOutOfOrderPacketsAttack", "nodeFullPath"
     );
 
-    get_class_and_property_name_initial_value_sp_map()[ClassAndPropertyName( "InteractionRoot.C2WInteractionRoot.ActionBase.OmnetCommand.StopOutOfOrderPacketsAttack", "recordingNodeFullPath" )] =
+    get_class_and_property_name_initial_value_sp_map()[ClassAndPropertyName( "InteractionRoot.C2WInteractionRoot.ActionBase.OmnetCommand.StopOutOfOrderPacketsAttack", "nodeFullPath" )] =
       ValueSP( new Value( std::string("") ));
 
     classAndPropertyNameSetSP->emplace(
@@ -89,7 +89,7 @@ bool StopOutOfOrderPacketsAttack::static_init() {
     );
 
     allClassAndPropertyNameSetSP->emplace(
-        "InteractionRoot.C2WInteractionRoot.ActionBase.OmnetCommand.StopOutOfOrderPacketsAttack", "recordingNodeFullPath"
+        "InteractionRoot.C2WInteractionRoot.ActionBase.OmnetCommand.StopOutOfOrderPacketsAttack", "nodeFullPath"
     );
 
     allClassAndPropertyNameSetSP->emplace(

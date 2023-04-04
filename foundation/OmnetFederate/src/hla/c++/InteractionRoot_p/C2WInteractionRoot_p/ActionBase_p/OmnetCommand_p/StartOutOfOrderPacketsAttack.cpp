@@ -61,18 +61,18 @@ bool StartOutOfOrderPacketsAttack::static_init() {
       ValueSP( new Value( std::string("") ));
 
     classAndPropertyNameSetSP->emplace(
+        "InteractionRoot.C2WInteractionRoot.ActionBase.OmnetCommand.StartOutOfOrderPacketsAttack", "nodeFullPath"
+    );
+
+    get_class_and_property_name_initial_value_sp_map()[ClassAndPropertyName( "InteractionRoot.C2WInteractionRoot.ActionBase.OmnetCommand.StartOutOfOrderPacketsAttack", "nodeFullPath" )] =
+      ValueSP( new Value( std::string("") ));
+
+    classAndPropertyNameSetSP->emplace(
         "InteractionRoot.C2WInteractionRoot.ActionBase.OmnetCommand.StartOutOfOrderPacketsAttack", "recordDurationInSecs"
     );
 
     get_class_and_property_name_initial_value_sp_map()[ClassAndPropertyName( "InteractionRoot.C2WInteractionRoot.ActionBase.OmnetCommand.StartOutOfOrderPacketsAttack", "recordDurationInSecs" )] =
       ValueSP( new Value( static_cast<double>(0) ));
-
-    classAndPropertyNameSetSP->emplace(
-        "InteractionRoot.C2WInteractionRoot.ActionBase.OmnetCommand.StartOutOfOrderPacketsAttack", "recordingNodeFullPath"
-    );
-
-    get_class_and_property_name_initial_value_sp_map()[ClassAndPropertyName( "InteractionRoot.C2WInteractionRoot.ActionBase.OmnetCommand.StartOutOfOrderPacketsAttack", "recordingNodeFullPath" )] =
-      ValueSP( new Value( std::string("") ));
 
     classAndPropertyNameSetSP->emplace(
         "InteractionRoot.C2WInteractionRoot.ActionBase.OmnetCommand.StartOutOfOrderPacketsAttack", "srcNetworkAddress"
@@ -96,11 +96,11 @@ bool StartOutOfOrderPacketsAttack::static_init() {
     );
 
     allClassAndPropertyNameSetSP->emplace(
-        "InteractionRoot.C2WInteractionRoot.ActionBase.OmnetCommand.StartOutOfOrderPacketsAttack", "recordDurationInSecs"
+        "InteractionRoot.C2WInteractionRoot.ActionBase.OmnetCommand.StartOutOfOrderPacketsAttack", "nodeFullPath"
     );
 
     allClassAndPropertyNameSetSP->emplace(
-        "InteractionRoot.C2WInteractionRoot.ActionBase.OmnetCommand.StartOutOfOrderPacketsAttack", "recordingNodeFullPath"
+        "InteractionRoot.C2WInteractionRoot.ActionBase.OmnetCommand.StartOutOfOrderPacketsAttack", "recordDurationInSecs"
     );
 
     allClassAndPropertyNameSetSP->emplace(

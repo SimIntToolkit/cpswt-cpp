@@ -28,8 +28,8 @@
  * OR MODIFICATIONS.
  */
 
-#ifndef _edu_vanderbilt_vuisis_cpswt_hla_InteractionRoot_p_C2WInteractionRoot_p_ActionBase_p_OmnetCommand_p_CeaseReplayAttack_CLASS
-#define _edu_vanderbilt_vuisis_cpswt_hla_InteractionRoot_p_C2WInteractionRoot_p_ActionBase_p_OmnetCommand_p_CeaseReplayAttack_CLASS
+#ifndef _edu_vanderbilt_vuisis_cpswt_hla_InteractionRoot_p_C2WInteractionRoot_p_ActionBase_p_OmnetCommand_p_BecomeObservable_CLASS
+#define _edu_vanderbilt_vuisis_cpswt_hla_InteractionRoot_p_C2WInteractionRoot_p_ActionBase_p_OmnetCommand_p_BecomeObservable_CLASS
 
 #include "InteractionRoot_p/C2WInteractionRoot_p/ActionBase_p/OmnetCommand.hpp"
 #include "C2WException.hpp"
@@ -47,17 +47,17 @@ namespace edu {
        namespace ActionBase_p {
         namespace OmnetCommand_p {
 
-class CeaseReplayAttack : public ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::OmnetCommand {
+class BecomeObservable : public ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::OmnetCommand {
 public:
 //    using ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot;
     typedef ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::OmnetCommand Super;
-    typedef boost::shared_ptr< CeaseReplayAttack > SP;
+    typedef boost::shared_ptr< BecomeObservable > SP;
 
 private:
     static severity_logger &get_logger_aux() {
         static severity_logger logger;
         logger.add_attribute("MessagingClassName", attrs::constant< std::string >(
-          "InteractionRoot.C2WInteractionRoot.ActionBase.OmnetCommand.CeaseReplayAttack"
+          "InteractionRoot.C2WInteractionRoot.ActionBase.OmnetCommand.BecomeObservable"
         ));
 
         logging::add_common_attributes();
@@ -76,7 +76,7 @@ public:
     // ----------------------------------------------------------------------------
 
     /**
-     * Returns the fully-qualified (dot-delimited) name of the ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::OmnetCommand_p::CeaseReplayAttack interaction class.
+     * Returns the fully-qualified (dot-delimited) name of the ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::OmnetCommand_p::BecomeObservable interaction class.
      * Note: As this is a static method, it is NOT polymorphic, and so, if called on
      * a reference will return the name of the class pertaining to the reference,
      * rather than the name of the class for the instance referred to by the reference.
@@ -85,7 +85,7 @@ public:
      * @return the fully-qualified Java class name for this interaction class
      */
     static const std::string &get_cpp_class_name() {
-        static const std::string cppClassName("::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::OmnetCommand_p::CeaseReplayAttack");
+        static const std::string cppClassName("::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::OmnetCommand_p::BecomeObservable");
         return cppClassName;
     }
 
@@ -101,7 +101,7 @@ public:
 
     /**
      * Returns the simple name (the last name in the dot-delimited fully-qualified
-     * class name) of the edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.ActionBase_p.OmnetCommand_p.CeaseReplayAttack interaction class.
+     * class name) of the edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.ActionBase_p.OmnetCommand_p.BecomeObservable interaction class.
      *
      * @return the name of this interaction class
      */
@@ -111,7 +111,7 @@ public:
 
     /**
      * Returns the fully-qualified (dot-delimited) hla class name of the
-     * InteractionRoot.C2WInteractionRoot.ActionBase.OmnetCommand.CeaseReplayAttack interaction class.
+     * InteractionRoot.C2WInteractionRoot.ActionBase.OmnetCommand.BecomeObservable interaction class.
      * Note: As this is a static method, it is NOT polymorphic, and so, if called on
      * a reference will return the federation name of the class pertaining to the reference,
      * rather than the name of the class for the instance referred to by the reference.
@@ -120,7 +120,7 @@ public:
      * @return the fully-qualified federation (HLA) class name for this interaction class
      */
     static const std::string &get_hla_class_name() {
-        static const std::string hlaClassName("InteractionRoot.C2WInteractionRoot.ActionBase.OmnetCommand.CeaseReplayAttack");
+        static const std::string hlaClassName("InteractionRoot.C2WInteractionRoot.ActionBase.OmnetCommand.BecomeObservable");
         return hlaClassName;
     }
 
@@ -136,7 +136,7 @@ public:
 
     /**
      * Returns a sorted list containing the names of all of the non-hidden parameters in the
-     * edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.ActionBase_p.OmnetCommand_p.CeaseReplayAttack interaction class.
+     * edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.ActionBase_p.OmnetCommand_p.BecomeObservable interaction class.
      * The property names are paired with name of the hla class in which they are defined in a
      * ClassAndPropertyName POJO.
      * Note: As this is a static method, it is NOT polymorphic, and so, if called on
@@ -154,7 +154,7 @@ public:
 
     /**
      * Returns a sorted list containing the names of all of the parameters in the
-     * edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.ActionBase_p.OmnetCommand_p.CeaseReplayAttack interaction class.
+     * edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.ActionBase_p.OmnetCommand_p.BecomeObservable interaction class.
      * The property names are paired with name of the hla class in which they are defined in a
      * ClassAndPropertyName POJO.
      * Note: As this is a static method, it is NOT polymorphic, and so, if called on
@@ -186,7 +186,7 @@ public:
     // THIS CODE IS STATIC BECAUSE IT IS CLASS-DEPENDENT AND NOT INSTANCE-DEPENDENT
     // ----------------------------------------------------------------------------
     /**
-     * Returns the handle (RTI assigned) of the edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.ActionBase_p.OmnetCommand_p.CeaseReplayAttack interaction class.
+     * Returns the handle (RTI assigned) of the edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.ActionBase_p.OmnetCommand_p.BecomeObservable interaction class.
      * Note: As this is a static method, it is NOT polymorphic, and so, if called on
      * a reference will return the handle of the class pertaining to the reference,
      * rather than the handle of the class for the instance referred to by the reference.
@@ -200,7 +200,7 @@ public:
 
     /**
      * Returns the handle of an parameter (RTI assigned) of
-     * this interaction class (i.e. "edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.ActionBase_p.OmnetCommand_p.CeaseReplayAttack") given the parameter's name.
+     * this interaction class (i.e. "edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.ActionBase_p.OmnetCommand_p.BecomeObservable") given the parameter's name.
      *
      * @param propertyName name of parameter
      * @return the handle (RTI assigned) of the parameter "propertyName" of interaction class "hlaClassName"
@@ -219,7 +219,7 @@ public:
     //-------------------------------------------------
 
     /**
-     * Publishes the edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.ActionBase_p.OmnetCommand_p.CeaseReplayAttack interaction class for a federate.
+     * Publishes the edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.ActionBase_p.OmnetCommand_p.BecomeObservable interaction class for a federate.
      *
      * @param rti handle to the Local RTI Component
      */
@@ -232,7 +232,7 @@ public:
     }
 
     /**
-     * Unpublishes the edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.ActionBase_p.OmnetCommand_p.CeaseReplayAttack interaction class for a federate.
+     * Unpublishes the edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.ActionBase_p.OmnetCommand_p.BecomeObservable interaction class for a federate.
      *
      * @param rti handle to the Local RTI Component, usu. obtained through the
      *            {@link SynchronizedFederate#getRTI()} call
@@ -242,7 +242,7 @@ public:
     }
 
 /**
- * Subscribes a federate to the edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.ActionBase_p.OmnetCommand_p.CeaseReplayAttack interaction class.
+ * Subscribes a federate to the edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.ActionBase_p.OmnetCommand_p.BecomeObservable interaction class.
  *
  * @param rti handle to the Local RTI Component
  */
@@ -263,7 +263,7 @@ public:
     }
 
     /**
-     * Unsubscribes a federate from the edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.ActionBase_p.OmnetCommand_p.CeaseReplayAttack interaction class.
+     * Unsubscribes a federate from the edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.ActionBase_p.OmnetCommand_p.BecomeObservable interaction class.
      *
      * @param rti handle to the Local RTI Component
      */
@@ -289,12 +289,12 @@ public:
 
     /**
      * Return true if "handle" is equal to the handle (RTI assigned) of this class
-     * (that is, the edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.ActionBase_p.OmnetCommand_p.CeaseReplayAttack interaction class).
+     * (that is, the edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.ActionBase_p.OmnetCommand_p.BecomeObservable interaction class).
      *
      * @param handle handle to compare to the value of the handle (RTI assigned) of
-     * this class (the edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.ActionBase_p.OmnetCommand_p.CeaseReplayAttack interaction class).
+     * this class (the edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.ActionBase_p.OmnetCommand_p.BecomeObservable interaction class).
      * @return "true" if "handle" matches the value of the handle of this class
-     * (that is, the edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.ActionBase_p.OmnetCommand_p.CeaseReplayAttack interaction class).
+     * (that is, the edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.ActionBase_p.OmnetCommand_p.BecomeObservable interaction class).
      */
     static bool match(int handle) {
         return handle == get_class_handle();
@@ -310,67 +310,45 @@ public:
 
 
     /**
-     * Set the value of the "dstNetworkAddress" parameter to "value" for this parameter.
+     * Set the value of the "nodeFullPath" parameter to "value" for this parameter.
      *
-     * @param value the new value for the "dstNetworkAddress" parameter
+     * @param value the new value for the "nodeFullPath" parameter
      */
-    void set_dstNetworkAddress(const std::string & newValue) {
-        ClassAndPropertyName key(get_hla_class_name(), "dstNetworkAddress");
+    void set_nodeFullPath(const std::string & newValue) {
+        ClassAndPropertyName key(get_hla_class_name(), "nodeFullPath");
         Value &value(*_classAndPropertyNameValueSPMap[key]);
         value.setValue(newValue);
     }
 
     /**
-     * Returns the value of the "dstNetworkAddress" parameter of this interaction.
+     * Returns the value of the "nodeFullPath" parameter of this interaction.
      *
-     * @return the value of the "dstNetworkAddress" parameter
+     * @return the value of the "nodeFullPath" parameter
      */
-    std::string get_dstNetworkAddress() {
-        ClassAndPropertyName key(get_hla_class_name(), "dstNetworkAddress");
+    std::string get_nodeFullPath() {
+        ClassAndPropertyName key(get_hla_class_name(), "nodeFullPath");
         return static_cast<std::string>(*_classAndPropertyNameValueSPMap[key]);
     }
 
 
     /**
-     * Set the value of the "recordingNodeFullPath" parameter to "value" for this parameter.
+     * Set the value of the "observerId" parameter to "value" for this parameter.
      *
-     * @param value the new value for the "recordingNodeFullPath" parameter
+     * @param value the new value for the "observerId" parameter
      */
-    void set_recordingNodeFullPath(const std::string & newValue) {
-        ClassAndPropertyName key(get_hla_class_name(), "recordingNodeFullPath");
+    void set_observerId(const std::string & newValue) {
+        ClassAndPropertyName key(get_hla_class_name(), "observerId");
         Value &value(*_classAndPropertyNameValueSPMap[key]);
         value.setValue(newValue);
     }
 
     /**
-     * Returns the value of the "recordingNodeFullPath" parameter of this interaction.
+     * Returns the value of the "observerId" parameter of this interaction.
      *
-     * @return the value of the "recordingNodeFullPath" parameter
+     * @return the value of the "observerId" parameter
      */
-    std::string get_recordingNodeFullPath() {
-        ClassAndPropertyName key(get_hla_class_name(), "recordingNodeFullPath");
-        return static_cast<std::string>(*_classAndPropertyNameValueSPMap[key]);
-    }
-
-
-    /**
-     * Set the value of the "srcNetworkAddress" parameter to "value" for this parameter.
-     *
-     * @param value the new value for the "srcNetworkAddress" parameter
-     */
-    void set_srcNetworkAddress(const std::string & newValue) {
-        ClassAndPropertyName key(get_hla_class_name(), "srcNetworkAddress");
-        Value &value(*_classAndPropertyNameValueSPMap[key]);
-        value.setValue(newValue);
-    }
-
-    /**
-     * Returns the value of the "srcNetworkAddress" parameter of this interaction.
-     *
-     * @return the value of the "srcNetworkAddress" parameter
-     */
-    std::string get_srcNetworkAddress() {
-        ClassAndPropertyName key(get_hla_class_name(), "srcNetworkAddress");
+    std::string get_observerId() {
+        ClassAndPropertyName key(get_hla_class_name(), "observerId");
         return static_cast<std::string>(*_classAndPropertyNameValueSPMap[key]);
     }
 
@@ -383,11 +361,11 @@ public:
     //--------------------------
 public:
     static SP create() {
-        return SP(new CeaseReplayAttack());
+        return SP(new BecomeObservable());
     }
 
     static InteractionRoot::SP create_interaction() {
-        return SP(new CeaseReplayAttack());
+        return SP(new BecomeObservable());
     }
 
     virtual InteractionRoot::SP createInteraction() {
@@ -395,11 +373,11 @@ public:
     }
 
     static SP create(const RTIfedTime &rtiFedTime) {
-        return SP(new CeaseReplayAttack(rtiFedTime));
+        return SP(new BecomeObservable(rtiFedTime));
     }
 
     static InteractionRoot::SP create_interaction(const RTIfedTime &rtiFedTime) {
-        return SP(new CeaseReplayAttack(rtiFedTime));
+        return SP(new BecomeObservable(rtiFedTime));
     }
 
     virtual InteractionRoot::SP createInteraction(const RTIfedTime &rtiFedTime) {
@@ -409,13 +387,13 @@ public:
     static SP create(
       const RTI::ParameterHandleValuePairSet &propertyMap
     ) {
-        return SP(new CeaseReplayAttack(propertyMap));
+        return SP(new BecomeObservable(propertyMap));
     }
 
     static InteractionRoot::SP create_interaction(
       const RTI::ParameterHandleValuePairSet &propertyMap
     ) {
-        return SP(new CeaseReplayAttack(propertyMap));
+        return SP(new BecomeObservable(propertyMap));
     }
 
     virtual InteractionRoot::SP createInteraction(
@@ -427,13 +405,13 @@ public:
     static SP create(
       const RTI::ParameterHandleValuePairSet &propertyMap, const RTIfedTime &rtiFedTime
     ) {
-        return SP(new CeaseReplayAttack(propertyMap, rtiFedTime));
+        return SP(new BecomeObservable(propertyMap, rtiFedTime));
     }
 
     static InteractionRoot::SP create_interaction(
       const RTI::ParameterHandleValuePairSet &propertyMap, const RTIfedTime &rtiFedTime
     ) {
-        return SP(new CeaseReplayAttack(propertyMap, rtiFedTime));
+        return SP(new BecomeObservable(propertyMap, rtiFedTime));
     }
 
     virtual InteractionRoot::SP createInteraction(
@@ -442,7 +420,7 @@ public:
     }
 
     virtual InteractionRoot::SP cloneInteraction() {
-        return InteractionRoot::SP( new CeaseReplayAttack( *this )  );
+        return InteractionRoot::SP( new BecomeObservable( *this )  );
     }
 
     //------------------------------
@@ -453,27 +431,27 @@ public:
     // CONSTRUCTORS
     //-------------
 public:
-    CeaseReplayAttack() : Super( get_hla_class_name() ) { }
+    BecomeObservable() : Super( get_hla_class_name() ) { }
 
-    CeaseReplayAttack( const PropertyHandleValuePairSet &propertyMap ) : Super( get_hla_class_name(), propertyMap ) { }
+    BecomeObservable( const PropertyHandleValuePairSet &propertyMap ) : Super( get_hla_class_name(), propertyMap ) { }
 
-    CeaseReplayAttack( const RTIfedTime &rtiFedTime ) : Super( get_hla_class_name(), rtiFedTime ) { }
+    BecomeObservable( const RTIfedTime &rtiFedTime ) : Super( get_hla_class_name(), rtiFedTime ) { }
 
-    CeaseReplayAttack(const PropertyHandleValuePairSet &propertyMap, const RTIfedTime &rtiFedTime) :
+    BecomeObservable(const PropertyHandleValuePairSet &propertyMap, const RTIfedTime &rtiFedTime) :
        Super( get_hla_class_name(), propertyMap, rtiFedTime ) { }
 
 protected:
-    CeaseReplayAttack(InteractionRoot::NoInstanceInit &noInstanceInit) : Super(noInstanceInit) { }
+    BecomeObservable(InteractionRoot::NoInstanceInit &noInstanceInit) : Super(noInstanceInit) { }
 
-    CeaseReplayAttack( const std::string &hlaClassName ) : Super( hlaClassName ) { }
+    BecomeObservable( const std::string &hlaClassName ) : Super( hlaClassName ) { }
 
-    CeaseReplayAttack( const std::string &hlaClassName, const PropertyHandleValuePairSet &propertyMap ) :
+    BecomeObservable( const std::string &hlaClassName, const PropertyHandleValuePairSet &propertyMap ) :
       Super( hlaClassName, propertyMap ) { }
 
-    CeaseReplayAttack( const std::string &hlaClassName, const RTIfedTime &rtiFedTime ) :
+    BecomeObservable( const std::string &hlaClassName, const RTIfedTime &rtiFedTime ) :
       Super( hlaClassName, rtiFedTime ) { }
 
-    CeaseReplayAttack(
+    BecomeObservable(
       const std::string &hlaClassName, const PropertyHandleValuePairSet &propertyMap, const RTIfedTime &rtiFedTime
     ) : Super( hlaClassName, propertyMap, rtiFedTime ) { }
 
@@ -488,8 +466,8 @@ protected:
  } // NAMESPACE "vanderbilt"
 } // NAMESPACE "edu"
 
-inline std::ostream &operator<<( std::ostream &os, ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::OmnetCommand_p::CeaseReplayAttack::SP messagingSP ) {
+inline std::ostream &operator<<( std::ostream &os, ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::OmnetCommand_p::BecomeObservable::SP messagingSP ) {
     return os << *messagingSP;
 }
 
-#endif // _edu_vanderbilt_vuisis_cpswt_hla_InteractionRoot_p_C2WInteractionRoot_p_ActionBase_p_OmnetCommand_p_CeaseReplayAttack_CLASS
+#endif // _edu_vanderbilt_vuisis_cpswt_hla_InteractionRoot_p_C2WInteractionRoot_p_ActionBase_p_OmnetCommand_p_BecomeObservable_CLASS

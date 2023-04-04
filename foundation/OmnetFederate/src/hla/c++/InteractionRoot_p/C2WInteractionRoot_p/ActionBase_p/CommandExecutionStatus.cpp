@@ -51,12 +51,14 @@ bool CommandExecutionStatus::static_init() {
     get_hla_class_name_instance_sp_map()[get_hla_class_name()] = instanceSP;
 
     ClassAndPropertyNameSetSP classAndPropertyNameSetSP( new ClassAndPropertyNameSet() );
+
     classAndPropertyNameSetSP->emplace(
         "InteractionRoot.C2WInteractionRoot.ActionBase.CommandExecutionStatus", "execStatus"
     );
 
     get_class_and_property_name_initial_value_sp_map()[ClassAndPropertyName( "InteractionRoot.C2WInteractionRoot.ActionBase.CommandExecutionStatus", "execStatus" )] =
       ValueSP( new Value( static_cast<int>(0) ));
+
     classAndPropertyNameSetSP->emplace(
         "InteractionRoot.C2WInteractionRoot.ActionBase.CommandExecutionStatus", "uniqueCommandID"
     );
@@ -67,6 +69,10 @@ bool CommandExecutionStatus::static_init() {
     // ADD THIS CLASS'S _classAndPropertyNameSet TO _classNamePropertyNameSetMap DEFINED
     // IN InteractionRoot
     get_class_name_class_and_property_name_set_sp_map()[get_hla_class_name()] = classAndPropertyNameSetSP;
+
+    get_complete_class_and_property_name_set().insert(
+      classAndPropertyNameSetSP->begin(), classAndPropertyNameSetSP->end()
+    );
 
     ClassAndPropertyNameSetSP allClassAndPropertyNameSetSP( new ClassAndPropertyNameSet() );
 
@@ -92,6 +98,7 @@ bool CommandExecutionStatus::static_init() {
     // IN InteractionRoot
     get_class_name_all_class_and_property_name_set_sp_map()[get_hla_class_name()] = allClassAndPropertyNameSetSP;
 
+    common_init(get_hla_class_name());
     return true;
 }
 

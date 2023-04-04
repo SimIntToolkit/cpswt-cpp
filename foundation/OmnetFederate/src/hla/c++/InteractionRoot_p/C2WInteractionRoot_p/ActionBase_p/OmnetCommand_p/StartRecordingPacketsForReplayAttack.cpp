@@ -28,7 +28,7 @@
  * OR MODIFICATIONS.
  */
 
-#include "InteractionRoot_p/C2WInteractionRoot_p/ActionBase_p/OmnetCommand_p/CeaseReplayAttack.hpp"
+#include "InteractionRoot_p/C2WInteractionRoot_p/ActionBase_p/OmnetCommand_p/StartRecordingPacketsForReplayAttack.hpp"
 namespace edu {
  namespace vanderbilt {
   namespace vuisis {
@@ -39,39 +39,46 @@ namespace edu {
        namespace ActionBase_p {
         namespace OmnetCommand_p {
 
-bool CeaseReplayAttack::static_init_var = CeaseReplayAttack::static_init();
+bool StartRecordingPacketsForReplayAttack::static_init_var = StartRecordingPacketsForReplayAttack::static_init();
 
-bool CeaseReplayAttack::static_init() {
-    BOOST_LOG_SEV(get_logger(), info) << "Class \"::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::OmnetCommand_p::CeaseReplayAttack\" loaded.";
+bool StartRecordingPacketsForReplayAttack::static_init() {
+    BOOST_LOG_SEV(get_logger(), info) << "Class \"::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::OmnetCommand_p::StartRecordingPacketsForReplayAttack\" loaded.";
 
     // ADD THIS CLASS TO THE _classNameSet DEFINED IN InteractionRoot
     get_hla_class_name_set().insert(get_hla_class_name());
 
     InteractionRoot::NoInstanceInit noInstanceInit;
-    SP instanceSP = SP( new CeaseReplayAttack(noInstanceInit) );
+    SP instanceSP = SP( new StartRecordingPacketsForReplayAttack(noInstanceInit) );
     get_hla_class_name_instance_sp_map()[get_hla_class_name()] = instanceSP;
 
     ClassAndPropertyNameSetSP classAndPropertyNameSetSP( new ClassAndPropertyNameSet() );
 
     classAndPropertyNameSetSP->emplace(
-        "InteractionRoot.C2WInteractionRoot.ActionBase.OmnetCommand.CeaseReplayAttack", "dstNetworkAddress"
+        "InteractionRoot.C2WInteractionRoot.ActionBase.OmnetCommand.StartRecordingPacketsForReplayAttack", "dstNetworkAddress"
     );
 
-    get_class_and_property_name_initial_value_sp_map()[ClassAndPropertyName( "InteractionRoot.C2WInteractionRoot.ActionBase.OmnetCommand.CeaseReplayAttack", "dstNetworkAddress" )] =
+    get_class_and_property_name_initial_value_sp_map()[ClassAndPropertyName( "InteractionRoot.C2WInteractionRoot.ActionBase.OmnetCommand.StartRecordingPacketsForReplayAttack", "dstNetworkAddress" )] =
       ValueSP( new Value( std::string("") ));
 
     classAndPropertyNameSetSP->emplace(
-        "InteractionRoot.C2WInteractionRoot.ActionBase.OmnetCommand.CeaseReplayAttack", "recordingNodeFullPath"
+        "InteractionRoot.C2WInteractionRoot.ActionBase.OmnetCommand.StartRecordingPacketsForReplayAttack", "recordingId"
     );
 
-    get_class_and_property_name_initial_value_sp_map()[ClassAndPropertyName( "InteractionRoot.C2WInteractionRoot.ActionBase.OmnetCommand.CeaseReplayAttack", "recordingNodeFullPath" )] =
+    get_class_and_property_name_initial_value_sp_map()[ClassAndPropertyName( "InteractionRoot.C2WInteractionRoot.ActionBase.OmnetCommand.StartRecordingPacketsForReplayAttack", "recordingId" )] =
       ValueSP( new Value( std::string("") ));
 
     classAndPropertyNameSetSP->emplace(
-        "InteractionRoot.C2WInteractionRoot.ActionBase.OmnetCommand.CeaseReplayAttack", "srcNetworkAddress"
+        "InteractionRoot.C2WInteractionRoot.ActionBase.OmnetCommand.StartRecordingPacketsForReplayAttack", "recordingNodeFullPath"
     );
 
-    get_class_and_property_name_initial_value_sp_map()[ClassAndPropertyName( "InteractionRoot.C2WInteractionRoot.ActionBase.OmnetCommand.CeaseReplayAttack", "srcNetworkAddress" )] =
+    get_class_and_property_name_initial_value_sp_map()[ClassAndPropertyName( "InteractionRoot.C2WInteractionRoot.ActionBase.OmnetCommand.StartRecordingPacketsForReplayAttack", "recordingNodeFullPath" )] =
+      ValueSP( new Value( std::string("") ));
+
+    classAndPropertyNameSetSP->emplace(
+        "InteractionRoot.C2WInteractionRoot.ActionBase.OmnetCommand.StartRecordingPacketsForReplayAttack", "srcNetworkAddress"
+    );
+
+    get_class_and_property_name_initial_value_sp_map()[ClassAndPropertyName( "InteractionRoot.C2WInteractionRoot.ActionBase.OmnetCommand.StartRecordingPacketsForReplayAttack", "srcNetworkAddress" )] =
       ValueSP( new Value( std::string("") ));
 
     // ADD THIS CLASS'S _classAndPropertyNameSet TO _classNamePropertyNameSetMap DEFINED
@@ -85,15 +92,19 @@ bool CeaseReplayAttack::static_init() {
     ClassAndPropertyNameSetSP allClassAndPropertyNameSetSP( new ClassAndPropertyNameSet() );
 
     allClassAndPropertyNameSetSP->emplace(
-        "InteractionRoot.C2WInteractionRoot.ActionBase.OmnetCommand.CeaseReplayAttack", "dstNetworkAddress"
+        "InteractionRoot.C2WInteractionRoot.ActionBase.OmnetCommand.StartRecordingPacketsForReplayAttack", "dstNetworkAddress"
     );
 
     allClassAndPropertyNameSetSP->emplace(
-        "InteractionRoot.C2WInteractionRoot.ActionBase.OmnetCommand.CeaseReplayAttack", "recordingNodeFullPath"
+        "InteractionRoot.C2WInteractionRoot.ActionBase.OmnetCommand.StartRecordingPacketsForReplayAttack", "recordingId"
     );
 
     allClassAndPropertyNameSetSP->emplace(
-        "InteractionRoot.C2WInteractionRoot.ActionBase.OmnetCommand.CeaseReplayAttack", "srcNetworkAddress"
+        "InteractionRoot.C2WInteractionRoot.ActionBase.OmnetCommand.StartRecordingPacketsForReplayAttack", "recordingNodeFullPath"
+    );
+
+    allClassAndPropertyNameSetSP->emplace(
+        "InteractionRoot.C2WInteractionRoot.ActionBase.OmnetCommand.StartRecordingPacketsForReplayAttack", "srcNetworkAddress"
     );
 
     allClassAndPropertyNameSetSP->emplace(

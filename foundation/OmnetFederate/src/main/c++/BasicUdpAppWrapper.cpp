@@ -41,7 +41,6 @@
 Define_Module(BasicUdpAppWrapper);
 
 
-using NetworkPacket = ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::NetworkPacket;
 using C2WInteractionRoot = ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot;
 
 void BasicUdpAppWrapper::recordInterfaceIPAddresses( void ) {
@@ -200,6 +199,5 @@ void BasicUdpAppWrapper::sendToUDP( inet::Packet *packet, const inet::Ipv4Addres
 	int destinationPort = appProperties.getPort();
 	// std::cerr << "BasicUDPAppWrapper: sending packet to " << destinationIPAddress << "(" << destinationPort << ")" << std::endl;
 
-	// std::cerr << "Hostname \"" << getHostFullName() << "\":  BasicUdpAppWrapper:  handleMessage method:  sending HlaMsg to NetworkPacket-specified destination in network." << std::endl;
 	Super::sendToUDP( packet, destinationIPAddress, destinationPort );
 }

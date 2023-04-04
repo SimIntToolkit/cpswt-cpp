@@ -332,6 +332,28 @@ public:
 
 
     /**
+     * Set the value of the "recordingId" parameter to "value" for this parameter.
+     *
+     * @param value the new value for the "recordingId" parameter
+     */
+    void set_recordingId(const std::string & newValue) {
+        ClassAndPropertyName key(get_hla_class_name(), "recordingId");
+        Value &value(*_classAndPropertyNameValueSPMap[key]);
+        value.setValue(newValue);
+    }
+
+    /**
+     * Returns the value of the "recordingId" parameter of this interaction.
+     *
+     * @return the value of the "recordingId" parameter
+     */
+    std::string get_recordingId() {
+        ClassAndPropertyName key(get_hla_class_name(), "recordingId");
+        return static_cast<std::string>(*_classAndPropertyNameValueSPMap[key]);
+    }
+
+
+    /**
      * Set the value of the "recordingNodeFullPath" parameter to "value" for this parameter.
      *
      * @param value the new value for the "recordingNodeFullPath" parameter

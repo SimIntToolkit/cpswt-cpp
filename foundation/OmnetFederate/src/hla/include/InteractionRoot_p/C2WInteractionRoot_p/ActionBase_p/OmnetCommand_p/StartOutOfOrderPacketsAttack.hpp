@@ -332,6 +332,28 @@ public:
 
 
     /**
+     * Set the value of the "nodeFullPath" parameter to "value" for this parameter.
+     *
+     * @param value the new value for the "nodeFullPath" parameter
+     */
+    void set_nodeFullPath(const std::string & newValue) {
+        ClassAndPropertyName key(get_hla_class_name(), "nodeFullPath");
+        Value &value(*_classAndPropertyNameValueSPMap[key]);
+        value.setValue(newValue);
+    }
+
+    /**
+     * Returns the value of the "nodeFullPath" parameter of this interaction.
+     *
+     * @return the value of the "nodeFullPath" parameter
+     */
+    std::string get_nodeFullPath() {
+        ClassAndPropertyName key(get_hla_class_name(), "nodeFullPath");
+        return static_cast<std::string>(*_classAndPropertyNameValueSPMap[key]);
+    }
+
+
+    /**
      * Set the value of the "recordDurationInSecs" parameter to "value" for this parameter.
      *
      * @param value the new value for the "recordDurationInSecs" parameter
@@ -350,28 +372,6 @@ public:
     double get_recordDurationInSecs() {
         ClassAndPropertyName key(get_hla_class_name(), "recordDurationInSecs");
         return static_cast<double>(*_classAndPropertyNameValueSPMap[key]);
-    }
-
-
-    /**
-     * Set the value of the "recordingNodeFullPath" parameter to "value" for this parameter.
-     *
-     * @param value the new value for the "recordingNodeFullPath" parameter
-     */
-    void set_recordingNodeFullPath(const std::string & newValue) {
-        ClassAndPropertyName key(get_hla_class_name(), "recordingNodeFullPath");
-        Value &value(*_classAndPropertyNameValueSPMap[key]);
-        value.setValue(newValue);
-    }
-
-    /**
-     * Returns the value of the "recordingNodeFullPath" parameter of this interaction.
-     *
-     * @return the value of the "recordingNodeFullPath" parameter
-     */
-    std::string get_recordingNodeFullPath() {
-        ClassAndPropertyName key(get_hla_class_name(), "recordingNodeFullPath");
-        return static_cast<std::string>(*_classAndPropertyNameValueSPMap[key]);
     }
 
 

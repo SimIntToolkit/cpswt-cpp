@@ -31,15 +31,22 @@
 #ifndef INCLUDE_ATTACKCOORDINATOR_H_
 #define INCLUDE_ATTACKCOORDINATOR_H_
 
+#include <jsoncpp/json/json.h>
+
 #include <boost/lexical_cast.hpp>
 #include <boost/shared_ptr.hpp>
 
 #include <omnetpp/cmodule.h>
 #include <inet/networklayer/ipv4/Ipv4Route.h>
 
+#include <inet/common/Topology.h>
+
+
 class AttackCoordinator {
 
 public:
+    typedef std::set<std::string> StringSet;
+
     static int getUniqueNo( void ) {
         static int uniqueNo = -1;
         return ++uniqueNo;
@@ -494,16 +501,18 @@ public:
     };
 
     typedef std::map< std::string, DelayNodeParameters > DelayNodeAttackMap;
-    typedef std::set< std::string > ModifyFromHLAPacketsSet;
-    typedef std::set< std::string > ModifyToHLAPacketsSet;
-    typedef std::set< std::string > NodeAttackSet;
+    typedef StringSet ModifyFromHLAPacketsSet;
+    typedef StringSet ModifyToHLAPacketsSet;
+    typedef StringSet NodeAttackSet;
+    typedef std::map< std::string, StringSet > GroupStatusMap;
 
 private:
-
     DelayNodeAttackMap _delayNodeAttackMap;
     ModifyFromHLAPacketsSet _modifyFromHLAPacketsSet;
     ModifyToHLAPacketsSet _modifyToHLAPacketsSet;
     NodeAttackSet _nodeAttackSet;
+    GroupStatusMap _observableMap;
+    GroupStatusMap _ownershipMap;
 
 public:
 
@@ -557,6 +566,160 @@ public:
     bool nodeAttack( const std::string &nodeFullPath ) {
         return _nodeAttackSet.find( nodeFullPath ) != _nodeAttackSet.end();
     }
+
+    void setObservable(const std::string &nodeFullPath, const std::string &observerId, bool addObserverId) {
+        GroupStatusMap::iterator gsmItr = _observableMap.find(nodeFullPath);
+        if (gsmItr == _observableMap.end()) {
+            if (addObserverId) {
+                gsmItr = _observableMap.insert(std::make_pair(nodeFullPath, StringSet())).first;
+            } else {
+                return;
+            }
+         }
+        StringSet &observerIdSet = gsmItr->second;
+        if (addObserverId) {
+            observerIdSet.insert(observerId);
+        } else {
+            observerIdSet.erase(observerId);
+            if (observerIdSet.empty()) {
+                _observableMap.erase(nodeFullPath);
+            }
+        }
+    }
+
+    const StringSet &getObserverIdSet(const std::string &nodeFullPath) {
+        static StringSet emptyObserverIdSet;
+
+        GroupStatusMap::const_iterator gsmCit = _observableMap.find(nodeFullPath);
+        return gsmCit == _observableMap.end() ? emptyObserverIdSet : gsmCit->second;
+    }
+
+    bool isObservable(const std::string &nodeFullPath, const std::string &observerId) {
+        GroupStatusMap::const_iterator gsmCit = _observableMap.find(nodeFullPath);
+        if (gsmCit == _observableMap.end()) {
+            return false;
+        }
+        const StringSet &observerIdSet = gsmCit->second;
+        return observerIdSet.find(observerId) != observerIdSet.end();
+    }
+
+    void setOwnership(const std::string &nodeFullPath, const std::string &ownerId, bool addOwnerId) {
+        GroupStatusMap::iterator gsmItr = _ownershipMap.find(nodeFullPath);
+        if (gsmItr == _ownershipMap.end()) {
+            if (addOwnerId) {
+                gsmItr = _ownershipMap.insert(std::make_pair(nodeFullPath, StringSet())).first;
+            } else {
+                return;
+            }
+        }
+        StringSet &ownerIdSet = gsmItr->second;
+        if (addOwnerId) {
+            ownerIdSet.insert(ownerId);
+        } else {
+            ownerIdSet.erase(ownerId);
+            if (ownerIdSet.empty()) {
+                _ownershipMap.erase(nodeFullPath);
+            }
+        }
+    }
+
+    const StringSet &getOwnerIdSet(const std::string &nodeFullPath) {
+        static StringSet emptyOwnerIdSet;
+
+        GroupStatusMap::const_iterator gsmCit = _ownershipMap.find(nodeFullPath);
+        return gsmCit == _ownershipMap.end() ? emptyOwnerIdSet : gsmCit->second;
+    }
+
+    bool hasOwnership(const std::string &nodeFullPath, const std::string &ownerId) {
+        GroupStatusMap::const_iterator gsmCit = _ownershipMap.find(nodeFullPath);
+        if (gsmCit == _ownershipMap.end()) {
+            return false;
+        }
+        const StringSet &ownerIdSet = gsmCit->second;
+        return ownerIdSet.find(ownerId) != ownerIdSet.end();
+    }
+
+private:
+
+    static const StringSet &get_node_type_set_aux() {
+        static StringSet stringSet;
+        stringSet.insert("inet.node.inet.StandardHost");
+        stringSet.insert("inet.node.inet.Router");
+        stringSet.insert("inet.node.ethernet.EtherSwitch");
+
+        return stringSet;
+    }
+    static const StringSet &get_node_type_set() {
+        static const StringSet stringSet = get_node_type_set_aux();
+        return stringSet;
+    }
+
+    static const StringSet &get_pass_through_node_type_set_aux() {
+        static StringSet stringSet;
+        stringSet.insert("inet.node.ethernet.EtherSwitch");
+        return stringSet;
+    }
+    static const StringSet &get_pass_through_node_type_set() {
+        static const StringSet stringSet = get_pass_through_node_type_set_aux();
+        return stringSet;
+    }
+
+    struct NodeData {
+        StringSet observableBySet;
+        StringSet ownedBySet;
+        std::string nodeTypeFullName;
+        StringSet connectedNodeFullNameSet;
+
+        Json::Value toJsonValue(const std::string &nodeFullPath) {
+            static const std::string observableByArrayKey("observableByArray");
+            static const std::string ownedByArrayKey("ownedByArray");
+            static const std::string connectedNodeFullOathArrayKey("connectedNodeFullPathArray");
+            static const std::string nodeTypeFullNameKey("nodeTypeFullName");
+
+            Json::Value nodeDataMap(Json::ValueType::objectValue);
+            nodeDataMap[nodeTypeFullNameKey] = nodeTypeFullName;
+
+            Json::Value connectedNodeFullNameArray(Json::ValueType::arrayValue);
+            for(
+              StringSet::const_iterator cmsItr = connectedNodeFullNameSet.begin() ;
+              cmsItr != connectedNodeFullNameSet.end() ;
+              ++cmsItr
+            ) {
+                connectedNodeFullNameArray.append(*cmsItr);
+            }
+            nodeDataMap[connectedNodeFullOathArrayKey] = connectedNodeFullNameArray;
+
+            Json::Value observableByArray(Json::ValueType::arrayValue);
+            const StringSet &observerIdSet = AttackCoordinator::getSingleton().getObserverIdSet(nodeFullPath);
+            for(StringSet::const_iterator stsCit = observerIdSet.begin() ; stsCit != observerIdSet.end() ; ++stsCit) {
+                observableByArray.append(*stsCit);
+            }
+            nodeDataMap[observableByArrayKey] = observableByArray;
+
+            Json::Value ownedByArray(Json::ValueType::arrayValue);
+            const StringSet &ownerIdSet = AttackCoordinator::getSingleton().getOwnerIdSet(nodeFullPath);
+            for(StringSet::const_iterator stsCit = ownerIdSet.begin() ; stsCit != ownerIdSet.end() ; ++stsCit) {
+                ownedByArray.append(*stsCit);
+            }
+            nodeDataMap[ownedByArrayKey] = ownedByArray;
+
+            return nodeDataMap;
+        }
+    };
+
+    typedef std::map<std::string, NodeData> NodeFullPathToNodeDataMap;
+
+    class Predicate: public inet::Topology::Predicate {
+    public:
+        bool matches(omnetpp::cModule *module) {
+            omnetpp::cModuleType *moduleType = module->getModuleType();
+            return get_node_type_set().find(moduleType->getFullName()) != get_node_type_set().end();
+        }
+    };
+    Predicate predicate;
+
+public:
+    std::string getStatus();
 };
 
 std::ostream &operator<<( std::ostream &os, const AttackCoordinator::NetworkAddress &networkAddress );

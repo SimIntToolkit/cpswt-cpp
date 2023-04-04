@@ -28,8 +28,8 @@
  * OR MODIFICATIONS.
  */
 
-#ifndef _edu_vanderbilt_vuisis_cpswt_hla_InteractionRoot_p_C2WInteractionRoot_p_ActionBase_p_OmnetCommand_p_RecordPacketsForReplayAttack_CLASS
-#define _edu_vanderbilt_vuisis_cpswt_hla_InteractionRoot_p_C2WInteractionRoot_p_ActionBase_p_OmnetCommand_p_RecordPacketsForReplayAttack_CLASS
+#ifndef _edu_vanderbilt_vuisis_cpswt_hla_InteractionRoot_p_C2WInteractionRoot_p_ActionBase_p_OmnetCommand_p_StopReplayAttack_CLASS
+#define _edu_vanderbilt_vuisis_cpswt_hla_InteractionRoot_p_C2WInteractionRoot_p_ActionBase_p_OmnetCommand_p_StopReplayAttack_CLASS
 
 #include "InteractionRoot_p/C2WInteractionRoot_p/ActionBase_p/OmnetCommand.hpp"
 #include "C2WException.hpp"
@@ -47,17 +47,17 @@ namespace edu {
        namespace ActionBase_p {
         namespace OmnetCommand_p {
 
-class RecordPacketsForReplayAttack : public ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::OmnetCommand {
+class StopReplayAttack : public ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::OmnetCommand {
 public:
 //    using ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot;
     typedef ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::OmnetCommand Super;
-    typedef boost::shared_ptr< RecordPacketsForReplayAttack > SP;
+    typedef boost::shared_ptr< StopReplayAttack > SP;
 
 private:
     static severity_logger &get_logger_aux() {
         static severity_logger logger;
         logger.add_attribute("MessagingClassName", attrs::constant< std::string >(
-          "InteractionRoot.C2WInteractionRoot.ActionBase.OmnetCommand.RecordPacketsForReplayAttack"
+          "InteractionRoot.C2WInteractionRoot.ActionBase.OmnetCommand.StopReplayAttack"
         ));
 
         logging::add_common_attributes();
@@ -76,7 +76,7 @@ public:
     // ----------------------------------------------------------------------------
 
     /**
-     * Returns the fully-qualified (dot-delimited) name of the ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::OmnetCommand_p::RecordPacketsForReplayAttack interaction class.
+     * Returns the fully-qualified (dot-delimited) name of the ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::OmnetCommand_p::StopReplayAttack interaction class.
      * Note: As this is a static method, it is NOT polymorphic, and so, if called on
      * a reference will return the name of the class pertaining to the reference,
      * rather than the name of the class for the instance referred to by the reference.
@@ -85,7 +85,7 @@ public:
      * @return the fully-qualified Java class name for this interaction class
      */
     static const std::string &get_cpp_class_name() {
-        static const std::string cppClassName("::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::OmnetCommand_p::RecordPacketsForReplayAttack");
+        static const std::string cppClassName("::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::OmnetCommand_p::StopReplayAttack");
         return cppClassName;
     }
 
@@ -101,7 +101,7 @@ public:
 
     /**
      * Returns the simple name (the last name in the dot-delimited fully-qualified
-     * class name) of the edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.ActionBase_p.OmnetCommand_p.RecordPacketsForReplayAttack interaction class.
+     * class name) of the edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.ActionBase_p.OmnetCommand_p.StopReplayAttack interaction class.
      *
      * @return the name of this interaction class
      */
@@ -111,7 +111,7 @@ public:
 
     /**
      * Returns the fully-qualified (dot-delimited) hla class name of the
-     * InteractionRoot.C2WInteractionRoot.ActionBase.OmnetCommand.RecordPacketsForReplayAttack interaction class.
+     * InteractionRoot.C2WInteractionRoot.ActionBase.OmnetCommand.StopReplayAttack interaction class.
      * Note: As this is a static method, it is NOT polymorphic, and so, if called on
      * a reference will return the federation name of the class pertaining to the reference,
      * rather than the name of the class for the instance referred to by the reference.
@@ -120,7 +120,7 @@ public:
      * @return the fully-qualified federation (HLA) class name for this interaction class
      */
     static const std::string &get_hla_class_name() {
-        static const std::string hlaClassName("InteractionRoot.C2WInteractionRoot.ActionBase.OmnetCommand.RecordPacketsForReplayAttack");
+        static const std::string hlaClassName("InteractionRoot.C2WInteractionRoot.ActionBase.OmnetCommand.StopReplayAttack");
         return hlaClassName;
     }
 
@@ -136,7 +136,7 @@ public:
 
     /**
      * Returns a sorted list containing the names of all of the non-hidden parameters in the
-     * edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.ActionBase_p.OmnetCommand_p.RecordPacketsForReplayAttack interaction class.
+     * edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.ActionBase_p.OmnetCommand_p.StopReplayAttack interaction class.
      * The property names are paired with name of the hla class in which they are defined in a
      * ClassAndPropertyName POJO.
      * Note: As this is a static method, it is NOT polymorphic, and so, if called on
@@ -154,7 +154,7 @@ public:
 
     /**
      * Returns a sorted list containing the names of all of the parameters in the
-     * edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.ActionBase_p.OmnetCommand_p.RecordPacketsForReplayAttack interaction class.
+     * edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.ActionBase_p.OmnetCommand_p.StopReplayAttack interaction class.
      * The property names are paired with name of the hla class in which they are defined in a
      * ClassAndPropertyName POJO.
      * Note: As this is a static method, it is NOT polymorphic, and so, if called on
@@ -186,7 +186,7 @@ public:
     // THIS CODE IS STATIC BECAUSE IT IS CLASS-DEPENDENT AND NOT INSTANCE-DEPENDENT
     // ----------------------------------------------------------------------------
     /**
-     * Returns the handle (RTI assigned) of the edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.ActionBase_p.OmnetCommand_p.RecordPacketsForReplayAttack interaction class.
+     * Returns the handle (RTI assigned) of the edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.ActionBase_p.OmnetCommand_p.StopReplayAttack interaction class.
      * Note: As this is a static method, it is NOT polymorphic, and so, if called on
      * a reference will return the handle of the class pertaining to the reference,
      * rather than the handle of the class for the instance referred to by the reference.
@@ -200,7 +200,7 @@ public:
 
     /**
      * Returns the handle of an parameter (RTI assigned) of
-     * this interaction class (i.e. "edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.ActionBase_p.OmnetCommand_p.RecordPacketsForReplayAttack") given the parameter's name.
+     * this interaction class (i.e. "edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.ActionBase_p.OmnetCommand_p.StopReplayAttack") given the parameter's name.
      *
      * @param propertyName name of parameter
      * @return the handle (RTI assigned) of the parameter "propertyName" of interaction class "hlaClassName"
@@ -219,7 +219,7 @@ public:
     //-------------------------------------------------
 
     /**
-     * Publishes the edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.ActionBase_p.OmnetCommand_p.RecordPacketsForReplayAttack interaction class for a federate.
+     * Publishes the edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.ActionBase_p.OmnetCommand_p.StopReplayAttack interaction class for a federate.
      *
      * @param rti handle to the Local RTI Component
      */
@@ -232,7 +232,7 @@ public:
     }
 
     /**
-     * Unpublishes the edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.ActionBase_p.OmnetCommand_p.RecordPacketsForReplayAttack interaction class for a federate.
+     * Unpublishes the edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.ActionBase_p.OmnetCommand_p.StopReplayAttack interaction class for a federate.
      *
      * @param rti handle to the Local RTI Component, usu. obtained through the
      *            {@link SynchronizedFederate#getRTI()} call
@@ -242,7 +242,7 @@ public:
     }
 
 /**
- * Subscribes a federate to the edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.ActionBase_p.OmnetCommand_p.RecordPacketsForReplayAttack interaction class.
+ * Subscribes a federate to the edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.ActionBase_p.OmnetCommand_p.StopReplayAttack interaction class.
  *
  * @param rti handle to the Local RTI Component
  */
@@ -263,7 +263,7 @@ public:
     }
 
     /**
-     * Unsubscribes a federate from the edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.ActionBase_p.OmnetCommand_p.RecordPacketsForReplayAttack interaction class.
+     * Unsubscribes a federate from the edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.ActionBase_p.OmnetCommand_p.StopReplayAttack interaction class.
      *
      * @param rti handle to the Local RTI Component
      */
@@ -289,12 +289,12 @@ public:
 
     /**
      * Return true if "handle" is equal to the handle (RTI assigned) of this class
-     * (that is, the edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.ActionBase_p.OmnetCommand_p.RecordPacketsForReplayAttack interaction class).
+     * (that is, the edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.ActionBase_p.OmnetCommand_p.StopReplayAttack interaction class).
      *
      * @param handle handle to compare to the value of the handle (RTI assigned) of
-     * this class (the edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.ActionBase_p.OmnetCommand_p.RecordPacketsForReplayAttack interaction class).
+     * this class (the edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.ActionBase_p.OmnetCommand_p.StopReplayAttack interaction class).
      * @return "true" if "handle" matches the value of the handle of this class
-     * (that is, the edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.ActionBase_p.OmnetCommand_p.RecordPacketsForReplayAttack interaction class).
+     * (that is, the edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.ActionBase_p.OmnetCommand_p.StopReplayAttack interaction class).
      */
     static bool match(int handle) {
         return handle == get_class_handle();
@@ -332,24 +332,24 @@ public:
 
 
     /**
-     * Set the value of the "recordDurationInSecs" parameter to "value" for this parameter.
+     * Set the value of the "recordingId" parameter to "value" for this parameter.
      *
-     * @param value the new value for the "recordDurationInSecs" parameter
+     * @param value the new value for the "recordingId" parameter
      */
-    void set_recordDurationInSecs(double newValue) {
-        ClassAndPropertyName key(get_hla_class_name(), "recordDurationInSecs");
+    void set_recordingId(const std::string & newValue) {
+        ClassAndPropertyName key(get_hla_class_name(), "recordingId");
         Value &value(*_classAndPropertyNameValueSPMap[key]);
         value.setValue(newValue);
     }
 
     /**
-     * Returns the value of the "recordDurationInSecs" parameter of this interaction.
+     * Returns the value of the "recordingId" parameter of this interaction.
      *
-     * @return the value of the "recordDurationInSecs" parameter
+     * @return the value of the "recordingId" parameter
      */
-    double get_recordDurationInSecs() {
-        ClassAndPropertyName key(get_hla_class_name(), "recordDurationInSecs");
-        return static_cast<double>(*_classAndPropertyNameValueSPMap[key]);
+    std::string get_recordingId() {
+        ClassAndPropertyName key(get_hla_class_name(), "recordingId");
+        return static_cast<std::string>(*_classAndPropertyNameValueSPMap[key]);
     }
 
 
@@ -405,11 +405,11 @@ public:
     //--------------------------
 public:
     static SP create() {
-        return SP(new RecordPacketsForReplayAttack());
+        return SP(new StopReplayAttack());
     }
 
     static InteractionRoot::SP create_interaction() {
-        return SP(new RecordPacketsForReplayAttack());
+        return SP(new StopReplayAttack());
     }
 
     virtual InteractionRoot::SP createInteraction() {
@@ -417,11 +417,11 @@ public:
     }
 
     static SP create(const RTIfedTime &rtiFedTime) {
-        return SP(new RecordPacketsForReplayAttack(rtiFedTime));
+        return SP(new StopReplayAttack(rtiFedTime));
     }
 
     static InteractionRoot::SP create_interaction(const RTIfedTime &rtiFedTime) {
-        return SP(new RecordPacketsForReplayAttack(rtiFedTime));
+        return SP(new StopReplayAttack(rtiFedTime));
     }
 
     virtual InteractionRoot::SP createInteraction(const RTIfedTime &rtiFedTime) {
@@ -431,13 +431,13 @@ public:
     static SP create(
       const RTI::ParameterHandleValuePairSet &propertyMap
     ) {
-        return SP(new RecordPacketsForReplayAttack(propertyMap));
+        return SP(new StopReplayAttack(propertyMap));
     }
 
     static InteractionRoot::SP create_interaction(
       const RTI::ParameterHandleValuePairSet &propertyMap
     ) {
-        return SP(new RecordPacketsForReplayAttack(propertyMap));
+        return SP(new StopReplayAttack(propertyMap));
     }
 
     virtual InteractionRoot::SP createInteraction(
@@ -449,13 +449,13 @@ public:
     static SP create(
       const RTI::ParameterHandleValuePairSet &propertyMap, const RTIfedTime &rtiFedTime
     ) {
-        return SP(new RecordPacketsForReplayAttack(propertyMap, rtiFedTime));
+        return SP(new StopReplayAttack(propertyMap, rtiFedTime));
     }
 
     static InteractionRoot::SP create_interaction(
       const RTI::ParameterHandleValuePairSet &propertyMap, const RTIfedTime &rtiFedTime
     ) {
-        return SP(new RecordPacketsForReplayAttack(propertyMap, rtiFedTime));
+        return SP(new StopReplayAttack(propertyMap, rtiFedTime));
     }
 
     virtual InteractionRoot::SP createInteraction(
@@ -464,7 +464,7 @@ public:
     }
 
     virtual InteractionRoot::SP cloneInteraction() {
-        return InteractionRoot::SP( new RecordPacketsForReplayAttack( *this )  );
+        return InteractionRoot::SP( new StopReplayAttack( *this )  );
     }
 
     //------------------------------
@@ -475,27 +475,27 @@ public:
     // CONSTRUCTORS
     //-------------
 public:
-    RecordPacketsForReplayAttack() : Super( get_hla_class_name() ) { }
+    StopReplayAttack() : Super( get_hla_class_name() ) { }
 
-    RecordPacketsForReplayAttack( const PropertyHandleValuePairSet &propertyMap ) : Super( get_hla_class_name(), propertyMap ) { }
+    StopReplayAttack( const PropertyHandleValuePairSet &propertyMap ) : Super( get_hla_class_name(), propertyMap ) { }
 
-    RecordPacketsForReplayAttack( const RTIfedTime &rtiFedTime ) : Super( get_hla_class_name(), rtiFedTime ) { }
+    StopReplayAttack( const RTIfedTime &rtiFedTime ) : Super( get_hla_class_name(), rtiFedTime ) { }
 
-    RecordPacketsForReplayAttack(const PropertyHandleValuePairSet &propertyMap, const RTIfedTime &rtiFedTime) :
+    StopReplayAttack(const PropertyHandleValuePairSet &propertyMap, const RTIfedTime &rtiFedTime) :
        Super( get_hla_class_name(), propertyMap, rtiFedTime ) { }
 
 protected:
-    RecordPacketsForReplayAttack(InteractionRoot::NoInstanceInit &noInstanceInit) : Super(noInstanceInit) { }
+    StopReplayAttack(InteractionRoot::NoInstanceInit &noInstanceInit) : Super(noInstanceInit) { }
 
-    RecordPacketsForReplayAttack( const std::string &hlaClassName ) : Super( hlaClassName ) { }
+    StopReplayAttack( const std::string &hlaClassName ) : Super( hlaClassName ) { }
 
-    RecordPacketsForReplayAttack( const std::string &hlaClassName, const PropertyHandleValuePairSet &propertyMap ) :
+    StopReplayAttack( const std::string &hlaClassName, const PropertyHandleValuePairSet &propertyMap ) :
       Super( hlaClassName, propertyMap ) { }
 
-    RecordPacketsForReplayAttack( const std::string &hlaClassName, const RTIfedTime &rtiFedTime ) :
+    StopReplayAttack( const std::string &hlaClassName, const RTIfedTime &rtiFedTime ) :
       Super( hlaClassName, rtiFedTime ) { }
 
-    RecordPacketsForReplayAttack(
+    StopReplayAttack(
       const std::string &hlaClassName, const PropertyHandleValuePairSet &propertyMap, const RTIfedTime &rtiFedTime
     ) : Super( hlaClassName, propertyMap, rtiFedTime ) { }
 
@@ -510,8 +510,8 @@ protected:
  } // NAMESPACE "vanderbilt"
 } // NAMESPACE "edu"
 
-inline std::ostream &operator<<( std::ostream &os, ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::OmnetCommand_p::RecordPacketsForReplayAttack::SP messagingSP ) {
+inline std::ostream &operator<<( std::ostream &os, ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::OmnetCommand_p::StopReplayAttack::SP messagingSP ) {
     return os << *messagingSP;
 }
 
-#endif // _edu_vanderbilt_vuisis_cpswt_hla_InteractionRoot_p_C2WInteractionRoot_p_ActionBase_p_OmnetCommand_p_RecordPacketsForReplayAttack_CLASS
+#endif // _edu_vanderbilt_vuisis_cpswt_hla_InteractionRoot_p_C2WInteractionRoot_p_ActionBase_p_OmnetCommand_p_StopReplayAttack_CLASS

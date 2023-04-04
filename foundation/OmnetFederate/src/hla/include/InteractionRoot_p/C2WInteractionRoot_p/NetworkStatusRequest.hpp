@@ -28,10 +28,10 @@
  * OR MODIFICATIONS.
  */
 
-#ifndef _edu_vanderbilt_vuisis_cpswt_hla_InteractionRoot_p_C2WInteractionRoot_p_ActionBase_p_OmnetCommand_p_StartNetworkFilterAttack_CLASS
-#define _edu_vanderbilt_vuisis_cpswt_hla_InteractionRoot_p_C2WInteractionRoot_p_ActionBase_p_OmnetCommand_p_StartNetworkFilterAttack_CLASS
+#ifndef _edu_vanderbilt_vuisis_cpswt_hla_InteractionRoot_p_C2WInteractionRoot_p_NetworkStatusRequest_CLASS
+#define _edu_vanderbilt_vuisis_cpswt_hla_InteractionRoot_p_C2WInteractionRoot_p_NetworkStatusRequest_CLASS
 
-#include "InteractionRoot_p/C2WInteractionRoot_p/ActionBase_p/OmnetCommand.hpp"
+#include "InteractionRoot_p/C2WInteractionRoot.hpp"
 #include "C2WException.hpp"
 
 #include <boost/unordered_set.hpp>
@@ -44,20 +44,18 @@ namespace edu {
     namespace hla {
      namespace InteractionRoot_p {
       namespace C2WInteractionRoot_p {
-       namespace ActionBase_p {
-        namespace OmnetCommand_p {
 
-class StartNetworkFilterAttack : public ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::OmnetCommand {
+class NetworkStatusRequest : public ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot {
 public:
 //    using ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot;
-    typedef ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::OmnetCommand Super;
-    typedef boost::shared_ptr< StartNetworkFilterAttack > SP;
+    typedef ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot Super;
+    typedef boost::shared_ptr< NetworkStatusRequest > SP;
 
 private:
     static severity_logger &get_logger_aux() {
         static severity_logger logger;
         logger.add_attribute("MessagingClassName", attrs::constant< std::string >(
-          "InteractionRoot.C2WInteractionRoot.ActionBase.OmnetCommand.StartNetworkFilterAttack"
+          "InteractionRoot.C2WInteractionRoot.NetworkStatusRequest"
         ));
 
         logging::add_common_attributes();
@@ -76,7 +74,7 @@ public:
     // ----------------------------------------------------------------------------
 
     /**
-     * Returns the fully-qualified (dot-delimited) name of the ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::OmnetCommand_p::StartNetworkFilterAttack interaction class.
+     * Returns the fully-qualified (dot-delimited) name of the ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::NetworkStatusRequest interaction class.
      * Note: As this is a static method, it is NOT polymorphic, and so, if called on
      * a reference will return the name of the class pertaining to the reference,
      * rather than the name of the class for the instance referred to by the reference.
@@ -85,7 +83,7 @@ public:
      * @return the fully-qualified Java class name for this interaction class
      */
     static const std::string &get_cpp_class_name() {
-        static const std::string cppClassName("::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::OmnetCommand_p::StartNetworkFilterAttack");
+        static const std::string cppClassName("::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::NetworkStatusRequest");
         return cppClassName;
     }
 
@@ -101,7 +99,7 @@ public:
 
     /**
      * Returns the simple name (the last name in the dot-delimited fully-qualified
-     * class name) of the edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.ActionBase_p.OmnetCommand_p.StartNetworkFilterAttack interaction class.
+     * class name) of the edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.NetworkStatusRequest interaction class.
      *
      * @return the name of this interaction class
      */
@@ -111,7 +109,7 @@ public:
 
     /**
      * Returns the fully-qualified (dot-delimited) hla class name of the
-     * InteractionRoot.C2WInteractionRoot.ActionBase.OmnetCommand.StartNetworkFilterAttack interaction class.
+     * InteractionRoot.C2WInteractionRoot.NetworkStatusRequest interaction class.
      * Note: As this is a static method, it is NOT polymorphic, and so, if called on
      * a reference will return the federation name of the class pertaining to the reference,
      * rather than the name of the class for the instance referred to by the reference.
@@ -120,7 +118,7 @@ public:
      * @return the fully-qualified federation (HLA) class name for this interaction class
      */
     static const std::string &get_hla_class_name() {
-        static const std::string hlaClassName("InteractionRoot.C2WInteractionRoot.ActionBase.OmnetCommand.StartNetworkFilterAttack");
+        static const std::string hlaClassName("InteractionRoot.C2WInteractionRoot.NetworkStatusRequest");
         return hlaClassName;
     }
 
@@ -136,7 +134,7 @@ public:
 
     /**
      * Returns a sorted list containing the names of all of the non-hidden parameters in the
-     * edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.ActionBase_p.OmnetCommand_p.StartNetworkFilterAttack interaction class.
+     * edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.NetworkStatusRequest interaction class.
      * The property names are paired with name of the hla class in which they are defined in a
      * ClassAndPropertyName POJO.
      * Note: As this is a static method, it is NOT polymorphic, and so, if called on
@@ -154,7 +152,7 @@ public:
 
     /**
      * Returns a sorted list containing the names of all of the parameters in the
-     * edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.ActionBase_p.OmnetCommand_p.StartNetworkFilterAttack interaction class.
+     * edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.NetworkStatusRequest interaction class.
      * The property names are paired with name of the hla class in which they are defined in a
      * ClassAndPropertyName POJO.
      * Note: As this is a static method, it is NOT polymorphic, and so, if called on
@@ -186,7 +184,7 @@ public:
     // THIS CODE IS STATIC BECAUSE IT IS CLASS-DEPENDENT AND NOT INSTANCE-DEPENDENT
     // ----------------------------------------------------------------------------
     /**
-     * Returns the handle (RTI assigned) of the edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.ActionBase_p.OmnetCommand_p.StartNetworkFilterAttack interaction class.
+     * Returns the handle (RTI assigned) of the edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.NetworkStatusRequest interaction class.
      * Note: As this is a static method, it is NOT polymorphic, and so, if called on
      * a reference will return the handle of the class pertaining to the reference,
      * rather than the handle of the class for the instance referred to by the reference.
@@ -200,7 +198,7 @@ public:
 
     /**
      * Returns the handle of an parameter (RTI assigned) of
-     * this interaction class (i.e. "edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.ActionBase_p.OmnetCommand_p.StartNetworkFilterAttack") given the parameter's name.
+     * this interaction class (i.e. "edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.NetworkStatusRequest") given the parameter's name.
      *
      * @param propertyName name of parameter
      * @return the handle (RTI assigned) of the parameter "propertyName" of interaction class "hlaClassName"
@@ -219,7 +217,7 @@ public:
     //-------------------------------------------------
 
     /**
-     * Publishes the edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.ActionBase_p.OmnetCommand_p.StartNetworkFilterAttack interaction class for a federate.
+     * Publishes the edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.NetworkStatusRequest interaction class for a federate.
      *
      * @param rti handle to the Local RTI Component
      */
@@ -232,7 +230,7 @@ public:
     }
 
     /**
-     * Unpublishes the edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.ActionBase_p.OmnetCommand_p.StartNetworkFilterAttack interaction class for a federate.
+     * Unpublishes the edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.NetworkStatusRequest interaction class for a federate.
      *
      * @param rti handle to the Local RTI Component, usu. obtained through the
      *            {@link SynchronizedFederate#getRTI()} call
@@ -242,7 +240,7 @@ public:
     }
 
 /**
- * Subscribes a federate to the edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.ActionBase_p.OmnetCommand_p.StartNetworkFilterAttack interaction class.
+ * Subscribes a federate to the edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.NetworkStatusRequest interaction class.
  *
  * @param rti handle to the Local RTI Component
  */
@@ -263,7 +261,7 @@ public:
     }
 
     /**
-     * Unsubscribes a federate from the edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.ActionBase_p.OmnetCommand_p.StartNetworkFilterAttack interaction class.
+     * Unsubscribes a federate from the edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.NetworkStatusRequest interaction class.
      *
      * @param rti handle to the Local RTI Component
      */
@@ -289,12 +287,12 @@ public:
 
     /**
      * Return true if "handle" is equal to the handle (RTI assigned) of this class
-     * (that is, the edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.ActionBase_p.OmnetCommand_p.StartNetworkFilterAttack interaction class).
+     * (that is, the edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.NetworkStatusRequest interaction class).
      *
      * @param handle handle to compare to the value of the handle (RTI assigned) of
-     * this class (the edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.ActionBase_p.OmnetCommand_p.StartNetworkFilterAttack interaction class).
+     * this class (the edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.NetworkStatusRequest interaction class).
      * @return "true" if "handle" matches the value of the handle of this class
-     * (that is, the edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.ActionBase_p.OmnetCommand_p.StartNetworkFilterAttack interaction class).
+     * (that is, the edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.NetworkStatusRequest interaction class).
      */
     static bool match(int handle) {
         return handle == get_class_handle();
@@ -308,72 +306,6 @@ public:
     // PROPERTY MANIPULATION METHODS
     //------------------------------
 
-
-    /**
-     * Set the value of the "dstNetworkAddress" parameter to "value" for this parameter.
-     *
-     * @param value the new value for the "dstNetworkAddress" parameter
-     */
-    void set_dstNetworkAddress(const std::string & newValue) {
-        ClassAndPropertyName key(get_hla_class_name(), "dstNetworkAddress");
-        Value &value(*_classAndPropertyNameValueSPMap[key]);
-        value.setValue(newValue);
-    }
-
-    /**
-     * Returns the value of the "dstNetworkAddress" parameter of this interaction.
-     *
-     * @return the value of the "dstNetworkAddress" parameter
-     */
-    std::string get_dstNetworkAddress() {
-        ClassAndPropertyName key(get_hla_class_name(), "dstNetworkAddress");
-        return static_cast<std::string>(*_classAndPropertyNameValueSPMap[key]);
-    }
-
-
-    /**
-     * Set the value of the "nodeFullPath" parameter to "value" for this parameter.
-     *
-     * @param value the new value for the "nodeFullPath" parameter
-     */
-    void set_nodeFullPath(const std::string & newValue) {
-        ClassAndPropertyName key(get_hla_class_name(), "nodeFullPath");
-        Value &value(*_classAndPropertyNameValueSPMap[key]);
-        value.setValue(newValue);
-    }
-
-    /**
-     * Returns the value of the "nodeFullPath" parameter of this interaction.
-     *
-     * @return the value of the "nodeFullPath" parameter
-     */
-    std::string get_nodeFullPath() {
-        ClassAndPropertyName key(get_hla_class_name(), "nodeFullPath");
-        return static_cast<std::string>(*_classAndPropertyNameValueSPMap[key]);
-    }
-
-
-    /**
-     * Set the value of the "srcNetworkAddress" parameter to "value" for this parameter.
-     *
-     * @param value the new value for the "srcNetworkAddress" parameter
-     */
-    void set_srcNetworkAddress(const std::string & newValue) {
-        ClassAndPropertyName key(get_hla_class_name(), "srcNetworkAddress");
-        Value &value(*_classAndPropertyNameValueSPMap[key]);
-        value.setValue(newValue);
-    }
-
-    /**
-     * Returns the value of the "srcNetworkAddress" parameter of this interaction.
-     *
-     * @return the value of the "srcNetworkAddress" parameter
-     */
-    std::string get_srcNetworkAddress() {
-        ClassAndPropertyName key(get_hla_class_name(), "srcNetworkAddress");
-        return static_cast<std::string>(*_classAndPropertyNameValueSPMap[key]);
-    }
-
     //------------------------------------
     // END PROPERTY MANIPULATION METHODS
     //------------------------------------
@@ -383,11 +315,11 @@ public:
     //--------------------------
 public:
     static SP create() {
-        return SP(new StartNetworkFilterAttack());
+        return SP(new NetworkStatusRequest());
     }
 
     static InteractionRoot::SP create_interaction() {
-        return SP(new StartNetworkFilterAttack());
+        return SP(new NetworkStatusRequest());
     }
 
     virtual InteractionRoot::SP createInteraction() {
@@ -395,11 +327,11 @@ public:
     }
 
     static SP create(const RTIfedTime &rtiFedTime) {
-        return SP(new StartNetworkFilterAttack(rtiFedTime));
+        return SP(new NetworkStatusRequest(rtiFedTime));
     }
 
     static InteractionRoot::SP create_interaction(const RTIfedTime &rtiFedTime) {
-        return SP(new StartNetworkFilterAttack(rtiFedTime));
+        return SP(new NetworkStatusRequest(rtiFedTime));
     }
 
     virtual InteractionRoot::SP createInteraction(const RTIfedTime &rtiFedTime) {
@@ -409,13 +341,13 @@ public:
     static SP create(
       const RTI::ParameterHandleValuePairSet &propertyMap
     ) {
-        return SP(new StartNetworkFilterAttack(propertyMap));
+        return SP(new NetworkStatusRequest(propertyMap));
     }
 
     static InteractionRoot::SP create_interaction(
       const RTI::ParameterHandleValuePairSet &propertyMap
     ) {
-        return SP(new StartNetworkFilterAttack(propertyMap));
+        return SP(new NetworkStatusRequest(propertyMap));
     }
 
     virtual InteractionRoot::SP createInteraction(
@@ -427,13 +359,13 @@ public:
     static SP create(
       const RTI::ParameterHandleValuePairSet &propertyMap, const RTIfedTime &rtiFedTime
     ) {
-        return SP(new StartNetworkFilterAttack(propertyMap, rtiFedTime));
+        return SP(new NetworkStatusRequest(propertyMap, rtiFedTime));
     }
 
     static InteractionRoot::SP create_interaction(
       const RTI::ParameterHandleValuePairSet &propertyMap, const RTIfedTime &rtiFedTime
     ) {
-        return SP(new StartNetworkFilterAttack(propertyMap, rtiFedTime));
+        return SP(new NetworkStatusRequest(propertyMap, rtiFedTime));
     }
 
     virtual InteractionRoot::SP createInteraction(
@@ -442,7 +374,7 @@ public:
     }
 
     virtual InteractionRoot::SP cloneInteraction() {
-        return InteractionRoot::SP( new StartNetworkFilterAttack( *this )  );
+        return InteractionRoot::SP( new NetworkStatusRequest( *this )  );
     }
 
     //------------------------------
@@ -453,33 +385,31 @@ public:
     // CONSTRUCTORS
     //-------------
 public:
-    StartNetworkFilterAttack() : Super( get_hla_class_name() ) { }
+    NetworkStatusRequest() : Super( get_hla_class_name() ) { }
 
-    StartNetworkFilterAttack( const PropertyHandleValuePairSet &propertyMap ) : Super( get_hla_class_name(), propertyMap ) { }
+    NetworkStatusRequest( const PropertyHandleValuePairSet &propertyMap ) : Super( get_hla_class_name(), propertyMap ) { }
 
-    StartNetworkFilterAttack( const RTIfedTime &rtiFedTime ) : Super( get_hla_class_name(), rtiFedTime ) { }
+    NetworkStatusRequest( const RTIfedTime &rtiFedTime ) : Super( get_hla_class_name(), rtiFedTime ) { }
 
-    StartNetworkFilterAttack(const PropertyHandleValuePairSet &propertyMap, const RTIfedTime &rtiFedTime) :
+    NetworkStatusRequest(const PropertyHandleValuePairSet &propertyMap, const RTIfedTime &rtiFedTime) :
        Super( get_hla_class_name(), propertyMap, rtiFedTime ) { }
 
 protected:
-    StartNetworkFilterAttack(InteractionRoot::NoInstanceInit &noInstanceInit) : Super(noInstanceInit) { }
+    NetworkStatusRequest(InteractionRoot::NoInstanceInit &noInstanceInit) : Super(noInstanceInit) { }
 
-    StartNetworkFilterAttack( const std::string &hlaClassName ) : Super( hlaClassName ) { }
+    NetworkStatusRequest( const std::string &hlaClassName ) : Super( hlaClassName ) { }
 
-    StartNetworkFilterAttack( const std::string &hlaClassName, const PropertyHandleValuePairSet &propertyMap ) :
+    NetworkStatusRequest( const std::string &hlaClassName, const PropertyHandleValuePairSet &propertyMap ) :
       Super( hlaClassName, propertyMap ) { }
 
-    StartNetworkFilterAttack( const std::string &hlaClassName, const RTIfedTime &rtiFedTime ) :
+    NetworkStatusRequest( const std::string &hlaClassName, const RTIfedTime &rtiFedTime ) :
       Super( hlaClassName, rtiFedTime ) { }
 
-    StartNetworkFilterAttack(
+    NetworkStatusRequest(
       const std::string &hlaClassName, const PropertyHandleValuePairSet &propertyMap, const RTIfedTime &rtiFedTime
     ) : Super( hlaClassName, propertyMap, rtiFedTime ) { }
 
 };
-        } // NAMESPACE "OmnetCommand_p"
-       } // NAMESPACE "ActionBase_p"
       } // NAMESPACE "C2WInteractionRoot_p"
      } // NAMESPACE "InteractionRoot_p"
     } // NAMESPACE "hla"
@@ -488,8 +418,8 @@ protected:
  } // NAMESPACE "vanderbilt"
 } // NAMESPACE "edu"
 
-inline std::ostream &operator<<( std::ostream &os, ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::OmnetCommand_p::StartNetworkFilterAttack::SP messagingSP ) {
+inline std::ostream &operator<<( std::ostream &os, ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::NetworkStatusRequest::SP messagingSP ) {
     return os << *messagingSP;
 }
 
-#endif // _edu_vanderbilt_vuisis_cpswt_hla_InteractionRoot_p_C2WInteractionRoot_p_ActionBase_p_OmnetCommand_p_StartNetworkFilterAttack_CLASS
+#endif // _edu_vanderbilt_vuisis_cpswt_hla_InteractionRoot_p_C2WInteractionRoot_p_NetworkStatusRequest_CLASS

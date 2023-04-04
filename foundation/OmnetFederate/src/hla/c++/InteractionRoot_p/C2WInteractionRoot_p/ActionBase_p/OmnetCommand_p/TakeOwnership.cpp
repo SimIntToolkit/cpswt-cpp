@@ -28,7 +28,7 @@
  * OR MODIFICATIONS.
  */
 
-#include "InteractionRoot_p/C2WInteractionRoot_p/ActionBase_p/OmnetCommand_p/TerminateReplayAttack.hpp"
+#include "InteractionRoot_p/C2WInteractionRoot_p/ActionBase_p/OmnetCommand_p/TakeOwnership.hpp"
 namespace edu {
  namespace vanderbilt {
   namespace vuisis {
@@ -39,39 +39,32 @@ namespace edu {
        namespace ActionBase_p {
         namespace OmnetCommand_p {
 
-bool TerminateReplayAttack::static_init_var = TerminateReplayAttack::static_init();
+bool TakeOwnership::static_init_var = TakeOwnership::static_init();
 
-bool TerminateReplayAttack::static_init() {
-    BOOST_LOG_SEV(get_logger(), info) << "Class \"::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::OmnetCommand_p::TerminateReplayAttack\" loaded.";
+bool TakeOwnership::static_init() {
+    BOOST_LOG_SEV(get_logger(), info) << "Class \"::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::ActionBase_p::OmnetCommand_p::TakeOwnership\" loaded.";
 
     // ADD THIS CLASS TO THE _classNameSet DEFINED IN InteractionRoot
     get_hla_class_name_set().insert(get_hla_class_name());
 
     InteractionRoot::NoInstanceInit noInstanceInit;
-    SP instanceSP = SP( new TerminateReplayAttack(noInstanceInit) );
+    SP instanceSP = SP( new TakeOwnership(noInstanceInit) );
     get_hla_class_name_instance_sp_map()[get_hla_class_name()] = instanceSP;
 
     ClassAndPropertyNameSetSP classAndPropertyNameSetSP( new ClassAndPropertyNameSet() );
 
     classAndPropertyNameSetSP->emplace(
-        "InteractionRoot.C2WInteractionRoot.ActionBase.OmnetCommand.TerminateReplayAttack", "dstNetworkAddress"
+        "InteractionRoot.C2WInteractionRoot.ActionBase.OmnetCommand.TakeOwnership", "nodeFullPath"
     );
 
-    get_class_and_property_name_initial_value_sp_map()[ClassAndPropertyName( "InteractionRoot.C2WInteractionRoot.ActionBase.OmnetCommand.TerminateReplayAttack", "dstNetworkAddress" )] =
+    get_class_and_property_name_initial_value_sp_map()[ClassAndPropertyName( "InteractionRoot.C2WInteractionRoot.ActionBase.OmnetCommand.TakeOwnership", "nodeFullPath" )] =
       ValueSP( new Value( std::string("") ));
 
     classAndPropertyNameSetSP->emplace(
-        "InteractionRoot.C2WInteractionRoot.ActionBase.OmnetCommand.TerminateReplayAttack", "recordingNodeFullPath"
+        "InteractionRoot.C2WInteractionRoot.ActionBase.OmnetCommand.TakeOwnership", "ownerId"
     );
 
-    get_class_and_property_name_initial_value_sp_map()[ClassAndPropertyName( "InteractionRoot.C2WInteractionRoot.ActionBase.OmnetCommand.TerminateReplayAttack", "recordingNodeFullPath" )] =
-      ValueSP( new Value( std::string("") ));
-
-    classAndPropertyNameSetSP->emplace(
-        "InteractionRoot.C2WInteractionRoot.ActionBase.OmnetCommand.TerminateReplayAttack", "srcNetworkAddress"
-    );
-
-    get_class_and_property_name_initial_value_sp_map()[ClassAndPropertyName( "InteractionRoot.C2WInteractionRoot.ActionBase.OmnetCommand.TerminateReplayAttack", "srcNetworkAddress" )] =
+    get_class_and_property_name_initial_value_sp_map()[ClassAndPropertyName( "InteractionRoot.C2WInteractionRoot.ActionBase.OmnetCommand.TakeOwnership", "ownerId" )] =
       ValueSP( new Value( std::string("") ));
 
     // ADD THIS CLASS'S _classAndPropertyNameSet TO _classNamePropertyNameSetMap DEFINED
@@ -85,15 +78,11 @@ bool TerminateReplayAttack::static_init() {
     ClassAndPropertyNameSetSP allClassAndPropertyNameSetSP( new ClassAndPropertyNameSet() );
 
     allClassAndPropertyNameSetSP->emplace(
-        "InteractionRoot.C2WInteractionRoot.ActionBase.OmnetCommand.TerminateReplayAttack", "dstNetworkAddress"
+        "InteractionRoot.C2WInteractionRoot.ActionBase.OmnetCommand.TakeOwnership", "nodeFullPath"
     );
 
     allClassAndPropertyNameSetSP->emplace(
-        "InteractionRoot.C2WInteractionRoot.ActionBase.OmnetCommand.TerminateReplayAttack", "recordingNodeFullPath"
-    );
-
-    allClassAndPropertyNameSetSP->emplace(
-        "InteractionRoot.C2WInteractionRoot.ActionBase.OmnetCommand.TerminateReplayAttack", "srcNetworkAddress"
+        "InteractionRoot.C2WInteractionRoot.ActionBase.OmnetCommand.TakeOwnership", "ownerId"
     );
 
     allClassAndPropertyNameSetSP->emplace(
