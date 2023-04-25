@@ -1,5 +1,4 @@
-# UCEF C++ Integration
+# CPSWT C++ Integration
 
-Integrates support for C++ federates into the Universal Cyber-Physical Systems Environment for Federation (UCEF).
+Integrates support for C++ federates into the Cyber-Physical Systems WindTunnel.
 
-This repository is meant to be used in conjunction with the UCEF virtual machine available at https://github.com/usnistgov/ucef and cannot be used on its own.
