@@ -251,6 +251,48 @@ std::string ObjectRoot::ObjectReflector::toJson() const {
     return stringOutputStream.str();
 }
 
+ObjectRoot::ObjectReflector::operator std::string() const {
+    std::ostringstream stringOutputStream;
+
+    const ClassAndPropertyNameValueSPMap &classAndPropertyNameValueSPMap = getClassAndPropertyNameValueSPMap();
+    stringOutputStream << "[" << getHlaClassName() << "," << getObjectHandle() << "," << ""
+      << getFederateSequence() << "](";
+
+    bool first = true;
+    for(
+      ClassAndPropertyNameValueSPMap::const_iterator cvmCit = classAndPropertyNameValueSPMap.begin() ;
+      cvmCit != classAndPropertyNameValueSPMap.end() ;
+      ++cvmCit
+    ) {
+        if (first) first = false;
+        else stringOutputStream << ", " ;
+
+        stringOutputStream << static_cast<std::string>(cvmCit->first) << ": ";
+        TypeMedley &value = *cvmCit->second;
+        switch(value.getDataType()) {
+            case TypeMedley::DOUBLE: {
+                stringOutputStream << static_cast<double>(value);
+                break;
+            }
+            case TypeMedley::FLOAT: {
+                stringOutputStream << static_cast<float>(value);
+                break;
+            }
+            case TypeMedley::STRING: {
+                stringOutputStream << "\"" << static_cast<std::string>(value) << "\"";
+                break;
+            }
+            default: {
+                stringOutputStream << static_cast<std::string>(value);
+                break;
+            }
+        }
+    }
+    stringOutputStream << ")";
+
+    return stringOutputStream.str();
+}
+
 void ObjectRoot::pub_sub_class_and_property_name(
   const std::string &callingFunctionName,
   StringClassAndPropertyNameSetSPMap &stringClassAndPropertyNameSetSPMap,
@@ -1120,91 +1162,48 @@ void ObjectRoot::readFederateDynamicMessageClass(const std::string &hlaClassName
     }
 }
 
+ObjectRoot::operator std::string() const {
+    std::ostringstream stringOutputStream;
+
+    const ClassAndPropertyNameValueSPMap &classAndPropertyNameValueSPMap = getClassAndPropertyNameValueSPMap();
+    stringOutputStream << getInstanceHlaClassName() << "(";
+    bool first = true;
+    for(
+      ClassAndPropertyNameValueSPMap::const_iterator cvmCit = classAndPropertyNameValueSPMap.begin() ;
+      cvmCit != classAndPropertyNameValueSPMap.end() ;
+      ++cvmCit
+    ) {
+        if (first) first = false;
+        else stringOutputStream << ", ";
+
+        stringOutputStream << static_cast<std::string>(cvmCit->first) << ": ";
+        TypeMedley &value = *cvmCit->second;
+        switch(value.getDataType()) {
+            case TypeMedley::DOUBLE: {
+                stringOutputStream << static_cast<double>(value);
+                break;
+            }
+            case TypeMedley::FLOAT: {
+                stringOutputStream << static_cast<float>(value);
+                break;
+            }
+            case TypeMedley::STRING: {
+                stringOutputStream << "\"" << static_cast<std::string>(value) << "\"";
+                break;
+            }
+            default: {
+                stringOutputStream << static_cast<std::string>(value);
+                break;
+            }
+        }
+    }
+    stringOutputStream << ")";
+
+    return stringOutputStream.str();
+}
 
     } // NAMESPACE "hla"
    } // NAMESPACE "cpswt"
   } // NAMESPACE "vuisis"
  } // NAMESPACE "vanderbilt"
 } // NAMESPACE "edu"
-
-std::ostream &operator<<( std::ostream &os, const ::edu::vanderbilt::vuisis::cpswt::hla::ObjectRoot &messaging ) {
-
-    typedef ::edu::vanderbilt::vuisis::cpswt::hla::ObjectRoot::ClassAndPropertyNameValueSPMap::const_iterator const_iterator;
-    const ::edu::vanderbilt::vuisis::cpswt::hla::ObjectRoot::ClassAndPropertyNameValueSPMap &classAndPropertyNameValueSPMap =
-      messaging.getClassAndPropertyNameValueSPMap();
-    os << messaging.getInstanceHlaClassName() << "(";
-    bool first = true;
-    for(
-      const_iterator cvmCit = classAndPropertyNameValueSPMap.begin() ;
-      cvmCit != classAndPropertyNameValueSPMap.end() ;
-      ++cvmCit
-    ) {
-        if (first) first = false;
-        else os << ", " ;
-
-        os << static_cast<std::string>(cvmCit->first) << ": ";
-        TypeMedley &value = *cvmCit->second;
-        switch(value.getDataType()) {
-            case TypeMedley::DOUBLE: {
-                os << static_cast<double>(value);
-                break;
-            }
-            case TypeMedley::FLOAT: {
-                os << static_cast<float>(value);
-                break;
-            }
-            case TypeMedley::STRING: {
-                os << "\"" << static_cast<std::string>(value) << "\"";
-                break;
-            }
-            default: {
-                os << static_cast<std::string>(value);
-                break;
-            }
-        }
-    }
-    return os << ")";
-}
-
-std::ostream &operator<<(
-  std::ostream &os, const ::edu::vanderbilt::vuisis::cpswt::hla::ObjectRoot::ObjectReflector &objectReflector
-) {
-
-    typedef ::edu::vanderbilt::vuisis::cpswt::hla::ObjectRoot::ClassAndPropertyNameValueSPMap::const_iterator
-      const_iterator;
-    const ::edu::vanderbilt::vuisis::cpswt::hla::ObjectRoot::ClassAndPropertyNameValueSPMap
-      &classAndPropertyNameValueSPMap = objectReflector.getClassAndPropertyNameValueSPMap();
-    os << "[" << objectReflector.getHlaClassName() << "," << objectReflector.getObjectHandle() << ","
-      << "" << objectReflector.getFederateSequence() << "](";
-    bool first = true;
-    for(
-      const_iterator cvmCit = classAndPropertyNameValueSPMap.begin() ;
-      cvmCit != classAndPropertyNameValueSPMap.end() ;
-      ++cvmCit
-    ) {
-        if (first) first = false;
-        else os << ", " ;
-
-        os << static_cast<std::string>(cvmCit->first) << ": ";
-        TypeMedley &value = *cvmCit->second;
-        switch(value.getDataType()) {
-            case TypeMedley::DOUBLE: {
-                os << static_cast<double>(value);
-                break;
-            }
-            case TypeMedley::FLOAT: {
-                os << static_cast<float>(value);
-                break;
-            }
-            case TypeMedley::STRING: {
-                os << "\"" << static_cast<std::string>(value) << "\"";
-                break;
-            }
-            default: {
-                os << static_cast<std::string>(value);
-                break;
-            }
-        }
-    }
-    return os << ")";
-}

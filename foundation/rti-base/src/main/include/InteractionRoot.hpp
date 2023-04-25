@@ -1621,6 +1621,9 @@ private:
         }
         return true;
     }
+
+public:
+    explicit operator std::string() const;
 };
     } // NAMESPACE "hla"
    } // NAMESPACE "cpswt"
@@ -1628,9 +1631,26 @@ private:
  } // NAMESPACE "vanderbilt"
 } // NAMESPACE "edu"
 
-std::ostream &operator<<( std::ostream &os, const ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot &messaging );
-inline std::ostream &operator<<( std::ostream &os, ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot::SP messagingSP ) {
-    return os << *messagingSP;
+inline std::ostream &operator<<(
+  std::ostream &os, const ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot &messaging
+) {
+    return os << static_cast<std::string>(messaging);
+}
+inline std::ostream &operator<<(
+  std::ostream &os, ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot::SP messagingSP
+) {
+    return os << static_cast<std::string>(*messagingSP);
+}
+
+inline boost::log::formatting_ostream& operator<<(
+  boost::log::formatting_ostream& os, const ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot &messaging
+) {
+    return os << static_cast<std::string>(messaging);
+}
+inline boost::log::formatting_ostream &operator<<(
+  boost::log::formatting_ostream &os, ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot::SP messagingSP
+) {
+    return os << static_cast<std::string>(*messagingSP);
 }
 
 #endif // _INTERACTION_ROOT

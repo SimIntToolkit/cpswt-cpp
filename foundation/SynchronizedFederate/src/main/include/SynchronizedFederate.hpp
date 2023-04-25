@@ -632,7 +632,7 @@ private:
                 }
             }
 
-            return false;
+            return interactionRootSP1->getUniqueId() < interactionRootSP2->getUniqueId();
         }
     };
 
