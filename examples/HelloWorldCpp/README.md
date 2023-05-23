@@ -1,5 +1,7 @@
 ## To run the HelloWorld example:
 
+[Note: Steps below assume that you are already able to run HelloWorldJava from the cpswt-core repository]
+
 * Open a terminal and change directory to the HelloWorldCpp directory
 
 * For the first run only, enter the following command:
@@ -7,6 +9,7 @@
           gradle wrapper --gradle-version=7.4
 
 * To run the federation, enter the following command:
+
           ./gradlew :runFederation
 
 ### Explanation of HelloWorld example:
