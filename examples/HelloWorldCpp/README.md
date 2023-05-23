@@ -1,6 +1,7 @@
 ## To run the HelloWorld example:
 
-[Note: Steps below assume that you are already able to run HelloWorldJava from the cpswt-core repository]
+[Note: Steps below assume that you are already able to run [HelloWorldJava example](https://github.com/SimIntToolkit/cpswt-core/tree/develop/examples/HelloWorldJava)
+from the [cpswt-core](https://github.com/SimIntToolkit/cpswt-core) repository]
 
 * Open a terminal and change directory to the HelloWorldCpp directory
 
