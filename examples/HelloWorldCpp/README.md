@@ -1,5 +1,9 @@
 ## To run the HelloWorld example:
 
+[Note: Steps below assume that you have installed CPSWT on your computer as shown in
+[CPSWT Installation Instructions for HelloWorldJava example on Ubuntu 20.04 (Focal Fossa)](UbuntuFocalInstall/ubuntuFocalInstall.md) and
+[CPSWT Installation Instructions for HelloWorldCpp example on Ubuntu 20.04 (Focal Fossa)](UbuntuFocalInstall/ubuntuFocalInstall.md)]
+
 [Note: Steps below assume that you are already able to run [HelloWorldJava example](https://github.com/SimIntToolkit/cpswt-core/tree/develop/examples/HelloWorldJava)
 from the [cpswt-core](https://github.com/SimIntToolkit/cpswt-core) repository]
 
