@@ -84,7 +84,9 @@ bool LowPrio::static_init() {
 
     allClassAndPropertyNameSetSP->emplace(
         "InteractionRoot.C2WInteractionRoot", "federateSequence"
-    );// ADD THIS CLASS'S _allClassAndPropertyNameSet TO _classNameAllPropertyNameSetMap DEFINED
+    );
+
+    // ADD THIS CLASS'S _allClassAndPropertyNameSet TO _classNameAllPropertyNameSetMap DEFINED
     // IN InteractionRoot
     get_class_name_all_class_and_property_name_set_sp_map()[get_hla_class_name()] = allClassAndPropertyNameSetSP;
 

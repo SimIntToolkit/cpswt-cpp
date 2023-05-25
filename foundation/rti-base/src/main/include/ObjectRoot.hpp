@@ -245,15 +245,11 @@ public:
 
         void initHlaClassName() {
             ObjectRoot::SP objectRootSP = get_object( _objectHandle );
-            if (objectRootSP) {
-                const std::string &hlaClassName = objectRootSP->getInstanceHlaClassName();
-                if (!_hlaClassName.empty() && _hlaClassName != hlaClassName) {
-                    BOOST_LOG_SEV( get_logger(), warning ) << "HLA class name from object with object handle"
-                      << _objectHandle << "(\"" << hlaClassName << "\") not the same as that provided (\""
-                      << _hlaClassName << "\") -- Overriding provided";
-                }
-                _hlaClassName = hlaClassName;
+            if (!objectRootSP) {
+                return;
             }
+            const std::string &hlaClassName = objectRootSP->getInstanceHlaClassName();
+            _hlaClassName = hlaClassName;
         }
 
         void copyClassAndPropertyNameValueSPMap(const ClassAndPropertyNameValueSPMap &copyFrom) {
@@ -282,8 +278,8 @@ public:
          _objectHandle(objectHandle),
          _federateSequence("[]"),
          _time(-1) {
-            initHlaClassName();
             copyClassAndPropertyNameValueSPMap(classAndPropertyNameValueSPMap);
+            initHlaClassName();
         }
 
         ObjectReflector(
@@ -292,11 +288,15 @@ public:
          const ClassAndPropertyNameValueSPMap &classAndPropertyNameValueSPMap
         ) :
          _objectHandle(objectHandle),
-         _hlaClassName(hlaClassName),
          _federateSequence("[]"),
          _time(-1) {
-            initHlaClassName();
             copyClassAndPropertyNameValueSPMap(classAndPropertyNameValueSPMap);
+            initHlaClassName();
+            if (_hlaClassName.empty()) {
+                _hlaClassName = hlaClassName;
+                ObjectRoot::discover(_hlaClassName, _objectHandle);
+            }
+
         }
 
         ObjectReflector(
@@ -1407,12 +1407,27 @@ private:
     // METHODS THAT USE OBJECT-HANDLE INSTANCE MAP
     //--------------------------------------------
 public:
-    static SP discover( int class_handle, int object_handle ) {
-        SP objectRootSP = create_object( class_handle );
-        if (objectRootSP) {
-            set_object_handle(objectRootSP, object_handle);
+    static SP discover(const std::string &full_hla_class_name, int object_handle) {
+
+        ObjectHandleInstanceSPMap::iterator oimItr = get_object_handle_instance_sp_map().find(object_handle);
+
+        if (oimItr != get_object_handle_instance_sp_map().end()) {
+            return oimItr->second;
         }
+
+        SP objectRootSP = create_object( full_hla_class_name );
+
+        if (objectRootSP) {
+            objectRootSP->setObjectHandle( object_handle );
+            get_object_handle_instance_sp_map().insert(std::make_pair(object_handle, objectRootSP));
+        }
+
         return objectRootSP;
+    }
+
+    static SP discover( int class_handle, int object_handle ) {
+        IntegerStringMap::const_iterator ismCit = get_class_handle_name_map().find(class_handle);
+        return ismCit == get_class_handle_name_map().end() ? SP() : discover(ismCit->second, object_handle);
     }
 
     //------------------------------------------------
