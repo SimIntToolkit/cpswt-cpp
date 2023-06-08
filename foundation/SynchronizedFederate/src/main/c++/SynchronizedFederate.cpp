@@ -32,7 +32,6 @@
 
 
 #include <sys/types.h>
-#include <sys/stat.h>
 #include <fcntl.h>
 
 #include <stdlib.h>
@@ -167,7 +166,7 @@ void SynchronizedFederate::joinFederation() {
 
     initializeDynamicMessaging(_federationJsonFileName, _federateDynamicMessagingClassesJsonFileName);
 
-    ensureSimEndSubscription();
+    ensureSimEndPubsub();
 
     notifyFederationOfJoin();
 }
@@ -605,15 +604,11 @@ void SynchronizedFederate::run( void ) {
         advanceTimeRequest.getATRCallback().execute();
     }
 
-    noMoreATRs();
+//    noMoreATRs();
 
-    while( getNextInteraction() != 0 ); // EMPTY THE QUEUE
+//    while( getNextInteraction() != 0 ); // EMPTY THE QUEUE
 
-    // WAIT FOR SIMEND (?)
-    while( true ) {
-        timeRequest += _stepSize;
-        advanceTime( timeRequest );
-    }
+    exitGracefully();
 }
 
 void SynchronizedFederate::advanceTime( double time ) {

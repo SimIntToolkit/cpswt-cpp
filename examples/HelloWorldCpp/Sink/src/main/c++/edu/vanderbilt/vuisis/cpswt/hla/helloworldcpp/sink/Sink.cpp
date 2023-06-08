@@ -96,9 +96,11 @@ void Sink::execute() {
     //    updateAttributeValues(PingCounter_0, getCurrentTime() + getLookahead());
     // TODO update registered object instances
 
-    m_currentTime += 1;
-    SinkATRCallback advanceTimeRequest( *this );
-    putAdvanceTimeRequest( m_currentTime, advanceTimeRequest );
+    if (!exitCondition) {
+        m_currentTime += 1;
+        SinkATRCallback advanceTimeRequest( *this );
+        putAdvanceTimeRequest( m_currentTime, advanceTimeRequest );
+    }
 }
       } // NAMESPACE "sink"
      } // NAMESPACE "helloworldcpp"
