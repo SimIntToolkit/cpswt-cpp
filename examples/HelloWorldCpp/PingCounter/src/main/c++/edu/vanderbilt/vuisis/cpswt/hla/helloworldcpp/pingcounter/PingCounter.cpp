@@ -46,6 +46,11 @@ void PingCounter::handleObjectClass_ObjectRoot_PingCounter(ObjectRoot::SP object
     ::edu::vanderbilt::vuisis::cpswt::hla::ObjectRoot_p::PingCounter::SP pingCounter0SP =
         boost::dynamic_pointer_cast<::edu::vanderbilt::vuisis::cpswt::hla::ObjectRoot_p::PingCounter>( objectRootSP );
 
+    static int counter = 0;
+    if (++counter >= 5) {
+        exitCondition = true;
+        setStatus(1);
+    }
 
     std::cout << "PingCounter: ping count is now " << pingCounter0SP->get_pingCount() << std::endl;
 }
@@ -86,9 +91,11 @@ void PingCounter::execute() {
     checkReceivedSubscriptions();
     // TODO update registered object instances
 
-    m_currentTime += 1;
-    PingCounterATRCallback advanceTimeRequest( *this );
-    putAdvanceTimeRequest( m_currentTime, advanceTimeRequest );
+    if (!exitCondition) {
+        m_currentTime += 1;
+        PingCounterATRCallback advanceTimeRequest( *this );
+        putAdvanceTimeRequest( m_currentTime, advanceTimeRequest );
+    }
 }
       } // NAMESPACE "pingcounter"
      } // NAMESPACE "helloworldcpp"

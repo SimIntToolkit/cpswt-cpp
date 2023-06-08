@@ -69,7 +69,9 @@ bool PingCounter::static_init() {
 
     allClassAndPropertyNameSetSP->emplace(
         "ObjectRoot.PingCounter", "pingCount"
-    );// ADD THIS CLASS'S _allClassAndPropertyNameSet TO _classNameAllPropertyNameSetMap DEFINED
+    );
+
+    // ADD THIS CLASS'S _allClassAndPropertyNameSet TO _classNameAllPropertyNameSetMap DEFINED
     // IN ObjectRoot
     get_class_name_all_class_and_property_name_set_sp_map()[get_hla_class_name()] = allClassAndPropertyNameSetSP;
 
