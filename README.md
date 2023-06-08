@@ -1,6 +1,6 @@
 # CPSWT C++ Integration
 
-Integrates support for C++ federates into the Cyber-Physical Systems WindTunnel.
+Integrates support for C++ federates into the Cyber-Physical Systems Wind Tunnel.
 
 Any C++-based federate will use the classes in this repository in order to execute.
 
