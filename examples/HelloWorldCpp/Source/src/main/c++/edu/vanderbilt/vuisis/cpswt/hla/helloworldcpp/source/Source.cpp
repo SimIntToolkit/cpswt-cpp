@@ -64,9 +64,11 @@ void Source::execute() {
     Ping0.set_federateFilter( "" );
     sendInteraction(Ping0, m_currentTime + getLookahead());
 
-    m_currentTime += 1;
-    SourceATRCallback advanceTimeRequest( *this );
-    putAdvanceTimeRequest( m_currentTime, advanceTimeRequest );
+    if (!exitCondition) {
+        m_currentTime += 1;
+        SourceATRCallback advanceTimeRequest( *this );
+        putAdvanceTimeRequest( m_currentTime, advanceTimeRequest );
+    }
 }
       } // NAMESPACE "source"
      } // NAMESPACE "helloworldcpp"

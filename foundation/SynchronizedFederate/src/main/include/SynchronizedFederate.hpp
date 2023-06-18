@@ -36,10 +36,12 @@
 #endif
 
 #include <fstream>
+#include <sys/stat.h>
 #include <string>
 #include <set>
 #include <map>
 #include <algorithm>
+#include <cstdlib>
 
 #include <iostream>
 
@@ -116,7 +118,20 @@ public:
 protected:
     RTI::RTIambassador *_rti;
 
+    bool exitCondition;
+
+    void setStatus(int status) {
+        _status = status;
+    }
+
+    int getStatus() {
+        return _status;
+    }
+
 private:
+
+    int _status;
+
     std::string _federationId;
 //    std::string _lockFileName;
 
@@ -135,7 +150,7 @@ private:
     bool _timeConstrainedNotEnabled;
     bool _timeRegulationNotEnabled;
     bool _timeAdvanceNotGranted;
-    bool _simEndNotSubscribed;
+    bool _simEndNotPubsub;
 
     double _lookahead;
     double _stepSize;
@@ -230,6 +245,9 @@ private:
 
 public:
     SynchronizedFederate( void ) :
+      exitCondition(false),
+      _status(0),
+
       _federateId( "" ),
       _federateType(""),
       _federationId( "" ),
@@ -238,7 +256,7 @@ public:
 
       _timeConstrainedNotEnabled( true ),
       _timeRegulationNotEnabled( true ),
-      _simEndNotSubscribed( true ),
+      _simEndNotPubsub( true ),
 
       _currentTime( 0 ),
       _lookahead( 0 )
@@ -253,7 +271,7 @@ public:
          _timeAdvanceMode = SF_TIME_ADVANCE_REQUEST;
     }
 
-    SynchronizedFederate( FederateConfig *fedconfig) {
+    SynchronizedFederate( FederateConfig *fedconfig) : exitCondition(false), _status(0) {
         this->_federationId = fedconfig->federationId;
         this->_federateType = fedconfig->federateType;
         this->_federateId = fedconfig->federateType + std::to_string(rand());
@@ -265,7 +283,7 @@ public:
 
         this->_timeConstrainedNotEnabled = true;
         this->_timeRegulationNotEnabled = true;
-        this->_simEndNotSubscribed = true;
+        this->_simEndNotPubsub = true;
 
         setLookahead(fedconfig->lookahead);
         setStepSize(fedconfig->stepSize);
@@ -316,11 +334,12 @@ public:
     void notifyFederationOfJoin();
     void notifyFederationOfResign();
 
-    void ensureSimEndSubscription( void ) {
-        if ( _simEndNotSubscribed ) {
+    void ensureSimEndPubsub( void ) {
+        if ( _simEndNotPubsub ) {
             // Auto-subscribing also ensures that there is no filter set for SimEnd
             SimEnd::subscribe_interaction( getRTI() );
-            _simEndNotSubscribed = false;
+            SimEnd::publish_interaction( getRTI() );
+            _simEndNotPubsub = false;
         }
     }
 
@@ -708,6 +727,10 @@ public:
             double assumedTimestamp = std::max(getLBTS(), getCurrentTime());
 
             InteractionRoot::SP interactionRootSP = InteractionRoot::create_interaction(theInteraction, theParameters);
+            if (interactionRootSP->isInstanceOfHlaClass(SimEnd::get_hla_class_name())) {
+                exitImmediately();
+            }
+
             receiveInteractionAux(interactionRootSP, assumedTimestamp);
         }
     }
@@ -843,16 +866,37 @@ public:
 //        double ltime = rtitime.getTime();
     }
 
+    void notifyFederationOfSimEnd() {
+        SimEnd simEnd;
+
+        sendInteraction(simEnd);
+    }
+
+    void writeStatus() {
+        mkdir("StatusDirectory", 0755);
+        std::ofstream outputFileStream("StatusDirectory/exitStatus");
+        outputFileStream << getStatus() << std::endl;
+        outputFileStream.close();
+    }
+
     void exitGracefully() {
-        notifyFederationOfResign();
 
+        notifyFederationOfSimEnd();
+
+        writeStatus();
+
+        // SLEEP 3 SECONDS TO ALLOW SimEnd TO BE SENT
 #ifdef _WIN32
-        Sleep( 5000 );
+        Sleep( 3000 );
 #else
-        usleep( 5000000 );
+        usleep( 3000000 );
 #endif
+    }
 
-        resignFederationExecution();
+    void exitImmediately() {
+        writeStatus();
+
+        exit(0);
     }
 };
 
