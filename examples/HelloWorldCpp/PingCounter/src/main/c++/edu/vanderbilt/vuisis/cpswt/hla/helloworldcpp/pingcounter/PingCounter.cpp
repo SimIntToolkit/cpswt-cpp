@@ -49,7 +49,6 @@ void PingCounter::handleObjectClass_ObjectRoot_PingCounter(ObjectRoot::SP object
     static int counter = 0;
     if (++counter >= 5) {
         exitCondition = true;
-        setStatus(1);
     }
 
     std::cout << "PingCounter: ping count is now " << pingCounter0SP->get_pingCount() << std::endl;

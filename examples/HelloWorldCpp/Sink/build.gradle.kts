@@ -28,6 +28,10 @@
  * OR MODIFICATIONS.
  */
 
+import java.io.PrintWriter
+import java.nio.file.Files
+
+
 plugins {
     `cpp-application`
 //    `maven-publish`
@@ -104,7 +108,8 @@ tasks.withType(LinkExecutable::class.java).configureEach {
     val linkDirectoryList = listOf(
         "$projectDir/lib",
         "$rtiHome/lib/gcc4",
-        "$javaHome/jre/lib/amd64/server"
+        "$javaHome/jre/lib/amd64/server",
+        "$javaHome/lib/server"
     )
 
     val rpathDirectoryList = linkDirectoryList + listOf("/lib", ".")
@@ -143,8 +148,6 @@ tasks.withType(LinkExecutable::class.java).configureEach {
             listOf("-Wl,--whole-archive") + linkWholeLibraryOptionList + listOf("-Wl,--no-whole-archive") +
             linkLibraryOptionList
 
-    println(gccCompleteLinkerOptionList)
-
     linkerArgs.addAll(toolChain.map { toolChain ->
         when(toolChain) {
             is Gcc, is Clang -> gccCompleteLinkerOptionList
@@ -155,7 +158,7 @@ tasks.withType(LinkExecutable::class.java).configureEach {
 
 tasks.register<Exec>("run") {
     val installDebugTask = tasks.withType(InstallExecutable::class.java).filter {
-        it.name.toLowerCase().contains("debug")
+        it.name.lowercase().contains("debug")
     }.get(0)
 
     val installDirectory = File(installDebugTask.installDirectory.get().asFile, "lib").absolutePath
@@ -170,41 +173,92 @@ tasks.register<Exec>("run") {
     commandLine = listOf(executableFileString, "--configFile", "conf/Sink.json")
 }
 
-var spawnedProcess: Process? = null
+fun getCommandList(): List<String> {
+    val runTask = tasks.named<Exec>("run").get()
 
-fun spawnProcess() {
-    val installDebugTask = tasks.withType(InstallExecutable::class.java).filter {
-        it.name.toLowerCase().contains("debug")
-    }.get(0)
+    val commandList = runTask.commandLine
 
-    val executableFileString = installDebugTask.installedExecutable.get().asFile.absolutePath
-    val workingDir = project.projectDir
-    val installDirectory = File(installDebugTask.installDirectory.get().asFile, "lib").absolutePath
+    return commandList
+}
 
-    val commandList: List<String> = listOf(executableFileString, "--configFile", "conf/Sink.json")
-
-    val libraryPathList = listOf("$javaHome/jre/lib/amd64/server", installDirectory)
-    println(libraryPathList)
+fun getXTermCommandList(): List<String> {
+    val commandList = getCommandList()
 
     val xtermCommandList = listOf(
-        "xterm", "-geometry", "220x80", "-fg", "black", "-bg", "white", "-e", commandList.joinToString(" ")
+            "xterm", "-geometry", "220x80", "-fg", "black", "-bg", "white", "-e", commandList.joinToString(" ")
     )
 
-    val processBuilder = ProcessBuilder(xtermCommandList)
-    processBuilder.directory(workingDir)
+    return xtermCommandList
+}
+
+var spawnedProcess: Process? = null
+
+fun configureProcessBuilder(processBuilder: ProcessBuilder) {
+    processBuilder.directory(projectDir)
+
+    val installDebugTask = tasks.withType(InstallExecutable::class.java).filter {
+        it.name.lowercase().contains("debug")
+    }.get(0)
+
+    val installDirectory = File(installDebugTask.installDirectory.get().asFile, "lib").absolutePath
+
+    val libraryPathList = listOf("$javaHome/jre/lib/amd64/server", "$javaHome/lib/server", installDirectory)
 
     val environment = processBuilder.environment()
-    environment.put(
-        "LD_LIBRARY_PATH", libraryPathList.joinToString(":")
-    )
+    environment.put("LD_LIBRARY_PATH", libraryPathList.joinToString(":"))
+}
+
+fun spawnProcess() {
+    val xtermCommandList = getXTermCommandList()
+
+    val processBuilder = ProcessBuilder(xtermCommandList)
+    configureProcessBuilder(processBuilder)
 
     spawnedProcess = processBuilder.start()
+}
+
+fun spawnProcessBatch() {
+    val commandList = getCommandList()
+
+    val processBuilder = ProcessBuilder(commandList)
+    configureProcessBuilder(processBuilder)
+
+    val statusDirectory = File(projectDir, "StatusDirectory")
+    if (!statusDirectory.exists()) {
+        Files.createDirectory(statusDirectory.toPath());
+    }
+    val stdoutFile = File(statusDirectory, "stdout")
+    val stderrFile = File(statusDirectory, "stderr")
+
+    processBuilder.redirectOutput(stdoutFile)
+    processBuilder.redirectError(stderrFile)
+
+    spawnedProcess = processBuilder.start()
+
+    val pid = spawnedProcess?.pid()
+
+    PrintWriter(File(statusDirectory, "pid")).use {
+        it.println(pid)
+    }
 }
 
 tasks.register("runAsynchronous") {
     dependsOn("assemble")
     doLast {
         spawnProcess()
+    }
+}
+
+val runAsynchronousBatch = tasks.register("runAsynchronousBatch") {
+    dependsOn("assemble")
+    doLast {
+        spawnProcessBatch()
+    }
+}
+
+tasks.register("waitForFederate") {
+    doLast {
+        spawnedProcess?.waitFor()
     }
 }
 
