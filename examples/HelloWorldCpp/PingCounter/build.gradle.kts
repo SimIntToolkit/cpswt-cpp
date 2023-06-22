@@ -162,7 +162,7 @@ tasks.register<Exec>("run") {
     }.get(0)
 
     val installDirectory = File(installDebugTask.installDirectory.get().asFile, "lib").absolutePath
-    val libraryPathList = listOf("$javaHome/jre/lib/amd64/server", installDirectory)
+    val libraryPathList = listOf("$javaHome/jre/lib/amd64/server", "$javaHome/lib/server", installDirectory)
     environment.put(
         "LD_LIBRARY_PATH", libraryPathList.joinToString(":")
     )
