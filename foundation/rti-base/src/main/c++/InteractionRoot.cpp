@@ -339,7 +339,6 @@ void InteractionRoot::unsubscribe_interaction(const std::string &hlaClassName, R
 }
 
 void InteractionRoot::initializeProperties(const std::string &hlaClassName) {
-    federateAppendedToFederateSequence = false;
     setInstanceHlaClassName(hlaClassName);
     if (get_class_name_handle_map().find(hlaClassName) == get_class_name_handle_map().end()) {
         BOOST_LOG_SEV(get_logger(), error)

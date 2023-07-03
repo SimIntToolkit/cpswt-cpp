@@ -217,7 +217,7 @@ protected:
     }
 
     // FOR INTERACTIONS DERIVED FROM InteractionRoot.C2WInteractionRoot
-    bool federateAppendedToFederateSequence;
+    bool federateAppendedToFederateSequence = false;
 
 public:
     void setFederateAppendedToFederateSequence(bool value) {
