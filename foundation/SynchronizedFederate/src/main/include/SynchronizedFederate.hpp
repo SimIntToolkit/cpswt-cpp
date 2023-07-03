@@ -349,6 +349,8 @@ public:
     void sendInteraction(InteractionRoot &interactionRoot, const StringSet &federateNameSet, double time);
 
     void sendInteraction(InteractionRoot &interactionRoot, const std::string &federateName, double time) {
+        C2WInteractionRoot::update_federate_sequence(interactionRoot, getFederateType());
+
         std::set<std::string> stringSet;
         stringSet.emplace(federateName);
         sendInteraction(interactionRoot, stringSet, time);
@@ -374,6 +376,8 @@ public:
     }
 
     void sendInteraction(InteractionRoot &interactionRoot, const std::string &federateName) {
+        C2WInteractionRoot::update_federate_sequence(interactionRoot, getFederateType());
+
         std::set<std::string> stringSet;
         stringSet.emplace(federateName);
         sendInteraction(interactionRoot, stringSet, -1);
