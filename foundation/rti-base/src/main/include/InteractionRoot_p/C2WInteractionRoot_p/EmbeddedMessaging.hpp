@@ -325,7 +325,7 @@ public:
      */
     std::string get_command() {
         ClassAndPropertyName key(get_hla_class_name(), "command");
-        return static_cast<std::string>(*_classAndPropertyNameValueSPMap[key]);
+        return _classAndPropertyNameValueSPMap[key]->asString();
     }
 
 
@@ -347,7 +347,7 @@ public:
      */
     std::string get_hlaClassName() {
         ClassAndPropertyName key(get_hla_class_name(), "hlaClassName");
-        return static_cast<std::string>(*_classAndPropertyNameValueSPMap[key]);
+        return _classAndPropertyNameValueSPMap[key]->asString();
     }
 
 
@@ -369,7 +369,7 @@ public:
      */
     std::string get_messagingJson() {
         ClassAndPropertyName key(get_hla_class_name(), "messagingJson");
-        return static_cast<std::string>(*_classAndPropertyNameValueSPMap[key]);
+        return _classAndPropertyNameValueSPMap[key]->asString();
     }
 
     //------------------------------------

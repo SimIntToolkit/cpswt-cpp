@@ -46,6 +46,9 @@ namespace logging = boost::log;
 namespace sinks = boost::log::sinks;
 
 class EmbeddedMessagingObjectTests: public CppUnit::TestCase {
+private:
+    void compareStringLists(const std::list<std::string> &list1, const std::list<std::string> &list2);
+    bool stringListsNotEqual(const std::list<std::string> &list1, const std::list<std::string> &list2);
 
 public:
     typedef sinks::synchronous_sink< sinks::text_ostream_backend > text_sink;

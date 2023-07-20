@@ -72,6 +72,8 @@ void Sender::execute() {
     TestObject_0.set_ShortValue(300);
     TestObject_0.set_LongValue(1000000000000000000L);
     TestObject_0.set_StringValue("Hello");
+    TestObject_0.set_StringListValue1(std::list<std::string>());
+    TestObject_0.set_StringListValue2(std::list<std::string> { "this", "that", "other" });
     updateAttributeValues(TestObject_0, 0.0);
 }
       } // NAMESPACE "sender"

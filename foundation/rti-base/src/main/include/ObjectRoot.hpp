@@ -2333,6 +2333,7 @@ private:
         typeInitialValueSPMap[ "long" ] = ValueSP( new Value(static_cast<long>(0)) );
         typeInitialValueSPMap[ "short" ] = ValueSP( new Value(static_cast<short>(0)) );
         typeInitialValueSPMap[ "String" ] = ValueSP( new Value(std::string("")) );
+        typeInitialValueSPMap[ "StringList" ] = ValueSP( new Value(std::list<std::string>()) );
 
         return typeInitialValueSPMap;
     }

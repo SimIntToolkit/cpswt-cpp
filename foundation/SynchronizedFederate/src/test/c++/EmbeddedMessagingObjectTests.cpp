@@ -15,6 +15,40 @@ typedef ::edu::vanderbilt::vuisis::cpswt::hla::embeddedmessagingobjecttestcpp::s
 typedef ::edu::vanderbilt::vuisis::cpswt::hla::embeddedmessagingobjecttestcpp::receiver::Receiver Receiver;
 
 
+void EmbeddedMessagingObjectTests::compareStringLists(
+  const std::list<std::string> &list1, const std::list<std::string> &list2
+) {
+
+    CPPUNIT_ASSERT_EQUAL(list1.size(), list2.size());
+    std::list<std::string>::const_iterator stlCit1 = list1.begin();
+    std::list<std::string>::const_iterator stlCit2 = list2.begin();
+    while(stlCit1 != list1.end()) {
+        CPPUNIT_ASSERT_EQUAL(*stlCit1, *stlCit2);
+        ++stlCit1;
+        ++stlCit2;
+    }
+}
+
+bool EmbeddedMessagingObjectTests::stringListsNotEqual(
+  const std::list<std::string> &list1, const std::list<std::string> &list2
+) {
+
+    if (list1.size() != list2.size()) {
+        return true;
+    }
+    std::list<std::string>::const_iterator stlCit1 = list1.begin();
+    std::list<std::string>::const_iterator stlCit2 = list2.begin();
+    while(stlCit1 != list1.end()) {
+        if (*stlCit1 != *stlCit2) {
+            return true;
+        }
+        ++stlCit1;
+        ++stlCit2;
+    }
+
+    return false;
+}
+
 void EmbeddedMessagingObjectTests::testObjectNetworkPropagation() {
 
     //
@@ -86,8 +120,8 @@ void EmbeddedMessagingObjectTests::testObjectNetworkPropagation() {
     CPPUNIT_ASSERT_EQUAL(senderTestObject.getObjectHandle(), updatedObjectData.getObjectHandle());
 
     // ReflectedAttributes SHOULD BE PRESENT IN THE UPDATED-OBJECT DATA, AND SHOULD ONLY
-    // CONTAIN DATA FOR 7 ATTRIBUTE -- THE NUMBER THAT ARE PUBLISHED.
-    CPPUNIT_ASSERT_EQUAL(8, static_cast<int>(updatedObjectData.getAttributeHandleValuePairSet().size()));
+    // CONTAIN DATA FOR 10 ATTRIBUTES -- THE NUMBER THAT ARE PUBLISHED.
+    CPPUNIT_ASSERT_EQUAL(10, static_cast<int>(updatedObjectData.getAttributeHandleValuePairSet().size()));
 
     // CREATE A LOCAL OBJECT INSTANCE FROM THE OBJECT-DATA THAT WAS SENT OUT FROM THE "updateAttributes"
     // CALL
@@ -112,6 +146,8 @@ void EmbeddedMessagingObjectTests::testObjectNetworkPropagation() {
     CPPUNIT_ASSERT_EQUAL(senderTestObject.get_IntValue(), localTestObject.get_IntValue());
     CPPUNIT_ASSERT_EQUAL(senderTestObject.get_LongValue(), localTestObject.get_LongValue());
     CPPUNIT_ASSERT_EQUAL(senderTestObject.get_ShortValue(), localTestObject.get_ShortValue());
+    compareStringLists(senderTestObject.get_StringListValue1(), localTestObject.get_StringListValue1());
+    compareStringLists(senderTestObject.get_StringListValue2(), localTestObject.get_StringListValue2());
 
     // THE ATTRIBUTES THAT ARE *NOT* PUBLISHED FOR THE REGISTERED OBJECT SHOULD *NOT* HAVE THE SAME VALUES
     // AS THE CORRESPONDING ATTRIBUTES IN THE LOCAL OBJECT
@@ -175,7 +211,7 @@ void EmbeddedMessagingObjectTests::testObjectNetworkPropagation() {
     Json::Value objectReflectorJsonPropertiesMap = objectReflectorJson["properties"];
 
     // THE messagingJson SHOULD BE FOR ALL OF THE PUBLISHED ATTRIBUTES
-    CPPUNIT_ASSERT_EQUAL(8, static_cast<int>(objectReflectorJsonPropertiesMap.size()));
+    CPPUNIT_ASSERT_EQUAL(10, static_cast<int>(objectReflectorJsonPropertiesMap.size()));
 
     // GET ClassAndPropertyNameValueMap FOR THE senderTestObject
     const ObjectRoot::ClassAndPropertyNameValueSPMap &senderClassAndPropertyNameValueSPMap =
@@ -186,23 +222,71 @@ void EmbeddedMessagingObjectTests::testObjectNetworkPropagation() {
             *TestObject::get_published_attribute_name_set_sp();
 
     // testObjectClassAndPropertyNameSet SHOULD HAVE 7 MEMBERS
-    CPPUNIT_ASSERT_EQUAL(8, static_cast<int>(testObjectPublishedAttributeSet.size()));
+    CPPUNIT_ASSERT_EQUAL(10, static_cast<int>(testObjectPublishedAttributeSet.size()));
 
     // MAKE SURE objectReflector HAS SAME JSON-ENCODED ATTRIBUTE VALUES AS VALUES OF ATTRIBUTES
     // FOR senderTestObject
     for(const ClassAndPropertyName &classAndPropertyName: testObjectPublishedAttributeSet) {
+
         const ObjectRoot::Value &value = *senderClassAndPropertyNameValueSPMap.find(classAndPropertyName)->second;
-        std::string valueString = value.getDataType() == ObjectRoot::Value::CHARACTER ?
-          boost::lexical_cast<std::string>(value.asInt()) : value.asString();
-        CPPUNIT_ASSERT_EQUAL(
-                valueString,
-                objectReflectorJsonPropertiesMap[static_cast<std::string>(classAndPropertyName)].asString()
-        );
+        const Json::Value jsonValue = objectReflectorJsonPropertiesMap[static_cast<std::string>(classAndPropertyName)];
+
+        switch(value.getDataType()) {
+            case TypeMedley::BOOLEAN: {
+                CPPUNIT_ASSERT_EQUAL(value.asBool(), jsonValue.asBool());
+                break;
+            }
+            case TypeMedley::CHARACTER: {
+                int intValue = 0;
+                if (jsonValue.isString()) {
+                    std::string stringValue = jsonValue.asString();
+                    intValue = stringValue.size() > 0 ? stringValue[0] : 0;
+                } else {
+                    intValue = jsonValue.isNumeric() ? value.asInt() : 0;
+                }
+                char jsonCharValue = static_cast<char>(intValue);
+                CPPUNIT_ASSERT_EQUAL(value.asChar(), jsonCharValue);
+                break;
+            }
+            case TypeMedley::SHORT: {
+                short jsonShortValue = static_cast<short>(jsonValue.asInt());
+                CPPUNIT_ASSERT_EQUAL(value.asShort(), jsonShortValue);
+                break;
+            }
+            case TypeMedley::INTEGER: {
+                CPPUNIT_ASSERT_EQUAL(value.asInt(), jsonValue.asInt());
+                break;
+            }
+            case TypeMedley::LONG: {
+                long jsonLongValue = static_cast<long>(jsonValue.asInt64());
+                CPPUNIT_ASSERT_EQUAL(value.asLong(), jsonLongValue);
+                break;
+            }
+            case TypeMedley::FLOAT: {
+                CPPUNIT_ASSERT_EQUAL(value.asFloat(), jsonValue.asFloat());
+                break;
+            }
+            case TypeMedley::DOUBLE: {
+                CPPUNIT_ASSERT_EQUAL(value.asDouble(), jsonValue.asDouble());
+                break;
+            }
+            case TypeMedley::STRING: {
+                CPPUNIT_ASSERT_EQUAL(value.asString(), jsonValue.asString());
+                break;
+            }
+            case TypeMedley::STRINGLIST: {
+                std::list<std::string> jsonStringListValue;
+                for(auto item: jsonValue) {
+                    jsonStringListValue.push_back(item.asString());
+                }
+                compareStringLists(value.asStringList(), jsonStringListValue);
+                break;
+            }
+        }
     }
 
     // CLEAR OBJECTS IN ObjectRoot._objectHandleInstanceMap, SINCE THE Receiver FEDERATE ALSO USES IT.
     sender.unregisterObject(senderTestObject);
-
 
     // CLEAR THE AMBASSADOR PROXY FOR THE Receiver FEDERATE
     RTIAmbassadorTest2::clear();
@@ -221,7 +305,7 @@ void EmbeddedMessagingObjectTests::testObjectNetworkPropagation() {
     receiver.putAdvanceTimeRequest(0, advanceTimeRequest);
 
     ObjectRoot::AttributeHandleSet &attributeHandleSet = *TestObject::get_subscribed_attribute_handle_set_sp();
-    CPPUNIT_ASSERT_EQUAL(4, static_cast<int>(attributeHandleSet.size()));
+    CPPUNIT_ASSERT_EQUAL(5, static_cast<int>(attributeHandleSet.size()));
 
     ObjectRoot::PropertyHandleValuePairSetSP subscribedAttributeHandleValuePairSetSP(
       RTI::AttributeSetFactory::create( attributeHandleSet.size() )
@@ -271,11 +355,15 @@ void EmbeddedMessagingObjectTests::testObjectNetworkPropagation() {
     CPPUNIT_ASSERT_EQUAL(receivedTestObject.get_BooleanValue2(), localTestObject.get_BooleanValue2());
     CPPUNIT_ASSERT_EQUAL(receivedTestObject.get_ByteValue(), localTestObject.get_ByteValue());
     CPPUNIT_ASSERT_EQUAL(receivedTestObject.get_CharValue(), localTestObject.get_CharValue());
+    compareStringLists(receivedTestObject.get_StringListValue1(), localTestObject.get_StringListValue1());
 
     // THESE ARE UPDATED THROUGH THE NETWORK, SO NOT RECEIVED YET
     CPPUNIT_ASSERT(receivedTestObject.get_IntValue() != localTestObject.get_IntValue());
     CPPUNIT_ASSERT(receivedTestObject.get_LongValue() != localTestObject.get_LongValue());
     CPPUNIT_ASSERT(receivedTestObject.get_ShortValue() != localTestObject.get_ShortValue());
+    CPPUNIT_ASSERT(stringListsNotEqual(
+      receivedTestObject.get_StringListValue2(), localTestObject.get_StringListValue2()
+    ));
 
     // SEND THE RECEIVER THE EmbeddedMessaging.Receiver INTERACTION THAT CONTAINS THE ATTRIBUTES UPDATE
     // FOR THE DISCOVERED OBJECT
@@ -300,6 +388,7 @@ void EmbeddedMessagingObjectTests::testObjectNetworkPropagation() {
     CPPUNIT_ASSERT(fabs(receivedTestObject.get_FloatValue() - localTestObject.get_FloatValue()) > 0.001);
     // NOT PUBLISHED BY Sender, SO BOTH HAVE DEFAULT VALUE
     CPPUNIT_ASSERT_EQUAL(receivedTestObject.get_StringValue(), localTestObject.get_StringValue());
+    compareStringLists(receivedTestObject.get_StringListValue1(), localTestObject.get_StringListValue1());
 
     // BOTH PUBLISHED BY SENDER AND SUBSCRIBED BY RECEIVER
     CPPUNIT_ASSERT_EQUAL(receivedTestObject.get_BooleanValue2(), localTestObject.get_BooleanValue2());
@@ -308,6 +397,7 @@ void EmbeddedMessagingObjectTests::testObjectNetworkPropagation() {
     CPPUNIT_ASSERT_EQUAL(receivedTestObject.get_IntValue(), localTestObject.get_IntValue());
     CPPUNIT_ASSERT_EQUAL(receivedTestObject.get_LongValue(), localTestObject.get_LongValue());
     CPPUNIT_ASSERT_EQUAL(receivedTestObject.get_ShortValue(), localTestObject.get_ShortValue());
+    compareStringLists(receivedTestObject.get_StringListValue2(), localTestObject.get_StringListValue2());
 }
 
 CPPUNIT_TEST_SUITE_REGISTRATION( EmbeddedMessagingObjectTests );

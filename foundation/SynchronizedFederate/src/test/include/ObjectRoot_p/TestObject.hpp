@@ -365,7 +365,7 @@ public:
      */
     bool get_BooleanValue1() {
         ClassAndPropertyName key(get_hla_class_name(), "BooleanValue1");
-        return static_cast<bool>(*_classAndPropertyNameValueSPMap[key]);
+        return _classAndPropertyNameValueSPMap[key]->asBool();
     }
 
     /**
@@ -398,7 +398,7 @@ public:
      */
     bool get_BooleanValue2() {
         ClassAndPropertyName key(get_hla_class_name(), "BooleanValue2");
-        return static_cast<bool>(*_classAndPropertyNameValueSPMap[key]);
+        return _classAndPropertyNameValueSPMap[key]->asBool();
     }
 
     /**
@@ -431,7 +431,7 @@ public:
      */
     char get_ByteValue() {
         ClassAndPropertyName key(get_hla_class_name(), "ByteValue");
-        return static_cast<char>(*_classAndPropertyNameValueSPMap[key]);
+        return _classAndPropertyNameValueSPMap[key]->asChar();
     }
 
     /**
@@ -464,7 +464,7 @@ public:
      */
     char get_CharValue() {
         ClassAndPropertyName key(get_hla_class_name(), "CharValue");
-        return static_cast<char>(*_classAndPropertyNameValueSPMap[key]);
+        return _classAndPropertyNameValueSPMap[key]->asChar();
     }
 
     /**
@@ -497,7 +497,7 @@ public:
      */
     double get_DoubleValue() {
         ClassAndPropertyName key(get_hla_class_name(), "DoubleValue");
-        return static_cast<double>(*_classAndPropertyNameValueSPMap[key]);
+        return _classAndPropertyNameValueSPMap[key]->asDouble();
     }
 
     /**
@@ -530,7 +530,7 @@ public:
      */
     float get_FloatValue() {
         ClassAndPropertyName key(get_hla_class_name(), "FloatValue");
-        return static_cast<float>(*_classAndPropertyNameValueSPMap[key]);
+        return _classAndPropertyNameValueSPMap[key]->asFloat();
     }
 
     /**
@@ -563,7 +563,7 @@ public:
      */
     int get_IntValue() {
         ClassAndPropertyName key(get_hla_class_name(), "IntValue");
-        return static_cast<int>(*_classAndPropertyNameValueSPMap[key]);
+        return _classAndPropertyNameValueSPMap[key]->asInt();
     }
 
     /**
@@ -596,7 +596,7 @@ public:
      */
     long get_LongValue() {
         ClassAndPropertyName key(get_hla_class_name(), "LongValue");
-        return static_cast<long>(*_classAndPropertyNameValueSPMap[key]);
+        return _classAndPropertyNameValueSPMap[key]->asLong();
     }
 
     /**
@@ -629,7 +629,7 @@ public:
      */
     short get_ShortValue() {
         ClassAndPropertyName key(get_hla_class_name(), "ShortValue");
-        return static_cast<short>(*_classAndPropertyNameValueSPMap[key]);
+        return _classAndPropertyNameValueSPMap[key]->asShort();
     }
 
     /**
@@ -639,6 +639,72 @@ public:
      */
     double get_ShortValue_time() {
         ClassAndPropertyName key(get_hla_class_name(), "ShortValue");
+        return _classAndPropertyNameValueSPMap[key]->getTime();
+    }
+
+
+    /**
+     * Set the value of the "StringListValue1" parameter to "value" for this parameter.
+     *
+     * @param value the new value for the "StringListValue1" parameter
+     */
+    void set_StringListValue1(const std::list<std::string> & newValue) {
+        ClassAndPropertyName key(get_hla_class_name(), "StringListValue1");
+        Value &value(*_classAndPropertyNameValueSPMap[key]);
+        value.setValue(newValue);
+        value.setTime(getTime());
+    }
+
+    /**
+     * Returns the value of the "StringListValue1" parameter of this interaction.
+     *
+     * @return the value of the "StringListValue1" parameter
+     */
+    std::list<std::string> get_StringListValue1() {
+        ClassAndPropertyName key(get_hla_class_name(), "StringListValue1");
+        return _classAndPropertyNameValueSPMap[key]->asStringList();
+    }
+
+    /**
+     * Returns the current timestamp of the "StringListValue1" attribute of this object.
+     *
+     * @return the current timestamp of the "StringListValue1" attribute
+     */
+    double get_StringListValue1_time() {
+        ClassAndPropertyName key(get_hla_class_name(), "StringListValue1");
+        return _classAndPropertyNameValueSPMap[key]->getTime();
+    }
+
+
+    /**
+     * Set the value of the "StringListValue2" parameter to "value" for this parameter.
+     *
+     * @param value the new value for the "StringListValue2" parameter
+     */
+    void set_StringListValue2(const std::list<std::string> & newValue) {
+        ClassAndPropertyName key(get_hla_class_name(), "StringListValue2");
+        Value &value(*_classAndPropertyNameValueSPMap[key]);
+        value.setValue(newValue);
+        value.setTime(getTime());
+    }
+
+    /**
+     * Returns the value of the "StringListValue2" parameter of this interaction.
+     *
+     * @return the value of the "StringListValue2" parameter
+     */
+    std::list<std::string> get_StringListValue2() {
+        ClassAndPropertyName key(get_hla_class_name(), "StringListValue2");
+        return _classAndPropertyNameValueSPMap[key]->asStringList();
+    }
+
+    /**
+     * Returns the current timestamp of the "StringListValue2" attribute of this object.
+     *
+     * @return the current timestamp of the "StringListValue2" attribute
+     */
+    double get_StringListValue2_time() {
+        ClassAndPropertyName key(get_hla_class_name(), "StringListValue2");
         return _classAndPropertyNameValueSPMap[key]->getTime();
     }
 
@@ -662,7 +728,7 @@ public:
      */
     std::string get_StringValue() {
         ClassAndPropertyName key(get_hla_class_name(), "StringValue");
-        return static_cast<std::string>(*_classAndPropertyNameValueSPMap[key]);
+        return _classAndPropertyNameValueSPMap[key]->asString();
     }
 
     /**
@@ -1456,6 +1522,150 @@ public:
     */
     static void soft_unsubscribe_ShortValue_attribute() {
         soft_unsubscribe_attribute(get_hla_class_name(), "ShortValue");
+    }
+
+    /**
+    * Publishes the "StringListValue1" attribute of the attribute's containing object
+    * class for a federate.
+    * Note:  This method only marks the "StringListValue1" attribute for publication.
+    * To actually publish the attribute, the federate must (re)publish its containing
+    * object class.
+    * (using <objectClassName>.publish_object( RTIambassador *rti ) ).
+    */
+    static void publish_StringListValue1_attribute() {
+        publish_attribute( get_hla_class_name(), "StringListValue1" );
+    }
+
+    /**
+    * Unpublishes the "StringListValue1" attribute of the attribute's containing object
+    * class for a federate.
+    * Note:  This method only marks the "StringListValue1" attribute for unpublication.
+    * To actually publish the attribute, the federate must (re)publish its containing
+    * object class.
+    * (using <objectClassName>.publish_object( RTIambassador *rti ) ).
+    */
+    static void unpublish_StringListValue1_attribute() {
+        unpublish_attribute( get_hla_class_name(), "StringListValue1" );
+    }
+
+    /**
+    * Subscribes a federate to the "StringListValue1" attribute of the attribute's
+    * containing object class.
+    * Note:  This method only marks the "StringListValue1" attribute for subscription.
+    * To actually subscribe to the attribute, the federate must (re)subscribe to its
+    * containing object class.
+    * (using <objectClassName>.subscribe_object( RTIambassador *rti ) ).
+    */
+    static void subscribe_StringListValue1_attribute() {
+        subscribe_attribute( get_hla_class_name(), "StringListValue1" );
+    }
+
+    /**
+    * Unsubscribes a federate from the "StringListValue1" attribute of the attribute's
+    * containing object class.
+    * Note:  This method only marks the "StringListValue1" attribute for unsubscription.
+    * To actually unsubscribe to the attribute, the federate must (re)subscribe to its
+    * containing object class.
+    * (using <objectClassName>.subscribe_object( RTIambassador *rti ) ).
+    */
+    static void unsubscribe_StringListValue1_attribute() {
+        unsubscribe_attribute( get_hla_class_name(), "StringListValue1" );
+    }
+
+    /**
+    * Soft subscribes a federate to the "StringListValue1" attribute of the attribute's
+    * containing object class.
+    * Note:  This method only marks the "StringListValue1" attribute for soft subscription.
+    * To actually soft subscribe to the attribute, the federate must (re)subscribe to its
+    * containing object class.
+    * (using <objectClassName>.soft_subscribe_object( RTIambassador rti ) ).
+    */
+    static void soft_subscribe_StringListValue1_attribute() {
+        soft_subscribe_attribute(get_hla_class_name(), "StringListValue1");
+    }
+
+    /**
+    * Soft unsubscribes a federate from the "StringListValue1" attribute of the attribute's
+    * containing object class.
+    * Note:  This method only marks the "StringListValue1" attribute for soft unsubscription.
+    * To actually soft unsubscribe to the attribute, the federate must (re)subscribe to its
+    * containing object class.
+    * (using <objectClassName>.unsubscribe_object( RTIambassador rti ) ).
+    */
+    static void soft_unsubscribe_StringListValue1_attribute() {
+        soft_unsubscribe_attribute(get_hla_class_name(), "StringListValue1");
+    }
+
+    /**
+    * Publishes the "StringListValue2" attribute of the attribute's containing object
+    * class for a federate.
+    * Note:  This method only marks the "StringListValue2" attribute for publication.
+    * To actually publish the attribute, the federate must (re)publish its containing
+    * object class.
+    * (using <objectClassName>.publish_object( RTIambassador *rti ) ).
+    */
+    static void publish_StringListValue2_attribute() {
+        publish_attribute( get_hla_class_name(), "StringListValue2" );
+    }
+
+    /**
+    * Unpublishes the "StringListValue2" attribute of the attribute's containing object
+    * class for a federate.
+    * Note:  This method only marks the "StringListValue2" attribute for unpublication.
+    * To actually publish the attribute, the federate must (re)publish its containing
+    * object class.
+    * (using <objectClassName>.publish_object( RTIambassador *rti ) ).
+    */
+    static void unpublish_StringListValue2_attribute() {
+        unpublish_attribute( get_hla_class_name(), "StringListValue2" );
+    }
+
+    /**
+    * Subscribes a federate to the "StringListValue2" attribute of the attribute's
+    * containing object class.
+    * Note:  This method only marks the "StringListValue2" attribute for subscription.
+    * To actually subscribe to the attribute, the federate must (re)subscribe to its
+    * containing object class.
+    * (using <objectClassName>.subscribe_object( RTIambassador *rti ) ).
+    */
+    static void subscribe_StringListValue2_attribute() {
+        subscribe_attribute( get_hla_class_name(), "StringListValue2" );
+    }
+
+    /**
+    * Unsubscribes a federate from the "StringListValue2" attribute of the attribute's
+    * containing object class.
+    * Note:  This method only marks the "StringListValue2" attribute for unsubscription.
+    * To actually unsubscribe to the attribute, the federate must (re)subscribe to its
+    * containing object class.
+    * (using <objectClassName>.subscribe_object( RTIambassador *rti ) ).
+    */
+    static void unsubscribe_StringListValue2_attribute() {
+        unsubscribe_attribute( get_hla_class_name(), "StringListValue2" );
+    }
+
+    /**
+    * Soft subscribes a federate to the "StringListValue2" attribute of the attribute's
+    * containing object class.
+    * Note:  This method only marks the "StringListValue2" attribute for soft subscription.
+    * To actually soft subscribe to the attribute, the federate must (re)subscribe to its
+    * containing object class.
+    * (using <objectClassName>.soft_subscribe_object( RTIambassador rti ) ).
+    */
+    static void soft_subscribe_StringListValue2_attribute() {
+        soft_subscribe_attribute(get_hla_class_name(), "StringListValue2");
+    }
+
+    /**
+    * Soft unsubscribes a federate from the "StringListValue2" attribute of the attribute's
+    * containing object class.
+    * Note:  This method only marks the "StringListValue2" attribute for soft unsubscription.
+    * To actually soft unsubscribe to the attribute, the federate must (re)subscribe to its
+    * containing object class.
+    * (using <objectClassName>.unsubscribe_object( RTIambassador rti ) ).
+    */
+    static void soft_unsubscribe_StringListValue2_attribute() {
+        soft_unsubscribe_attribute(get_hla_class_name(), "StringListValue2");
     }
 
     /**

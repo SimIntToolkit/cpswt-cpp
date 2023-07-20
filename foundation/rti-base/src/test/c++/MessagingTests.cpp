@@ -34,11 +34,13 @@
 
 #include "InteractionRoot.hpp"
 #include "InteractionRoot_p/C2WInteractionRoot.hpp"
+#include "InteractionRoot_p/C2WInteractionRoot_p/StringListTestInteraction.hpp"
 #include "InteractionRoot_p/C2WInteractionRoot_p/SimLog.hpp"
 #include "InteractionRoot_p/C2WInteractionRoot_p/SimLog_p/HighPrio.hpp"
 #include "InteractionRoot_p/C2WInteractionRoot_p/SimulationControl.hpp"
 #include "InteractionRoot_p/C2WInteractionRoot_p/SimulationControl_p/SimEnd.hpp"
 #include "ObjectRoot.hpp"
+#include "ObjectRoot_p/StringListTestObject.hpp"
 #include "ObjectRoot_p/FederateObject.hpp"
 #include "ObjectRoot_p/BaseObjectClass.hpp"
 #include "ObjectRoot_p/BaseObjectClass_p/DerivedObjectClass.hpp"
@@ -61,7 +63,9 @@ using SimLog = ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInte
 using HighPrio = ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::SimLog_p::HighPrio;
 using SimulationControl = ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::SimulationControl;
 using SimEnd = ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::SimulationControl_p::SimEnd;
+using StringListTestInteraction = ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::StringListTestInteraction;
 using FederateObject = ::edu::vanderbilt::vuisis::cpswt::hla::ObjectRoot_p::FederateObject;
+using StringListTestObject = ::edu::vanderbilt::vuisis::cpswt::hla::ObjectRoot_p::StringListTestObject;
 using DerivedObjectClass = ::edu::vanderbilt::vuisis::cpswt::hla::ObjectRoot_p::BaseObjectClass_p::DerivedObjectClass;
 
 typedef std::set<std::string> StringSet;
@@ -69,6 +73,7 @@ typedef std::list<std::string> StringList;
 
 namespace expr = boost::log::expressions;
 namespace attrs = boost::log::attributes;
+
 
 MessagingTests::MessagingTests() : CppUnit::TestCase() {
     Initialization::init_1();
@@ -107,6 +112,18 @@ void MessagingTests::setUp() {
     RTIAmbassadorTest1::clearPubSub();
 }
 
+void MessagingTests::compareStringLists(const std::list<std::string> &list1, const std::list<std::string> &list2) {
+
+    CPPUNIT_ASSERT_EQUAL(list1.size(), list2.size());
+    std::list<std::string>::const_iterator stlCit1 = list1.begin();
+    std::list<std::string>::const_iterator stlCit2 = list2.begin();
+    while(stlCit1 != list1.end()) {
+        CPPUNIT_ASSERT_EQUAL(*stlCit1, *stlCit2);
+        ++stlCit1;
+        ++stlCit2;
+    }
+}
+
 void MessagingTests::interactionClassNamesTest() {
 
     std::cout << "START interactionClassNamesTest" << std::endl;
@@ -128,6 +145,7 @@ void MessagingTests::interactionClassNamesTest() {
     expectedInteractionClassNameSet.insert("InteractionRoot.C2WInteractionRoot.SimulationControl.SimEnd");
     expectedInteractionClassNameSet.insert("InteractionRoot.C2WInteractionRoot.SimulationControl.SimPause");
     expectedInteractionClassNameSet.insert("InteractionRoot.C2WInteractionRoot.SimulationControl.SimResume");
+    expectedInteractionClassNameSet.insert("InteractionRoot.C2WInteractionRoot.StringListTestInteraction");
     expectedInteractionClassNameSet.insert("InteractionRoot.TestBase");
     expectedInteractionClassNameSet.insert("InteractionRoot.TestBase.TestDerived");
 
@@ -146,6 +164,7 @@ void MessagingTests::objectClassNamesTest() {
     expectedObjectClassNameSet.insert("ObjectRoot.FederateObject");
     expectedObjectClassNameSet.insert("ObjectRoot.BaseObjectClass");
     expectedObjectClassNameSet.insert("ObjectRoot.BaseObjectClass.DerivedObjectClass");
+    expectedObjectClassNameSet.insert("ObjectRoot.StringListTestObject");
 
     const std::set<std::string> &actualObjectClassNameSet = ObjectRoot::get_object_hla_class_name_set();
     CPPUNIT_ASSERT(expectedObjectClassNameSet == actualObjectClassNameSet);
@@ -1055,5 +1074,54 @@ void MessagingTests::printInteractionTest() {
 
     std::cout << "END printInteractionTest" << std::endl;
 }
+
+void MessagingTests::stringListTest() {
+
+    std::cout << "START stringListTest" << std::endl;
+
+    InteractionRoot::SP stringListTestInteractionRootSP = InteractionRoot::create_interaction(
+      "InteractionRoot.C2WInteractionRoot.StringListTestInteraction"
+    );
+
+    std::list<std::string> emptyList;
+
+    std::list<std::string> stringListParameterGetParameterEmptyList =
+      stringListTestInteractionRootSP->getParameter("stringListParameter").asStringList();
+
+    compareStringLists(emptyList, stringListParameterGetParameterEmptyList);
+
+    StringListTestInteraction::SP stringListTestInteractionSP =
+      boost::dynamic_pointer_cast<StringListTestInteraction>(stringListTestInteractionRootSP);
+
+    std::list<std::string> stringListParameterGetParameterDirectEmptyList =
+      stringListTestInteractionSP->get_stringListParameter();
+
+    compareStringLists(emptyList, stringListParameterGetParameterDirectEmptyList);
+
+    std::list<std::string> thingList { "this", "that", "other" };
+    stringListTestInteractionRootSP->setParameter("stringListParameter", thingList);
+
+    std::list<std::string> stringListParameterGetParameterThingList =
+      stringListTestInteractionRootSP->getParameter("stringListParameter").asStringList();
+    compareStringLists(thingList, stringListParameterGetParameterThingList);
+
+    std::list<std::string> stringListParameterGetParameterDirectThingList =
+      stringListTestInteractionSP->get_stringListParameter();
+    compareStringLists(thingList, stringListParameterGetParameterDirectThingList);
+
+    std::list<std::string> stoogeList { "Moe", "Larry", "Curly" };
+    stringListTestInteractionSP->set_stringListParameter(stoogeList);
+
+    std::list<std::string> stringListParameterGetParameterStoogeList =
+      stringListTestInteractionRootSP->getParameter("stringListParameter").asStringList();
+    compareStringLists(stoogeList, stringListParameterGetParameterStoogeList);
+
+    std::list<std::string> stringListParameterGetParameterDirectStoogeList =
+      stringListTestInteractionSP->get_stringListParameter();
+    compareStringLists(stoogeList, stringListParameterGetParameterDirectStoogeList);
+
+    std::cout << "END stringListTest" << std::endl;
+}
+
 
 CPPUNIT_TEST_SUITE_REGISTRATION( MessagingTests );

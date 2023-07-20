@@ -325,7 +325,7 @@ public:
      */
     std::string get_Comment() {
         ClassAndPropertyName key(get_hla_class_name(), "Comment");
-        return static_cast<std::string>(*_classAndPropertyNameValueSPMap[key]);
+        return _classAndPropertyNameValueSPMap[key]->asString();
     }
 
 
@@ -347,7 +347,7 @@ public:
      */
     std::string get_FedName() {
         ClassAndPropertyName key(get_hla_class_name(), "FedName");
-        return static_cast<std::string>(*_classAndPropertyNameValueSPMap[key]);
+        return _classAndPropertyNameValueSPMap[key]->asString();
     }
 
 
@@ -369,7 +369,7 @@ public:
      */
     double get_Time() {
         ClassAndPropertyName key(get_hla_class_name(), "Time");
-        return static_cast<double>(*_classAndPropertyNameValueSPMap[key]);
+        return _classAndPropertyNameValueSPMap[key]->asDouble();
     }
 
     //------------------------------------

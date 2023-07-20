@@ -37,11 +37,14 @@
 #include <utility>
 #include <boost/algorithm/string.hpp>
 #include <boost/shared_ptr.hpp>
+#include <jsoncpp/json/json.h>
+#include <list>
 #include <map>
+
 
 class TypeMedley {
 public:
-    enum DataType { BOOLEAN, CHARACTER, SHORT, INTEGER, LONG, FLOAT, DOUBLE, STRING };
+    enum DataType { BOOLEAN, CHARACTER, SHORT, INTEGER, LONG, FLOAT, DOUBLE, STRING, STRINGLIST };
     typedef boost::shared_ptr<TypeMedley> SP;
 
 private:
@@ -75,6 +78,7 @@ private:
         enumToStringTypeMap[FLOAT] = "float";
         enumToStringTypeMap[DOUBLE] = "double";
         enumToStringTypeMap[STRING] = "std::string";
+        enumToStringTypeMap[STRINGLIST] = "std::list<std::string>";
 
         return enumToStringTypeMap;
     }
@@ -85,6 +89,39 @@ private:
         return enumToStringTypeMap;
     }
 
+    std::list<std::string> jsonToList() const {
+        std::list<std::string> stringList;
+
+        std::istringstream jsonInputStream(_value);
+
+        Json::Value topLevelJSONObject;
+        jsonInputStream >> topLevelJSONObject;
+
+        if (topLevelJSONObject.isArray()) {
+            for (auto item : topLevelJSONObject) {
+                stringList.push_back(item.asString());
+            }
+        } else {
+            stringList.push_back(asString());
+        }
+
+        return stringList;
+    }
+
+    std::string listToJson(const std::list<std::string> &stringList) const {
+        Json::Value topLevelJSONObject(Json::arrayValue);
+        for(const std::string &item : stringList) {
+            topLevelJSONObject.append(item);
+        }
+
+        Json::StreamWriterBuilder streamWriterBuilder;
+        streamWriterBuilder["commentStyle"] = "None";
+        streamWriterBuilder["indentation"] = "    ";
+        std::unique_ptr<Json::StreamWriter> streamWriterUPtr(streamWriterBuilder.newStreamWriter());
+        std::ostringstream stringOutputStream;
+        streamWriterUPtr->write(topLevelJSONObject, &stringOutputStream);
+        return stringOutputStream.str();
+    }
 
 protected:
     DataType _dataType;
@@ -114,6 +151,9 @@ public:
 
     explicit TypeMedley(std::string value):
       _dataType(STRING), _value(std::move(value)) { }
+
+    explicit TypeMedley(const std::list<std::string> &value):
+      _dataType(STRINGLIST), _value(listToJson(value)) { }
 
 public:
     DataType getDataType() const {
@@ -151,6 +191,46 @@ public:
             case STRING:
                 _value = boost::lexical_cast<std::string>(value);
                 break;
+            case STRINGLIST:
+                std::string stringValue = boost::lexical_cast<std::string>(value);
+                std::list<std::string> stringList;
+                stringList.push_back(stringValue);
+                _value = listToJson(stringList);
+                break;
+        }
+        return true;
+    }
+
+    // SPECIALIZATION FOR LIST OF STRINGS
+    bool setValue(const std::list<std::string> &value) {
+        switch(_dataType) {
+            case BOOLEAN:
+                _value = boost::lexical_cast<std::string>(static_cast<bool>(value.size()));
+                break;
+            case CHARACTER:
+                _value = boost::lexical_cast<std::string>(static_cast<short>(value.size()));
+                break;
+            case SHORT:
+                _value = boost::lexical_cast<std::string>(static_cast<short>(value.size()));
+                break;
+            case INTEGER:
+                _value = boost::lexical_cast<std::string>(static_cast<int>(value.size()));
+                break;
+            case LONG:
+                _value = boost::lexical_cast<std::string>(static_cast<long>(value.size()));
+                break;
+            case FLOAT:
+                _value = boost::lexical_cast<std::string>(static_cast<float>(value.size()));
+                break;
+            case DOUBLE:
+                _value = boost::lexical_cast<std::string>(static_cast<double>(value.size()));
+                break;
+            case STRING:
+                _value = boost::lexical_cast<std::string>(value.size() == 0 ? std::string("") : value.front());
+                break;
+            case STRINGLIST:
+                _value = listToJson(value);
+                break;
         }
         return true;
     }
@@ -184,6 +264,7 @@ public:
                 setValue( other.asDouble() );
                 break;
             case STRING:
+            case STRINGLIST:
                 setValue( other.asString() );
                 break;
         }
@@ -195,8 +276,38 @@ public:
         return setValue(std::string(cString));
     }
 
+private:
+
+    template<typename T>
+    T convertToType() const {
+        switch(_dataType) {
+            case STRINGLIST: {
+                return static_cast<T>(jsonToList().size());
+            }
+            case STRING: {
+                if (!hasDoubleFormat(_value)) {
+                    return static_cast<T>(_value.empty() ? 0 : _value[0]);
+                }
+            }
+            default: {
+                return static_cast<T>(boost::lexical_cast<double>(_value));
+            }
+        }
+    }
+
+public:
     bool asBool() const {
-        return _dataType == STRING ? string_to_bool(_value) : static_cast<bool>(boost::lexical_cast<double>(_value));
+        switch(_dataType) {
+            case STRINGLIST: {
+                return static_cast<bool>(jsonToList().size());
+            }
+            case STRING: {
+                return string_to_bool(_value);
+            }
+            default: {
+                return static_cast<bool>(boost::lexical_cast<double>(_value));
+            }
+        }
     }
 
     operator bool() const {
@@ -204,10 +315,7 @@ public:
     }
 
     char asChar() const {
-        if (_dataType == STRING && !hasDoubleFormat(_value)) {
-            return static_cast<char>(_value.empty());
-        }
-        return static_cast<char>(boost::lexical_cast<double>(_value));
+        return convertToType<char>();
     }
 
     operator char() const {
@@ -215,10 +323,7 @@ public:
     }
 
     short asShort() const {
-        if (_dataType == STRING && !hasDoubleFormat(_value)) {
-            return static_cast<short>(_value.empty());
-        }
-        return static_cast<short>(boost::lexical_cast<double>(_value));
+        return convertToType<short>();
     }
 
     operator short() const {
@@ -226,10 +331,7 @@ public:
     }
 
     int asInt() const {
-        if (_dataType == STRING && !hasDoubleFormat(_value)) {
-            return static_cast<int>(_value.empty());
-        }
-        return static_cast<int>(boost::lexical_cast<double>(_value));
+        return convertToType<int>();
     }
 
     operator int() const {
@@ -237,10 +339,7 @@ public:
     }
 
     long asLong() const {
-        if (_dataType == STRING && !hasDoubleFormat(_value)) {
-            return static_cast<long>(_value.empty());
-        }
-        return static_cast<long>(boost::lexical_cast<double>(_value));
+        return convertToType<long>();
     }
 
     operator long() const {
@@ -248,10 +347,7 @@ public:
     }
 
     float asFloat() const {
-        if (_dataType == STRING && !hasDoubleFormat(_value)) {
-            return static_cast<float>(_value.empty());
-        }
-        return static_cast<float>(boost::lexical_cast<double>(_value));
+        return convertToType<float>();
     }
 
     operator float() const {
@@ -259,10 +355,7 @@ public:
     }
 
     double asDouble() const {
-        if (_dataType == STRING && !hasDoubleFormat(_value)) {
-            return static_cast<double>(_value.empty());
-        }
-        return boost::lexical_cast<double>(_value);
+        return convertToType<double>();
     }
 
     operator double() const {
@@ -284,6 +377,14 @@ public:
 
     operator std::string() const {
         return asString();
+    }
+
+    std::list<std::string> asStringList() const {
+        return jsonToList();
+    }
+
+    operator std::list<std::string>() const {
+        return asStringList();
     }
 
     std::string getStringRepresentation() const {

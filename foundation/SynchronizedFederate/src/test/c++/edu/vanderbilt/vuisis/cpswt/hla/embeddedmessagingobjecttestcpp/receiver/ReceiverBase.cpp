@@ -58,6 +58,7 @@ void ReceiverBase::init() {
     ::edu::vanderbilt::vuisis::cpswt::hla::ObjectRoot_p::TestObject::soft_subscribe_attribute("ObjectRoot.TestObject", "IntValue");
     ::edu::vanderbilt::vuisis::cpswt::hla::ObjectRoot_p::TestObject::soft_subscribe_attribute("ObjectRoot.TestObject", "LongValue");
     ::edu::vanderbilt::vuisis::cpswt::hla::ObjectRoot_p::TestObject::soft_subscribe_attribute("ObjectRoot.TestObject", "ShortValue");
+    ::edu::vanderbilt::vuisis::cpswt::hla::ObjectRoot_p::TestObject::soft_subscribe_attribute("ObjectRoot.TestObject", "StringListValue2");
     ::edu::vanderbilt::vuisis::cpswt::hla::ObjectRoot_p::TestObject::soft_subscribe_attribute("ObjectRoot.TestObject", "StringValue");
     ::edu::vanderbilt::vuisis::cpswt::hla::ObjectRoot_p::TestObject::soft_subscribe_object(getRTI());
 
@@ -66,6 +67,7 @@ void ReceiverBase::init() {
     ::edu::vanderbilt::vuisis::cpswt::hla::ObjectRoot_p::TestObject::subscribe_attribute("ObjectRoot.TestObject", "ByteValue");
     ::edu::vanderbilt::vuisis::cpswt::hla::ObjectRoot_p::TestObject::subscribe_attribute("ObjectRoot.TestObject", "CharValue");
     ::edu::vanderbilt::vuisis::cpswt::hla::ObjectRoot_p::TestObject::subscribe_attribute("ObjectRoot.TestObject", "DoubleValue");
+    ::edu::vanderbilt::vuisis::cpswt::hla::ObjectRoot_p::TestObject::subscribe_attribute("ObjectRoot.TestObject", "StringListValue1");
 
     ::edu::vanderbilt::vuisis::cpswt::hla::ObjectRoot_p::TestObject::subscribe_object(getRTI());
 }

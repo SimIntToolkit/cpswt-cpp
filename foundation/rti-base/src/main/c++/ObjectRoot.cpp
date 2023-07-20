@@ -214,29 +214,37 @@ std::string ObjectRoot::ObjectReflector::toJson() const {
         const std::string key(cvmCit->first);
         TypeMedley &value = *cvmCit->second;
         switch(value.getDataType()) {
-            case(TypeMedley::BOOLEAN):
+            case TypeMedley::BOOLEAN:
                 propertyJSONObject[key] = static_cast<bool>(value);
                 break;
-            case(TypeMedley::CHARACTER):
+            case TypeMedley::CHARACTER:
                 propertyJSONObject[key] = static_cast<char>(value);
                 break;
-            case(TypeMedley::SHORT):
+            case TypeMedley::SHORT:
                 propertyJSONObject[key] = static_cast<short>(value);
                 break;
-            case(TypeMedley::INTEGER):
+            case TypeMedley::INTEGER:
                 propertyJSONObject[key] = static_cast<int>(value);
                 break;
-            case(TypeMedley::LONG):
+            case TypeMedley::LONG:
                 propertyJSONObject[key] = static_cast<Json::Value::Int64>(static_cast<long>(value));
                 break;
-            case(TypeMedley::FLOAT):
+            case TypeMedley::FLOAT:
                 propertyJSONObject[key] = static_cast<float>(value);
                 break;
-            case(TypeMedley::DOUBLE):
+            case TypeMedley::DOUBLE:
                 propertyJSONObject[key] = static_cast<double>(value);
                 break;
-            case(TypeMedley::STRING):
+            case TypeMedley::STRING:
                 propertyJSONObject[key] = static_cast<std::string>(value);
+                break;
+            case TypeMedley::STRINGLIST:
+                Json::Value jsonArray(Json::arrayValue);
+                const std::list<std::string> stringList(value.asStringList());
+                for(const std::string &item : stringList) {
+                    jsonArray.append(item);
+                }
+                propertyJSONObject[key] = jsonArray;
                 break;
         }
     }
@@ -724,6 +732,7 @@ void ObjectRoot::requestUpdate( RTI::RTIambassador *rti ) {
 }
 
 void ObjectRoot::initializeProperties(const std::string &hlaClassName) {
+
     setInstanceHlaClassName(hlaClassName);
     if (get_class_name_handle_map().find(hlaClassName) == get_class_name_handle_map().end()) {
         BOOST_LOG_SEV(get_logger(), error)
@@ -867,29 +876,37 @@ std::string ObjectRoot::toJson(bool force) {
         Attribute &value = *_classAndPropertyNameValueSPMap[classAndPropertyName];
         if (value.getShouldBeUpdated(force)) {
             switch(value.getDataType()) {
-                case(TypeMedley::BOOLEAN):
+                case TypeMedley::BOOLEAN:
                     propertyJSONObject[key] = static_cast<bool>(value);
                     break;
-                case(TypeMedley::CHARACTER):
+                case TypeMedley::CHARACTER:
                     propertyJSONObject[key] = static_cast<char>(value);
                     break;
-                case(TypeMedley::SHORT):
+                case TypeMedley::SHORT:
                     propertyJSONObject[key] = static_cast<short>(value);
                     break;
-                case(TypeMedley::INTEGER):
+                case TypeMedley::INTEGER:
                     propertyJSONObject[key] = static_cast<int>(value);
                     break;
-                case(TypeMedley::LONG):
+                case TypeMedley::LONG:
                     propertyJSONObject[key] = static_cast<Json::Value::Int64>(static_cast<long>(value));
                     break;
-                case(TypeMedley::FLOAT):
+                case TypeMedley::FLOAT:
                     propertyJSONObject[key] = static_cast<float>(value);
                     break;
-                case(TypeMedley::DOUBLE):
+                case TypeMedley::DOUBLE:
                     propertyJSONObject[key] = static_cast<double>(value);
                     break;
-                case(TypeMedley::STRING):
+                case TypeMedley::STRING:
                     propertyJSONObject[key] = static_cast<std::string>(value);
+                    break;
+                case TypeMedley::STRINGLIST:
+                    Json::Value jsonArray(Json::arrayValue);
+                    const std::list<std::string> stringList(value.asStringList());
+                    for(const std::string &item : stringList) {
+                        jsonArray.append(item);
+                    }
+                    propertyJSONObject[key] = jsonArray;
                     break;
             }
         }
@@ -942,7 +959,7 @@ ObjectRoot::ObjectReflector::SP ObjectRoot::fromJson(const std::string &jsonStri
 
         switch(classAndPropertyNameValueSPMap[classAndPropertyName]->getDataType()) {
             case TypeMedley::BOOLEAN:
-                (*classAndPropertyNameValueSPMap[classAndPropertyName]).setValue(
+                classAndPropertyNameValueSPMap[classAndPropertyName]->setValue(
                   propertyJSONObject[memberName].asBool()
                 );
                 break;
@@ -955,38 +972,46 @@ ObjectRoot::ObjectReflector::SP ObjectRoot::fromJson(const std::string &jsonStri
                 } else {
                     intValue = value.isNumeric() ? value.asInt() : 0;
                 }
-                (*classAndPropertyNameValueSPMap[classAndPropertyName]).setValue(static_cast<char>(intValue));
+                classAndPropertyNameValueSPMap[classAndPropertyName]->setValue(static_cast<char>(intValue));
                 break;
             }
             case TypeMedley::SHORT:
-                (*classAndPropertyNameValueSPMap[classAndPropertyName]).setValue(
+                classAndPropertyNameValueSPMap[classAndPropertyName]->setValue(
                   static_cast<short>(propertyJSONObject[memberName].asInt())
                 );
                 break;
             case TypeMedley::INTEGER:
-                (*classAndPropertyNameValueSPMap[classAndPropertyName]).setValue(
+                classAndPropertyNameValueSPMap[classAndPropertyName]->setValue(
                   propertyJSONObject[memberName].asInt()
                 );
                 break;
             case TypeMedley::LONG:
-                (*classAndPropertyNameValueSPMap[classAndPropertyName]).setValue(
+                classAndPropertyNameValueSPMap[classAndPropertyName]->setValue(
                   static_cast<long>(propertyJSONObject[memberName].asInt64())
                 );
                 break;
             case TypeMedley::FLOAT:
-                (*classAndPropertyNameValueSPMap[classAndPropertyName]).setValue(
+                classAndPropertyNameValueSPMap[classAndPropertyName]->setValue(
                   propertyJSONObject[memberName].asFloat()
                 );
                 break;
             case TypeMedley::DOUBLE:
-                (*classAndPropertyNameValueSPMap[classAndPropertyName]).setValue(
+                classAndPropertyNameValueSPMap[classAndPropertyName]->setValue(
                   propertyJSONObject[memberName].asDouble()
                 );
                 break;
             case TypeMedley::STRING:
-                (*classAndPropertyNameValueSPMap[classAndPropertyName]).setValue(
+                classAndPropertyNameValueSPMap[classAndPropertyName]->setValue(
                   propertyJSONObject[memberName].asString()
                 );
+                break;
+            case TypeMedley::STRINGLIST:
+                std::list<std::string> stringList;
+                Json::Value arrayValue = propertyJSONObject[memberName];
+                for(auto item: arrayValue) {
+                    stringList.push_back(item.asString());
+                }
+                classAndPropertyNameValueSPMap[classAndPropertyName]->setValue(stringList);
                 break;
         }
     }

@@ -90,7 +90,7 @@ bool TestObject::static_init() {
     );
 
     get_class_and_property_name_initial_value_sp_map()[ClassAndPropertyName( "ObjectRoot.TestObject", "FloatValue" )] =
-      ValueSP( new Value( static_cast<bool>(0) ));
+      ValueSP( new Value( static_cast<float>(0) ));
 
     classAndPropertyNameSetSP->emplace(
         "ObjectRoot.TestObject", "IntValue"
@@ -112,6 +112,20 @@ bool TestObject::static_init() {
 
     get_class_and_property_name_initial_value_sp_map()[ClassAndPropertyName( "ObjectRoot.TestObject", "ShortValue" )] =
       ValueSP( new Value( static_cast<short>(0) ));
+
+    classAndPropertyNameSetSP->emplace(
+        "ObjectRoot.TestObject", "StringListValue1"
+    );
+
+    get_class_and_property_name_initial_value_sp_map()[ClassAndPropertyName( "ObjectRoot.TestObject", "StringListValue1" )] =
+      ValueSP( new Value( std::list<std::string>() ));
+
+    classAndPropertyNameSetSP->emplace(
+        "ObjectRoot.TestObject", "StringListValue2"
+    );
+
+    get_class_and_property_name_initial_value_sp_map()[ClassAndPropertyName( "ObjectRoot.TestObject", "StringListValue2" )] =
+      ValueSP( new Value( std::list<std::string>() ));
 
     classAndPropertyNameSetSP->emplace(
         "ObjectRoot.TestObject", "StringValue"
@@ -167,8 +181,18 @@ bool TestObject::static_init() {
     );
 
     allClassAndPropertyNameSetSP->emplace(
+        "ObjectRoot.TestObject", "StringListValue1"
+    );
+
+    allClassAndPropertyNameSetSP->emplace(
+        "ObjectRoot.TestObject", "StringListValue2"
+    );
+
+    allClassAndPropertyNameSetSP->emplace(
         "ObjectRoot.TestObject", "StringValue"
-    );// ADD THIS CLASS'S _allClassAndPropertyNameSet TO _classNameAllPropertyNameSetMap DEFINED
+    );
+
+    // ADD THIS CLASS'S _allClassAndPropertyNameSet TO _classNameAllPropertyNameSetMap DEFINED
     // IN ObjectRoot
     get_class_name_all_class_and_property_name_set_sp_map()[get_hla_class_name()] = allClassAndPropertyNameSetSP;
 

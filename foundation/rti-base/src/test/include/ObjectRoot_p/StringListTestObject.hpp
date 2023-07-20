@@ -28,8 +28,8 @@
  * OR MODIFICATIONS.
  */
 
-#ifndef _edu_vanderbilt_vuisis_cpswt_hla_ObjectRoot_p_FederateObject_CLASS
-#define _edu_vanderbilt_vuisis_cpswt_hla_ObjectRoot_p_FederateObject_CLASS
+#ifndef _edu_vanderbilt_vuisis_cpswt_hla_ObjectRoot_p_StringListTestObject_CLASS
+#define _edu_vanderbilt_vuisis_cpswt_hla_ObjectRoot_p_StringListTestObject_CLASS
 
 #include "ObjectRoot.hpp"
 #include "C2WException.hpp"
@@ -44,17 +44,17 @@ namespace edu {
     namespace hla {
      namespace ObjectRoot_p {
 
-class FederateObject : public ::edu::vanderbilt::vuisis::cpswt::hla::ObjectRoot {
+class StringListTestObject : public ::edu::vanderbilt::vuisis::cpswt::hla::ObjectRoot {
 public:
 //    using ::edu::vanderbilt::vuisis::cpswt::hla::ObjectRoot;
     typedef ::edu::vanderbilt::vuisis::cpswt::hla::ObjectRoot Super;
-    typedef boost::shared_ptr< FederateObject > SP;
+    typedef boost::shared_ptr< StringListTestObject > SP;
 
 private:
     static severity_logger &get_logger_aux() {
         static severity_logger logger;
         logger.add_attribute("MessagingClassName", attrs::constant< std::string >(
-          "ObjectRoot.FederateObject"
+          "ObjectRoot.StringListTestObject"
         ));
 
         logging::add_common_attributes();
@@ -73,7 +73,7 @@ public:
     // ----------------------------------------------------------------------------
 
     /**
-     * Returns the fully-qualified (dot-delimited) name of the ::edu::vanderbilt::vuisis::cpswt::hla::ObjectRoot_p::FederateObject object class.
+     * Returns the fully-qualified (dot-delimited) name of the ::edu::vanderbilt::vuisis::cpswt::hla::ObjectRoot_p::StringListTestObject object class.
      * Note: As this is a static method, it is NOT polymorphic, and so, if called on
      * a reference will return the name of the class pertaining to the reference,
      * rather than the name of the class for the instance referred to by the reference.
@@ -82,7 +82,7 @@ public:
      * @return the fully-qualified Java class name for this object class
      */
     static const std::string &get_cpp_class_name() {
-        static const std::string cppClassName("::edu::vanderbilt::vuisis::cpswt::hla::ObjectRoot_p::FederateObject");
+        static const std::string cppClassName("::edu::vanderbilt::vuisis::cpswt::hla::ObjectRoot_p::StringListTestObject");
         return cppClassName;
     }
 
@@ -98,7 +98,7 @@ public:
 
     /**
      * Returns the simple name (the last name in the dot-delimited fully-qualified
-     * class name) of the edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.FederateObject object class.
+     * class name) of the edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.StringListTestObject object class.
      *
      * @return the name of this object class
      */
@@ -108,7 +108,7 @@ public:
 
     /**
      * Returns the fully-qualified (dot-delimited) hla class name of the
-     * ObjectRoot.FederateObject object class.
+     * ObjectRoot.StringListTestObject object class.
      * Note: As this is a static method, it is NOT polymorphic, and so, if called on
      * a reference will return the federation name of the class pertaining to the reference,
      * rather than the name of the class for the instance referred to by the reference.
@@ -117,7 +117,7 @@ public:
      * @return the fully-qualified federation (HLA) class name for this object class
      */
     static const std::string &get_hla_class_name() {
-        static const std::string hlaClassName("ObjectRoot.FederateObject");
+        static const std::string hlaClassName("ObjectRoot.StringListTestObject");
         return hlaClassName;
     }
 
@@ -133,7 +133,7 @@ public:
 
     /**
      * Returns a sorted list containing the names of all of the non-hidden attributes in the
-     * edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.FederateObject object class.
+     * edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.StringListTestObject object class.
      * The property names are paired with name of the hla class in which they are defined in a
      * ClassAndPropertyName POJO.
      * Note: As this is a static method, it is NOT polymorphic, and so, if called on
@@ -151,7 +151,7 @@ public:
 
     /**
      * Returns a sorted list containing the names of all of the attributes in the
-     * edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.FederateObject object class.
+     * edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.StringListTestObject object class.
      * The property names are paired with name of the hla class in which they are defined in a
      * ClassAndPropertyName POJO.
      * Note: As this is a static method, it is NOT polymorphic, and so, if called on
@@ -183,7 +183,7 @@ public:
     // THIS CODE IS STATIC BECAUSE IT IS CLASS-DEPENDENT AND NOT INSTANCE-DEPENDENT
     // ----------------------------------------------------------------------------
     /**
-     * Returns the handle (RTI assigned) of the edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.FederateObject object class.
+     * Returns the handle (RTI assigned) of the edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.StringListTestObject object class.
      * Note: As this is a static method, it is NOT polymorphic, and so, if called on
      * a reference will return the handle of the class pertaining to the reference,
      * rather than the handle of the class for the instance referred to by the reference.
@@ -197,7 +197,7 @@ public:
 
     /**
      * Returns the handle of an attribute (RTI assigned) of
-     * this object class (i.e. "edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.FederateObject") given the attribute's name.
+     * this object class (i.e. "edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.StringListTestObject") given the attribute's name.
      *
      * @param propertyName name of attribute
      * @return the handle (RTI assigned) of the attribute "propertyName" of object class "hlaClassName"
@@ -232,7 +232,7 @@ public:
     //-------------------------------------------------
 
     /**
-     * Publishes the edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.FederateObject object class for a federate.
+     * Publishes the edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.StringListTestObject object class for a federate.
      *
      * @param rti handle to the Local RTI Component
      */
@@ -245,7 +245,7 @@ public:
     }
 
     /**
-     * Unpublishes the edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.FederateObject object class for a federate.
+     * Unpublishes the edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.StringListTestObject object class for a federate.
      *
      * @param rti handle to the Local RTI Component, usu. obtained through the
      *            {@link SynchronizedFederate#getRTI()} call
@@ -255,7 +255,7 @@ public:
     }
 
 /**
- * Subscribes a federate to the edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.FederateObject object class.
+ * Subscribes a federate to the edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.StringListTestObject object class.
  *
  * @param rti handle to the Local RTI Component
  */
@@ -276,7 +276,7 @@ public:
     }
 
     /**
-     * Unsubscribes a federate from the edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.FederateObject object class.
+     * Unsubscribes a federate from the edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.StringListTestObject object class.
      *
      * @param rti handle to the Local RTI Component
      */
@@ -326,12 +326,12 @@ public:
 
     /**
      * Return true if "handle" is equal to the handle (RTI assigned) of this class
-     * (that is, the edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.FederateObject object class).
+     * (that is, the edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.StringListTestObject object class).
      *
      * @param handle handle to compare to the value of the handle (RTI assigned) of
-     * this class (the edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.FederateObject object class).
+     * this class (the edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.StringListTestObject object class).
      * @return "true" if "handle" matches the value of the handle of this class
-     * (that is, the edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.FederateObject object class).
+     * (that is, the edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.StringListTestObject object class).
      */
     static bool match(int handle) {
         return handle == get_class_handle();
@@ -347,100 +347,34 @@ public:
 
 
     /**
-     * Set the value of the "FederateHandle" parameter to "value" for this parameter.
+     * Set the value of the "stringListAttribute" parameter to "value" for this parameter.
      *
-     * @param value the new value for the "FederateHandle" parameter
+     * @param value the new value for the "stringListAttribute" parameter
      */
-    void set_FederateHandle(int newValue) {
-        ClassAndPropertyName key(get_hla_class_name(), "FederateHandle");
+    void set_stringListAttribute(const std::list<std::string> & newValue) {
+        ClassAndPropertyName key(get_hla_class_name(), "stringListAttribute");
         Value &value(*_classAndPropertyNameValueSPMap[key]);
         value.setValue(newValue);
         value.setTime(getTime());
     }
 
     /**
-     * Returns the value of the "FederateHandle" parameter of this interaction.
+     * Returns the value of the "stringListAttribute" parameter of this interaction.
      *
-     * @return the value of the "FederateHandle" parameter
+     * @return the value of the "stringListAttribute" parameter
      */
-    int get_FederateHandle() {
-        ClassAndPropertyName key(get_hla_class_name(), "FederateHandle");
-        return _classAndPropertyNameValueSPMap[key]->asInt();
+    std::list<std::string> get_stringListAttribute() {
+        ClassAndPropertyName key(get_hla_class_name(), "stringListAttribute");
+        return _classAndPropertyNameValueSPMap[key]->asStringList();
     }
 
     /**
-     * Returns the current timestamp of the "FederateHandle" attribute of this object.
+     * Returns the current timestamp of the "stringListAttribute" attribute of this object.
      *
-     * @return the current timestamp of the "FederateHandle" attribute
+     * @return the current timestamp of the "stringListAttribute" attribute
      */
-    double get_FederateHandle_time() {
-        ClassAndPropertyName key(get_hla_class_name(), "FederateHandle");
-        return _classAndPropertyNameValueSPMap[key]->getTime();
-    }
-
-
-    /**
-     * Set the value of the "FederateHost" parameter to "value" for this parameter.
-     *
-     * @param value the new value for the "FederateHost" parameter
-     */
-    void set_FederateHost(const std::string & newValue) {
-        ClassAndPropertyName key(get_hla_class_name(), "FederateHost");
-        Value &value(*_classAndPropertyNameValueSPMap[key]);
-        value.setValue(newValue);
-        value.setTime(getTime());
-    }
-
-    /**
-     * Returns the value of the "FederateHost" parameter of this interaction.
-     *
-     * @return the value of the "FederateHost" parameter
-     */
-    std::string get_FederateHost() {
-        ClassAndPropertyName key(get_hla_class_name(), "FederateHost");
-        return _classAndPropertyNameValueSPMap[key]->asString();
-    }
-
-    /**
-     * Returns the current timestamp of the "FederateHost" attribute of this object.
-     *
-     * @return the current timestamp of the "FederateHost" attribute
-     */
-    double get_FederateHost_time() {
-        ClassAndPropertyName key(get_hla_class_name(), "FederateHost");
-        return _classAndPropertyNameValueSPMap[key]->getTime();
-    }
-
-
-    /**
-     * Set the value of the "FederateType" parameter to "value" for this parameter.
-     *
-     * @param value the new value for the "FederateType" parameter
-     */
-    void set_FederateType(const std::string & newValue) {
-        ClassAndPropertyName key(get_hla_class_name(), "FederateType");
-        Value &value(*_classAndPropertyNameValueSPMap[key]);
-        value.setValue(newValue);
-        value.setTime(getTime());
-    }
-
-    /**
-     * Returns the value of the "FederateType" parameter of this interaction.
-     *
-     * @return the value of the "FederateType" parameter
-     */
-    std::string get_FederateType() {
-        ClassAndPropertyName key(get_hla_class_name(), "FederateType");
-        return _classAndPropertyNameValueSPMap[key]->asString();
-    }
-
-    /**
-     * Returns the current timestamp of the "FederateType" attribute of this object.
-     *
-     * @return the current timestamp of the "FederateType" attribute
-     */
-    double get_FederateType_time() {
-        ClassAndPropertyName key(get_hla_class_name(), "FederateType");
+    double get_stringListAttribute_time() {
+        ClassAndPropertyName key(get_hla_class_name(), "stringListAttribute");
         return _classAndPropertyNameValueSPMap[key]->getTime();
     }
 
@@ -453,11 +387,11 @@ public:
     //--------------------------
 public:
     static SP create() {
-        return SP(new FederateObject());
+        return SP(new StringListTestObject());
     }
 
     static ObjectRoot::SP create_object() {
-        return SP(new FederateObject());
+        return SP(new StringListTestObject());
     }
 
     virtual ObjectRoot::SP createObject() {
@@ -465,11 +399,11 @@ public:
     }
 
     static SP create(const RTIfedTime &rtiFedTime) {
-        return SP(new FederateObject(rtiFedTime));
+        return SP(new StringListTestObject(rtiFedTime));
     }
 
     static ObjectRoot::SP create_object(const RTIfedTime &rtiFedTime) {
-        return SP(new FederateObject(rtiFedTime));
+        return SP(new StringListTestObject(rtiFedTime));
     }
 
     virtual ObjectRoot::SP createObject(const RTIfedTime &rtiFedTime) {
@@ -479,13 +413,13 @@ public:
     static SP create(
       const RTI::AttributeHandleValuePairSet &propertyMap
     ) {
-        return SP(new FederateObject(propertyMap));
+        return SP(new StringListTestObject(propertyMap));
     }
 
     static ObjectRoot::SP create_object(
       const RTI::AttributeHandleValuePairSet &propertyMap
     ) {
-        return SP(new FederateObject(propertyMap));
+        return SP(new StringListTestObject(propertyMap));
     }
 
     virtual ObjectRoot::SP createObject(
@@ -497,13 +431,13 @@ public:
     static SP create(
       const RTI::AttributeHandleValuePairSet &propertyMap, const RTIfedTime &rtiFedTime
     ) {
-        return SP(new FederateObject(propertyMap, rtiFedTime));
+        return SP(new StringListTestObject(propertyMap, rtiFedTime));
     }
 
     static ObjectRoot::SP create_object(
       const RTI::AttributeHandleValuePairSet &propertyMap, const RTIfedTime &rtiFedTime
     ) {
-        return SP(new FederateObject(propertyMap, rtiFedTime));
+        return SP(new StringListTestObject(propertyMap, rtiFedTime));
     }
 
     virtual ObjectRoot::SP createObject(
@@ -512,7 +446,7 @@ public:
     }
 
     virtual ObjectRoot::SP cloneObject() {
-        return ObjectRoot::SP( new FederateObject( *this )  );
+        return ObjectRoot::SP( new StringListTestObject( *this )  );
     }
 
     //------------------------------
@@ -580,246 +514,102 @@ public:
     }
 
     /**
-    * Publishes the "FederateHandle" attribute of the attribute's containing object
+    * Publishes the "stringListAttribute" attribute of the attribute's containing object
     * class for a federate.
-    * Note:  This method only marks the "FederateHandle" attribute for publication.
+    * Note:  This method only marks the "stringListAttribute" attribute for publication.
     * To actually publish the attribute, the federate must (re)publish its containing
     * object class.
     * (using <objectClassName>.publish_object( RTIambassador *rti ) ).
     */
-    static void publish_FederateHandle_attribute() {
-        publish_attribute( get_hla_class_name(), "FederateHandle" );
+    static void publish_stringListAttribute_attribute() {
+        publish_attribute( get_hla_class_name(), "stringListAttribute" );
     }
 
     /**
-    * Unpublishes the "FederateHandle" attribute of the attribute's containing object
+    * Unpublishes the "stringListAttribute" attribute of the attribute's containing object
     * class for a federate.
-    * Note:  This method only marks the "FederateHandle" attribute for unpublication.
+    * Note:  This method only marks the "stringListAttribute" attribute for unpublication.
     * To actually publish the attribute, the federate must (re)publish its containing
     * object class.
     * (using <objectClassName>.publish_object( RTIambassador *rti ) ).
     */
-    static void unpublish_FederateHandle_attribute() {
-        unpublish_attribute( get_hla_class_name(), "FederateHandle" );
+    static void unpublish_stringListAttribute_attribute() {
+        unpublish_attribute( get_hla_class_name(), "stringListAttribute" );
     }
 
     /**
-    * Subscribes a federate to the "FederateHandle" attribute of the attribute's
+    * Subscribes a federate to the "stringListAttribute" attribute of the attribute's
     * containing object class.
-    * Note:  This method only marks the "FederateHandle" attribute for subscription.
+    * Note:  This method only marks the "stringListAttribute" attribute for subscription.
     * To actually subscribe to the attribute, the federate must (re)subscribe to its
     * containing object class.
     * (using <objectClassName>.subscribe_object( RTIambassador *rti ) ).
     */
-    static void subscribe_FederateHandle_attribute() {
-        subscribe_attribute( get_hla_class_name(), "FederateHandle" );
+    static void subscribe_stringListAttribute_attribute() {
+        subscribe_attribute( get_hla_class_name(), "stringListAttribute" );
     }
 
     /**
-    * Unsubscribes a federate from the "FederateHandle" attribute of the attribute's
+    * Unsubscribes a federate from the "stringListAttribute" attribute of the attribute's
     * containing object class.
-    * Note:  This method only marks the "FederateHandle" attribute for unsubscription.
+    * Note:  This method only marks the "stringListAttribute" attribute for unsubscription.
     * To actually unsubscribe to the attribute, the federate must (re)subscribe to its
     * containing object class.
     * (using <objectClassName>.subscribe_object( RTIambassador *rti ) ).
     */
-    static void unsubscribe_FederateHandle_attribute() {
-        unsubscribe_attribute( get_hla_class_name(), "FederateHandle" );
+    static void unsubscribe_stringListAttribute_attribute() {
+        unsubscribe_attribute( get_hla_class_name(), "stringListAttribute" );
     }
 
     /**
-    * Soft subscribes a federate to the "FederateHandle" attribute of the attribute's
+    * Soft subscribes a federate to the "stringListAttribute" attribute of the attribute's
     * containing object class.
-    * Note:  This method only marks the "FederateHandle" attribute for soft subscription.
+    * Note:  This method only marks the "stringListAttribute" attribute for soft subscription.
     * To actually soft subscribe to the attribute, the federate must (re)subscribe to its
     * containing object class.
     * (using <objectClassName>.soft_subscribe_object( RTIambassador rti ) ).
     */
-    static void soft_subscribe_FederateHandle_attribute() {
-        soft_subscribe_attribute(get_hla_class_name(), "FederateHandle");
+    static void soft_subscribe_stringListAttribute_attribute() {
+        soft_subscribe_attribute(get_hla_class_name(), "stringListAttribute");
     }
 
     /**
-    * Soft unsubscribes a federate from the "FederateHandle" attribute of the attribute's
+    * Soft unsubscribes a federate from the "stringListAttribute" attribute of the attribute's
     * containing object class.
-    * Note:  This method only marks the "FederateHandle" attribute for soft unsubscription.
+    * Note:  This method only marks the "stringListAttribute" attribute for soft unsubscription.
     * To actually soft unsubscribe to the attribute, the federate must (re)subscribe to its
     * containing object class.
     * (using <objectClassName>.unsubscribe_object( RTIambassador rti ) ).
     */
-    static void soft_unsubscribe_FederateHandle_attribute() {
-        soft_unsubscribe_attribute(get_hla_class_name(), "FederateHandle");
-    }
-
-    /**
-    * Publishes the "FederateHost" attribute of the attribute's containing object
-    * class for a federate.
-    * Note:  This method only marks the "FederateHost" attribute for publication.
-    * To actually publish the attribute, the federate must (re)publish its containing
-    * object class.
-    * (using <objectClassName>.publish_object( RTIambassador *rti ) ).
-    */
-    static void publish_FederateHost_attribute() {
-        publish_attribute( get_hla_class_name(), "FederateHost" );
-    }
-
-    /**
-    * Unpublishes the "FederateHost" attribute of the attribute's containing object
-    * class for a federate.
-    * Note:  This method only marks the "FederateHost" attribute for unpublication.
-    * To actually publish the attribute, the federate must (re)publish its containing
-    * object class.
-    * (using <objectClassName>.publish_object( RTIambassador *rti ) ).
-    */
-    static void unpublish_FederateHost_attribute() {
-        unpublish_attribute( get_hla_class_name(), "FederateHost" );
-    }
-
-    /**
-    * Subscribes a federate to the "FederateHost" attribute of the attribute's
-    * containing object class.
-    * Note:  This method only marks the "FederateHost" attribute for subscription.
-    * To actually subscribe to the attribute, the federate must (re)subscribe to its
-    * containing object class.
-    * (using <objectClassName>.subscribe_object( RTIambassador *rti ) ).
-    */
-    static void subscribe_FederateHost_attribute() {
-        subscribe_attribute( get_hla_class_name(), "FederateHost" );
-    }
-
-    /**
-    * Unsubscribes a federate from the "FederateHost" attribute of the attribute's
-    * containing object class.
-    * Note:  This method only marks the "FederateHost" attribute for unsubscription.
-    * To actually unsubscribe to the attribute, the federate must (re)subscribe to its
-    * containing object class.
-    * (using <objectClassName>.subscribe_object( RTIambassador *rti ) ).
-    */
-    static void unsubscribe_FederateHost_attribute() {
-        unsubscribe_attribute( get_hla_class_name(), "FederateHost" );
-    }
-
-    /**
-    * Soft subscribes a federate to the "FederateHost" attribute of the attribute's
-    * containing object class.
-    * Note:  This method only marks the "FederateHost" attribute for soft subscription.
-    * To actually soft subscribe to the attribute, the federate must (re)subscribe to its
-    * containing object class.
-    * (using <objectClassName>.soft_subscribe_object( RTIambassador rti ) ).
-    */
-    static void soft_subscribe_FederateHost_attribute() {
-        soft_subscribe_attribute(get_hla_class_name(), "FederateHost");
-    }
-
-    /**
-    * Soft unsubscribes a federate from the "FederateHost" attribute of the attribute's
-    * containing object class.
-    * Note:  This method only marks the "FederateHost" attribute for soft unsubscription.
-    * To actually soft unsubscribe to the attribute, the federate must (re)subscribe to its
-    * containing object class.
-    * (using <objectClassName>.unsubscribe_object( RTIambassador rti ) ).
-    */
-    static void soft_unsubscribe_FederateHost_attribute() {
-        soft_unsubscribe_attribute(get_hla_class_name(), "FederateHost");
-    }
-
-    /**
-    * Publishes the "FederateType" attribute of the attribute's containing object
-    * class for a federate.
-    * Note:  This method only marks the "FederateType" attribute for publication.
-    * To actually publish the attribute, the federate must (re)publish its containing
-    * object class.
-    * (using <objectClassName>.publish_object( RTIambassador *rti ) ).
-    */
-    static void publish_FederateType_attribute() {
-        publish_attribute( get_hla_class_name(), "FederateType" );
-    }
-
-    /**
-    * Unpublishes the "FederateType" attribute of the attribute's containing object
-    * class for a federate.
-    * Note:  This method only marks the "FederateType" attribute for unpublication.
-    * To actually publish the attribute, the federate must (re)publish its containing
-    * object class.
-    * (using <objectClassName>.publish_object( RTIambassador *rti ) ).
-    */
-    static void unpublish_FederateType_attribute() {
-        unpublish_attribute( get_hla_class_name(), "FederateType" );
-    }
-
-    /**
-    * Subscribes a federate to the "FederateType" attribute of the attribute's
-    * containing object class.
-    * Note:  This method only marks the "FederateType" attribute for subscription.
-    * To actually subscribe to the attribute, the federate must (re)subscribe to its
-    * containing object class.
-    * (using <objectClassName>.subscribe_object( RTIambassador *rti ) ).
-    */
-    static void subscribe_FederateType_attribute() {
-        subscribe_attribute( get_hla_class_name(), "FederateType" );
-    }
-
-    /**
-    * Unsubscribes a federate from the "FederateType" attribute of the attribute's
-    * containing object class.
-    * Note:  This method only marks the "FederateType" attribute for unsubscription.
-    * To actually unsubscribe to the attribute, the federate must (re)subscribe to its
-    * containing object class.
-    * (using <objectClassName>.subscribe_object( RTIambassador *rti ) ).
-    */
-    static void unsubscribe_FederateType_attribute() {
-        unsubscribe_attribute( get_hla_class_name(), "FederateType" );
-    }
-
-    /**
-    * Soft subscribes a federate to the "FederateType" attribute of the attribute's
-    * containing object class.
-    * Note:  This method only marks the "FederateType" attribute for soft subscription.
-    * To actually soft subscribe to the attribute, the federate must (re)subscribe to its
-    * containing object class.
-    * (using <objectClassName>.soft_subscribe_object( RTIambassador rti ) ).
-    */
-    static void soft_subscribe_FederateType_attribute() {
-        soft_subscribe_attribute(get_hla_class_name(), "FederateType");
-    }
-
-    /**
-    * Soft unsubscribes a federate from the "FederateType" attribute of the attribute's
-    * containing object class.
-    * Note:  This method only marks the "FederateType" attribute for soft unsubscription.
-    * To actually soft unsubscribe to the attribute, the federate must (re)subscribe to its
-    * containing object class.
-    * (using <objectClassName>.unsubscribe_object( RTIambassador rti ) ).
-    */
-    static void soft_unsubscribe_FederateType_attribute() {
-        soft_unsubscribe_attribute(get_hla_class_name(), "FederateType");
+    static void soft_unsubscribe_stringListAttribute_attribute() {
+        soft_unsubscribe_attribute(get_hla_class_name(), "stringListAttribute");
     }
 
     //-------------
     // CONSTRUCTORS
     //-------------
 public:
-    FederateObject() : Super( get_hla_class_name() ) { }
+    StringListTestObject() : Super( get_hla_class_name() ) { }
 
-    FederateObject( const PropertyHandleValuePairSet &propertyMap ) : Super( get_hla_class_name(), propertyMap ) { }
+    StringListTestObject( const PropertyHandleValuePairSet &propertyMap ) : Super( get_hla_class_name(), propertyMap ) { }
 
-    FederateObject( const RTIfedTime &rtiFedTime ) : Super( get_hla_class_name(), rtiFedTime ) { }
+    StringListTestObject( const RTIfedTime &rtiFedTime ) : Super( get_hla_class_name(), rtiFedTime ) { }
 
-    FederateObject(const PropertyHandleValuePairSet &propertyMap, const RTIfedTime &rtiFedTime) :
+    StringListTestObject(const PropertyHandleValuePairSet &propertyMap, const RTIfedTime &rtiFedTime) :
        Super( get_hla_class_name(), propertyMap, rtiFedTime ) { }
 
 protected:
-    FederateObject(ObjectRoot::NoInstanceInit &noInstanceInit) : Super(noInstanceInit) { }
+    StringListTestObject(ObjectRoot::NoInstanceInit &noInstanceInit) : Super(noInstanceInit) { }
 
-    FederateObject( const std::string &hlaClassName ) : Super( hlaClassName ) { }
+    StringListTestObject( const std::string &hlaClassName ) : Super( hlaClassName ) { }
 
-    FederateObject( const std::string &hlaClassName, const PropertyHandleValuePairSet &propertyMap ) :
+    StringListTestObject( const std::string &hlaClassName, const PropertyHandleValuePairSet &propertyMap ) :
       Super( hlaClassName, propertyMap ) { }
 
-    FederateObject( const std::string &hlaClassName, const RTIfedTime &rtiFedTime ) :
+    StringListTestObject( const std::string &hlaClassName, const RTIfedTime &rtiFedTime ) :
       Super( hlaClassName, rtiFedTime ) { }
 
-    FederateObject(
+    StringListTestObject(
       const std::string &hlaClassName, const PropertyHandleValuePairSet &propertyMap, const RTIfedTime &rtiFedTime
     ) : Super( hlaClassName, propertyMap, rtiFedTime ) { }
 
@@ -831,8 +621,8 @@ protected:
  } // NAMESPACE "vanderbilt"
 } // NAMESPACE "edu"
 
-inline std::ostream &operator<<( std::ostream &os, ::edu::vanderbilt::vuisis::cpswt::hla::ObjectRoot_p::FederateObject::SP messagingSP ) {
+inline std::ostream &operator<<( std::ostream &os, ::edu::vanderbilt::vuisis::cpswt::hla::ObjectRoot_p::StringListTestObject::SP messagingSP ) {
     return os << *messagingSP;
 }
 
-#endif // _edu_vanderbilt_vuisis_cpswt_hla_ObjectRoot_p_FederateObject_CLASS
+#endif // _edu_vanderbilt_vuisis_cpswt_hla_ObjectRoot_p_StringListTestObject_CLASS

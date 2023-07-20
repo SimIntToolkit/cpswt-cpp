@@ -136,16 +136,21 @@ const RTIAmbassadorTest2::ClassNameHandleMap &RTIAmbassadorTest2::get_object_cla
 const ObjectRoot::ClassAndPropertyNameIntegerMap &RTIAmbassadorTest2::get_object_class_and_property_name_handle_map_aux() {
     static ObjectRoot::ClassAndPropertyNameIntegerMap objectClassAndPropertyNameHandleMap;
 
-    objectClassAndPropertyNameHandleMap[ClassAndPropertyName("ObjectRoot.FederateObject", "FederateHandle")] =
-      get_unique_no();
-    objectClassAndPropertyNameHandleMap[ClassAndPropertyName("ObjectRoot.FederateObject", "FederateHost")] =
-      get_unique_no();
-    objectClassAndPropertyNameHandleMap[ClassAndPropertyName("ObjectRoot.FederateObject", "FederateType")] =
-      get_unique_no();
-    objectClassAndPropertyNameHandleMap[ClassAndPropertyName("ObjectRoot.TestObject", "BooleanValue1")] = 
-      get_unique_no();
-    objectClassAndPropertyNameHandleMap[ClassAndPropertyName("ObjectRoot.TestObject", "BooleanValue2")] =
-      get_unique_no();
+    objectClassAndPropertyNameHandleMap[
+      ClassAndPropertyName("ObjectRoot.FederateObject", "FederateHandle")
+    ] = get_unique_no();
+    objectClassAndPropertyNameHandleMap[
+      ClassAndPropertyName("ObjectRoot.FederateObject", "FederateHost")
+    ] = get_unique_no();
+    objectClassAndPropertyNameHandleMap[
+      ClassAndPropertyName("ObjectRoot.FederateObject", "FederateType")
+    ] = get_unique_no();
+    objectClassAndPropertyNameHandleMap[
+      ClassAndPropertyName("ObjectRoot.TestObject", "BooleanValue1")
+    ] = get_unique_no();
+    objectClassAndPropertyNameHandleMap[
+      ClassAndPropertyName("ObjectRoot.TestObject", "BooleanValue2")
+    ] = get_unique_no();
     objectClassAndPropertyNameHandleMap[ClassAndPropertyName("ObjectRoot.TestObject", "ByteValue")] = get_unique_no();
     objectClassAndPropertyNameHandleMap[ClassAndPropertyName("ObjectRoot.TestObject", "CharValue")] = get_unique_no();
     objectClassAndPropertyNameHandleMap[ClassAndPropertyName("ObjectRoot.TestObject", "DoubleValue")] = get_unique_no();
@@ -154,6 +159,12 @@ const ObjectRoot::ClassAndPropertyNameIntegerMap &RTIAmbassadorTest2::get_object
     objectClassAndPropertyNameHandleMap[ClassAndPropertyName("ObjectRoot.TestObject", "LongValue")] = get_unique_no();
     objectClassAndPropertyNameHandleMap[ClassAndPropertyName("ObjectRoot.TestObject", "ShortValue")] = get_unique_no();
     objectClassAndPropertyNameHandleMap[ClassAndPropertyName("ObjectRoot.TestObject", "StringValue")] = get_unique_no();
+    objectClassAndPropertyNameHandleMap[
+      ClassAndPropertyName("ObjectRoot.TestObject", "StringListValue1")
+    ] = get_unique_no();
+    objectClassAndPropertyNameHandleMap[
+      ClassAndPropertyName("ObjectRoot.TestObject", "StringListValue2")
+    ] = get_unique_no();
 
     return objectClassAndPropertyNameHandleMap;
 }

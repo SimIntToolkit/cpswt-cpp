@@ -35,6 +35,8 @@
 
 #include "RTIAmbassadorTest1.hpp"
 
+#include <list>
+
 #include <cppunit/extensions/HelperMacros.h>
 
 #include <boost/log/core.hpp>
@@ -50,6 +52,8 @@ public:
     typedef sinks::synchronous_sink< sinks::text_ostream_backend > text_sink;
 
 private:
+    static void compareStringLists(const std::list<std::string> &list1, const std::list<std::string> &list2);
+
     static bool null_filter(const logging::attribute_value_set &attrs) {
         return false;
     }
@@ -73,6 +77,7 @@ private:
     CPPUNIT_TEST(federateSequenceTest);
     CPPUNIT_TEST(attributePubSubTest);
     CPPUNIT_TEST(printInteractionTest);
+    CPPUNIT_TEST(stringListTest);
     CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -95,7 +100,7 @@ public:
     void federateSequenceTest();
     void attributePubSubTest();
     void printInteractionTest();
-    void rejectSourceFederateIdTest();
+    void stringListTest();
 };
 
 #endif // _MESSAGING_TESTS
