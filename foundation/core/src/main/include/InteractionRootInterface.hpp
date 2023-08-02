@@ -42,8 +42,17 @@
 #define RTI_USES_STD_FSTREAM
 #endif
 
+#if __cplusplus >= 201703L
+#define throw(x, ...) throw()
+#endif
+
 #include <RTI.hh>
 #include "fedtime.hh"
+
+#if __cplusplus >= 201703L
+#undef throw
+#endif
+
 
 #endif // CPSWT_TEST
 

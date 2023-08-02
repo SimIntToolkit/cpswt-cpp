@@ -33,6 +33,10 @@
 
 #include "RTIForTesting.hpp"
 
+#if __cplusplus >= 201703L
+#define throw(x, ...) throw()
+#endif
+
 namespace RTIProxy {
 
 class RTIAmbassadorProxy {
@@ -1505,5 +1509,9 @@ public:
 };  // class RTIambassador
 
 } // namespace RTIProxy
+
+#if __cplusplus >= 201703L
+#undef throw
+#endif
 
 #endif

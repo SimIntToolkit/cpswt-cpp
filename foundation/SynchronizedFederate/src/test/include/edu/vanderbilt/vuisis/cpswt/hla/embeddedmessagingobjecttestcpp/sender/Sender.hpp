@@ -35,6 +35,9 @@
 #include "edu/vanderbilt/vuisis/cpswt/hla/embeddedmessagingobjecttestcpp/sender/SenderBase.hpp"
 #include "FederateConfigParser.h"
 
+#if __cplusplus >= 201703L
+#define throw(x, ...) throw()
+#endif
 
 namespace edu {
  namespace vanderbilt {
@@ -97,5 +100,9 @@ public:
   } // NAMESPACE "vuisis"
  } // NAMESPACE "vanderbilt"
 } // NAMESPACE "edu"
+
+#if __cplusplus >= 201703L
+#undef throw
+#endif
 
 #endif // ORG_CPSWT_HLA_EMBEDDEDMESSAGINGOBJECTTESTCPP_SENDER_CLASS_CLASS

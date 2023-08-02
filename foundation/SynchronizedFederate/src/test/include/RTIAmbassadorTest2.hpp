@@ -12,6 +12,10 @@
 #include <iostream>
 #include <boost/shared_ptr.hpp>
 
+#if __cplusplus >= 201703L
+#define throw(x, ...) throw()
+#endif
+
 class RTIAmbassadorTest2: public RTIProxy::RTIAmbassadorProxy {
 
 public:
@@ -343,5 +347,9 @@ public:
       RTI::RTIinternalError
     ) override;
 };
+
+#if __cplusplus >= 201703L
+#undef throw
+#endif
 
 #endif  // RTI_AMBASSADOR_TEST_2_HH

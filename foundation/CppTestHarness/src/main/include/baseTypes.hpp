@@ -26,6 +26,10 @@ enum Boolean {
     RTI_FALSE = 0,
     RTI_TRUE};
 
+#if __cplusplus >= 201703L
+#define throw(x, ...) throw()
+#endif
+
 class RTI_EXPORT Exception {
 public:
   ULong _serial;
@@ -56,6 +60,6 @@ public: \
   void        throwSelf() const         { throw *this; } \
 };
 
-
-
-
+#if __cplusplus >= 201703L
+#undef throw
+#endif

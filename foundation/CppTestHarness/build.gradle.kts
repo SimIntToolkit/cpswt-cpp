@@ -50,7 +50,7 @@ library {
 tasks.withType(CppCompile::class.java).configureEach {
     compilerArgs.addAll(toolChain.map { toolChain ->
         when(toolChain) {
-            is Gcc, is Clang -> listOf("-Wno-deprecated")
+            is Gcc, is Clang -> listOf("-Wno-deprecated", "-std=c++17")
 //            is VisualCpp -> listOf("/I $rtiHome/include/hla13")
             else -> listOf()
         }

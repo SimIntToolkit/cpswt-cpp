@@ -31,6 +31,10 @@
 #include "RTIForTesting.hpp"
 #include "RTIAmbassadorProxy.hpp"
 
+#if __cplusplus >= 201703L
+#define throw(x, ...) throw()
+#endif
+
 // 4.2
 void RTI::RTIambassador::createFederationExecution (
   const char *executionName, // supplied C4
@@ -1720,3 +1724,6 @@ RTI::Region *RTI::RTIambassador::getRegion(
     return rtiAmbassadorProxy->getRegion(regionToken);
 }
 
+#if __cplusplus >= 201703L
+#undef throw
+#endif

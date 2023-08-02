@@ -36,6 +36,10 @@
 #include <map>
 #include <set>
 
+#if __cplusplus >= 201703L
+#define throw(x, ...) throw()
+#endif
+
 class ClassAndPropertyName;
 
 class RTIAmbassadorTest1: public RTIProxy::RTIAmbassadorProxy {
@@ -273,5 +277,9 @@ public:
     ) override;
 
 };
+
+#if __cplusplus >= 201703L
+#undef throw
+#endif
 
 #endif  // RTI_AMBASSADOR_TEST_1_HH

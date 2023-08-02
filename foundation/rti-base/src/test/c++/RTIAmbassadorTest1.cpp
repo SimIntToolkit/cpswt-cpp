@@ -36,6 +36,10 @@
 #include <limits>
 #include <iostream>
 
+#if __cplusplus >= 201703L
+#define throw(x, ...) throw()
+#endif
+
 using InteractionRoot = ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot;
 using ObjectRoot = ::edu::vanderbilt::vuisis::cpswt::hla::ObjectRoot;
 
@@ -337,3 +341,7 @@ RTI::EventRetractionHandle RTIAmbassadorTest1::updateAttributeValues (
 
     return RTI::EventRetractionHandle(); // DUMMY EventRestractionHandle
 }
+
+#if __cplusplus >= 201703L
+#undef throw
+#endif

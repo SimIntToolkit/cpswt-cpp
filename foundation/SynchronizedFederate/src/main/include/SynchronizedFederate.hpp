@@ -54,7 +54,17 @@
 #include <boost/log/utility/setup/common_attributes.hpp>
 
 #ifndef CPSWT_TEST
+
+#if __cplusplus >= 201703L
+#define throw(x, ...) throw()
+#endif
+
 #include "NullFederateAmbassador.hh"
+
+#if __cplusplus >= 201703L
+#undef throw
+#endif
+
 #endif // CPSWT_TEST
 
 #include "InteractionRoot.hpp"
@@ -77,6 +87,10 @@
 #include <windows.h>
 #else
 #include <unistd.h>
+#endif
+
+#if __cplusplus >= 201703L
+#define throw(x, ...) throw()
 #endif
 
 namespace logging = boost::log;
@@ -638,7 +652,9 @@ private:
 
     class InteractionRootSPComparator {
     public:
-        bool operator()( const InteractionRoot::SP &interactionRootSP1, const InteractionRoot::SP &interactionRootSP2 ) {
+        bool operator()(
+          const InteractionRoot::SP &interactionRootSP1, const InteractionRoot::SP &interactionRootSP2
+        ) const {
             if ( interactionRootSP1->getTime() < interactionRootSP2->getTime() ) {
                 return true;
             } else if ( interactionRootSP1->getTime() > interactionRootSP2->getTime() ) {
@@ -903,5 +919,9 @@ public:
         exit(0);
     }
 };
+
+#if __cplusplus >= 201703L
+#undef throw
+#endif
 
 #endif

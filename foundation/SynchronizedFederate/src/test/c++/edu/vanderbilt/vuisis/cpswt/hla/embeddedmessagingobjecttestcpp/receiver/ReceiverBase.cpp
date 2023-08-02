@@ -33,6 +33,10 @@
 #include "edu/vanderbilt/vuisis/cpswt/hla/embeddedmessagingobjecttestcpp/receiver/ReceiverBase.hpp"
 
 
+#if __cplusplus >= 201703L
+#define throw(x, ...) throw()
+#endif
+
 namespace edu {
  namespace vanderbilt {
   namespace vuisis {
@@ -139,3 +143,7 @@ void ReceiverBase::receiveInteraction(
   } // NAMESPACE "vuisis"
  } // NAMESPACE "vanderbilt"
 } // NAMESPACE "edu"
+
+#if __cplusplus >= 201703L
+#undef throw
+#endif

@@ -50,6 +50,9 @@
 #include "InteractionRoot_p/C2WInteractionRoot_p/EmbeddedMessaging_p/OmnetFederate.hpp"
 #include "ObjectRoot_p/TestObject.hpp"
 
+#if __cplusplus >= 201703L
+#define throw(x, ...) throw()
+#endif
 
 namespace edu {
  namespace vanderbilt {
@@ -169,5 +172,9 @@ public:
   } // NAMESPACE "vuisis"
  } // NAMESPACE "vanderbilt"
 } // NAMESPACE "edu"
+
+#if __cplusplus >= 201703L
+#undef throw
+#endif
 
 #endif // EDU_VANDERBILT_VUISIS_CPSWT_HLA_EMBEDDEDMESSAGINGOBJECTTESTCPP_SENDER_CLASS_BASE_CLASS

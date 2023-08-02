@@ -47,8 +47,13 @@ class RTIAmbassadorProxy;
 class RTI {
 
 public:
+
 #include "baseTypes.hpp"
 #include "RTItypes.hpp"
+
+#if __cplusplus >= 201703L
+#define throw(x, ...) throw()
+#endif
 
     class RTIambassador {
     private:
@@ -1763,5 +1768,9 @@ public:
 typedef RTI::FederateAmbassador NullFederateAmbassador;
 
 #include "fedtimeForTesting.hpp"
+
+#if __cplusplus >= 201703L
+#undef throw
+#endif
 
 #endif

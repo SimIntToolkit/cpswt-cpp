@@ -34,6 +34,9 @@
 #include <set>
 #include "RTIForTesting.hpp"
 
+#if __cplusplus >= 201703L
+#define throw(x, ...) throw()
+#endif
 
 class AttributeHandleSetTest: public RTI::AttributeHandleSet {
 
@@ -85,5 +88,9 @@ public:
         return sasCit == attributeHandleSet.end() ? RTI::RTI_FALSE : RTI::RTI_TRUE;
     }
 };
+
+#if __cplusplus >= 201703L
+#undef throw
+#endif
 
 #endif // _ATTRIBUTE_HANDLE_SET_TEST

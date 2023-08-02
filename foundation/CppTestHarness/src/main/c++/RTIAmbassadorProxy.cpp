@@ -30,6 +30,9 @@
 
 #include "RTIAmbassadorProxy.hpp"
 
+#if __cplusplus >= 201703L
+#define throw(x, ...) throw()
+#endif
 
 namespace RTIProxy {
 
@@ -1582,3 +1585,7 @@ RTI::Region *RTIAmbassadorProxy::getRegion(
 
 
 } // namespace RTIProxy
+
+#if __cplusplus >= 201703L
+#undef throw
+#endif

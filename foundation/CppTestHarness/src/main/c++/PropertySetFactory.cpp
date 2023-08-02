@@ -32,6 +32,10 @@
 #include "AttributeHandleSetForTesting.hpp"
 #include "PropertyHandleValuePairSetForTesting.hpp"
 
+#if __cplusplus >= 201703L
+#define throw(x, ...) throw()
+#endif
+
 RTI::ParameterHandleValuePairSet *RTI::ParameterSetFactory::create(ULong count) throw (
   MemoryExhausted, ValueCountExceeded, HandleValuePairMaximumExceeded
 ) {
@@ -49,3 +53,7 @@ RTI::AttributeHandleSet* RTI::AttributeHandleSetFactory::create(ULong count) thr
 ) {
     return new AttributeHandleSetTest();
 }
+
+#if __cplusplus >= 201703L
+#undef throw
+#endif

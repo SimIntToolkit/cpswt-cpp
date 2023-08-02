@@ -35,6 +35,10 @@
 #include <string.h>
 #include <iostream>
 
+#if __cplusplus >= 201703L
+#define throw(x, ...) throw()
+#endif
+
 class RTI_EXPORT_FEDTIME RTIfedTime : public RTI::FedTime {
 //-----------------------------------------------------------------
 // Constructors and Destructors
@@ -183,5 +187,9 @@ RTIfedTime operator+ (const RTI::Double&, const RTI::FedTime&);
 RTIfedTime operator- (const RTI::Double&, const RTI::FedTime&);
 RTIfedTime operator* (const RTI::Double&, const RTI::FedTime&);
 RTIfedTime operator/ (const RTI::Double&, const RTI::FedTime&);
+
+#if __cplusplus >= 201703L
+#undef throw
+#endif
 
 #endif

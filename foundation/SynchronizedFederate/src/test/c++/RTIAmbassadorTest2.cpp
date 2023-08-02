@@ -5,6 +5,9 @@
 typedef ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot InteractionRoot;
 typedef ::edu::vanderbilt::vuisis::cpswt::hla::ObjectRoot ObjectRoot;
 
+#if __cplusplus >= 201703L
+#define throw(x, ...) throw()
+#endif
 
 const RTIAmbassadorTest2::ClassNameHandleMap &RTIAmbassadorTest2::get_interaction_class_name_handle_map_aux() {
     static ClassNameHandleMap interactionClassNameHandleMap;
@@ -333,3 +336,7 @@ RTI::EventRetractionHandle RTIAmbassadorTest2::updateAttributeValues (
 
     return RTI::EventRetractionHandle(); // DUMMY EventRetractionHandle
 }
+
+#if __cplusplus >= 201703L
+#undef throw
+#endif

@@ -20,6 +20,10 @@
 #include "GenericHandleValuePairForTesting.hpp"
 #include <boost/shared_ptr.hpp>
 
+#if __cplusplus >= 201703L
+#define throw(x, ...) throw()
+#endif
+
 class PropertyHandleValuePairSetForTesting :
   public RTI::ParameterHandleValuePairSet, public RTI::AttributeHandleValuePairSet {
 	//----------------------------------------------------------
@@ -130,5 +134,9 @@ class PropertyHandleValuePairSetForTesting :
 	//----------------------------------------------------------
 
 };
+
+#if __cplusplus >= 201703L
+#undef throw
+#endif
 
 #endif /* ATTRIBUTEHANDLEVALUEPAIRSET_H_ */

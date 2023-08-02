@@ -51,6 +51,10 @@ const std::string SynchronizedFederate::ReadyToResignSynch( "readyToResign" );
 
 // const double SynchronizedFederate::_stepSize = 0.2;
 
+#if __cplusplus >= 201703L
+#define throw(x, ...) throw()
+#endif
+
 void SynchronizedFederate::createRTI( void ) {
 
     bool rtiNotPresent = true;
@@ -675,3 +679,7 @@ void SynchronizedFederate::advanceTime( double time ) {
 //         _logger->addLog(id,attribute,std::string(value, valueLength),ptype,time,loglevel);
 //     }
 // }
+
+#if __cplusplus >= 201703L
+#undef throw
+#endif

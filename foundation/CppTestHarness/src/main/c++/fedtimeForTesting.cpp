@@ -31,6 +31,9 @@
 #include "RTIForTesting.hpp"
 #include <limits>
 
+#if __cplusplus >= 201703L
+#define throw(x, ...) throw()
+#endif
 
 RTI::FedTime::~FedTime() { }
 
@@ -278,3 +281,7 @@ RTI_STD::ostream &operator<< (RTI_STD::ostream &os, const RTI::FedTime &fedTime)
     RTIfedTime const *rtiFedTimePtr = dynamic_cast<RTIfedTime const *>(&fedTime);
     return os << (rtiFedTimePtr == nullptr ? -1 : rtiFedTimePtr->_fedTime);
 }
+
+#if __cplusplus >= 201703L
+#undef throw
+#endif
