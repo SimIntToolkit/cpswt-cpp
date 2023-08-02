@@ -52,7 +52,9 @@
 
 
 #if __cplusplus >= 201703L
-#define throw(x, ...)
+#define MultiArgTuple17
+#define Tuple17 noexcept
+#define throw(...) __VA_OPT__(MultiArg)##Tuple17
 #endif
 
 namespace edu {
@@ -169,6 +171,8 @@ public:
 } // NAMESPACE "edu"
 
 #if __cplusplus >= 201703L
+#undef MultiArgTuple17
+#undef Tuple17
 #undef throw
 #endif
 

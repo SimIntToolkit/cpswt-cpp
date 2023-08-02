@@ -32,7 +32,9 @@
 #include <limits>
 
 #if __cplusplus >= 201703L
-#define throw(x, ...)
+#define MultiArgTuple17
+#define Tuple17 noexcept
+#define throw(...) __VA_OPT__(MultiArg)##Tuple17
 #endif
 
 RTI::FedTime::~FedTime() { }
@@ -283,5 +285,7 @@ RTI_STD::ostream &operator<< (RTI_STD::ostream &os, const RTI::FedTime &fedTime)
 }
 
 #if __cplusplus >= 201703L
+#undef MultiArgTuple17
+#undef Tuple17
 #undef throw
 #endif

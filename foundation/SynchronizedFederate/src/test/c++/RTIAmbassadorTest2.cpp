@@ -6,7 +6,9 @@ typedef ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot InteractionRoot;
 typedef ::edu::vanderbilt::vuisis::cpswt::hla::ObjectRoot ObjectRoot;
 
 #if __cplusplus >= 201703L
-#define throw(x, ...)
+#define MultiArgTuple17
+#define Tuple17 noexcept
+#define throw(...) __VA_OPT__(MultiArg)##Tuple17
 #endif
 
 const RTIAmbassadorTest2::ClassNameHandleMap &RTIAmbassadorTest2::get_interaction_class_name_handle_map_aux() {
@@ -338,5 +340,7 @@ RTI::EventRetractionHandle RTIAmbassadorTest2::updateAttributeValues (
 }
 
 #if __cplusplus >= 201703L
+#undef MultiArgTuple17
+#undef Tuple17
 #undef throw
 #endif
