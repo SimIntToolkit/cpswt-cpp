@@ -52,7 +52,7 @@ public:
 #include "RTItypes.hpp"
 
 #if __cplusplus >= 201703L
-#define throw(x, ...) throw()
+#define throw(x, ...)
 #endif
 
     class RTIambassador {
@@ -1767,10 +1767,10 @@ public:
 
 typedef RTI::FederateAmbassador NullFederateAmbassador;
 
-#include "fedtimeForTesting.hpp"
-
 #if __cplusplus >= 201703L
 #undef throw
 #endif
+
+#include "fedtimeForTesting.hpp"
 
 #endif

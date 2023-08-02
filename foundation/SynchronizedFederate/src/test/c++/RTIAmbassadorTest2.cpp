@@ -6,7 +6,7 @@ typedef ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot InteractionRoot;
 typedef ::edu::vanderbilt::vuisis::cpswt::hla::ObjectRoot ObjectRoot;
 
 #if __cplusplus >= 201703L
-#define throw(x, ...) throw()
+#define throw(x, ...)
 #endif
 
 const RTIAmbassadorTest2::ClassNameHandleMap &RTIAmbassadorTest2::get_interaction_class_name_handle_map_aux() {

@@ -27,7 +27,7 @@ enum Boolean {
     RTI_TRUE};
 
 #if __cplusplus >= 201703L
-#define throw(x, ...) throw()
+#define throw(x, ...)
 #endif
 
 class RTI_EXPORT Exception {

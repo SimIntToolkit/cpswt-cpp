@@ -56,7 +56,7 @@
 #ifndef CPSWT_TEST
 
 #if __cplusplus >= 201703L
-#define throw(x, ...) throw()
+#define throw(x, ...)
 #endif
 
 #include "NullFederateAmbassador.hh"
@@ -90,7 +90,7 @@
 #endif
 
 #if __cplusplus >= 201703L
-#define throw(x, ...) throw()
+#define throw(x, ...)
 #endif
 
 namespace logging = boost::log;

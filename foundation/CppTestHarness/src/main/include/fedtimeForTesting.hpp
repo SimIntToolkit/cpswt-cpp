@@ -36,7 +36,7 @@
 #include <iostream>
 
 #if __cplusplus >= 201703L
-#define throw(x, ...) throw()
+#define throw(x, ...)
 #endif
 
 class RTI_EXPORT_FEDTIME RTIfedTime : public RTI::FedTime {

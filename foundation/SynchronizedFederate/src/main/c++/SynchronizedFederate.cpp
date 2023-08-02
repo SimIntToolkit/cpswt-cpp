@@ -52,7 +52,7 @@ const std::string SynchronizedFederate::ReadyToResignSynch( "readyToResign" );
 // const double SynchronizedFederate::_stepSize = 0.2;
 
 #if __cplusplus >= 201703L
-#define throw(x, ...) throw()
+#define throw(x, ...)
 #endif
 
 void SynchronizedFederate::createRTI( void ) {

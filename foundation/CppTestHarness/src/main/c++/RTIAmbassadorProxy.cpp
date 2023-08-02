@@ -31,7 +31,7 @@
 #include "RTIAmbassadorProxy.hpp"
 
 #if __cplusplus >= 201703L
-#define throw(x, ...) throw()
+#define throw(x, ...)
 #endif
 
 namespace RTIProxy {
