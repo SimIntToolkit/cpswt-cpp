@@ -5,6 +5,11 @@
 typedef ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot InteractionRoot;
 typedef ::edu::vanderbilt::vuisis::cpswt::hla::ObjectRoot ObjectRoot;
 
+#if __cplusplus >= 201703L
+#define MultiArgThrow17
+#define Throw17 noexcept
+#define throw(...) __VA_OPT__(MultiArg)##Throw17
+#endif
 
 const RTIAmbassadorTest2::ClassNameHandleMap &RTIAmbassadorTest2::get_interaction_class_name_handle_map_aux() {
     static ClassNameHandleMap interactionClassNameHandleMap;
@@ -333,3 +338,9 @@ RTI::EventRetractionHandle RTIAmbassadorTest2::updateAttributeValues (
 
     return RTI::EventRetractionHandle(); // DUMMY EventRetractionHandle
 }
+
+#if __cplusplus >= 201703L
+#undef MultiArgThrow17
+#undef Throw17
+#undef throw
+#endif

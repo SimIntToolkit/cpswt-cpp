@@ -32,6 +32,12 @@
 #include "AttributeHandleSetForTesting.hpp"
 #include "PropertyHandleValuePairSetForTesting.hpp"
 
+#if __cplusplus >= 201703L
+#define MultiArgTuple17
+#define Tuple17 noexcept
+#define throw(...) __VA_OPT__(MultiArg)##Tuple17
+#endif
+
 RTI::ParameterHandleValuePairSet *RTI::ParameterSetFactory::create(ULong count) throw (
   MemoryExhausted, ValueCountExceeded, HandleValuePairMaximumExceeded
 ) {
@@ -49,3 +55,9 @@ RTI::AttributeHandleSet* RTI::AttributeHandleSetFactory::create(ULong count) thr
 ) {
     return new AttributeHandleSetTest();
 }
+
+#if __cplusplus >= 201703L
+#undef MultiArgTuple17
+#undef Tuple17
+#undef throw
+#endif

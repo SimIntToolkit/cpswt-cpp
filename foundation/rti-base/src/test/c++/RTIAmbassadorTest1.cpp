@@ -36,6 +36,12 @@
 #include <limits>
 #include <iostream>
 
+#if __cplusplus >= 201703L
+#define MultiArgTuple17
+#define Tuple17 noexcept
+#define throw(...) __VA_OPT__(MultiArg)##Tuple17
+#endif
+
 using InteractionRoot = ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot;
 using ObjectRoot = ::edu::vanderbilt::vuisis::cpswt::hla::ObjectRoot;
 
@@ -337,3 +343,9 @@ RTI::EventRetractionHandle RTIAmbassadorTest1::updateAttributeValues (
 
     return RTI::EventRetractionHandle(); // DUMMY EventRestractionHandle
 }
+
+#if __cplusplus >= 201703L
+#undef MultiArgTuple17
+#undef Tuple17
+#undef throw
+#endif

@@ -35,6 +35,12 @@
 #include <string.h>
 #include <iostream>
 
+#if __cplusplus >= 201703L
+#define MultiArgTuple17
+#define Tuple17 noexcept
+#define throw(...) __VA_OPT__(MultiArg)##Tuple17
+#endif
+
 class RTI_EXPORT_FEDTIME RTIfedTime : public RTI::FedTime {
 //-----------------------------------------------------------------
 // Constructors and Destructors
@@ -183,5 +189,11 @@ RTIfedTime operator+ (const RTI::Double&, const RTI::FedTime&);
 RTIfedTime operator- (const RTI::Double&, const RTI::FedTime&);
 RTIfedTime operator* (const RTI::Double&, const RTI::FedTime&);
 RTIfedTime operator/ (const RTI::Double&, const RTI::FedTime&);
+
+#if __cplusplus >= 201703L
+#undef MultiArgTuple17
+#undef Tuple17
+#undef throw
+#endif
 
 #endif

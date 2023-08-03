@@ -31,6 +31,12 @@
 #include "RTIForTesting.hpp"
 #include "RTIAmbassadorProxy.hpp"
 
+#if __cplusplus >= 201703L
+#define MultiArgTuple17
+#define Tuple17 noexcept
+#define throw(...) __VA_OPT__(MultiArg)##Tuple17
+#endif
+
 // 4.2
 void RTI::RTIambassador::createFederationExecution (
   const char *executionName, // supplied C4
@@ -1720,3 +1726,8 @@ RTI::Region *RTI::RTIambassador::getRegion(
     return rtiAmbassadorProxy->getRegion(regionToken);
 }
 
+#if __cplusplus >= 201703L
+#undef MultiArgTuple17
+#undef Tuple17
+#undef throw
+#endif

@@ -26,6 +26,12 @@ enum Boolean {
     RTI_FALSE = 0,
     RTI_TRUE};
 
+#if __cplusplus >= 201703L
+#define MultiArgTuple17
+#define Tuple17 noexcept
+#define throw(...) __VA_OPT__(MultiArg)##Tuple17
+#endif
+
 class RTI_EXPORT Exception {
 public:
   ULong _serial;
@@ -56,6 +62,8 @@ public: \
   void        throwSelf() const         { throw *this; } \
 };
 
-
-
-
+#if __cplusplus >= 201703L
+#undef MultiArgTuple17
+#undef Tuple17
+#undef throw
+#endif

@@ -34,6 +34,11 @@
 #include <set>
 #include "RTIForTesting.hpp"
 
+#if __cplusplus >= 201703L
+#define MultiArgTuple17
+#define Tuple17 noexcept
+#define throw(...) __VA_OPT__(MultiArg)##Tuple17
+#endif
 
 class AttributeHandleSetTest: public RTI::AttributeHandleSet {
 
@@ -85,5 +90,11 @@ public:
         return sasCit == attributeHandleSet.end() ? RTI::RTI_FALSE : RTI::RTI_TRUE;
     }
 };
+
+#if __cplusplus >= 201703L
+#undef MultiArgTuple17
+#undef Tuple17
+#undef throw
+#endif
 
 #endif // _ATTRIBUTE_HANDLE_SET_TEST
