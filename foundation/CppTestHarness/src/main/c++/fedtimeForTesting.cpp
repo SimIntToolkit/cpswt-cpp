@@ -31,6 +31,11 @@
 #include "RTIForTesting.hpp"
 #include <limits>
 
+#if __cplusplus >= 201703L
+#define MultiArgTuple17
+#define Tuple17 noexcept
+#define throw(...) __VA_OPT__(MultiArg)##Tuple17
+#endif
 
 RTI::FedTime::~FedTime() { }
 
@@ -278,3 +283,9 @@ RTI_STD::ostream &operator<< (RTI_STD::ostream &os, const RTI::FedTime &fedTime)
     RTIfedTime const *rtiFedTimePtr = dynamic_cast<RTIfedTime const *>(&fedTime);
     return os << (rtiFedTimePtr == nullptr ? -1 : rtiFedTimePtr->_fedTime);
 }
+
+#if __cplusplus >= 201703L
+#undef MultiArgTuple17
+#undef Tuple17
+#undef throw
+#endif

@@ -42,8 +42,21 @@
 #define RTI_USES_STD_FSTREAM
 #endif
 
+#if __cplusplus >= 201703L
+#define MultiArgThrow17
+#define Throw17 noexcept
+#define throw(...) __VA_OPT__(MultiArg)##Throw17
+#endif
+
 #include <RTI.hh>
 #include "fedtime.hh"
+
+#if __cplusplus >= 201703L
+#undef MultiArgThrow17
+#undef Throw17
+#undef throw
+#endif
+
 
 #endif // CPSWT_TEST
 

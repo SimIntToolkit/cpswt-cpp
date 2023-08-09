@@ -12,6 +12,12 @@
 #include <iostream>
 #include <boost/shared_ptr.hpp>
 
+#if __cplusplus >= 201703L
+#define MultiArgThrow17
+#define Throw17 noexcept
+#define throw(...) __VA_OPT__(MultiArg)##Throw17
+#endif
+
 class RTIAmbassadorTest2: public RTIProxy::RTIAmbassadorProxy {
 
 public:
@@ -343,5 +349,11 @@ public:
       RTI::RTIinternalError
     ) override;
 };
+
+#if __cplusplus >= 201703L
+#undef MultiArgThrow17
+#undef Throw17
+#undef throw
+#endif
 
 #endif  // RTI_AMBASSADOR_TEST_2_HH

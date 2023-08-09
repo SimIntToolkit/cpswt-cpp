@@ -51,6 +51,12 @@ const std::string SynchronizedFederate::ReadyToResignSynch( "readyToResign" );
 
 // const double SynchronizedFederate::_stepSize = 0.2;
 
+#if __cplusplus >= 201703L
+#define MultiArgThrow17
+#define Throw17 noexcept
+#define throw(...) __VA_OPT__(MultiArg)##Throw17
+#endif
+
 void SynchronizedFederate::createRTI( void ) {
 
     bool rtiNotPresent = true;
@@ -675,3 +681,9 @@ void SynchronizedFederate::advanceTime( double time ) {
 //         _logger->addLog(id,attribute,std::string(value, valueLength),ptype,time,loglevel);
 //     }
 // }
+
+#if __cplusplus >= 201703L
+#undef MultiArgThrow17
+#undef Throw17
+#undef throw
+#endif

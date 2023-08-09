@@ -436,7 +436,9 @@ public:
 
     class ObjectReflectorSPComparator {
     public:
-        bool operator()(const ObjectReflector::SP &objectReflectorSP1, const ObjectReflector::SP &objectReflectorSP2) {
+        bool operator()(
+          const ObjectReflector::SP &objectReflectorSP1, const ObjectReflector::SP &objectReflectorSP2
+        ) const {
             return objectReflectorSP1->getTime() < objectReflectorSP2->getTime();
         }
     };
