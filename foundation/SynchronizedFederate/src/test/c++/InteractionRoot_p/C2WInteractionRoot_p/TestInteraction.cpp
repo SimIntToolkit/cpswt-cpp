@@ -28,114 +28,108 @@
  * OR MODIFICATIONS.
  */
 
-#include "ObjectRoot_p/TestObject.hpp"
+#include "InteractionRoot_p/C2WInteractionRoot_p/TestInteraction.hpp"
 namespace edu {
  namespace vanderbilt {
   namespace vuisis {
    namespace cpswt {
     namespace hla {
-     namespace ObjectRoot_p {
+     namespace InteractionRoot_p {
+      namespace C2WInteractionRoot_p {
 
-bool TestObject::static_init_var = TestObject::static_init();
+bool TestInteraction::static_init_var = TestInteraction::static_init();
 
-bool TestObject::static_init() {
-    BOOST_LOG_SEV(get_logger(), info) << "Class \"::edu::vanderbilt::vuisis::cpswt::hla::ObjectRoot_p::TestObject\" loaded.";
+bool TestInteraction::static_init() {
+    BOOST_LOG_SEV(get_logger(), info) << "Class \"::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::TestInteraction\" loaded.";
 
-    // ADD THIS CLASS TO THE _classNameSet DEFINED IN ObjectRoot
+    // ADD THIS CLASS TO THE _classNameSet DEFINED IN InteractionRoot
     get_hla_class_name_set().insert(get_hla_class_name());
 
-    ObjectRoot::NoInstanceInit noInstanceInit;
-    SP instanceSP = SP( new TestObject(noInstanceInit) );
+    InteractionRoot::NoInstanceInit noInstanceInit;
+    SP instanceSP = SP( new TestInteraction(noInstanceInit) );
     get_hla_class_name_instance_sp_map()[get_hla_class_name()] = instanceSP;
 
     ClassAndPropertyNameSetSP classAndPropertyNameSetSP( new ClassAndPropertyNameSet() );
 
     classAndPropertyNameSetSP->emplace(
-        "ObjectRoot.TestObject", "BoolValue1"
+        "InteractionRoot.C2WInteractionRoot.TestInteraction", "BoolValue1"
     );
 
-    get_class_and_property_name_initial_value_sp_map()[ClassAndPropertyName( "ObjectRoot.TestObject", "BoolValue1" )] =
+    get_class_and_property_name_initial_value_sp_map()[ClassAndPropertyName( "InteractionRoot.C2WInteractionRoot.TestInteraction", "BoolValue1" )] =
       ValueSP( new Value( false ));
 
     classAndPropertyNameSetSP->emplace(
-        "ObjectRoot.TestObject", "BoolValue2"
+        "InteractionRoot.C2WInteractionRoot.TestInteraction", "BoolValue2"
     );
 
-    get_class_and_property_name_initial_value_sp_map()[ClassAndPropertyName( "ObjectRoot.TestObject", "BoolValue2" )] =
+    get_class_and_property_name_initial_value_sp_map()[ClassAndPropertyName( "InteractionRoot.C2WInteractionRoot.TestInteraction", "BoolValue2" )] =
       ValueSP( new Value( false ));
 
     classAndPropertyNameSetSP->emplace(
-        "ObjectRoot.TestObject", "ByteValue"
+        "InteractionRoot.C2WInteractionRoot.TestInteraction", "ByteValue"
     );
 
-    get_class_and_property_name_initial_value_sp_map()[ClassAndPropertyName( "ObjectRoot.TestObject", "ByteValue" )] =
+    get_class_and_property_name_initial_value_sp_map()[ClassAndPropertyName( "InteractionRoot.C2WInteractionRoot.TestInteraction", "ByteValue" )] =
       ValueSP( new Value( static_cast<char>(0) ));
 
     classAndPropertyNameSetSP->emplace(
-        "ObjectRoot.TestObject", "CharValue"
+        "InteractionRoot.C2WInteractionRoot.TestInteraction", "CharValue"
     );
 
-    get_class_and_property_name_initial_value_sp_map()[ClassAndPropertyName( "ObjectRoot.TestObject", "CharValue" )] =
+    get_class_and_property_name_initial_value_sp_map()[ClassAndPropertyName( "InteractionRoot.C2WInteractionRoot.TestInteraction", "CharValue" )] =
       ValueSP( new Value( static_cast<char>(0) ));
 
     classAndPropertyNameSetSP->emplace(
-        "ObjectRoot.TestObject", "DoubleValue"
+        "InteractionRoot.C2WInteractionRoot.TestInteraction", "DoubleValue"
     );
 
-    get_class_and_property_name_initial_value_sp_map()[ClassAndPropertyName( "ObjectRoot.TestObject", "DoubleValue" )] =
+    get_class_and_property_name_initial_value_sp_map()[ClassAndPropertyName( "InteractionRoot.C2WInteractionRoot.TestInteraction", "DoubleValue" )] =
       ValueSP( new Value( static_cast<double>(0) ));
 
     classAndPropertyNameSetSP->emplace(
-        "ObjectRoot.TestObject", "FloatValue"
+        "InteractionRoot.C2WInteractionRoot.TestInteraction", "FloatValue"
     );
 
-    get_class_and_property_name_initial_value_sp_map()[ClassAndPropertyName( "ObjectRoot.TestObject", "FloatValue" )] =
+    get_class_and_property_name_initial_value_sp_map()[ClassAndPropertyName( "InteractionRoot.C2WInteractionRoot.TestInteraction", "FloatValue" )] =
       ValueSP( new Value( static_cast<float>(0) ));
 
     classAndPropertyNameSetSP->emplace(
-        "ObjectRoot.TestObject", "IntValue"
+        "InteractionRoot.C2WInteractionRoot.TestInteraction", "IntValue"
     );
 
-    get_class_and_property_name_initial_value_sp_map()[ClassAndPropertyName( "ObjectRoot.TestObject", "IntValue" )] =
+    get_class_and_property_name_initial_value_sp_map()[ClassAndPropertyName( "InteractionRoot.C2WInteractionRoot.TestInteraction", "IntValue" )] =
       ValueSP( new Value( static_cast<int>(0) ));
 
     classAndPropertyNameSetSP->emplace(
-        "ObjectRoot.TestObject", "JSONValue1"
+        "InteractionRoot.C2WInteractionRoot.TestInteraction", "JSONValue"
     );
 
-    get_class_and_property_name_initial_value_sp_map()[ClassAndPropertyName( "ObjectRoot.TestObject", "JSONValue1" )] =
+    get_class_and_property_name_initial_value_sp_map()[ClassAndPropertyName( "InteractionRoot.C2WInteractionRoot.TestInteraction", "JSONValue" )] =
       ValueSP( new Value( Json::Value("") ));
 
     classAndPropertyNameSetSP->emplace(
-        "ObjectRoot.TestObject", "JSONValue2"
+        "InteractionRoot.C2WInteractionRoot.TestInteraction", "LongValue"
     );
 
-    get_class_and_property_name_initial_value_sp_map()[ClassAndPropertyName( "ObjectRoot.TestObject", "JSONValue2" )] =
-      ValueSP( new Value( Json::Value("") ));
-
-    classAndPropertyNameSetSP->emplace(
-        "ObjectRoot.TestObject", "LongValue"
-    );
-
-    get_class_and_property_name_initial_value_sp_map()[ClassAndPropertyName( "ObjectRoot.TestObject", "LongValue" )] =
+    get_class_and_property_name_initial_value_sp_map()[ClassAndPropertyName( "InteractionRoot.C2WInteractionRoot.TestInteraction", "LongValue" )] =
       ValueSP( new Value( static_cast<long>(0) ));
 
     classAndPropertyNameSetSP->emplace(
-        "ObjectRoot.TestObject", "ShortValue"
+        "InteractionRoot.C2WInteractionRoot.TestInteraction", "ShortValue"
     );
 
-    get_class_and_property_name_initial_value_sp_map()[ClassAndPropertyName( "ObjectRoot.TestObject", "ShortValue" )] =
+    get_class_and_property_name_initial_value_sp_map()[ClassAndPropertyName( "InteractionRoot.C2WInteractionRoot.TestInteraction", "ShortValue" )] =
       ValueSP( new Value( static_cast<short>(0) ));
 
     classAndPropertyNameSetSP->emplace(
-        "ObjectRoot.TestObject", "StringValue"
+        "InteractionRoot.C2WInteractionRoot.TestInteraction", "StringValue"
     );
 
-    get_class_and_property_name_initial_value_sp_map()[ClassAndPropertyName( "ObjectRoot.TestObject", "StringValue" )] =
+    get_class_and_property_name_initial_value_sp_map()[ClassAndPropertyName( "InteractionRoot.C2WInteractionRoot.TestInteraction", "StringValue" )] =
       ValueSP( new Value( std::string("") ));
 
     // ADD THIS CLASS'S _classAndPropertyNameSet TO _classNamePropertyNameSetMap DEFINED
-    // IN ObjectRoot
+    // IN InteractionRoot
     get_class_name_class_and_property_name_set_sp_map()[get_hla_class_name()] = classAndPropertyNameSetSP;
 
     get_complete_class_and_property_name_set().insert(
@@ -145,62 +139,71 @@ bool TestObject::static_init() {
     ClassAndPropertyNameSetSP allClassAndPropertyNameSetSP( new ClassAndPropertyNameSet() );
 
     allClassAndPropertyNameSetSP->emplace(
-        "ObjectRoot.TestObject", "BoolValue1"
+        "InteractionRoot.C2WInteractionRoot.TestInteraction", "BoolValue1"
     );
 
     allClassAndPropertyNameSetSP->emplace(
-        "ObjectRoot.TestObject", "BoolValue2"
+        "InteractionRoot.C2WInteractionRoot.TestInteraction", "BoolValue2"
     );
 
     allClassAndPropertyNameSetSP->emplace(
-        "ObjectRoot.TestObject", "ByteValue"
+        "InteractionRoot.C2WInteractionRoot.TestInteraction", "ByteValue"
     );
 
     allClassAndPropertyNameSetSP->emplace(
-        "ObjectRoot.TestObject", "CharValue"
+        "InteractionRoot.C2WInteractionRoot.TestInteraction", "CharValue"
     );
 
     allClassAndPropertyNameSetSP->emplace(
-        "ObjectRoot.TestObject", "DoubleValue"
+        "InteractionRoot.C2WInteractionRoot.TestInteraction", "DoubleValue"
     );
 
     allClassAndPropertyNameSetSP->emplace(
-        "ObjectRoot.TestObject", "FloatValue"
+        "InteractionRoot.C2WInteractionRoot.TestInteraction", "FloatValue"
     );
 
     allClassAndPropertyNameSetSP->emplace(
-        "ObjectRoot.TestObject", "IntValue"
+        "InteractionRoot.C2WInteractionRoot.TestInteraction", "IntValue"
     );
 
     allClassAndPropertyNameSetSP->emplace(
-        "ObjectRoot.TestObject", "JSONValue1"
+        "InteractionRoot.C2WInteractionRoot.TestInteraction", "JSONValue"
     );
 
     allClassAndPropertyNameSetSP->emplace(
-        "ObjectRoot.TestObject", "JSONValue2"
+        "InteractionRoot.C2WInteractionRoot.TestInteraction", "LongValue"
     );
 
     allClassAndPropertyNameSetSP->emplace(
-        "ObjectRoot.TestObject", "LongValue"
+        "InteractionRoot.C2WInteractionRoot.TestInteraction", "ShortValue"
     );
 
     allClassAndPropertyNameSetSP->emplace(
-        "ObjectRoot.TestObject", "ShortValue"
+        "InteractionRoot.C2WInteractionRoot.TestInteraction", "StringValue"
     );
 
     allClassAndPropertyNameSetSP->emplace(
-        "ObjectRoot.TestObject", "StringValue"
+        "InteractionRoot.C2WInteractionRoot", "actualLogicalGenerationTime"
+    );
+
+    allClassAndPropertyNameSetSP->emplace(
+        "InteractionRoot.C2WInteractionRoot", "federateFilter"
+    );
+
+    allClassAndPropertyNameSetSP->emplace(
+        "InteractionRoot.C2WInteractionRoot", "federateSequence"
     );
 
     // ADD THIS CLASS'S _allClassAndPropertyNameSet TO _classNameAllPropertyNameSetMap DEFINED
-    // IN ObjectRoot
+    // IN InteractionRoot
     get_class_name_all_class_and_property_name_set_sp_map()[get_hla_class_name()] = allClassAndPropertyNameSetSP;
 
     common_init(get_hla_class_name());
     return true;
 }
 
-     } // NAMESPACE "ObjectRoot_p"
+      } // NAMESPACE "C2WInteractionRoot_p"
+     } // NAMESPACE "InteractionRoot_p"
     } // NAMESPACE "hla"
    } // NAMESPACE "cpswt"
   } // NAMESPACE "vuisis"

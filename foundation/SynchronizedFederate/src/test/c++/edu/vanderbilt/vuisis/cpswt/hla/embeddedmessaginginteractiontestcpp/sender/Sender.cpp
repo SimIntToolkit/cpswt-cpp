@@ -28,7 +28,7 @@
  * OR MODIFICATIONS.
  */
 
-#include "edu/vanderbilt/vuisis/cpswt/hla/embeddedmessagingobjecttestcpp/sender/Sender.hpp"
+#include "edu/vanderbilt/vuisis/cpswt/hla/embeddedmessaginginteractiontestcpp/sender/Sender.hpp"
 
 
 namespace edu {
@@ -36,14 +36,10 @@ namespace edu {
   namespace vuisis {
    namespace cpswt {
     namespace hla {
-     namespace embeddedmessagingobjecttestcpp {
+     namespace embeddedmessaginginteractiontestcpp {
       namespace sender {
 
 Sender::Sender(FederateConfig *federateConfig): Super(federateConfig) {
-    //////////////////////////////////////////////////////
-    // TODO register object instances after super(args) //
-    //////////////////////////////////////////////////////
-    registerObject(TestObject_0);
 }
 
 void Sender::initialize( void ) {
@@ -62,28 +58,30 @@ void Sender::initialize( void ) {
 
 void Sender::execute() {
 
-    TestObject_0.set_BoolValue1(false);
-    TestObject_0.set_BoolValue2(true);
-    TestObject_0.set_ByteValue(42);
-    TestObject_0.set_CharValue('X');
-    TestObject_0.set_DoubleValue(2.7181);
-    TestObject_0.set_FloatValue(3.14f);
-    TestObject_0.set_IntValue(1000000);
-    TestObject_0.set_ShortValue(300);
-    TestObject_0.set_LongValue(1000000000000000000L);
-    TestObject_0.set_StringValue("Hello");
-    TestObject_0.set_JSONValue1(Json::Value(Json::arrayValue));
+    TestInteraction_0.set_BoolValue1(false);
+    TestInteraction_0.set_BoolValue2(true);
+    TestInteraction_0.set_ByteValue(42);
+    TestInteraction_0.set_CharValue('X');
+    TestInteraction_0.set_DoubleValue(2.7181);
+    TestInteraction_0.set_FloatValue(3.14f);
+    TestInteraction_0.set_IntValue(1000000);
+    TestInteraction_0.set_ShortValue(300);
+    TestInteraction_0.set_LongValue(1000000000000000000L);
 
     Json::Value thingList(Json::arrayValue);
     thingList.append("this");
     thingList.append("that");
     thingList.append("other");
-    TestObject_0.set_JSONValue2(thingList);
+    TestInteraction_0.set_JSONValue(thingList);
 
-    updateAttributeValues(TestObject_0, 0.0);
+    TestInteraction_0.set_StringValue("Hello");
+    TestInteraction_0.set_actualLogicalGenerationTime(0.0);
+    TestInteraction_0.set_federateFilter("");
+
+    sendInteraction(TestInteraction_0, 0.0);
 }
       } // NAMESPACE "sender"
-     } // NAMESPACE "embeddedmessagingobjecttestcpp"
+     } // NAMESPACE "embeddedmessaginginteractiontestcpp"
     } // NAMESPACE "hla"
    } // NAMESPACE "cpswt"
   } // NAMESPACE "vuisis"

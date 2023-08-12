@@ -238,13 +238,8 @@ std::string ObjectRoot::ObjectReflector::toJson() const {
             case TypeMedley::STRING:
                 propertyJSONObject[key] = static_cast<std::string>(value);
                 break;
-            case TypeMedley::STRINGLIST:
-                Json::Value jsonArray(Json::arrayValue);
-                const std::list<std::string> stringList(value.asStringList());
-                for(const std::string &item : stringList) {
-                    jsonArray.append(item);
-                }
-                propertyJSONObject[key] = jsonArray;
+            case TypeMedley::JSON:
+                propertyJSONObject[key] = static_cast<Json::Value>(value);
                 break;
         }
     }
@@ -900,13 +895,8 @@ std::string ObjectRoot::toJson(bool force) {
                 case TypeMedley::STRING:
                     propertyJSONObject[key] = static_cast<std::string>(value);
                     break;
-                case TypeMedley::STRINGLIST:
-                    Json::Value jsonArray(Json::arrayValue);
-                    const std::list<std::string> stringList(value.asStringList());
-                    for(const std::string &item : stringList) {
-                        jsonArray.append(item);
-                    }
-                    propertyJSONObject[key] = jsonArray;
+                case TypeMedley::JSON:
+                    propertyJSONObject[key] = static_cast<Json::Value>(value);
                     break;
             }
         }
@@ -1005,13 +995,10 @@ ObjectRoot::ObjectReflector::SP ObjectRoot::fromJson(const std::string &jsonStri
                   propertyJSONObject[memberName].asString()
                 );
                 break;
-            case TypeMedley::STRINGLIST:
-                std::list<std::string> stringList;
-                Json::Value arrayValue = propertyJSONObject[memberName];
-                for(auto item: arrayValue) {
-                    stringList.push_back(item.asString());
-                }
-                classAndPropertyNameValueSPMap[classAndPropertyName]->setValue(stringList);
+            case TypeMedley::JSON:
+                classAndPropertyNameValueSPMap[classAndPropertyName]->setValue(
+                  propertyJSONObject[memberName]
+                );
                 break;
         }
     }

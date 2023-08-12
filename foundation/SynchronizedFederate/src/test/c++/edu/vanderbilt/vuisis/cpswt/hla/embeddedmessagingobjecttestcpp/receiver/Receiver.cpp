@@ -88,8 +88,7 @@ void Receiver::initialize( void ) {
 
 void Receiver::execute() {
     checkReceivedSubscriptions();
-    }
-
+}
       } // NAMESPACE "receiver"
      } // NAMESPACE "embeddedmessagingobjecttestcpp"
     } // NAMESPACE "hla"

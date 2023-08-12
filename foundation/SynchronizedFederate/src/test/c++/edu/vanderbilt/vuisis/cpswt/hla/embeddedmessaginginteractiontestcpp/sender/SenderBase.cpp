@@ -30,8 +30,7 @@
 
 
 
-#include "edu/vanderbilt/vuisis/cpswt/hla/embeddedmessagingobjecttestcpp/receiver/ReceiverBase.hpp"
-
+#include "edu/vanderbilt/vuisis/cpswt/hla/embeddedmessaginginteractiontestcpp/sender/SenderBase.hpp"
 
 #if __cplusplus >= 201703L
 #define MultiArgThrow17
@@ -39,50 +38,36 @@
 #define throw(...) __VA_OPT__(MultiArg)##Throw17
 #endif
 
+
 namespace edu {
  namespace vanderbilt {
   namespace vuisis {
    namespace cpswt {
     namespace hla {
-     namespace embeddedmessagingobjecttestcpp {
-      namespace receiver {
+     namespace embeddedmessaginginteractiontestcpp {
+      namespace sender {
 
 
 // constructor
-void ReceiverBase::init() {
+void SenderBase::init() {
     createRTI();
     joinFederation();
 
     enableTimeConstrained();
     enableTimeRegulation(getLookahead());
 
-    // INTERACTION SUBSCRIPTIONS
+    // DIRECT INTERACTION PUBLICATIONS
+    ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::EmbeddedMessaging_p::TestOmnetFederate::publish_interaction(getRTI());
 
-    ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::EmbeddedMessaging_p::Receiver::subscribe_interaction(getRTI());
-
-    // SOFT OBJECT SUBSCRIPTIONS
-    ::edu::vanderbilt::vuisis::cpswt::hla::ObjectRoot_p::TestObject::soft_subscribe_attribute("ObjectRoot.TestObject", "IntValue");
-    ::edu::vanderbilt::vuisis::cpswt::hla::ObjectRoot_p::TestObject::soft_subscribe_attribute("ObjectRoot.TestObject", "JSONValue2");
-    ::edu::vanderbilt::vuisis::cpswt::hla::ObjectRoot_p::TestObject::soft_subscribe_attribute("ObjectRoot.TestObject", "LongValue");
-    ::edu::vanderbilt::vuisis::cpswt::hla::ObjectRoot_p::TestObject::soft_subscribe_attribute("ObjectRoot.TestObject", "ShortValue");
-    ::edu::vanderbilt::vuisis::cpswt::hla::ObjectRoot_p::TestObject::soft_subscribe_attribute("ObjectRoot.TestObject", "StringValue");
-    ::edu::vanderbilt::vuisis::cpswt::hla::ObjectRoot_p::TestObject::soft_subscribe_object(getRTI());
-
-    // DIRECT OBJECT SUBSCRIPTIONS
-    ::edu::vanderbilt::vuisis::cpswt::hla::ObjectRoot_p::TestObject::subscribe_attribute("ObjectRoot.TestObject", "BoolValue2");
-    ::edu::vanderbilt::vuisis::cpswt::hla::ObjectRoot_p::TestObject::subscribe_attribute("ObjectRoot.TestObject", "ByteValue");
-    ::edu::vanderbilt::vuisis::cpswt::hla::ObjectRoot_p::TestObject::subscribe_attribute("ObjectRoot.TestObject", "CharValue");
-    ::edu::vanderbilt::vuisis::cpswt::hla::ObjectRoot_p::TestObject::subscribe_attribute("ObjectRoot.TestObject", "DoubleValue");
-    ::edu::vanderbilt::vuisis::cpswt::hla::ObjectRoot_p::TestObject::subscribe_attribute("ObjectRoot.TestObject", "JSONValue1");
-
-    ::edu::vanderbilt::vuisis::cpswt::hla::ObjectRoot_p::TestObject::subscribe_object(getRTI());
+    // SOFT INTERACTION PUBLICATIONS
+    ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::TestInteraction::add_federate_name_soft_publish("TestOmnetFederate");
 }
 
-ReceiverBase::ReceiverBase(FederateConfig *federateConfig): Super(federateConfig) {
+SenderBase::SenderBase(FederateConfig *federateConfig): Super(federateConfig) {
     init();
 }
 
-void ReceiverBase::receiveInteraction(
+void SenderBase::receiveInteraction(
   RTI::InteractionClassHandle interactionClassHandle,
   const RTI::ParameterHandleValuePairSet& parameterHandleValuePairSet,
   const char *userSuppliedTag
@@ -109,7 +94,7 @@ void ReceiverBase::receiveInteraction(
     }
 }
 
-void ReceiverBase::receiveInteraction(
+void SenderBase::receiveInteraction(
   RTI::InteractionClassHandle interactionClassHandle,
   const RTI::ParameterHandleValuePairSet &parameterHandleValuePairSet,
   const RTI::FedTime &fedTime,
@@ -140,8 +125,8 @@ void ReceiverBase::receiveInteraction(
         );
     }
 }
-      } // NAMESPACE "receiver"
-     } // NAMESPACE "embeddedmessagingobjecttestcpp"
+      } // NAMESPACE "sender"
+     } // NAMESPACE "embeddedmessaginginteractiontestcpp"
     } // NAMESPACE "hla"
    } // NAMESPACE "cpswt"
   } // NAMESPACE "vuisis"

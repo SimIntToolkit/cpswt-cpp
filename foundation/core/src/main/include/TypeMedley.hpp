@@ -44,7 +44,7 @@
 
 class TypeMedley {
 public:
-    enum DataType { BOOLEAN, CHARACTER, SHORT, INTEGER, LONG, FLOAT, DOUBLE, STRING, STRINGLIST };
+    enum DataType { BOOLEAN, CHARACTER, SHORT, INTEGER, LONG, FLOAT, DOUBLE, STRING, JSON };
     typedef boost::shared_ptr<TypeMedley> SP;
 
 private:
@@ -78,7 +78,7 @@ private:
         enumToStringTypeMap[FLOAT] = "float";
         enumToStringTypeMap[DOUBLE] = "double";
         enumToStringTypeMap[STRING] = "std::string";
-        enumToStringTypeMap[STRINGLIST] = "std::list<std::string>";
+        enumToStringTypeMap[JSON] = "Json::Value";
 
         return enumToStringTypeMap;
     }
@@ -89,37 +89,23 @@ private:
         return enumToStringTypeMap;
     }
 
-    std::list<std::string> jsonToList() const {
-        std::list<std::string> stringList;
-
+    Json::Value jsonStringToJson() const {
         std::istringstream jsonInputStream(_value);
 
         Json::Value topLevelJSONObject;
         jsonInputStream >> topLevelJSONObject;
 
-        if (topLevelJSONObject.isArray()) {
-            for (auto item : topLevelJSONObject) {
-                stringList.push_back(item.asString());
-            }
-        } else {
-            stringList.push_back(asString());
-        }
-
-        return stringList;
+        return topLevelJSONObject;
     }
 
-    std::string listToJson(const std::list<std::string> &stringList) const {
-        Json::Value topLevelJSONObject(Json::arrayValue);
-        for(const std::string &item : stringList) {
-            topLevelJSONObject.append(item);
-        }
+    std::string jsonToJsonString(const Json::Value &jsonValue) const {
 
         Json::StreamWriterBuilder streamWriterBuilder;
         streamWriterBuilder["commentStyle"] = "None";
         streamWriterBuilder["indentation"] = "    ";
         std::unique_ptr<Json::StreamWriter> streamWriterUPtr(streamWriterBuilder.newStreamWriter());
         std::ostringstream stringOutputStream;
-        streamWriterUPtr->write(topLevelJSONObject, &stringOutputStream);
+        streamWriterUPtr->write(jsonValue, &stringOutputStream);
         return stringOutputStream.str();
     }
 
@@ -152,8 +138,8 @@ public:
     explicit TypeMedley(std::string value):
       _dataType(STRING), _value(std::move(value)) { }
 
-    explicit TypeMedley(const std::list<std::string> &value):
-      _dataType(STRINGLIST), _value(listToJson(value)) { }
+    explicit TypeMedley(const Json::Value &value):
+      _dataType(JSON), _value(jsonToJsonString(value)) { }
 
 public:
     DataType getDataType() const {
@@ -191,18 +177,26 @@ public:
             case STRING:
                 _value = boost::lexical_cast<std::string>(value);
                 break;
-            case STRINGLIST:
-                std::string stringValue = boost::lexical_cast<std::string>(value);
-                std::list<std::string> stringList;
-                stringList.push_back(stringValue);
-                _value = listToJson(stringList);
+            case JSON:
+                Json::Value jsonValue(value);
+                _value = jsonToJsonString(jsonValue);
                 break;
         }
         return true;
     }
 
-    // SPECIALIZATION FOR LIST OF STRINGS
-    bool setValue(const std::list<std::string> &value) {
+    bool setValue(long value) {
+        return setValue(static_cast<Json::Value::Int64>(value));
+    }
+    // SPECIALIZATION FOR std::string
+    bool setValue(const std::string &value);
+
+    bool setValue(const char *cString) {
+        return setValue(std::string(cString));
+    }
+
+    // SPECIALIZATION FOR Json::Value
+    bool setValue(const Json::Value &value) {
         switch(_dataType) {
             case BOOLEAN:
                 _value = boost::lexical_cast<std::string>(static_cast<bool>(value.size()));
@@ -226,10 +220,8 @@ public:
                 _value = boost::lexical_cast<std::string>(static_cast<double>(value.size()));
                 break;
             case STRING:
-                _value = boost::lexical_cast<std::string>(value.size() == 0 ? std::string("") : value.front());
-                break;
-            case STRINGLIST:
-                _value = listToJson(value);
+            case JSON:
+                _value = jsonToJsonString(value);
                 break;
         }
         return true;
@@ -264,16 +256,10 @@ public:
                 setValue( other.asDouble() );
                 break;
             case STRING:
-            case STRINGLIST:
+            case JSON:
                 setValue( other.asString() );
                 break;
         }
-    }
-
-    bool setValue(const std::string &value);
-
-    bool setValue(const char *cString) {
-        return setValue(std::string(cString));
     }
 
 private:
@@ -281,8 +267,8 @@ private:
     template<typename T>
     T convertToType() const {
         switch(_dataType) {
-            case STRINGLIST: {
-                return static_cast<T>(jsonToList().size());
+            case JSON: {
+                return static_cast<T>(jsonStringToJson().size());
             }
             case STRING: {
                 if (!hasDoubleFormat(_value)) {
@@ -298,8 +284,9 @@ private:
 public:
     bool asBool() const {
         switch(_dataType) {
-            case STRINGLIST: {
-                return static_cast<bool>(jsonToList().size());
+            case JSON: {
+                Json::Value value = jsonStringToJson();
+                return static_cast<bool>(value.size());
             }
             case STRING: {
                 return string_to_bool(_value);
@@ -379,12 +366,32 @@ public:
         return asString();
     }
 
-    std::list<std::string> asStringList() const {
-        return jsonToList();
+    Json::Value asJson() const {
+        switch(_dataType) {
+            case BOOLEAN:
+                return Json::Value(asBool());
+            case CHARACTER:
+                return Json::Value(asChar());
+            case SHORT:
+                return Json::Value(asShort());
+            case INTEGER:
+                return Json::Value(asInt());
+            case LONG:
+                return Json::Value(static_cast<Json::Value::Int64>(asLong()));
+            case FLOAT:
+                return Json::Value(asFloat());
+            case DOUBLE:
+                return Json::Value(asDouble());
+            case STRING:
+                return Json::Value(asString());
+            case JSON:
+                return jsonStringToJson();
+                
+        }
     }
 
-    operator std::list<std::string>() const {
-        return asStringList();
+    operator Json::Value() const {
+        return asJson();
     }
 
     std::string getStringRepresentation() const {

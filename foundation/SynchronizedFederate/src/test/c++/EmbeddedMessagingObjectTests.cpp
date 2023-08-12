@@ -6,7 +6,10 @@
 #include <boost/lexical_cast.hpp>
 
 typedef ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot InteractionRoot;
-typedef ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::EmbeddedMessaging EmbeddedMessaging;
+typedef ::edu::vanderbilt::vuisis::cpswt::hla::
+  InteractionRoot_p::C2WInteractionRoot_p::EmbeddedMessaging EmbeddedMessaging;
+typedef ::edu::vanderbilt::vuisis::cpswt::hla::
+  InteractionRoot_p::C2WInteractionRoot_p::EmbeddedMessaging_p::TestOmnetFederate TestOmnetFederate;
 
 typedef ::edu::vanderbilt::vuisis::cpswt::hla::ObjectRoot ObjectRoot;
 typedef ::edu::vanderbilt::vuisis::cpswt::hla::ObjectRoot_p::TestObject TestObject;
@@ -14,40 +17,6 @@ typedef ::edu::vanderbilt::vuisis::cpswt::hla::ObjectRoot_p::TestObject TestObje
 typedef ::edu::vanderbilt::vuisis::cpswt::hla::embeddedmessagingobjecttestcpp::sender::Sender Sender;
 typedef ::edu::vanderbilt::vuisis::cpswt::hla::embeddedmessagingobjecttestcpp::receiver::Receiver Receiver;
 
-
-void EmbeddedMessagingObjectTests::compareStringLists(
-  const std::list<std::string> &list1, const std::list<std::string> &list2
-) {
-
-    CPPUNIT_ASSERT_EQUAL(list1.size(), list2.size());
-    std::list<std::string>::const_iterator stlCit1 = list1.begin();
-    std::list<std::string>::const_iterator stlCit2 = list2.begin();
-    while(stlCit1 != list1.end()) {
-        CPPUNIT_ASSERT_EQUAL(*stlCit1, *stlCit2);
-        ++stlCit1;
-        ++stlCit2;
-    }
-}
-
-bool EmbeddedMessagingObjectTests::stringListsNotEqual(
-  const std::list<std::string> &list1, const std::list<std::string> &list2
-) {
-
-    if (list1.size() != list2.size()) {
-        return true;
-    }
-    std::list<std::string>::const_iterator stlCit1 = list1.begin();
-    std::list<std::string>::const_iterator stlCit2 = list2.begin();
-    while(stlCit1 != list1.end()) {
-        if (*stlCit1 != *stlCit2) {
-            return true;
-        }
-        ++stlCit1;
-        ++stlCit2;
-    }
-
-    return false;
-}
 
 void EmbeddedMessagingObjectTests::testObjectNetworkPropagation() {
 
@@ -61,7 +30,7 @@ void EmbeddedMessagingObjectTests::testObjectNetworkPropagation() {
     // CLASS HANDLES FOR FEDERATE-SPECIFIC EmbeddedMessaging INTERACTIONS
     //
     int embeddedMessagingOmnetFederateInteractionClassHandle = InteractionRoot::get_class_handle(
-            EmbeddedMessaging::get_hla_class_name() + ".OmnetFederate"
+            EmbeddedMessaging::get_hla_class_name() + ".TestOmnetFederate"
     );
 
     //
@@ -138,16 +107,16 @@ void EmbeddedMessagingObjectTests::testObjectNetworkPropagation() {
 
     // THE ATTRIBUTES THAT ARE PUBLISHED FOR THE REGISTERED OBJECT SHOULD HAVE THE SAME VALUES
     // AS THE CORRESPONDING ATTRIBUTES IN THE LOCAL OBJECT
-    CPPUNIT_ASSERT_EQUAL(senderTestObject.get_BooleanValue1(), localTestObject.get_BooleanValue1());
-    CPPUNIT_ASSERT_EQUAL(senderTestObject.get_BooleanValue2(), localTestObject.get_BooleanValue2());
+    CPPUNIT_ASSERT_EQUAL(senderTestObject.get_BoolValue1(), localTestObject.get_BoolValue1());
+    CPPUNIT_ASSERT_EQUAL(senderTestObject.get_BoolValue2(), localTestObject.get_BoolValue2());
     CPPUNIT_ASSERT_EQUAL(senderTestObject.get_ByteValue(), localTestObject.get_ByteValue());
     CPPUNIT_ASSERT_EQUAL(senderTestObject.get_CharValue(), localTestObject.get_CharValue());
     CPPUNIT_ASSERT_DOUBLES_EQUAL(senderTestObject.get_FloatValue(), localTestObject.get_FloatValue(), 0.001);
     CPPUNIT_ASSERT_EQUAL(senderTestObject.get_IntValue(), localTestObject.get_IntValue());
     CPPUNIT_ASSERT_EQUAL(senderTestObject.get_LongValue(), localTestObject.get_LongValue());
     CPPUNIT_ASSERT_EQUAL(senderTestObject.get_ShortValue(), localTestObject.get_ShortValue());
-    compareStringLists(senderTestObject.get_StringListValue1(), localTestObject.get_StringListValue1());
-    compareStringLists(senderTestObject.get_StringListValue2(), localTestObject.get_StringListValue2());
+    CPPUNIT_ASSERT_EQUAL(senderTestObject.get_JSONValue1(), localTestObject.get_JSONValue1());
+    CPPUNIT_ASSERT_EQUAL(senderTestObject.get_JSONValue2(), localTestObject.get_JSONValue2());
 
     // THE ATTRIBUTES THAT ARE *NOT* PUBLISHED FOR THE REGISTERED OBJECT SHOULD *NOT* HAVE THE SAME VALUES
     // AS THE CORRESPONDING ATTRIBUTES IN THE LOCAL OBJECT
@@ -155,7 +124,7 @@ void EmbeddedMessagingObjectTests::testObjectNetworkPropagation() {
     CPPUNIT_ASSERT(senderTestObject.get_StringValue() != localTestObject.get_StringValue());
 
     // WHEN THE SENDER CALLED "updateAttributes" FOR THE REGISTERED OBJECT, IT SHOULD ALSO HAVE
-    // SENT AN EmbeddedMessaging.OmnetFederate INTERACTION TO SEND THE UPDATED ATTRIBUTES THROUGH
+    // SENT AN EmbeddedMessaging.TestOmnetFederate INTERACTION TO SEND THE UPDATED ATTRIBUTES THROUGH
     // A SIMULATED NETWORK.
     CPPUNIT_ASSERT_EQUAL(1, static_cast<int>(sentInteractionDataSPList.size()));
 
@@ -167,7 +136,7 @@ void EmbeddedMessagingObjectTests::testObjectNetworkPropagation() {
       *updatedAttributesEmbeddedMessagingOmnetFederateDataSP;
 
     // THE CLASS HANDLE OF THE INTERACTION ASSOCIATED WITH THE ATTRIBUTES UPDATE SHOULD
-    // THAT OF THE OmnetFederate-SPECIFIC EmbeddedMessaging INTERACTION
+    // THAT OF THE TestOmnetFederate-SPECIFIC EmbeddedMessaging INTERACTION
     int updateAttributesEmbeddedMessagingOmnetFederateClassHandle =
             updatedAttributesEmbeddedMessagingOmnetFederateData.getInteractionClassHandle();
     CPPUNIT_ASSERT_EQUAL(
@@ -181,21 +150,18 @@ void EmbeddedMessagingObjectTests::testObjectNetworkPropagation() {
             updatedAttributesEmbeddedMessagingOmnetFederateData.getParameterHandleValuePairSet()
     );
 
-    edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::EmbeddedMessaging_p::OmnetFederate::SP
-      localEmbeddedMessagingOmnetFederateInteractionSP =
-        boost::dynamic_pointer_cast<
-          edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::EmbeddedMessaging_p::OmnetFederate
-        >(localEmbeddedMessagingOmnetFederateInteractionRootSP);
+    TestOmnetFederate::SP localEmbeddedMessagingOmnetFederateInteractionSP =
+      boost::dynamic_pointer_cast<TestOmnetFederate>(localEmbeddedMessagingOmnetFederateInteractionRootSP);
 
 
-    // THE LOCAL INTERACTION SHOULD BE OF THE OmnetFederate-SPECIFIC EmbeddedMessaging CLASS
+    // THE LOCAL INTERACTION SHOULD BE OF THE TestOmnetFederate-SPECIFIC EmbeddedMessaging CLASS
     CPPUNIT_ASSERT(localEmbeddedMessagingOmnetFederateInteractionSP);
 
-    // CAST THE LOCAL INTERACTION TO THE OmnetFederate-SPECIFIC EmbeddedMessaging CLASS
-    ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::EmbeddedMessaging_p::OmnetFederate
-      &localEmbeddedMessagingOmnetFederateInteraction = *localEmbeddedMessagingOmnetFederateInteractionSP;
+    // CAST THE LOCAL INTERACTION TO THE TestOmnetFederate-SPECIFIC EmbeddedMessaging CLASS
+    TestOmnetFederate &localEmbeddedMessagingOmnetFederateInteraction =
+      *localEmbeddedMessagingOmnetFederateInteractionSP;
 
-    // THE command FOR THE LOCAL EmbeddedMessaging.OmnetFederate INTERACTION SHOULD BE "object"
+    // THE command FOR THE LOCAL EmbeddedMessaging.TestOmnetFederate INTERACTION SHOULD BE "object"
     CPPUNIT_ASSERT_EQUAL(localEmbeddedMessagingOmnetFederateInteraction.get_command(), std::string("object"));
 
     // THE hlaClassName SHOULD BE FOR TestObject
@@ -274,12 +240,8 @@ void EmbeddedMessagingObjectTests::testObjectNetworkPropagation() {
                 CPPUNIT_ASSERT_EQUAL(value.asString(), jsonValue.asString());
                 break;
             }
-            case TypeMedley::STRINGLIST: {
-                std::list<std::string> jsonStringListValue;
-                for(auto item: jsonValue) {
-                    jsonStringListValue.push_back(item.asString());
-                }
-                compareStringLists(value.asStringList(), jsonStringListValue);
+            case TypeMedley::JSON: {
+                CPPUNIT_ASSERT_EQUAL(value.asJson(), jsonValue);
                 break;
             }
         }
@@ -341,9 +303,9 @@ void EmbeddedMessagingObjectTests::testObjectNetworkPropagation() {
     CPPUNIT_ASSERT(receiver.getTestObjectSP());
 
     TestObject &receivedTestObject = *receiver.getTestObjectSP();
-    // NOT SUBSCRIBED BY Receiver, SO receivedTestObject.get_BooleanValue1() HAS DEFAULT VALUE OF false,
-    // BUT localTestObject.get_BooleanValue1 IS INCIDENTALLY false
-    CPPUNIT_ASSERT_EQUAL(receivedTestObject.get_BooleanValue1(), localTestObject.get_BooleanValue1());
+    // NOT SUBSCRIBED BY Receiver, SO receivedTestObject.get_BoolValue1() HAS DEFAULT VALUE OF false,
+    // BUT localTestObject.get_BoolValue1 IS INCIDENTALLY false
+    CPPUNIT_ASSERT_EQUAL(receivedTestObject.get_BoolValue1(), localTestObject.get_BoolValue1());
     // NOT PUBLISHED BY Sender, SO BOTH HAVE DEFAULT VALUE
     CPPUNIT_ASSERT_DOUBLES_EQUAL(receivedTestObject.get_DoubleValue(), localTestObject.get_DoubleValue(), 0.001);
     // NOT SUBSCRIBED BY Receiver
@@ -352,18 +314,16 @@ void EmbeddedMessagingObjectTests::testObjectNetworkPropagation() {
     CPPUNIT_ASSERT_EQUAL(receivedTestObject.get_StringValue(), localTestObject.get_StringValue());
 
     // BOTH PUBLISHED BY SENDER AND SUBSCRIBED BY RECEIVER
-    CPPUNIT_ASSERT_EQUAL(receivedTestObject.get_BooleanValue2(), localTestObject.get_BooleanValue2());
+    CPPUNIT_ASSERT_EQUAL(receivedTestObject.get_BoolValue2(), localTestObject.get_BoolValue2());
     CPPUNIT_ASSERT_EQUAL(receivedTestObject.get_ByteValue(), localTestObject.get_ByteValue());
     CPPUNIT_ASSERT_EQUAL(receivedTestObject.get_CharValue(), localTestObject.get_CharValue());
-    compareStringLists(receivedTestObject.get_StringListValue1(), localTestObject.get_StringListValue1());
+    CPPUNIT_ASSERT_EQUAL(receivedTestObject.get_JSONValue1(), localTestObject.get_JSONValue1());
 
     // THESE ARE UPDATED THROUGH THE NETWORK, SO NOT RECEIVED YET
     CPPUNIT_ASSERT(receivedTestObject.get_IntValue() != localTestObject.get_IntValue());
     CPPUNIT_ASSERT(receivedTestObject.get_LongValue() != localTestObject.get_LongValue());
     CPPUNIT_ASSERT(receivedTestObject.get_ShortValue() != localTestObject.get_ShortValue());
-    CPPUNIT_ASSERT(stringListsNotEqual(
-      receivedTestObject.get_StringListValue2(), localTestObject.get_StringListValue2()
-    ));
+    CPPUNIT_ASSERT(receivedTestObject.get_JSONValue2() != localTestObject.get_JSONValue2());
 
     // SEND THE RECEIVER THE EmbeddedMessaging.Receiver INTERACTION THAT CONTAINS THE ATTRIBUTES UPDATE
     // FOR THE DISCOVERED OBJECT
@@ -379,25 +339,25 @@ void EmbeddedMessagingObjectTests::testObjectNetworkPropagation() {
     // AND MAKE THE INSTANCE ACCESSIBLE THROUGH ITS getTestObject() METHOD
     receiver.execute();
 
-    // NOT SUBSCRIBED BY Receiver, SO receivedTestObject.get_BooleanValue1() HAS DEFAULT VALUE OF false,
-    // BUT localTestObject.get_BooleanValue1 IS INCIDENTALLY false
-    CPPUNIT_ASSERT_EQUAL(receivedTestObject.get_BooleanValue1(), localTestObject.get_BooleanValue1());
+    // NOT SUBSCRIBED BY Receiver, SO receivedTestObject.get_BoolValue1() HAS DEFAULT VALUE OF false,
+    // BUT localTestObject.get_BoolValue1 IS INCIDENTALLY false
+    CPPUNIT_ASSERT_EQUAL(receivedTestObject.get_BoolValue1(), localTestObject.get_BoolValue1());
     // NOT PUBLISHED BY Sender, SO BOTH HAVE DEFAULT VALUE
     CPPUNIT_ASSERT_DOUBLES_EQUAL(receivedTestObject.get_DoubleValue(), localTestObject.get_DoubleValue(), 0.001);
     // NOT SUBSCRIBED BY Receiver
     CPPUNIT_ASSERT(fabs(receivedTestObject.get_FloatValue() - localTestObject.get_FloatValue()) > 0.001);
     // NOT PUBLISHED BY Sender, SO BOTH HAVE DEFAULT VALUE
     CPPUNIT_ASSERT_EQUAL(receivedTestObject.get_StringValue(), localTestObject.get_StringValue());
-    compareStringLists(receivedTestObject.get_StringListValue1(), localTestObject.get_StringListValue1());
+    CPPUNIT_ASSERT_EQUAL(receivedTestObject.get_JSONValue1(), localTestObject.get_JSONValue1());
 
     // BOTH PUBLISHED BY SENDER AND SUBSCRIBED BY RECEIVER
-    CPPUNIT_ASSERT_EQUAL(receivedTestObject.get_BooleanValue2(), localTestObject.get_BooleanValue2());
+    CPPUNIT_ASSERT_EQUAL(receivedTestObject.get_BoolValue2(), localTestObject.get_BoolValue2());
     CPPUNIT_ASSERT_EQUAL(receivedTestObject.get_ByteValue(), localTestObject.get_ByteValue());
     CPPUNIT_ASSERT_EQUAL(receivedTestObject.get_CharValue(), localTestObject.get_CharValue());
     CPPUNIT_ASSERT_EQUAL(receivedTestObject.get_IntValue(), localTestObject.get_IntValue());
     CPPUNIT_ASSERT_EQUAL(receivedTestObject.get_LongValue(), localTestObject.get_LongValue());
     CPPUNIT_ASSERT_EQUAL(receivedTestObject.get_ShortValue(), localTestObject.get_ShortValue());
-    compareStringLists(receivedTestObject.get_StringListValue2(), localTestObject.get_StringListValue2());
+    CPPUNIT_ASSERT_EQUAL(receivedTestObject.get_JSONValue2(), localTestObject.get_JSONValue2());
 }
 
 CPPUNIT_TEST_SUITE_REGISTRATION( EmbeddedMessagingObjectTests );

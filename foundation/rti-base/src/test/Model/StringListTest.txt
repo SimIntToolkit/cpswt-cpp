@@ -1,1 +1,0 @@
-Get model from `cpswt-core` project: cpswt-core/cpswt-core/base-events/src/test/Models/StringListTest.webgmex

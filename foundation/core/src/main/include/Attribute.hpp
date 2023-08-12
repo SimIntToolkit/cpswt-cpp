@@ -51,7 +51,7 @@ public:
     explicit Attribute(float value) : TypeMedley(value), _oldValueInit(false), _time(-1) { }
     explicit Attribute(double value) : TypeMedley(value), _oldValueInit(false), _time(-1) { }
     explicit Attribute(const std::string &value) : TypeMedley(value), _oldValueInit(false), _time(-1) { }
-    explicit Attribute(const std::list<std::string> &value) : TypeMedley(value), _oldValueInit(false), _time(-1) { }
+    explicit Attribute(const Json::Value &value) : TypeMedley(value), _oldValueInit(false), _time(-1) { }
 
     using TypeMedley::setValue;
 

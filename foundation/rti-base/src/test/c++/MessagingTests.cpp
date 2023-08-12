@@ -34,13 +34,13 @@
 
 #include "InteractionRoot.hpp"
 #include "InteractionRoot_p/C2WInteractionRoot.hpp"
-#include "InteractionRoot_p/C2WInteractionRoot_p/StringListTestInteraction.hpp"
+#include "InteractionRoot_p/C2WInteractionRoot_p/JSONTestInteraction.hpp"
 #include "InteractionRoot_p/C2WInteractionRoot_p/SimLog.hpp"
 #include "InteractionRoot_p/C2WInteractionRoot_p/SimLog_p/HighPrio.hpp"
 #include "InteractionRoot_p/C2WInteractionRoot_p/SimulationControl.hpp"
 #include "InteractionRoot_p/C2WInteractionRoot_p/SimulationControl_p/SimEnd.hpp"
 #include "ObjectRoot.hpp"
-#include "ObjectRoot_p/StringListTestObject.hpp"
+#include "ObjectRoot_p/JSONTestObject.hpp"
 #include "ObjectRoot_p/FederateObject.hpp"
 #include "ObjectRoot_p/BaseObjectClass.hpp"
 #include "ObjectRoot_p/BaseObjectClass_p/DerivedObjectClass.hpp"
@@ -63,9 +63,9 @@ using SimLog = ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInte
 using HighPrio = ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::SimLog_p::HighPrio;
 using SimulationControl = ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::SimulationControl;
 using SimEnd = ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::SimulationControl_p::SimEnd;
-using StringListTestInteraction = ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::StringListTestInteraction;
+using JSONTestInteraction = ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::JSONTestInteraction;
 using FederateObject = ::edu::vanderbilt::vuisis::cpswt::hla::ObjectRoot_p::FederateObject;
-using StringListTestObject = ::edu::vanderbilt::vuisis::cpswt::hla::ObjectRoot_p::StringListTestObject;
+using JSONTestObject = ::edu::vanderbilt::vuisis::cpswt::hla::ObjectRoot_p::JSONTestObject;
 using DerivedObjectClass = ::edu::vanderbilt::vuisis::cpswt::hla::ObjectRoot_p::BaseObjectClass_p::DerivedObjectClass;
 
 typedef std::set<std::string> StringSet;
@@ -145,7 +145,7 @@ void MessagingTests::interactionClassNamesTest() {
     expectedInteractionClassNameSet.insert("InteractionRoot.C2WInteractionRoot.SimulationControl.SimEnd");
     expectedInteractionClassNameSet.insert("InteractionRoot.C2WInteractionRoot.SimulationControl.SimPause");
     expectedInteractionClassNameSet.insert("InteractionRoot.C2WInteractionRoot.SimulationControl.SimResume");
-    expectedInteractionClassNameSet.insert("InteractionRoot.C2WInteractionRoot.StringListTestInteraction");
+    expectedInteractionClassNameSet.insert("InteractionRoot.C2WInteractionRoot.JSONTestInteraction");
     expectedInteractionClassNameSet.insert("InteractionRoot.TestBase");
     expectedInteractionClassNameSet.insert("InteractionRoot.TestBase.TestDerived");
 
@@ -164,7 +164,7 @@ void MessagingTests::objectClassNamesTest() {
     expectedObjectClassNameSet.insert("ObjectRoot.FederateObject");
     expectedObjectClassNameSet.insert("ObjectRoot.BaseObjectClass");
     expectedObjectClassNameSet.insert("ObjectRoot.BaseObjectClass.DerivedObjectClass");
-    expectedObjectClassNameSet.insert("ObjectRoot.StringListTestObject");
+    expectedObjectClassNameSet.insert("ObjectRoot.JSONTestObject");
 
     const std::set<std::string> &actualObjectClassNameSet = ObjectRoot::get_object_hla_class_name_set();
     CPPUNIT_ASSERT(expectedObjectClassNameSet == actualObjectClassNameSet);
@@ -1075,52 +1075,59 @@ void MessagingTests::printInteractionTest() {
     std::cout << "END printInteractionTest" << std::endl;
 }
 
-void MessagingTests::stringListTest() {
+void MessagingTests::jsonTest() {
 
-    std::cout << "START stringListTest" << std::endl;
+    std::cout << "START jsonTest" << std::endl;
 
-    InteractionRoot::SP stringListTestInteractionRootSP = InteractionRoot::create_interaction(
-      "InteractionRoot.C2WInteractionRoot.StringListTestInteraction"
+    InteractionRoot::SP jsonTestInteractionRootSP = InteractionRoot::create_interaction(
+      "InteractionRoot.C2WInteractionRoot.JSONTestInteraction"
     );
 
-    std::list<std::string> emptyList;
+    Json::Value emptyString("");
 
-    std::list<std::string> stringListParameterGetParameterEmptyList =
-      stringListTestInteractionRootSP->getParameter("stringListParameter").asStringList();
+    Json::Value jsonParameterGetParameterEmptyString =
+      jsonTestInteractionRootSP->getParameter("JSONParameter").asJson();
 
-    compareStringLists(emptyList, stringListParameterGetParameterEmptyList);
+    CPPUNIT_ASSERT_EQUAL(emptyString, jsonParameterGetParameterEmptyString);
 
-    StringListTestInteraction::SP stringListTestInteractionSP =
-      boost::dynamic_pointer_cast<StringListTestInteraction>(stringListTestInteractionRootSP);
+    JSONTestInteraction::SP jsonTestInteractionSP =
+      boost::dynamic_pointer_cast<JSONTestInteraction>(jsonTestInteractionRootSP);
 
-    std::list<std::string> stringListParameterGetParameterDirectEmptyList =
-      stringListTestInteractionSP->get_stringListParameter();
+    Json::Value jsonParameterGetParameterDirectEmptyString =
+      jsonTestInteractionSP->get_JSONParameter();
 
-    compareStringLists(emptyList, stringListParameterGetParameterDirectEmptyList);
+    CPPUNIT_ASSERT_EQUAL(emptyString, jsonParameterGetParameterDirectEmptyString);
 
-    std::list<std::string> thingList { "this", "that", "other" };
-    stringListTestInteractionRootSP->setParameter("stringListParameter", thingList);
+    Json::Value thingList(Json::arrayValue);
+    thingList.append("this");
+    thingList.append("that");
+    thingList.append("other");
 
-    std::list<std::string> stringListParameterGetParameterThingList =
-      stringListTestInteractionRootSP->getParameter("stringListParameter").asStringList();
-    compareStringLists(thingList, stringListParameterGetParameterThingList);
+    jsonTestInteractionRootSP->setParameter("JSONParameter", thingList);
 
-    std::list<std::string> stringListParameterGetParameterDirectThingList =
-      stringListTestInteractionSP->get_stringListParameter();
-    compareStringLists(thingList, stringListParameterGetParameterDirectThingList);
+    Json::Value jsonParameterGetParameterThingList =
+      jsonTestInteractionRootSP->getParameter("JSONParameter").asJson();
+    CPPUNIT_ASSERT_EQUAL(thingList, jsonParameterGetParameterThingList);
 
-    std::list<std::string> stoogeList { "Moe", "Larry", "Curly" };
-    stringListTestInteractionSP->set_stringListParameter(stoogeList);
+    Json::Value jsonParameterGetParameterDirectThingList =
+      jsonTestInteractionSP->get_JSONParameter();
+    CPPUNIT_ASSERT_EQUAL(thingList, jsonParameterGetParameterDirectThingList);
 
-    std::list<std::string> stringListParameterGetParameterStoogeList =
-      stringListTestInteractionRootSP->getParameter("stringListParameter").asStringList();
-    compareStringLists(stoogeList, stringListParameterGetParameterStoogeList);
+    Json::Value stoogeList(Json::arrayValue);
+    stoogeList.append("Moe");
+    stoogeList.append("Larry");
+    stoogeList.append("Curly");
+    jsonTestInteractionSP->set_JSONParameter(stoogeList);
 
-    std::list<std::string> stringListParameterGetParameterDirectStoogeList =
-      stringListTestInteractionSP->get_stringListParameter();
-    compareStringLists(stoogeList, stringListParameterGetParameterDirectStoogeList);
+    Json::Value jsonParameterGetParameterStoogeList =
+      jsonTestInteractionRootSP->getParameter("JSONParameter").asJson();
+    CPPUNIT_ASSERT_EQUAL(stoogeList, jsonParameterGetParameterStoogeList);
 
-    std::cout << "END stringListTest" << std::endl;
+    Json::Value jsonParameterGetParameterDirectStoogeList =
+      jsonTestInteractionSP->get_JSONParameter();
+    CPPUNIT_ASSERT_EQUAL(stoogeList, jsonParameterGetParameterDirectStoogeList);
+
+    std::cout << "END jsonTest" << std::endl;
 }
 
 

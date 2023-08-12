@@ -28,8 +28,8 @@
  * OR MODIFICATIONS.
  */
 
-#ifndef _edu_vanderbilt_vuisis_cpswt_hla_InteractionRoot_p_C2WInteractionRoot_p_StringListTestInteraction_CLASS
-#define _edu_vanderbilt_vuisis_cpswt_hla_InteractionRoot_p_C2WInteractionRoot_p_StringListTestInteraction_CLASS
+#ifndef _edu_vanderbilt_vuisis_cpswt_hla_InteractionRoot_p_C2WInteractionRoot_p_TestInteraction_CLASS
+#define _edu_vanderbilt_vuisis_cpswt_hla_InteractionRoot_p_C2WInteractionRoot_p_TestInteraction_CLASS
 
 #include "InteractionRoot_p/C2WInteractionRoot.hpp"
 #include "C2WException.hpp"
@@ -45,17 +45,17 @@ namespace edu {
      namespace InteractionRoot_p {
       namespace C2WInteractionRoot_p {
 
-class StringListTestInteraction : public ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot {
+class TestInteraction : public ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot {
 public:
 //    using ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot;
     typedef ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot Super;
-    typedef boost::shared_ptr< StringListTestInteraction > SP;
+    typedef boost::shared_ptr< TestInteraction > SP;
 
 private:
     static severity_logger &get_logger_aux() {
         static severity_logger logger;
         logger.add_attribute("MessagingClassName", attrs::constant< std::string >(
-          "InteractionRoot.C2WInteractionRoot.StringListTestInteraction"
+          "InteractionRoot.C2WInteractionRoot.TestInteraction"
         ));
 
         logging::add_common_attributes();
@@ -74,7 +74,7 @@ public:
     // ----------------------------------------------------------------------------
 
     /**
-     * Returns the fully-qualified (dot-delimited) name of the ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::StringListTestInteraction interaction class.
+     * Returns the fully-qualified (dot-delimited) name of the ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::TestInteraction interaction class.
      * Note: As this is a static method, it is NOT polymorphic, and so, if called on
      * a reference will return the name of the class pertaining to the reference,
      * rather than the name of the class for the instance referred to by the reference.
@@ -83,7 +83,7 @@ public:
      * @return the fully-qualified Java class name for this interaction class
      */
     static const std::string &get_cpp_class_name() {
-        static const std::string cppClassName("::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::StringListTestInteraction");
+        static const std::string cppClassName("::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::TestInteraction");
         return cppClassName;
     }
 
@@ -99,7 +99,7 @@ public:
 
     /**
      * Returns the simple name (the last name in the dot-delimited fully-qualified
-     * class name) of the edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.StringListTestInteraction interaction class.
+     * class name) of the edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.TestInteraction interaction class.
      *
      * @return the name of this interaction class
      */
@@ -109,7 +109,7 @@ public:
 
     /**
      * Returns the fully-qualified (dot-delimited) hla class name of the
-     * InteractionRoot.C2WInteractionRoot.StringListTestInteraction interaction class.
+     * InteractionRoot.C2WInteractionRoot.TestInteraction interaction class.
      * Note: As this is a static method, it is NOT polymorphic, and so, if called on
      * a reference will return the federation name of the class pertaining to the reference,
      * rather than the name of the class for the instance referred to by the reference.
@@ -118,7 +118,7 @@ public:
      * @return the fully-qualified federation (HLA) class name for this interaction class
      */
     static const std::string &get_hla_class_name() {
-        static const std::string hlaClassName("InteractionRoot.C2WInteractionRoot.StringListTestInteraction");
+        static const std::string hlaClassName("InteractionRoot.C2WInteractionRoot.TestInteraction");
         return hlaClassName;
     }
 
@@ -134,7 +134,7 @@ public:
 
     /**
      * Returns a sorted list containing the names of all of the non-hidden parameters in the
-     * edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.StringListTestInteraction interaction class.
+     * edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.TestInteraction interaction class.
      * The property names are paired with name of the hla class in which they are defined in a
      * ClassAndPropertyName POJO.
      * Note: As this is a static method, it is NOT polymorphic, and so, if called on
@@ -152,7 +152,7 @@ public:
 
     /**
      * Returns a sorted list containing the names of all of the parameters in the
-     * edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.StringListTestInteraction interaction class.
+     * edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.TestInteraction interaction class.
      * The property names are paired with name of the hla class in which they are defined in a
      * ClassAndPropertyName POJO.
      * Note: As this is a static method, it is NOT polymorphic, and so, if called on
@@ -184,7 +184,7 @@ public:
     // THIS CODE IS STATIC BECAUSE IT IS CLASS-DEPENDENT AND NOT INSTANCE-DEPENDENT
     // ----------------------------------------------------------------------------
     /**
-     * Returns the handle (RTI assigned) of the edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.StringListTestInteraction interaction class.
+     * Returns the handle (RTI assigned) of the edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.TestInteraction interaction class.
      * Note: As this is a static method, it is NOT polymorphic, and so, if called on
      * a reference will return the handle of the class pertaining to the reference,
      * rather than the handle of the class for the instance referred to by the reference.
@@ -198,7 +198,7 @@ public:
 
     /**
      * Returns the handle of an parameter (RTI assigned) of
-     * this interaction class (i.e. "edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.StringListTestInteraction") given the parameter's name.
+     * this interaction class (i.e. "edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.TestInteraction") given the parameter's name.
      *
      * @param propertyName name of parameter
      * @return the handle (RTI assigned) of the parameter "propertyName" of interaction class "hlaClassName"
@@ -217,7 +217,7 @@ public:
     //-------------------------------------------------
 
     /**
-     * Publishes the edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.StringListTestInteraction interaction class for a federate.
+     * Publishes the edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.TestInteraction interaction class for a federate.
      *
      * @param rti handle to the Local RTI Component
      */
@@ -230,7 +230,7 @@ public:
     }
 
     /**
-     * Unpublishes the edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.StringListTestInteraction interaction class for a federate.
+     * Unpublishes the edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.TestInteraction interaction class for a federate.
      *
      * @param rti handle to the Local RTI Component, usu. obtained through the
      *            {@link SynchronizedFederate#getRTI()} call
@@ -240,7 +240,7 @@ public:
     }
 
 /**
- * Subscribes a federate to the edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.StringListTestInteraction interaction class.
+ * Subscribes a federate to the edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.TestInteraction interaction class.
  *
  * @param rti handle to the Local RTI Component
  */
@@ -261,7 +261,7 @@ public:
     }
 
     /**
-     * Unsubscribes a federate from the edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.StringListTestInteraction interaction class.
+     * Unsubscribes a federate from the edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.TestInteraction interaction class.
      *
      * @param rti handle to the Local RTI Component
      */
@@ -287,12 +287,12 @@ public:
 
     /**
      * Return true if "handle" is equal to the handle (RTI assigned) of this class
-     * (that is, the edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.StringListTestInteraction interaction class).
+     * (that is, the edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.TestInteraction interaction class).
      *
      * @param handle handle to compare to the value of the handle (RTI assigned) of
-     * this class (the edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.StringListTestInteraction interaction class).
+     * this class (the edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.TestInteraction interaction class).
      * @return "true" if "handle" matches the value of the handle of this class
-     * (that is, the edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.StringListTestInteraction interaction class).
+     * (that is, the edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.TestInteraction interaction class).
      */
     static bool match(int handle) {
         return handle == get_class_handle();
@@ -308,24 +308,244 @@ public:
 
 
     /**
-     * Set the value of the "stringListParameter" parameter to "value" for this parameter.
+     * Set the value of the "BoolValue1" parameter to "value" for this parameter.
      *
-     * @param value the new value for the "stringListParameter" parameter
+     * @param value the new value for the "BoolValue1" parameter
      */
-    void set_stringListParameter(const std::list<std::string> & newValue) {
-        ClassAndPropertyName key(get_hla_class_name(), "stringListParameter");
+    void set_BoolValue1(bool newValue) {
+        ClassAndPropertyName key(get_hla_class_name(), "BoolValue1");
         Value &value(*_classAndPropertyNameValueSPMap[key]);
         value.setValue(newValue);
     }
 
     /**
-     * Returns the value of the "stringListParameter" parameter of this interaction.
+     * Returns the value of the "BoolValue1" parameter of this interaction.
      *
-     * @return the value of the "stringListParameter" parameter
+     * @return the value of the "BoolValue1" parameter
      */
-    std::list<std::string> get_stringListParameter() {
-        ClassAndPropertyName key(get_hla_class_name(), "stringListParameter");
-        return _classAndPropertyNameValueSPMap[key]->asStringList();
+    bool get_BoolValue1() {
+        ClassAndPropertyName key(get_hla_class_name(), "BoolValue1");
+        return _classAndPropertyNameValueSPMap[key]->asBool();
+    }
+
+
+    /**
+     * Set the value of the "BoolValue2" parameter to "value" for this parameter.
+     *
+     * @param value the new value for the "BoolValue2" parameter
+     */
+    void set_BoolValue2(bool newValue) {
+        ClassAndPropertyName key(get_hla_class_name(), "BoolValue2");
+        Value &value(*_classAndPropertyNameValueSPMap[key]);
+        value.setValue(newValue);
+    }
+
+    /**
+     * Returns the value of the "BoolValue2" parameter of this interaction.
+     *
+     * @return the value of the "BoolValue2" parameter
+     */
+    bool get_BoolValue2() {
+        ClassAndPropertyName key(get_hla_class_name(), "BoolValue2");
+        return _classAndPropertyNameValueSPMap[key]->asBool();
+    }
+
+
+    /**
+     * Set the value of the "ByteValue" parameter to "value" for this parameter.
+     *
+     * @param value the new value for the "ByteValue" parameter
+     */
+    void set_ByteValue(char newValue) {
+        ClassAndPropertyName key(get_hla_class_name(), "ByteValue");
+        Value &value(*_classAndPropertyNameValueSPMap[key]);
+        value.setValue(newValue);
+    }
+
+    /**
+     * Returns the value of the "ByteValue" parameter of this interaction.
+     *
+     * @return the value of the "ByteValue" parameter
+     */
+    char get_ByteValue() {
+        ClassAndPropertyName key(get_hla_class_name(), "ByteValue");
+        return _classAndPropertyNameValueSPMap[key]->asChar();
+    }
+
+
+    /**
+     * Set the value of the "CharValue" parameter to "value" for this parameter.
+     *
+     * @param value the new value for the "CharValue" parameter
+     */
+    void set_CharValue(char newValue) {
+        ClassAndPropertyName key(get_hla_class_name(), "CharValue");
+        Value &value(*_classAndPropertyNameValueSPMap[key]);
+        value.setValue(newValue);
+    }
+
+    /**
+     * Returns the value of the "CharValue" parameter of this interaction.
+     *
+     * @return the value of the "CharValue" parameter
+     */
+    char get_CharValue() {
+        ClassAndPropertyName key(get_hla_class_name(), "CharValue");
+        return _classAndPropertyNameValueSPMap[key]->asChar();
+    }
+
+
+    /**
+     * Set the value of the "DoubleValue" parameter to "value" for this parameter.
+     *
+     * @param value the new value for the "DoubleValue" parameter
+     */
+    void set_DoubleValue(double newValue) {
+        ClassAndPropertyName key(get_hla_class_name(), "DoubleValue");
+        Value &value(*_classAndPropertyNameValueSPMap[key]);
+        value.setValue(newValue);
+    }
+
+    /**
+     * Returns the value of the "DoubleValue" parameter of this interaction.
+     *
+     * @return the value of the "DoubleValue" parameter
+     */
+    double get_DoubleValue() {
+        ClassAndPropertyName key(get_hla_class_name(), "DoubleValue");
+        return _classAndPropertyNameValueSPMap[key]->asDouble();
+    }
+
+
+    /**
+     * Set the value of the "FloatValue" parameter to "value" for this parameter.
+     *
+     * @param value the new value for the "FloatValue" parameter
+     */
+    void set_FloatValue(float newValue) {
+        ClassAndPropertyName key(get_hla_class_name(), "FloatValue");
+        Value &value(*_classAndPropertyNameValueSPMap[key]);
+        value.setValue(newValue);
+    }
+
+    /**
+     * Returns the value of the "FloatValue" parameter of this interaction.
+     *
+     * @return the value of the "FloatValue" parameter
+     */
+    float get_FloatValue() {
+        ClassAndPropertyName key(get_hla_class_name(), "FloatValue");
+        return _classAndPropertyNameValueSPMap[key]->asFloat();
+    }
+
+
+    /**
+     * Set the value of the "IntValue" parameter to "value" for this parameter.
+     *
+     * @param value the new value for the "IntValue" parameter
+     */
+    void set_IntValue(int newValue) {
+        ClassAndPropertyName key(get_hla_class_name(), "IntValue");
+        Value &value(*_classAndPropertyNameValueSPMap[key]);
+        value.setValue(newValue);
+    }
+
+    /**
+     * Returns the value of the "IntValue" parameter of this interaction.
+     *
+     * @return the value of the "IntValue" parameter
+     */
+    int get_IntValue() {
+        ClassAndPropertyName key(get_hla_class_name(), "IntValue");
+        return _classAndPropertyNameValueSPMap[key]->asInt();
+    }
+
+
+    /**
+     * Set the value of the "JSONValue" parameter to "value" for this parameter.
+     *
+     * @param value the new value for the "JSONValue" parameter
+     */
+    void set_JSONValue(const Json::Value & newValue) {
+        ClassAndPropertyName key(get_hla_class_name(), "JSONValue");
+        Value &value(*_classAndPropertyNameValueSPMap[key]);
+        value.setValue(newValue);
+    }
+
+    /**
+     * Returns the value of the "JSONValue" parameter of this interaction.
+     *
+     * @return the value of the "JSONValue" parameter
+     */
+    Json::Value get_JSONValue() {
+        ClassAndPropertyName key(get_hla_class_name(), "JSONValue");
+        return _classAndPropertyNameValueSPMap[key]->asJson();
+    }
+
+
+    /**
+     * Set the value of the "LongValue" parameter to "value" for this parameter.
+     *
+     * @param value the new value for the "LongValue" parameter
+     */
+    void set_LongValue(long newValue) {
+        ClassAndPropertyName key(get_hla_class_name(), "LongValue");
+        Value &value(*_classAndPropertyNameValueSPMap[key]);
+        value.setValue(newValue);
+    }
+
+    /**
+     * Returns the value of the "LongValue" parameter of this interaction.
+     *
+     * @return the value of the "LongValue" parameter
+     */
+    long get_LongValue() {
+        ClassAndPropertyName key(get_hla_class_name(), "LongValue");
+        return _classAndPropertyNameValueSPMap[key]->asLong();
+    }
+
+
+    /**
+     * Set the value of the "ShortValue" parameter to "value" for this parameter.
+     *
+     * @param value the new value for the "ShortValue" parameter
+     */
+    void set_ShortValue(short newValue) {
+        ClassAndPropertyName key(get_hla_class_name(), "ShortValue");
+        Value &value(*_classAndPropertyNameValueSPMap[key]);
+        value.setValue(newValue);
+    }
+
+    /**
+     * Returns the value of the "ShortValue" parameter of this interaction.
+     *
+     * @return the value of the "ShortValue" parameter
+     */
+    short get_ShortValue() {
+        ClassAndPropertyName key(get_hla_class_name(), "ShortValue");
+        return _classAndPropertyNameValueSPMap[key]->asShort();
+    }
+
+
+    /**
+     * Set the value of the "StringValue" parameter to "value" for this parameter.
+     *
+     * @param value the new value for the "StringValue" parameter
+     */
+    void set_StringValue(const std::string & newValue) {
+        ClassAndPropertyName key(get_hla_class_name(), "StringValue");
+        Value &value(*_classAndPropertyNameValueSPMap[key]);
+        value.setValue(newValue);
+    }
+
+    /**
+     * Returns the value of the "StringValue" parameter of this interaction.
+     *
+     * @return the value of the "StringValue" parameter
+     */
+    std::string get_StringValue() {
+        ClassAndPropertyName key(get_hla_class_name(), "StringValue");
+        return _classAndPropertyNameValueSPMap[key]->asString();
     }
 
     //------------------------------------
@@ -337,11 +557,11 @@ public:
     //--------------------------
 public:
     static SP create() {
-        return SP(new StringListTestInteraction());
+        return SP(new TestInteraction());
     }
 
     static InteractionRoot::SP create_interaction() {
-        return SP(new StringListTestInteraction());
+        return SP(new TestInteraction());
     }
 
     virtual InteractionRoot::SP createInteraction() {
@@ -349,11 +569,11 @@ public:
     }
 
     static SP create(const RTIfedTime &rtiFedTime) {
-        return SP(new StringListTestInteraction(rtiFedTime));
+        return SP(new TestInteraction(rtiFedTime));
     }
 
     static InteractionRoot::SP create_interaction(const RTIfedTime &rtiFedTime) {
-        return SP(new StringListTestInteraction(rtiFedTime));
+        return SP(new TestInteraction(rtiFedTime));
     }
 
     virtual InteractionRoot::SP createInteraction(const RTIfedTime &rtiFedTime) {
@@ -363,13 +583,13 @@ public:
     static SP create(
       const RTI::ParameterHandleValuePairSet &propertyMap
     ) {
-        return SP(new StringListTestInteraction(propertyMap));
+        return SP(new TestInteraction(propertyMap));
     }
 
     static InteractionRoot::SP create_interaction(
       const RTI::ParameterHandleValuePairSet &propertyMap
     ) {
-        return SP(new StringListTestInteraction(propertyMap));
+        return SP(new TestInteraction(propertyMap));
     }
 
     virtual InteractionRoot::SP createInteraction(
@@ -381,13 +601,13 @@ public:
     static SP create(
       const RTI::ParameterHandleValuePairSet &propertyMap, const RTIfedTime &rtiFedTime
     ) {
-        return SP(new StringListTestInteraction(propertyMap, rtiFedTime));
+        return SP(new TestInteraction(propertyMap, rtiFedTime));
     }
 
     static InteractionRoot::SP create_interaction(
       const RTI::ParameterHandleValuePairSet &propertyMap, const RTIfedTime &rtiFedTime
     ) {
-        return SP(new StringListTestInteraction(propertyMap, rtiFedTime));
+        return SP(new TestInteraction(propertyMap, rtiFedTime));
     }
 
     virtual InteractionRoot::SP createInteraction(
@@ -396,7 +616,7 @@ public:
     }
 
     virtual InteractionRoot::SP cloneInteraction() {
-        return InteractionRoot::SP( new StringListTestInteraction( *this )  );
+        return InteractionRoot::SP( new TestInteraction( *this )  );
     }
 
     //------------------------------
@@ -407,27 +627,27 @@ public:
     // CONSTRUCTORS
     //-------------
 public:
-    StringListTestInteraction() : Super( get_hla_class_name() ) { }
+    TestInteraction() : Super( get_hla_class_name() ) { }
 
-    StringListTestInteraction( const PropertyHandleValuePairSet &propertyMap ) : Super( get_hla_class_name(), propertyMap ) { }
+    TestInteraction( const PropertyHandleValuePairSet &propertyMap ) : Super( get_hla_class_name(), propertyMap ) { }
 
-    StringListTestInteraction( const RTIfedTime &rtiFedTime ) : Super( get_hla_class_name(), rtiFedTime ) { }
+    TestInteraction( const RTIfedTime &rtiFedTime ) : Super( get_hla_class_name(), rtiFedTime ) { }
 
-    StringListTestInteraction(const PropertyHandleValuePairSet &propertyMap, const RTIfedTime &rtiFedTime) :
+    TestInteraction(const PropertyHandleValuePairSet &propertyMap, const RTIfedTime &rtiFedTime) :
        Super( get_hla_class_name(), propertyMap, rtiFedTime ) { }
 
 protected:
-    StringListTestInteraction(InteractionRoot::NoInstanceInit &noInstanceInit) : Super(noInstanceInit) { }
+    TestInteraction(InteractionRoot::NoInstanceInit &noInstanceInit) : Super(noInstanceInit) { }
 
-    StringListTestInteraction( const std::string &hlaClassName ) : Super( hlaClassName ) { }
+    TestInteraction( const std::string &hlaClassName ) : Super( hlaClassName ) { }
 
-    StringListTestInteraction( const std::string &hlaClassName, const PropertyHandleValuePairSet &propertyMap ) :
+    TestInteraction( const std::string &hlaClassName, const PropertyHandleValuePairSet &propertyMap ) :
       Super( hlaClassName, propertyMap ) { }
 
-    StringListTestInteraction( const std::string &hlaClassName, const RTIfedTime &rtiFedTime ) :
+    TestInteraction( const std::string &hlaClassName, const RTIfedTime &rtiFedTime ) :
       Super( hlaClassName, rtiFedTime ) { }
 
-    StringListTestInteraction(
+    TestInteraction(
       const std::string &hlaClassName, const PropertyHandleValuePairSet &propertyMap, const RTIfedTime &rtiFedTime
     ) : Super( hlaClassName, propertyMap, rtiFedTime ) { }
 
@@ -440,8 +660,8 @@ protected:
  } // NAMESPACE "vanderbilt"
 } // NAMESPACE "edu"
 
-inline std::ostream &operator<<( std::ostream &os, ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::StringListTestInteraction::SP messagingSP ) {
+inline std::ostream &operator<<( std::ostream &os, ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::TestInteraction::SP messagingSP ) {
     return os << *messagingSP;
 }
 
-#endif // _edu_vanderbilt_vuisis_cpswt_hla_InteractionRoot_p_C2WInteractionRoot_p_StringListTestInteraction_CLASS
+#endif // _edu_vanderbilt_vuisis_cpswt_hla_InteractionRoot_p_C2WInteractionRoot_p_TestInteraction_CLASS

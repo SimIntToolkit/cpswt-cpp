@@ -28,49 +28,57 @@
  * OR MODIFICATIONS.
  */
 
-#ifndef _TYPEMEDLEY_TEST
-#define _TYPEMEDLEY_TEST
+#ifndef _EMBEDDEDMESSAGINGINTERACTION_TESTS
+#define _EMBEDDEDMESSAGINGINTERACTION_TESTS
+
+#define BOOST_LOG_DYN_LINK
+
+#include "RTIAmbassadorTest2.hpp"
 
 #include <cppunit/extensions/HelperMacros.h>
-#include "TypeMedley.hpp"
 
-class TypeMedleyTest: public CppUnit::TestCase {
+#include <boost/log/core.hpp>
+#include <boost/log/sinks/sync_frontend.hpp>
+#include <boost/log/sinks/text_ostream_backend.hpp>
+#include <boost/shared_ptr.hpp>
 
-    CPPUNIT_TEST_SUITE( TypeMedleyTest );
-    CPPUNIT_TEST(boolTrueTest);
-    CPPUNIT_TEST(boolFalseTest);
-    CPPUNIT_TEST(charTest);
-    CPPUNIT_TEST(charZeroTest);
-    CPPUNIT_TEST(zeroCharTest);
-    CPPUNIT_TEST(floatWithExponentTest);
-    CPPUNIT_TEST(intZeroTest);
-    CPPUNIT_TEST(floatTest);
-    CPPUNIT_TEST(zeroStringTest);
-    CPPUNIT_TEST(stringFloatWithExponentTest);
-    CPPUNIT_TEST(stringTest);
-    CPPUNIT_TEST(jsonTest);
-    CPPUNIT_TEST_SUITE_END();
+namespace logging = boost::log;
+namespace sinks = boost::log::sinks;
 
-    static void compareStringLists(const std::list<std::string> &list1, const std::list<std::string> &list2);
-    static void compareStringListRegex(
-      const std::list<std::string> &stringList, const std::list<std::regex> &regexList
-    );
+class EmbeddedMessagingInteractionTests: public CppUnit::TestCase {
 
 public:
-    TypeMedleyTest() : CppUnit::TestCase() {}
+    typedef sinks::synchronous_sink< sinks::text_ostream_backend > text_sink;
 
-    void boolTrueTest();
-    void boolFalseTest();
-    void charTest();
-    void charZeroTest();
-    void zeroCharTest();
-    void intZeroTest();
-    void floatTest();
-    void floatWithExponentTest();
-    void zeroStringTest();
-    void stringFloatWithExponentTest();
-    void stringTest();
-    void jsonTest();
+    static bool null_filter(const logging::attribute_value_set &attrs) {
+        return false;
+    }
+
+    // nullSink IS MEANT TO DISPOSE OF DEFAULT SINK, SO DEFAULT LOGGING BEHAVIOR IS ESSENTIALLY NO SINK.
+    boost::shared_ptr< text_sink > nullSink;
+
+    typedef boost::shared_ptr<FederateConfig> FederateConfigSP;
+    FederateConfigSP getNewFederateConfigSP(const std::string &federateName) {
+
+        FederateConfigSP federateConfigSP(new FederateConfig());
+
+        FederateConfig &federateConfig = *federateConfigSP;
+        federateConfig.federateType = federateName;
+        federateConfig.federationId = "testInteractionNetworkPropagation";
+        federateConfig.isLateJoiner = false;
+        federateConfig.lookahead = 0.1;
+        federateConfig.stepSize = 1.0;
+
+        return federateConfigSP;
+    }
+
+private:
+    CPPUNIT_TEST_SUITE( EmbeddedMessagingInteractionTests );
+    CPPUNIT_TEST(testInteractionNetworkPropagation);
+    CPPUNIT_TEST_SUITE_END();
+
+public:
+    void testInteractionNetworkPropagation();
 };
 
-#endif // _TYPEMEDLEY_TEST
+#endif // _EMBEDDEDMESSAGINGINTERACTION_TESTS

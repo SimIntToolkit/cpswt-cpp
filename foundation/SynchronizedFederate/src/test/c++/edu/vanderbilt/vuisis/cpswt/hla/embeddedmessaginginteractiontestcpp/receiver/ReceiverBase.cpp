@@ -30,7 +30,7 @@
 
 
 
-#include "edu/vanderbilt/vuisis/cpswt/hla/embeddedmessagingobjecttestcpp/receiver/ReceiverBase.hpp"
+#include "edu/vanderbilt/vuisis/cpswt/hla/embeddedmessaginginteractiontestcpp/receiver/ReceiverBase.hpp"
 
 
 #if __cplusplus >= 201703L
@@ -44,7 +44,7 @@ namespace edu {
   namespace vuisis {
    namespace cpswt {
     namespace hla {
-     namespace embeddedmessagingobjecttestcpp {
+     namespace embeddedmessaginginteractiontestcpp {
       namespace receiver {
 
 
@@ -60,22 +60,14 @@ void ReceiverBase::init() {
 
     ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::EmbeddedMessaging_p::Receiver::subscribe_interaction(getRTI());
 
-    // SOFT OBJECT SUBSCRIPTIONS
-    ::edu::vanderbilt::vuisis::cpswt::hla::ObjectRoot_p::TestObject::soft_subscribe_attribute("ObjectRoot.TestObject", "IntValue");
-    ::edu::vanderbilt::vuisis::cpswt::hla::ObjectRoot_p::TestObject::soft_subscribe_attribute("ObjectRoot.TestObject", "JSONValue2");
-    ::edu::vanderbilt::vuisis::cpswt::hla::ObjectRoot_p::TestObject::soft_subscribe_attribute("ObjectRoot.TestObject", "LongValue");
-    ::edu::vanderbilt::vuisis::cpswt::hla::ObjectRoot_p::TestObject::soft_subscribe_attribute("ObjectRoot.TestObject", "ShortValue");
-    ::edu::vanderbilt::vuisis::cpswt::hla::ObjectRoot_p::TestObject::soft_subscribe_attribute("ObjectRoot.TestObject", "StringValue");
-    ::edu::vanderbilt::vuisis::cpswt::hla::ObjectRoot_p::TestObject::soft_subscribe_object(getRTI());
+    // SOFT INTERACTION SUBSCRIPTIONS
 
-    // DIRECT OBJECT SUBSCRIPTIONS
-    ::edu::vanderbilt::vuisis::cpswt::hla::ObjectRoot_p::TestObject::subscribe_attribute("ObjectRoot.TestObject", "BoolValue2");
-    ::edu::vanderbilt::vuisis::cpswt::hla::ObjectRoot_p::TestObject::subscribe_attribute("ObjectRoot.TestObject", "ByteValue");
-    ::edu::vanderbilt::vuisis::cpswt::hla::ObjectRoot_p::TestObject::subscribe_attribute("ObjectRoot.TestObject", "CharValue");
-    ::edu::vanderbilt::vuisis::cpswt::hla::ObjectRoot_p::TestObject::subscribe_attribute("ObjectRoot.TestObject", "DoubleValue");
-    ::edu::vanderbilt::vuisis::cpswt::hla::ObjectRoot_p::TestObject::subscribe_attribute("ObjectRoot.TestObject", "JSONValue1");
-
-    ::edu::vanderbilt::vuisis::cpswt::hla::ObjectRoot_p::TestObject::subscribe_object(getRTI());
+    ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::TestInteraction::soft_subscribe_interaction(getRTI());
+    _subscribedInteractionFilter.setFedFilters(
+        ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::TestInteraction::get_class_handle(),
+        SubscribedInteractionFilter::ORIGIN_FILTER_DISABLED,
+        SubscribedInteractionFilter::SOURCE_FILTER_DISABLED
+    );
 }
 
 ReceiverBase::ReceiverBase(FederateConfig *federateConfig): Super(federateConfig) {
@@ -141,7 +133,7 @@ void ReceiverBase::receiveInteraction(
     }
 }
       } // NAMESPACE "receiver"
-     } // NAMESPACE "embeddedmessagingobjecttestcpp"
+     } // NAMESPACE "embeddedmessaginginteractiontestcpp"
     } // NAMESPACE "hla"
    } // NAMESPACE "cpswt"
   } // NAMESPACE "vuisis"

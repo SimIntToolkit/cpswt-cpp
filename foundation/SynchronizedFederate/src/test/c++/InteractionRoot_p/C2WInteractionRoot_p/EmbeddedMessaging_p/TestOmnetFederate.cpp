@@ -28,7 +28,7 @@
  * OR MODIFICATIONS.
  */
 
-#include "InteractionRoot_p/C2WInteractionRoot_p/EmbeddedMessaging_p/OmnetFederate.hpp"
+#include "InteractionRoot_p/C2WInteractionRoot_p/EmbeddedMessaging_p/TestOmnetFederate.hpp"
 namespace edu {
  namespace vanderbilt {
   namespace vuisis {
@@ -38,16 +38,16 @@ namespace edu {
       namespace C2WInteractionRoot_p {
        namespace EmbeddedMessaging_p {
 
-bool OmnetFederate::static_init_var = OmnetFederate::static_init();
+bool TestOmnetFederate::static_init_var = TestOmnetFederate::static_init();
 
-bool OmnetFederate::static_init() {
-    BOOST_LOG_SEV(get_logger(), info) << "Class \"::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::EmbeddedMessaging_p::OmnetFederate\" loaded.";
+bool TestOmnetFederate::static_init() {
+    BOOST_LOG_SEV(get_logger(), info) << "Class \"::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::EmbeddedMessaging_p::TestOmnetFederate\" loaded.";
 
     // ADD THIS CLASS TO THE _classNameSet DEFINED IN InteractionRoot
     get_hla_class_name_set().insert(get_hla_class_name());
 
     InteractionRoot::NoInstanceInit noInstanceInit;
-    SP instanceSP = SP( new OmnetFederate(noInstanceInit) );
+    SP instanceSP = SP( new TestOmnetFederate(noInstanceInit) );
     get_hla_class_name_instance_sp_map()[get_hla_class_name()] = instanceSP;
 
     ClassAndPropertyNameSetSP classAndPropertyNameSetSP( new ClassAndPropertyNameSet() );
@@ -84,7 +84,9 @@ bool OmnetFederate::static_init() {
 
     allClassAndPropertyNameSetSP->emplace(
         "InteractionRoot.C2WInteractionRoot", "federateSequence"
-    );// ADD THIS CLASS'S _allClassAndPropertyNameSet TO _classNameAllPropertyNameSetMap DEFINED
+    );
+
+    // ADD THIS CLASS'S _allClassAndPropertyNameSet TO _classNameAllPropertyNameSetMap DEFINED
     // IN InteractionRoot
     get_class_name_all_class_and_property_name_set_sp_map()[get_hla_class_name()] = allClassAndPropertyNameSetSP;
 

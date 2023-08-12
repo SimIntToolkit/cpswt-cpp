@@ -264,7 +264,9 @@ private:
     }
 
 public:
-    SynchronizedFederate( void ) :
+    SynchronizedFederate( void ):
+      _rti(nullptr),
+
       exitCondition(false),
       _status(0),
 
@@ -291,7 +293,7 @@ public:
          _timeAdvanceMode = SF_TIME_ADVANCE_REQUEST;
     }
 
-    SynchronizedFederate( FederateConfig *fedconfig) : exitCondition(false), _status(0) {
+    SynchronizedFederate( FederateConfig *fedconfig) : _rti(nullptr), exitCondition(false), _status(0) {
         this->_federationId = fedconfig->federationId;
         this->_federateType = fedconfig->federateType;
         this->_federateId = fedconfig->federateType + std::to_string(rand());

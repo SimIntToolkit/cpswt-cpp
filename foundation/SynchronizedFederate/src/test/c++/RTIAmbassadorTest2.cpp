@@ -18,7 +18,7 @@ const RTIAmbassadorTest2::ClassNameHandleMap &RTIAmbassadorTest2::get_interactio
     interactionClassNameHandleMap["InteractionRoot.C2WInteractionRoot"] = get_unique_no();
     interactionClassNameHandleMap["InteractionRoot.C2WInteractionRoot.ActionBase"] = get_unique_no();
     interactionClassNameHandleMap["InteractionRoot.C2WInteractionRoot.EmbeddedMessaging"] = get_unique_no();
-    interactionClassNameHandleMap["InteractionRoot.C2WInteractionRoot.EmbeddedMessaging.OmnetFederate"] =
+    interactionClassNameHandleMap["InteractionRoot.C2WInteractionRoot.EmbeddedMessaging.TestOmnetFederate"] =
       get_unique_no();
     interactionClassNameHandleMap["InteractionRoot.C2WInteractionRoot.EmbeddedMessaging.Receiver"] = get_unique_no();
     interactionClassNameHandleMap["InteractionRoot.C2WInteractionRoot.FederateJoinInteraction"] = get_unique_no();
@@ -33,6 +33,7 @@ const RTIAmbassadorTest2::ClassNameHandleMap &RTIAmbassadorTest2::get_interactio
     interactionClassNameHandleMap["InteractionRoot.C2WInteractionRoot.SimulationControl.SimEnd"] = get_unique_no();
     interactionClassNameHandleMap["InteractionRoot.C2WInteractionRoot.SimulationControl.SimPause"] = get_unique_no();
     interactionClassNameHandleMap["InteractionRoot.C2WInteractionRoot.SimulationControl.SimResume"] = get_unique_no();
+    interactionClassNameHandleMap["InteractionRoot.C2WInteractionRoot.TestInteraction"] = get_unique_no();
 
     return interactionClassNameHandleMap;    
 }
@@ -125,6 +126,50 @@ const std::map<ClassAndPropertyName, int>
       ClassAndPropertyName("InteractionRoot.C2WInteractionRoot.FederateResignInteraction", "IsLateJoiner")
     ] = get_unique_no();
 
+    interactionClassAndPropertyNameHandleMap[
+      ClassAndPropertyName("InteractionRoot.C2WInteractionRoot.TestInteraction", "BoolValue1")
+    ] = get_unique_no();
+
+    interactionClassAndPropertyNameHandleMap[
+      ClassAndPropertyName("InteractionRoot.C2WInteractionRoot.TestInteraction", "BoolValue2")
+    ] = get_unique_no();
+
+    interactionClassAndPropertyNameHandleMap[
+      ClassAndPropertyName("InteractionRoot.C2WInteractionRoot.TestInteraction", "ByteValue")
+    ] = get_unique_no();
+
+    interactionClassAndPropertyNameHandleMap[
+      ClassAndPropertyName("InteractionRoot.C2WInteractionRoot.TestInteraction", "CharValue")
+    ] = get_unique_no();
+
+    interactionClassAndPropertyNameHandleMap[
+      ClassAndPropertyName("InteractionRoot.C2WInteractionRoot.TestInteraction", "DoubleValue")
+    ] = get_unique_no();
+
+    interactionClassAndPropertyNameHandleMap[
+      ClassAndPropertyName("InteractionRoot.C2WInteractionRoot.TestInteraction", "FloatValue")
+    ] = get_unique_no();
+
+    interactionClassAndPropertyNameHandleMap[
+      ClassAndPropertyName("InteractionRoot.C2WInteractionRoot.TestInteraction", "IntValue")
+    ] = get_unique_no();
+
+    interactionClassAndPropertyNameHandleMap[
+      ClassAndPropertyName("InteractionRoot.C2WInteractionRoot.TestInteraction", "JSONValue")
+    ] = get_unique_no();
+
+    interactionClassAndPropertyNameHandleMap[
+      ClassAndPropertyName("InteractionRoot.C2WInteractionRoot.TestInteraction", "LongValue")
+    ] = get_unique_no();
+
+    interactionClassAndPropertyNameHandleMap[
+      ClassAndPropertyName("InteractionRoot.C2WInteractionRoot.TestInteraction", "ShortValue")
+    ] = get_unique_no();
+
+    interactionClassAndPropertyNameHandleMap[
+      ClassAndPropertyName("InteractionRoot.C2WInteractionRoot.TestInteraction", "StringValue")
+    ] = get_unique_no();
+
     return interactionClassAndPropertyNameHandleMap;
 }
 
@@ -151,10 +196,10 @@ const ObjectRoot::ClassAndPropertyNameIntegerMap &RTIAmbassadorTest2::get_object
       ClassAndPropertyName("ObjectRoot.FederateObject", "FederateType")
     ] = get_unique_no();
     objectClassAndPropertyNameHandleMap[
-      ClassAndPropertyName("ObjectRoot.TestObject", "BooleanValue1")
+      ClassAndPropertyName("ObjectRoot.TestObject", "BoolValue1")
     ] = get_unique_no();
     objectClassAndPropertyNameHandleMap[
-      ClassAndPropertyName("ObjectRoot.TestObject", "BooleanValue2")
+      ClassAndPropertyName("ObjectRoot.TestObject", "BoolValue2")
     ] = get_unique_no();
     objectClassAndPropertyNameHandleMap[ClassAndPropertyName("ObjectRoot.TestObject", "ByteValue")] = get_unique_no();
     objectClassAndPropertyNameHandleMap[ClassAndPropertyName("ObjectRoot.TestObject", "CharValue")] = get_unique_no();
@@ -165,10 +210,10 @@ const ObjectRoot::ClassAndPropertyNameIntegerMap &RTIAmbassadorTest2::get_object
     objectClassAndPropertyNameHandleMap[ClassAndPropertyName("ObjectRoot.TestObject", "ShortValue")] = get_unique_no();
     objectClassAndPropertyNameHandleMap[ClassAndPropertyName("ObjectRoot.TestObject", "StringValue")] = get_unique_no();
     objectClassAndPropertyNameHandleMap[
-      ClassAndPropertyName("ObjectRoot.TestObject", "StringListValue1")
+      ClassAndPropertyName("ObjectRoot.TestObject", "JSONValue1")
     ] = get_unique_no();
     objectClassAndPropertyNameHandleMap[
-      ClassAndPropertyName("ObjectRoot.TestObject", "StringListValue2")
+      ClassAndPropertyName("ObjectRoot.TestObject", "JSONValue2")
     ] = get_unique_no();
 
     return objectClassAndPropertyNameHandleMap;
@@ -242,7 +287,7 @@ RTI::FederateHandle RTIAmbassadorTest2::joinFederationExecution (
   RTI::RestoreInProgress,
   RTI::RTIinternalError
 ) {
-    _federateAmbassadorPtrList.push_back(federateAmbassadorReference);
+    get_federate_ambassador_ptr_set().insert(federateAmbassadorReference);
     return 0;
 }
 
@@ -307,13 +352,13 @@ RTI::Boolean RTIAmbassadorTest2::tick() throw (
 ) {
     if (_timeConstrainedRequestOutstanding) {
         _timeConstrainedRequestOutstanding = false;
-        for (RTI::FederateAmbassadorPtr federateAmbassadorPtr : _federateAmbassadorPtrList) {
+        for (RTI::FederateAmbassadorPtr federateAmbassadorPtr : get_federate_ambassador_ptr_set()) {
             federateAmbassadorPtr->timeConstrainedEnabled(defaultRTIfedTime);
         }
     }
     if (_timeRegulationRequestOutstanding) {
         _timeRegulationRequestOutstanding = false;
-        for (RTI::FederateAmbassadorPtr federateAmbassadorPtr : _federateAmbassadorPtrList) {
+        for (RTI::FederateAmbassadorPtr federateAmbassadorPtr : get_federate_ambassador_ptr_set()) {
             federateAmbassadorPtr->timeRegulationEnabled(defaultRTIfedTime);
         }
     }

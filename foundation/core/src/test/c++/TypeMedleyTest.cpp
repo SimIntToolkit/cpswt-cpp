@@ -31,31 +31,17 @@
 #include "TypeMedleyTest.hpp"
 #include <iostream>
 
-void TypeMedleyTest::compareStringLists(const std::list<std::string> &list1, const std::list<std::string> &list2) {
-
-    CPPUNIT_ASSERT_EQUAL(list1.size(), list2.size());
-    std::list<std::string>::const_iterator stlCit1 = list1.begin();
-    std::list<std::string>::const_iterator stlCit2 = list2.begin();
-    while(stlCit1 != list1.end()) {
-        CPPUNIT_ASSERT_EQUAL(*stlCit1, *stlCit2);
-        ++stlCit1;
-        ++stlCit2;
-    }
-}
-void TypeMedleyTest::compareStringListRegex(
-  const std::list<std::string> &stringList, const std::list<std::regex> &regexList
-) {
-
-    CPPUNIT_ASSERT_EQUAL(stringList.size(), regexList.size());
-    std::list<std::string>::const_iterator stlCit = stringList.begin();
-    std::list<std::regex>::const_iterator rglCit = regexList.begin();
-    while(stlCit != stringList.end()) {
-        CPPUNIT_ASSERT(std::regex_match(*stlCit, *rglCit));
-        ++stlCit;
-        ++rglCit;
-    }
-}
-
+//void TypeMedleyTest::compareJsonLists(const Json::Value list1, const Json::Value &list2) {
+//
+//    int size = list1.size()
+//    CPPUNIT_ASSERT_EQUAL(size, list2.size());
+//    for(int ix = 0 ; ix < size ; ++ix) {}
+//    while(stlCit1 != list1.end()) {
+//        CPPUNIT_ASSERT_EQUAL(*stlCit1, *stlCit2);
+//        ++stlCit1;
+//        ++stlCit2;
+//    }
+//}
 
 void TypeMedleyTest::boolTrueTest() {
     TypeMedley typeMedley(true);
@@ -85,8 +71,8 @@ void TypeMedleyTest::boolTrueTest() {
     const auto stringValue = static_cast<std::string>(typeMedley);
     CPPUNIT_ASSERT_EQUAL(std::string("true"), stringValue);
 
-    const auto stringListValue = typeMedley.asStringList();
-    compareStringLists(std::list<std::string> { std::string("true") }, stringListValue);
+    const auto jsonValue = typeMedley.asJson();
+    CPPUNIT_ASSERT(jsonValue.asBool());
 }
 
 void TypeMedleyTest::boolFalseTest() {
@@ -117,8 +103,8 @@ void TypeMedleyTest::boolFalseTest() {
     const auto stringValue = static_cast<std::string>(typeMedley);
     CPPUNIT_ASSERT_EQUAL(std::string("false"), stringValue);
 
-    const auto stringListValue = typeMedley.asStringList();
-    compareStringLists(std::list<std::string> { std::string("false") }, stringListValue);
+    const auto jsonValue = typeMedley.asJson();
+    CPPUNIT_ASSERT(!jsonValue.asBool());
 }
 
 void TypeMedleyTest::charTest() {
@@ -149,8 +135,8 @@ void TypeMedleyTest::charTest() {
     const auto stringValue = static_cast<std::string>(typeMedley);
     CPPUNIT_ASSERT_EQUAL(std::string("3"), stringValue);
 
-    const auto stringListValue = typeMedley.asStringList();
-    compareStringLists(std::list<std::string> { std::string("3") }, stringListValue);
+    const auto jsonValue = typeMedley.asJson();
+    CPPUNIT_ASSERT_EQUAL('3', static_cast<char>(jsonValue.asInt()));
 }
 
 void TypeMedleyTest::charZeroTest() {
@@ -182,8 +168,8 @@ void TypeMedleyTest::charZeroTest() {
     char localValue = '\0';
     CPPUNIT_ASSERT_EQUAL(std::string(&localValue, 1), stringValue);
 
-    const auto stringListValue = typeMedley.asStringList();
-    compareStringLists(std::list<std::string> { std::string(&localValue, 1) }, stringListValue);
+    const auto jsonValue = typeMedley.asJson();
+    CPPUNIT_ASSERT_EQUAL('\0', static_cast<char>(jsonValue.asInt()));
 }
 
 void TypeMedleyTest::zeroCharTest() {
@@ -214,8 +200,8 @@ void TypeMedleyTest::zeroCharTest() {
     const auto stringValue = static_cast<std::string>(typeMedley);
     CPPUNIT_ASSERT_EQUAL(std::string("0"), stringValue);
 
-    const auto stringListValue = typeMedley.asStringList();
-    compareStringLists(std::list<std::string> { std::string("0") }, stringListValue);
+    const auto jsonValue = typeMedley.asJson();
+    CPPUNIT_ASSERT_EQUAL('0', static_cast<char>(jsonValue.asInt()));
 }
 
 void TypeMedleyTest::intZeroTest() {
@@ -246,8 +232,8 @@ void TypeMedleyTest::intZeroTest() {
     const auto stringValue = static_cast<std::string>(typeMedley);
     CPPUNIT_ASSERT_EQUAL(std::string("0"), stringValue);
 
-    const auto stringListValue = typeMedley.asStringList();
-    compareStringLists(std::list<std::string> { std::string("0") }, stringListValue);
+    const auto jsonValue = typeMedley.asJson();
+    CPPUNIT_ASSERT_EQUAL('\0', static_cast<char>(jsonValue.asInt()));
 }
 
 void TypeMedleyTest::floatTest() {
@@ -280,8 +266,8 @@ void TypeMedleyTest::floatTest() {
 
     CPPUNIT_ASSERT(std::regex_match(stringValue, regex1));
 
-    const auto stringListValue = typeMedley.asStringList();
-    compareStringListRegex(std::list<std::string> { stringValue }, std::list<std::regex> { regex1 });
+    const auto jsonValue = typeMedley.asJson();
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(static_cast<float>(-53.231), jsonValue.asFloat(), 0.001);
 }
 
 void TypeMedleyTest::floatWithExponentTest() {
@@ -314,10 +300,9 @@ void TypeMedleyTest::floatWithExponentTest() {
 
     CPPUNIT_ASSERT(std::regex_match(stringValue, regex1));
 
-    const auto stringListValue = typeMedley.asStringList();
-    compareStringListRegex(std::list<std::string> { stringValue }, std::list<std::regex> { regex1 });
+    const auto jsonValue = typeMedley.asJson();
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(static_cast<float>(5.3231), jsonValue.asFloat(), 0.001);
 }
-
 
 void TypeMedleyTest::zeroStringTest() {
     TypeMedley typeMedley(std::string("0"));
@@ -347,8 +332,8 @@ void TypeMedleyTest::zeroStringTest() {
     const auto stringValue = static_cast<std::string>(typeMedley);
     CPPUNIT_ASSERT_EQUAL(std::string("0"), stringValue);
 
-    const auto stringListValue = typeMedley.asStringList();
-    compareStringLists(std::list<std::string> { std::string("0") }, stringListValue);
+    const auto jsonValue = typeMedley.asJson();
+    CPPUNIT_ASSERT_EQUAL(std::string("0"), jsonValue.asString());
 }
 
 void TypeMedleyTest::stringFloatWithExponentTest() {
@@ -379,8 +364,8 @@ void TypeMedleyTest::stringFloatWithExponentTest() {
     const auto stringValue = static_cast<std::string>(typeMedley);
     CPPUNIT_ASSERT_EQUAL(std::string("53.231e-01"), stringValue);
 
-    const auto stringListValue = typeMedley.asStringList();
-    compareStringLists(std::list<std::string> { std::string("53.231e-01") }, stringListValue);
+    const auto jsonValue = typeMedley.asJson();
+    CPPUNIT_ASSERT_EQUAL(std::string("53.231e-01"), jsonValue.asString());
 }
 
 void TypeMedleyTest::stringTest() {
@@ -411,20 +396,24 @@ void TypeMedleyTest::stringTest() {
     const auto stringValue = static_cast<std::string>(typeMedley);
     CPPUNIT_ASSERT_EQUAL(std::string("00ABCD"), stringValue);
 
-    const auto stringListValue = typeMedley.asStringList();
-    compareStringLists(std::list<std::string> { std::string("00ABCD") }, stringListValue);
+    const auto jsonValue = typeMedley.asJson();
+    CPPUNIT_ASSERT_EQUAL(std::string("00ABCD"), jsonValue.asString());
 }
 
-void TypeMedleyTest::stringListTest() {
-    std::list<std::string> stringList { "this", "that", "other" };
+void TypeMedleyTest::jsonTest() {
 
-    TypeMedley typeMedley(stringList);
-    CPPUNIT_ASSERT(typeMedley.getDataType() == TypeMedley::STRINGLIST);
+    Json::Value value(Json::arrayValue);
+    value.append("this");
+    value.append("that");
+    value.append("other");
+
+    TypeMedley typeMedley(value);
+    CPPUNIT_ASSERT(typeMedley.getDataType() == TypeMedley::JSON);
 
     const auto boolValue1 = static_cast<bool>(typeMedley);
     CPPUNIT_ASSERT(boolValue1);
 
-    const auto boolValue2 = static_cast<bool>(TypeMedley(std::list<std::string>()));
+    const auto boolValue2 = static_cast<bool>(TypeMedley(Json::Value(Json::arrayValue)));
     CPPUNIT_ASSERT(!boolValue2);
 
     const auto charValue = static_cast<char>(typeMedley);
@@ -448,8 +437,8 @@ void TypeMedleyTest::stringListTest() {
     const auto stringValue = static_cast<std::string>(typeMedley);
     CPPUNIT_ASSERT_EQUAL(std::string("[ \"this\", \"that\", \"other\" ]"), stringValue);
 
-    const auto stringListValue = typeMedley.asStringList();
-    compareStringLists(stringList, stringListValue);
+    const auto jsonValue = typeMedley.asJson();
+    CPPUNIT_ASSERT_EQUAL(value, jsonValue);
 }
 
 CPPUNIT_TEST_SUITE_REGISTRATION( TypeMedleyTest );

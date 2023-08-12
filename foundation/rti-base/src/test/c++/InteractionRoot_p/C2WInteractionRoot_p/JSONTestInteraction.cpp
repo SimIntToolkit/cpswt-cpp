@@ -28,7 +28,7 @@
  * OR MODIFICATIONS.
  */
 
-#include "InteractionRoot_p/C2WInteractionRoot_p/StringListTestInteraction.hpp"
+#include "InteractionRoot_p/C2WInteractionRoot_p/JSONTestInteraction.hpp"
 namespace edu {
  namespace vanderbilt {
   namespace vuisis {
@@ -37,26 +37,26 @@ namespace edu {
      namespace InteractionRoot_p {
       namespace C2WInteractionRoot_p {
 
-bool StringListTestInteraction::static_init_var = StringListTestInteraction::static_init();
+bool JSONTestInteraction::static_init_var = JSONTestInteraction::static_init();
 
-bool StringListTestInteraction::static_init() {
-    BOOST_LOG_SEV(get_logger(), info) << "Class \"::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::StringListTestInteraction\" loaded.";
+bool JSONTestInteraction::static_init() {
+    BOOST_LOG_SEV(get_logger(), info) << "Class \"::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::JSONTestInteraction\" loaded.";
 
     // ADD THIS CLASS TO THE _classNameSet DEFINED IN InteractionRoot
     get_hla_class_name_set().insert(get_hla_class_name());
 
     InteractionRoot::NoInstanceInit noInstanceInit;
-    SP instanceSP = SP( new StringListTestInteraction(noInstanceInit) );
+    SP instanceSP = SP( new JSONTestInteraction(noInstanceInit) );
     get_hla_class_name_instance_sp_map()[get_hla_class_name()] = instanceSP;
 
     ClassAndPropertyNameSetSP classAndPropertyNameSetSP( new ClassAndPropertyNameSet() );
 
     classAndPropertyNameSetSP->emplace(
-        "InteractionRoot.C2WInteractionRoot.StringListTestInteraction", "stringListParameter"
+        "InteractionRoot.C2WInteractionRoot.JSONTestInteraction", "JSONParameter"
     );
 
-    get_class_and_property_name_initial_value_sp_map()[ClassAndPropertyName( "InteractionRoot.C2WInteractionRoot.StringListTestInteraction", "stringListParameter" )] =
-      ValueSP( new Value( std::list<std::string>() ));
+    get_class_and_property_name_initial_value_sp_map()[ClassAndPropertyName( "InteractionRoot.C2WInteractionRoot.JSONTestInteraction", "JSONParameter" )] =
+      ValueSP( new Value( Json::Value("") ));
 
     // ADD THIS CLASS'S _classAndPropertyNameSet TO _classNamePropertyNameSetMap DEFINED
     // IN InteractionRoot
@@ -69,7 +69,7 @@ bool StringListTestInteraction::static_init() {
     ClassAndPropertyNameSetSP allClassAndPropertyNameSetSP( new ClassAndPropertyNameSet() );
 
     allClassAndPropertyNameSetSP->emplace(
-        "InteractionRoot.C2WInteractionRoot.StringListTestInteraction", "stringListParameter"
+        "InteractionRoot.C2WInteractionRoot.JSONTestInteraction", "JSONParameter"
     );
 
     allClassAndPropertyNameSetSP->emplace(

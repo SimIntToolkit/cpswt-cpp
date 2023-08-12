@@ -76,33 +76,11 @@ bool TypeMedley::setValue(const std::string &value) {
                 _value = convert_to_string<double>(value);
                 break;
             }
+            case JSON:
             case STRING: {
                 _value = value;
                 break;
             }
-            case STRINGLIST:
-                std::string tmpString(value);
-                tmpString.erase(
-                  tmpString.begin(),
-                  std::find_if(tmpString.begin(), tmpString.end(), [](unsigned char ch) {
-                      return !std::isspace(ch);
-                  })
-                );
-                if (tmpString.empty() || tmpString[0] != '[') {
-                   Json::Value topLevelJSONObject(Json::arrayValue);
-                   topLevelJSONObject.append(value);
-
-                   Json::StreamWriterBuilder streamWriterBuilder;
-                   streamWriterBuilder["commentStyle"] = "None";
-                   streamWriterBuilder["indentation"] = "    ";
-                   std::unique_ptr<Json::StreamWriter> streamWriterUPtr(streamWriterBuilder.newStreamWriter());
-                   std::ostringstream stringOutputStream;
-                   streamWriterUPtr->write(topLevelJSONObject, &stringOutputStream);
-                   _value = stringOutputStream.str();
-                } else {
-                    _value = value;
-                }
-                break;
         }
         return true;
     } catch(...) { }

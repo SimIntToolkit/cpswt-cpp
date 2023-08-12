@@ -49,13 +49,21 @@ private:
 
     static const std::map<ClassAndPropertyName, int> &get_object_class_and_property_name_handle_map_aux();
 
-    std::list<RTI::FederateAmbassadorPtr> _federateAmbassadorPtrList;
+    static std::set<RTI::FederateAmbassadorPtr> &get_federate_ambassador_ptr_set() {
+        static std::set<RTI::FederateAmbassadorPtr> federateAmbassadorPtrSet;
+        return federateAmbassadorPtrSet;
+    }
+
     bool _timeConstrainedRequestOutstanding;
     bool _timeRegulationRequestOutstanding;
 
 
 public:
     RTIAmbassadorTest2() : _timeConstrainedRequestOutstanding(false), _timeRegulationRequestOutstanding(false) {}
+
+    static void remove_federate_ptr(RTI::FederateAmbassadorPtr federateAmbassadorReference) {
+        get_federate_ambassador_ptr_set().erase(federateAmbassadorReference);
+    }
 
     static const ClassNameHandleMap &get_interaction_class_name_handle_map() {
         static const ClassNameHandleMap &interactionClassNameHandleMap =

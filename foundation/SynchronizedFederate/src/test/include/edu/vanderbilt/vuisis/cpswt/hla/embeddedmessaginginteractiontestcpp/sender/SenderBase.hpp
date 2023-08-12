@@ -28,8 +28,8 @@
  * OR MODIFICATIONS.
  */
 
-#ifndef EDU_VANDERBILT_VUISIS_CPSWT_HLA_EMBEDDEDMESSAGINGOBJECTTESTCPP_SENDER_CLASS_BASE_CLASS
-#define EDU_VANDERBILT_VUISIS_CPSWT_HLA_EMBEDDEDMESSAGINGOBJECTTESTCPP_SENDER_CLASS_BASE_CLASS
+#ifndef EDU_VANDERBILT_VUISIS_CPSWT_HLA_EMBEDDEDMESSAGINGINTERACTIONTESTCPP_SENDER_CLASS_BASE_CLASS
+#define EDU_VANDERBILT_VUISIS_CPSWT_HLA_EMBEDDEDMESSAGINGINTERACTIONTESTCPP_SENDER_CLASS_BASE_CLASS
 
 #define BOOST_LOG_DYN_LINK
 
@@ -48,7 +48,7 @@
 
 
 #include "InteractionRoot_p/C2WInteractionRoot_p/EmbeddedMessaging_p/TestOmnetFederate.hpp"
-#include "ObjectRoot_p/TestObject.hpp"
+#include "InteractionRoot_p/C2WInteractionRoot_p/TestInteraction.hpp"
 
 #if __cplusplus >= 201703L
 #define MultiArgThrow17
@@ -61,7 +61,7 @@ namespace edu {
   namespace vuisis {
    namespace cpswt {
     namespace hla {
-     namespace embeddedmessagingobjecttestcpp {
+     namespace embeddedmessaginginteractiontestcpp {
       namespace sender {
 
 BOOST_LOG_ATTRIBUTE_KEYWORD(federateName, "FederateName", std::string);
@@ -138,10 +138,10 @@ protected:
 public:
     SenderBase(FederateConfig *federateConfig);
 
-    ::edu::vanderbilt::vuisis::cpswt::hla::ObjectRoot_p::TestObject::SP create_ObjectRoot_TestObject() {
-        ::edu::vanderbilt::vuisis::cpswt::hla::ObjectRoot_p::TestObject::SP objectSP =
-            ::edu::vanderbilt::vuisis::cpswt::hla::ObjectRoot_p::TestObject::create();
-        return objectSP;
+    ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::TestInteraction::SP create_InteractionRoot_C2WInteractionRoot_TestInteraction_interaction() {
+        ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::TestInteraction::SP interactionSP =
+          ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::TestInteraction::create();
+        return interactionSP;
     }
 
     virtual void receiveInteraction(
@@ -168,7 +168,7 @@ public:
     );
 };
       } // NAMESPACE "sender"
-     } // NAMESPACE "embeddedmessagingobjecttestcpp"
+     } // NAMESPACE "embeddedmessaginginteractiontestcpp"
     } // NAMESPACE "hla"
    } // NAMESPACE "cpswt"
   } // NAMESPACE "vuisis"
@@ -181,4 +181,4 @@ public:
 #undef throw
 #endif
 
-#endif // EDU_VANDERBILT_VUISIS_CPSWT_HLA_EMBEDDEDMESSAGINGOBJECTTESTCPP_SENDER_CLASS_BASE_CLASS
+#endif // EDU_VANDERBILT_VUISIS_CPSWT_HLA_EMBEDDEDMESSAGINGINTERACTIONTESTCPP_SENDER_CLASS_BASE_CLASS

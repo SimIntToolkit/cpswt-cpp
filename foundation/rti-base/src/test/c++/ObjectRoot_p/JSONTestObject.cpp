@@ -28,7 +28,7 @@
  * OR MODIFICATIONS.
  */
 
-#include "ObjectRoot_p/StringListTestObject.hpp"
+#include "ObjectRoot_p/JSONTestObject.hpp"
 namespace edu {
  namespace vanderbilt {
   namespace vuisis {
@@ -36,26 +36,26 @@ namespace edu {
     namespace hla {
      namespace ObjectRoot_p {
 
-bool StringListTestObject::static_init_var = StringListTestObject::static_init();
+bool JSONTestObject::static_init_var = JSONTestObject::static_init();
 
-bool StringListTestObject::static_init() {
-    BOOST_LOG_SEV(get_logger(), info) << "Class \"::edu::vanderbilt::vuisis::cpswt::hla::ObjectRoot_p::StringListTestObject\" loaded.";
+bool JSONTestObject::static_init() {
+    BOOST_LOG_SEV(get_logger(), info) << "Class \"::edu::vanderbilt::vuisis::cpswt::hla::ObjectRoot_p::JSONTestObject\" loaded.";
 
     // ADD THIS CLASS TO THE _classNameSet DEFINED IN ObjectRoot
     get_hla_class_name_set().insert(get_hla_class_name());
 
     ObjectRoot::NoInstanceInit noInstanceInit;
-    SP instanceSP = SP( new StringListTestObject(noInstanceInit) );
+    SP instanceSP = SP( new JSONTestObject(noInstanceInit) );
     get_hla_class_name_instance_sp_map()[get_hla_class_name()] = instanceSP;
 
     ClassAndPropertyNameSetSP classAndPropertyNameSetSP( new ClassAndPropertyNameSet() );
 
     classAndPropertyNameSetSP->emplace(
-        "ObjectRoot.StringListTestObject", "stringListAttribute"
+        "ObjectRoot.JSONTestObject", "JSONAttribute"
     );
 
-    get_class_and_property_name_initial_value_sp_map()[ClassAndPropertyName( "ObjectRoot.StringListTestObject", "stringListAttribute" )] =
-      ValueSP( new Value( std::list<std::string>() ));
+    get_class_and_property_name_initial_value_sp_map()[ClassAndPropertyName( "ObjectRoot.JSONTestObject", "JSONAttribute" )] =
+      ValueSP( new Value( Json::Value("") ));
 
     // ADD THIS CLASS'S _classAndPropertyNameSet TO _classNamePropertyNameSetMap DEFINED
     // IN ObjectRoot
@@ -68,7 +68,7 @@ bool StringListTestObject::static_init() {
     ClassAndPropertyNameSetSP allClassAndPropertyNameSetSP( new ClassAndPropertyNameSet() );
 
     allClassAndPropertyNameSetSP->emplace(
-        "ObjectRoot.StringListTestObject", "stringListAttribute"
+        "ObjectRoot.JSONTestObject", "JSONAttribute"
     );
 
     // ADD THIS CLASS'S _allClassAndPropertyNameSet TO _classNameAllPropertyNameSetMap DEFINED

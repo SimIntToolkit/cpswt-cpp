@@ -77,7 +77,7 @@ private:
     CPPUNIT_TEST(federateSequenceTest);
     CPPUNIT_TEST(attributePubSubTest);
     CPPUNIT_TEST(printInteractionTest);
-    CPPUNIT_TEST(stringListTest);
+    CPPUNIT_TEST(jsonTest);
     CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -100,7 +100,7 @@ public:
     void federateSequenceTest();
     void attributePubSubTest();
     void printInteractionTest();
-    void stringListTest();
+    void jsonTest();
 };
 
 #endif // _MESSAGING_TESTS
