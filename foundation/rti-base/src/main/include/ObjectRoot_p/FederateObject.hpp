@@ -365,7 +365,7 @@ public:
      */
     int get_FederateHandle() {
         ClassAndPropertyName key(get_hla_class_name(), "FederateHandle");
-        return static_cast<int>(*_classAndPropertyNameValueSPMap[key]);
+        return _classAndPropertyNameValueSPMap[key]->asInt();
     }
 
     /**
@@ -398,7 +398,7 @@ public:
      */
     std::string get_FederateHost() {
         ClassAndPropertyName key(get_hla_class_name(), "FederateHost");
-        return static_cast<std::string>(*_classAndPropertyNameValueSPMap[key]);
+        return _classAndPropertyNameValueSPMap[key]->asString();
     }
 
     /**
@@ -431,7 +431,7 @@ public:
      */
     std::string get_FederateType() {
         ClassAndPropertyName key(get_hla_class_name(), "FederateType");
-        return static_cast<std::string>(*_classAndPropertyNameValueSPMap[key]);
+        return _classAndPropertyNameValueSPMap[key]->asString();
     }
 
     /**

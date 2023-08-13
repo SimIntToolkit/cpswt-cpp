@@ -330,7 +330,7 @@ public:
      */
     double get_actualLogicalGenerationTime() {
         ClassAndPropertyName key(get_hla_class_name(), "actualLogicalGenerationTime");
-        return static_cast<double>(*_classAndPropertyNameValueSPMap[key]);
+        return _classAndPropertyNameValueSPMap[key]->asDouble();
     }
 
 
@@ -352,7 +352,7 @@ public:
      */
     std::string get_federateFilter() {
         ClassAndPropertyName key(get_hla_class_name(), "federateFilter");
-        return static_cast<std::string>(*_classAndPropertyNameValueSPMap[key]);
+        return _classAndPropertyNameValueSPMap[key]->asString();
     }
 
 
@@ -374,7 +374,7 @@ public:
      */
     std::string get_federateSequence() {
         ClassAndPropertyName key(get_hla_class_name(), "federateSequence");
-        return static_cast<std::string>(*_classAndPropertyNameValueSPMap[key]);
+        return _classAndPropertyNameValueSPMap[key]->asString();
     }
 
     //------------------------------------

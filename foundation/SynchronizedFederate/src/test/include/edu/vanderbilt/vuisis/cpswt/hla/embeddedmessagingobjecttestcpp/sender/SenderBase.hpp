@@ -47,7 +47,7 @@
 #include "FederateConfigParser.h"
 
 
-#include "InteractionRoot_p/C2WInteractionRoot_p/EmbeddedMessaging_p/OmnetFederate.hpp"
+#include "InteractionRoot_p/C2WInteractionRoot_p/EmbeddedMessaging_p/TestOmnetFederate.hpp"
 #include "ObjectRoot_p/TestObject.hpp"
 
 #if __cplusplus >= 201703L

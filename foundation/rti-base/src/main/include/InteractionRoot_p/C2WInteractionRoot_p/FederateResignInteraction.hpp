@@ -325,7 +325,7 @@ public:
      */
     std::string get_FederateId() {
         ClassAndPropertyName key(get_hla_class_name(), "FederateId");
-        return static_cast<std::string>(*_classAndPropertyNameValueSPMap[key]);
+        return _classAndPropertyNameValueSPMap[key]->asString();
     }
 
 
@@ -347,7 +347,7 @@ public:
      */
     std::string get_FederateType() {
         ClassAndPropertyName key(get_hla_class_name(), "FederateType");
-        return static_cast<std::string>(*_classAndPropertyNameValueSPMap[key]);
+        return _classAndPropertyNameValueSPMap[key]->asString();
     }
 
 
@@ -369,7 +369,7 @@ public:
      */
     bool get_IsLateJoiner() {
         ClassAndPropertyName key(get_hla_class_name(), "IsLateJoiner");
-        return static_cast<bool>(*_classAndPropertyNameValueSPMap[key]);
+        return _classAndPropertyNameValueSPMap[key]->asBool();
     }
 
     //------------------------------------

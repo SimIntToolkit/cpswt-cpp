@@ -339,6 +339,7 @@ void InteractionRoot::unsubscribe_interaction(const std::string &hlaClassName, R
 }
 
 void InteractionRoot::initializeProperties(const std::string &hlaClassName) {
+
     setInstanceHlaClassName(hlaClassName);
     if (get_class_name_handle_map().find(hlaClassName) == get_class_name_handle_map().end()) {
         BOOST_LOG_SEV(get_logger(), error)
@@ -481,29 +482,32 @@ std::string InteractionRoot::toJson() {
         const std::string key(cvmItr->first);
         Value &value = *cvmItr->second;
         switch(value.getDataType()) {
-            case(TypeMedley::BOOLEAN):
+            case TypeMedley::BOOLEAN:
                 propertyJSONObject[key] = static_cast<bool>(value);
                 break;
-            case(TypeMedley::CHARACTER):
+            case TypeMedley::CHARACTER:
                 propertyJSONObject[key] = static_cast<char>(value);
                 break;
-            case(TypeMedley::SHORT):
+            case TypeMedley::SHORT:
                 propertyJSONObject[key] = static_cast<short>(value);
                 break;
-            case(TypeMedley::INTEGER):
+            case TypeMedley::INTEGER:
                 propertyJSONObject[key] = static_cast<int>(value);
                 break;
-            case(TypeMedley::LONG):
+            case TypeMedley::LONG:
                 propertyJSONObject[key] = static_cast<Json::Value::Int64>(static_cast<long>(value));
                 break;
-            case(TypeMedley::FLOAT):
+            case TypeMedley::FLOAT:
                 propertyJSONObject[key] = static_cast<float>(value);
                 break;
-            case(TypeMedley::DOUBLE):
+            case TypeMedley::DOUBLE:
                 propertyJSONObject[key] = static_cast<double>(value);
                 break;
-            case(TypeMedley::STRING):
+            case TypeMedley::STRING:
                 propertyJSONObject[key] = static_cast<std::string>(value);
+                break;
+            case TypeMedley::JSON:
+                propertyJSONObject[key] = static_cast<Json::Value>(value);
                 break;
         }
     }
@@ -542,11 +546,12 @@ InteractionRoot::SP InteractionRoot::fromJson(const std::string &jsonString) {
         ClassAndPropertyName classAndPropertyName(memberName);
 
         switch(otherClassAndPropertyNameValueSPMap[classAndPropertyName]->getDataType()) {
-            case TypeMedley::BOOLEAN:
-                (*otherClassAndPropertyNameValueSPMap[classAndPropertyName]).setValue(
+            case TypeMedley::BOOLEAN: {
+                otherClassAndPropertyNameValueSPMap[classAndPropertyName]->setValue(
                   propertyJSONObject[memberName].asBool()
                 );
                 break;
+            }
             case TypeMedley::CHARACTER: {
                 Json::Value value = propertyJSONObject[memberName];
                 int intValue = 0;
@@ -556,39 +561,51 @@ InteractionRoot::SP InteractionRoot::fromJson(const std::string &jsonString) {
                 } else {
                     intValue = value.isNumeric() ? value.asInt() : 0;
                 }
-                (*otherClassAndPropertyNameValueSPMap[classAndPropertyName]).setValue(static_cast<char>(intValue));
+                otherClassAndPropertyNameValueSPMap[classAndPropertyName]->setValue(static_cast<char>(intValue));
                 break;
             }
-            case TypeMedley::SHORT:
-                (*otherClassAndPropertyNameValueSPMap[classAndPropertyName]).setValue(
+            case TypeMedley::SHORT: {
+                otherClassAndPropertyNameValueSPMap[classAndPropertyName]->setValue(
                   static_cast<short>(propertyJSONObject[memberName].asInt())
                 );
                 break;
-            case TypeMedley::INTEGER:
-                (*otherClassAndPropertyNameValueSPMap[classAndPropertyName]).setValue(
+            }
+            case TypeMedley::INTEGER: {
+                otherClassAndPropertyNameValueSPMap[classAndPropertyName]->setValue(
                   propertyJSONObject[memberName].asInt()
                 );
                 break;
-            case TypeMedley::LONG:
-                (*otherClassAndPropertyNameValueSPMap[classAndPropertyName]).setValue(
+            }
+            case TypeMedley::LONG: {
+                otherClassAndPropertyNameValueSPMap[classAndPropertyName]->setValue(
                   static_cast<long>(propertyJSONObject[memberName].asInt64())
                 );
                 break;
-            case TypeMedley::FLOAT:
-                (*otherClassAndPropertyNameValueSPMap[classAndPropertyName]).setValue(
+            }
+            case TypeMedley::FLOAT: {
+                otherClassAndPropertyNameValueSPMap[classAndPropertyName]->setValue(
                   propertyJSONObject[memberName].asFloat()
                 );
                 break;
-            case TypeMedley::DOUBLE:
-                (*otherClassAndPropertyNameValueSPMap[classAndPropertyName]).setValue(
+            }
+            case TypeMedley::DOUBLE: {
+                otherClassAndPropertyNameValueSPMap[classAndPropertyName]->setValue(
                   propertyJSONObject[memberName].asDouble()
                 );
                 break;
-            case TypeMedley::STRING:
-                (*otherClassAndPropertyNameValueSPMap[classAndPropertyName]).setValue(
+            }
+            case TypeMedley::STRING: {
+                otherClassAndPropertyNameValueSPMap[classAndPropertyName]->setValue(
                   propertyJSONObject[memberName].asString()
                 );
                 break;
+            }
+            case TypeMedley::JSON: {
+                otherClassAndPropertyNameValueSPMap[classAndPropertyName]->setValue(
+                  propertyJSONObject[memberName]
+                );
+                break;
+            }
         }
     }
 

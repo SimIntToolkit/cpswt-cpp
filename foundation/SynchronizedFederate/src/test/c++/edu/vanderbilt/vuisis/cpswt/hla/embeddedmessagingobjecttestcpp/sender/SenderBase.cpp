@@ -56,21 +56,23 @@ void SenderBase::init() {
     enableTimeRegulation(getLookahead());
 
     // DIRECT INTERACTION PUBLICATIONS
-    ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::EmbeddedMessaging_p::OmnetFederate::publish_interaction(getRTI());
+    ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::EmbeddedMessaging_p::TestOmnetFederate::publish_interaction(getRTI());
 
     // OBJECT PUBLICATIONS
-    ::edu::vanderbilt::vuisis::cpswt::hla::ObjectRoot_p::TestObject::publish_attribute("ObjectRoot.TestObject", "BooleanValue1");
-    ::edu::vanderbilt::vuisis::cpswt::hla::ObjectRoot_p::TestObject::publish_attribute("ObjectRoot.TestObject", "BooleanValue2");
+    ::edu::vanderbilt::vuisis::cpswt::hla::ObjectRoot_p::TestObject::publish_attribute("ObjectRoot.TestObject", "BoolValue1");
+    ::edu::vanderbilt::vuisis::cpswt::hla::ObjectRoot_p::TestObject::publish_attribute("ObjectRoot.TestObject", "BoolValue2");
     ::edu::vanderbilt::vuisis::cpswt::hla::ObjectRoot_p::TestObject::publish_attribute("ObjectRoot.TestObject", "ByteValue");
     ::edu::vanderbilt::vuisis::cpswt::hla::ObjectRoot_p::TestObject::publish_attribute("ObjectRoot.TestObject", "CharValue");
     ::edu::vanderbilt::vuisis::cpswt::hla::ObjectRoot_p::TestObject::publish_attribute("ObjectRoot.TestObject", "FloatValue");
     ::edu::vanderbilt::vuisis::cpswt::hla::ObjectRoot_p::TestObject::publish_attribute("ObjectRoot.TestObject", "IntValue");
+    ::edu::vanderbilt::vuisis::cpswt::hla::ObjectRoot_p::TestObject::publish_attribute("ObjectRoot.TestObject", "JSONValue1");
+    ::edu::vanderbilt::vuisis::cpswt::hla::ObjectRoot_p::TestObject::publish_attribute("ObjectRoot.TestObject", "JSONValue2");
     ::edu::vanderbilt::vuisis::cpswt::hla::ObjectRoot_p::TestObject::publish_attribute("ObjectRoot.TestObject", "LongValue");
     ::edu::vanderbilt::vuisis::cpswt::hla::ObjectRoot_p::TestObject::publish_attribute("ObjectRoot.TestObject", "ShortValue");
     ::edu::vanderbilt::vuisis::cpswt::hla::ObjectRoot_p::TestObject::publish_object(getRTI());
 
     // SOFT OBJECT PUBLICATIONS
-    ::edu::vanderbilt::vuisis::cpswt::hla::ObjectRoot_p::TestObject::add_federate_name_soft_publish("OmnetFederate");
+    ::edu::vanderbilt::vuisis::cpswt::hla::ObjectRoot_p::TestObject::add_federate_name_soft_publish("TestOmnetFederate");
 }
 
 SenderBase::SenderBase(FederateConfig *federateConfig): Super(federateConfig) {

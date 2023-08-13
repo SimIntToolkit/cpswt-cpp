@@ -31,6 +31,18 @@
 #include "TypeMedleyTest.hpp"
 #include <iostream>
 
+//void TypeMedleyTest::compareJsonLists(const Json::Value list1, const Json::Value &list2) {
+//
+//    int size = list1.size()
+//    CPPUNIT_ASSERT_EQUAL(size, list2.size());
+//    for(int ix = 0 ; ix < size ; ++ix) {}
+//    while(stlCit1 != list1.end()) {
+//        CPPUNIT_ASSERT_EQUAL(*stlCit1, *stlCit2);
+//        ++stlCit1;
+//        ++stlCit2;
+//    }
+//}
+
 void TypeMedleyTest::boolTrueTest() {
     TypeMedley typeMedley(true);
     CPPUNIT_ASSERT(typeMedley.getDataType() == TypeMedley::BOOLEAN);
@@ -58,6 +70,9 @@ void TypeMedleyTest::boolTrueTest() {
 
     const auto stringValue = static_cast<std::string>(typeMedley);
     CPPUNIT_ASSERT_EQUAL(std::string("true"), stringValue);
+
+    const auto jsonValue = typeMedley.asJson();
+    CPPUNIT_ASSERT(jsonValue.asBool());
 }
 
 void TypeMedleyTest::boolFalseTest() {
@@ -87,6 +102,9 @@ void TypeMedleyTest::boolFalseTest() {
 
     const auto stringValue = static_cast<std::string>(typeMedley);
     CPPUNIT_ASSERT_EQUAL(std::string("false"), stringValue);
+
+    const auto jsonValue = typeMedley.asJson();
+    CPPUNIT_ASSERT(!jsonValue.asBool());
 }
 
 void TypeMedleyTest::charTest() {
@@ -116,6 +134,9 @@ void TypeMedleyTest::charTest() {
 
     const auto stringValue = static_cast<std::string>(typeMedley);
     CPPUNIT_ASSERT_EQUAL(std::string("3"), stringValue);
+
+    const auto jsonValue = typeMedley.asJson();
+    CPPUNIT_ASSERT_EQUAL('3', static_cast<char>(jsonValue.asInt()));
 }
 
 void TypeMedleyTest::charZeroTest() {
@@ -146,6 +167,9 @@ void TypeMedleyTest::charZeroTest() {
     const auto stringValue = static_cast<std::string>(typeMedley);
     char localValue = '\0';
     CPPUNIT_ASSERT_EQUAL(std::string(&localValue, 1), stringValue);
+
+    const auto jsonValue = typeMedley.asJson();
+    CPPUNIT_ASSERT_EQUAL('\0', static_cast<char>(jsonValue.asInt()));
 }
 
 void TypeMedleyTest::zeroCharTest() {
@@ -175,6 +199,9 @@ void TypeMedleyTest::zeroCharTest() {
 
     const auto stringValue = static_cast<std::string>(typeMedley);
     CPPUNIT_ASSERT_EQUAL(std::string("0"), stringValue);
+
+    const auto jsonValue = typeMedley.asJson();
+    CPPUNIT_ASSERT_EQUAL('0', static_cast<char>(jsonValue.asInt()));
 }
 
 void TypeMedleyTest::intZeroTest() {
@@ -204,6 +231,9 @@ void TypeMedleyTest::intZeroTest() {
 
     const auto stringValue = static_cast<std::string>(typeMedley);
     CPPUNIT_ASSERT_EQUAL(std::string("0"), stringValue);
+
+    const auto jsonValue = typeMedley.asJson();
+    CPPUNIT_ASSERT_EQUAL('\0', static_cast<char>(jsonValue.asInt()));
 }
 
 void TypeMedleyTest::floatTest() {
@@ -231,8 +261,13 @@ void TypeMedleyTest::floatTest() {
     const auto doubleValue = static_cast<double>(typeMedley);
     CPPUNIT_ASSERT_DOUBLES_EQUAL(static_cast<double>(-53.231), doubleValue, 0.001);
 
+    std::regex regex1("-53\\.23[0-9]*");
     const auto stringValue = static_cast<std::string>(typeMedley);
-    CPPUNIT_ASSERT(std::regex_match(stringValue, std::regex("-53\\.23[0-9]*")));
+
+    CPPUNIT_ASSERT(std::regex_match(stringValue, regex1));
+
+    const auto jsonValue = typeMedley.asJson();
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(static_cast<float>(-53.231), jsonValue.asFloat(), 0.001);
 }
 
 void TypeMedleyTest::floatWithExponentTest() {
@@ -260,10 +295,14 @@ void TypeMedleyTest::floatWithExponentTest() {
     const auto doubleValue = static_cast<double>(typeMedley);
     CPPUNIT_ASSERT_DOUBLES_EQUAL(static_cast<double>(5.3231), doubleValue, 0.001);
 
+    std::regex regex1("5\\.323[0-9]*");
     const auto stringValue = static_cast<std::string>(typeMedley);
-    CPPUNIT_ASSERT(std::regex_match(stringValue, std::regex("5\\.323[0-9]*")));
-}
 
+    CPPUNIT_ASSERT(std::regex_match(stringValue, regex1));
+
+    const auto jsonValue = typeMedley.asJson();
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(static_cast<float>(5.3231), jsonValue.asFloat(), 0.001);
+}
 
 void TypeMedleyTest::zeroStringTest() {
     TypeMedley typeMedley(std::string("0"));
@@ -292,6 +331,9 @@ void TypeMedleyTest::zeroStringTest() {
 
     const auto stringValue = static_cast<std::string>(typeMedley);
     CPPUNIT_ASSERT_EQUAL(std::string("0"), stringValue);
+
+    const auto jsonValue = typeMedley.asJson();
+    CPPUNIT_ASSERT_EQUAL(std::string("0"), jsonValue.asString());
 }
 
 void TypeMedleyTest::stringFloatWithExponentTest() {
@@ -321,6 +363,9 @@ void TypeMedleyTest::stringFloatWithExponentTest() {
 
     const auto stringValue = static_cast<std::string>(typeMedley);
     CPPUNIT_ASSERT_EQUAL(std::string("53.231e-01"), stringValue);
+
+    const auto jsonValue = typeMedley.asJson();
+    CPPUNIT_ASSERT_EQUAL(std::string("53.231e-01"), jsonValue.asString());
 }
 
 void TypeMedleyTest::stringTest() {
@@ -331,25 +376,69 @@ void TypeMedleyTest::stringTest() {
     CPPUNIT_ASSERT(!boolValue);
 
     const auto charValue = static_cast<char>(typeMedley);
-    CPPUNIT_ASSERT_EQUAL('\0', charValue);
+    CPPUNIT_ASSERT_EQUAL('0', charValue);
 
     const auto shortValue = static_cast<short>(typeMedley);
-    CPPUNIT_ASSERT_EQUAL(static_cast<short>(0), shortValue);
+    CPPUNIT_ASSERT_EQUAL(static_cast<short>('0'), shortValue);
 
     const auto intValue = static_cast<int>(typeMedley);
-    CPPUNIT_ASSERT_EQUAL(static_cast<int>(0), intValue);
+    CPPUNIT_ASSERT_EQUAL(static_cast<int>('0'), intValue);
 
     const auto longValue = static_cast<long>(typeMedley);
-    CPPUNIT_ASSERT_EQUAL(static_cast<long>(0), longValue);
+    CPPUNIT_ASSERT_EQUAL(static_cast<long>('0'), longValue);
 
     const auto floatValue = static_cast<float>(typeMedley);
-    CPPUNIT_ASSERT_DOUBLES_EQUAL(static_cast<float>(0), floatValue, 0.001);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(static_cast<float>('0'), floatValue, 0.001);
 
     const auto doubleValue = static_cast<double>(typeMedley);
-    CPPUNIT_ASSERT_DOUBLES_EQUAL(static_cast<double>(0), doubleValue, 0.001);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(static_cast<double>('0'), doubleValue, 0.001);
 
     const auto stringValue = static_cast<std::string>(typeMedley);
     CPPUNIT_ASSERT_EQUAL(std::string("00ABCD"), stringValue);
+
+    const auto jsonValue = typeMedley.asJson();
+    CPPUNIT_ASSERT_EQUAL(std::string("00ABCD"), jsonValue.asString());
+}
+
+void TypeMedleyTest::jsonTest() {
+
+    Json::Value value(Json::arrayValue);
+    value.append("this");
+    value.append("that");
+    value.append("other");
+
+    TypeMedley typeMedley(value);
+    CPPUNIT_ASSERT(typeMedley.getDataType() == TypeMedley::JSON);
+
+    const auto boolValue1 = static_cast<bool>(typeMedley);
+    CPPUNIT_ASSERT(boolValue1);
+
+    const auto boolValue2 = static_cast<bool>(TypeMedley(Json::Value(Json::arrayValue)));
+    CPPUNIT_ASSERT(!boolValue2);
+
+    const auto charValue = static_cast<char>(typeMedley);
+    CPPUNIT_ASSERT_EQUAL(static_cast<char>(3), charValue);
+
+    const auto shortValue = static_cast<short>(typeMedley);
+    CPPUNIT_ASSERT_EQUAL(static_cast<short>(3), shortValue);
+
+    const auto intValue = static_cast<int>(typeMedley);
+    CPPUNIT_ASSERT_EQUAL(static_cast<int>(3), intValue);
+
+    const auto longValue = static_cast<long>(typeMedley);
+    CPPUNIT_ASSERT_EQUAL(static_cast<long>(3), longValue);
+
+    const auto floatValue = static_cast<float>(typeMedley);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(static_cast<float>(3), floatValue, 0.001);
+
+    const auto doubleValue = static_cast<double>(typeMedley);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(static_cast<double>(3), doubleValue, 0.001);
+
+    const auto stringValue = static_cast<std::string>(typeMedley);
+    CPPUNIT_ASSERT_EQUAL(std::string("[ \"this\", \"that\", \"other\" ]"), stringValue);
+
+    const auto jsonValue = typeMedley.asJson();
+    CPPUNIT_ASSERT_EQUAL(value, jsonValue);
 }
 
 CPPUNIT_TEST_SUITE_REGISTRATION( TypeMedleyTest );

@@ -52,13 +52,13 @@ void Receiver::handleObjectClass_ObjectRoot_TestObject(ObjectRoot::SP objectRoot
 void Receiver::checkReceivedSubscriptions() {
 
     InteractionRoot::SP interactionRootSP;
-    while(interactionRootSP = getNextInteraction()) {
+    while (interactionRootSP = getNextInteraction()) {
 
         std::cerr << "unhandled interaction " << interactionRootSP->getInstanceHlaClassName() << std::endl;
     }
 
     ObjectReflector::SP reflectorSP;
-    while(reflectorSP = getNextObjectReflectorSP()) {
+    while (reflectorSP = getNextObjectReflectorSP()) {
         reflectorSP->reflect();
         ObjectRoot::SP objectRootSP = reflectorSP->getObjectRootSP();
 
@@ -89,7 +89,6 @@ void Receiver::initialize( void ) {
 void Receiver::execute() {
     checkReceivedSubscriptions();
 }
-
       } // NAMESPACE "receiver"
      } // NAMESPACE "embeddedmessagingobjecttestcpp"
     } // NAMESPACE "hla"

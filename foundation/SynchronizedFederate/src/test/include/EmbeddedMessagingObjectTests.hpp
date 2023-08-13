@@ -64,7 +64,7 @@ public:
 
         FederateConfig &federateConfig = *federateConfigSP;
         federateConfig.federateType = federateName;
-        federateConfig.federationId = "testOjbectNetworkPropagation";
+        federateConfig.federationId = "testObjectNetworkPropagation";
         federateConfig.isLateJoiner = false;
         federateConfig.lookahead = 0.1;
         federateConfig.stepSize = 1.0;

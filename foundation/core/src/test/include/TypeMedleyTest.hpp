@@ -48,7 +48,13 @@ class TypeMedleyTest: public CppUnit::TestCase {
     CPPUNIT_TEST(zeroStringTest);
     CPPUNIT_TEST(stringFloatWithExponentTest);
     CPPUNIT_TEST(stringTest);
+    CPPUNIT_TEST(jsonTest);
     CPPUNIT_TEST_SUITE_END();
+
+    static void compareStringLists(const std::list<std::string> &list1, const std::list<std::string> &list2);
+    static void compareStringListRegex(
+      const std::list<std::string> &stringList, const std::list<std::regex> &regexList
+    );
 
 public:
     TypeMedleyTest() : CppUnit::TestCase() {}
@@ -64,6 +70,7 @@ public:
     void zeroStringTest();
     void stringFloatWithExponentTest();
     void stringTest();
+    void jsonTest();
 };
 
 #endif // _TYPEMEDLEY_TEST

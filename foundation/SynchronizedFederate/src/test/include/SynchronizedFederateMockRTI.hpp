@@ -8,6 +8,11 @@ typedef RTI::FederateAmbassador NullFederateAmbassador;
 
 class SynchronizedFederateMockRTI: public SynchronizedFederate {
 public:
+
+    virtual ~SynchronizedFederateMockRTI() {
+        RTIAmbassadorTest2::remove_federate_ptr(this);
+    }
+
     typedef SynchronizedFederate Super;
     SynchronizedFederateMockRTI(FederateConfig *federateConfig) : Super(federateConfig) {}
 

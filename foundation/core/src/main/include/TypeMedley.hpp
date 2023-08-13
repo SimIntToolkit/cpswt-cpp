@@ -37,11 +37,14 @@
 #include <utility>
 #include <boost/algorithm/string.hpp>
 #include <boost/shared_ptr.hpp>
+#include <jsoncpp/json/json.h>
+#include <list>
 #include <map>
+
 
 class TypeMedley {
 public:
-    enum DataType { BOOLEAN, CHARACTER, SHORT, INTEGER, LONG, FLOAT, DOUBLE, STRING };
+    enum DataType { BOOLEAN, CHARACTER, SHORT, INTEGER, LONG, FLOAT, DOUBLE, STRING, JSON };
     typedef boost::shared_ptr<TypeMedley> SP;
 
 private:
@@ -75,6 +78,7 @@ private:
         enumToStringTypeMap[FLOAT] = "float";
         enumToStringTypeMap[DOUBLE] = "double";
         enumToStringTypeMap[STRING] = "std::string";
+        enumToStringTypeMap[JSON] = "Json::Value";
 
         return enumToStringTypeMap;
     }
@@ -85,6 +89,25 @@ private:
         return enumToStringTypeMap;
     }
 
+    Json::Value jsonStringToJson() const {
+        std::istringstream jsonInputStream(_value);
+
+        Json::Value topLevelJSONObject;
+        jsonInputStream >> topLevelJSONObject;
+
+        return topLevelJSONObject;
+    }
+
+    std::string jsonToJsonString(const Json::Value &jsonValue) const {
+
+        Json::StreamWriterBuilder streamWriterBuilder;
+        streamWriterBuilder["commentStyle"] = "None";
+        streamWriterBuilder["indentation"] = "    ";
+        std::unique_ptr<Json::StreamWriter> streamWriterUPtr(streamWriterBuilder.newStreamWriter());
+        std::ostringstream stringOutputStream;
+        streamWriterUPtr->write(jsonValue, &stringOutputStream);
+        return stringOutputStream.str();
+    }
 
 protected:
     DataType _dataType;
@@ -114,6 +137,9 @@ public:
 
     explicit TypeMedley(std::string value):
       _dataType(STRING), _value(std::move(value)) { }
+
+    explicit TypeMedley(const Json::Value &value):
+      _dataType(JSON), _value(jsonToJsonString(value)) { }
 
 public:
     DataType getDataType() const {
@@ -151,6 +177,52 @@ public:
             case STRING:
                 _value = boost::lexical_cast<std::string>(value);
                 break;
+            case JSON:
+                Json::Value jsonValue(value);
+                _value = jsonToJsonString(jsonValue);
+                break;
+        }
+        return true;
+    }
+
+    bool setValue(long value) {
+        return setValue(static_cast<Json::Value::Int64>(value));
+    }
+    // SPECIALIZATION FOR std::string
+    bool setValue(const std::string &value);
+
+    bool setValue(const char *cString) {
+        return setValue(std::string(cString));
+    }
+
+    // SPECIALIZATION FOR Json::Value
+    bool setValue(const Json::Value &value) {
+        switch(_dataType) {
+            case BOOLEAN:
+                _value = boost::lexical_cast<std::string>(static_cast<bool>(value.size()));
+                break;
+            case CHARACTER:
+                _value = boost::lexical_cast<std::string>(static_cast<short>(value.size()));
+                break;
+            case SHORT:
+                _value = boost::lexical_cast<std::string>(static_cast<short>(value.size()));
+                break;
+            case INTEGER:
+                _value = boost::lexical_cast<std::string>(static_cast<int>(value.size()));
+                break;
+            case LONG:
+                _value = boost::lexical_cast<std::string>(static_cast<long>(value.size()));
+                break;
+            case FLOAT:
+                _value = boost::lexical_cast<std::string>(static_cast<float>(value.size()));
+                break;
+            case DOUBLE:
+                _value = boost::lexical_cast<std::string>(static_cast<double>(value.size()));
+                break;
+            case STRING:
+            case JSON:
+                _value = jsonToJsonString(value);
+                break;
         }
         return true;
     }
@@ -184,19 +256,45 @@ public:
                 setValue( other.asDouble() );
                 break;
             case STRING:
+            case JSON:
                 setValue( other.asString() );
                 break;
         }
     }
 
-    bool setValue(const std::string &value);
+private:
 
-    bool setValue(const char *cString) {
-        return setValue(std::string(cString));
+    template<typename T>
+    T convertToType() const {
+        switch(_dataType) {
+            case JSON: {
+                return static_cast<T>(jsonStringToJson().size());
+            }
+            case STRING: {
+                if (!hasDoubleFormat(_value)) {
+                    return static_cast<T>(_value.empty() ? 0 : _value[0]);
+                }
+            }
+            default: {
+                return static_cast<T>(boost::lexical_cast<double>(_value));
+            }
+        }
     }
 
+public:
     bool asBool() const {
-        return _dataType == STRING ? string_to_bool(_value) : static_cast<bool>(boost::lexical_cast<double>(_value));
+        switch(_dataType) {
+            case JSON: {
+                Json::Value value = jsonStringToJson();
+                return static_cast<bool>(value.size());
+            }
+            case STRING: {
+                return string_to_bool(_value);
+            }
+            default: {
+                return static_cast<bool>(boost::lexical_cast<double>(_value));
+            }
+        }
     }
 
     operator bool() const {
@@ -204,10 +302,7 @@ public:
     }
 
     char asChar() const {
-        if (_dataType == STRING && !hasDoubleFormat(_value)) {
-            return static_cast<char>(_value.empty());
-        }
-        return static_cast<char>(boost::lexical_cast<double>(_value));
+        return convertToType<char>();
     }
 
     operator char() const {
@@ -215,10 +310,7 @@ public:
     }
 
     short asShort() const {
-        if (_dataType == STRING && !hasDoubleFormat(_value)) {
-            return static_cast<short>(_value.empty());
-        }
-        return static_cast<short>(boost::lexical_cast<double>(_value));
+        return convertToType<short>();
     }
 
     operator short() const {
@@ -226,10 +318,7 @@ public:
     }
 
     int asInt() const {
-        if (_dataType == STRING && !hasDoubleFormat(_value)) {
-            return static_cast<int>(_value.empty());
-        }
-        return static_cast<int>(boost::lexical_cast<double>(_value));
+        return convertToType<int>();
     }
 
     operator int() const {
@@ -237,10 +326,7 @@ public:
     }
 
     long asLong() const {
-        if (_dataType == STRING && !hasDoubleFormat(_value)) {
-            return static_cast<long>(_value.empty());
-        }
-        return static_cast<long>(boost::lexical_cast<double>(_value));
+        return convertToType<long>();
     }
 
     operator long() const {
@@ -248,10 +334,7 @@ public:
     }
 
     float asFloat() const {
-        if (_dataType == STRING && !hasDoubleFormat(_value)) {
-            return static_cast<float>(_value.empty());
-        }
-        return static_cast<float>(boost::lexical_cast<double>(_value));
+        return convertToType<float>();
     }
 
     operator float() const {
@@ -259,10 +342,7 @@ public:
     }
 
     double asDouble() const {
-        if (_dataType == STRING && !hasDoubleFormat(_value)) {
-            return static_cast<double>(_value.empty());
-        }
-        return boost::lexical_cast<double>(_value);
+        return convertToType<double>();
     }
 
     operator double() const {
@@ -284,6 +364,34 @@ public:
 
     operator std::string() const {
         return asString();
+    }
+
+    Json::Value asJson() const {
+        switch(_dataType) {
+            case BOOLEAN:
+                return Json::Value(asBool());
+            case CHARACTER:
+                return Json::Value(asChar());
+            case SHORT:
+                return Json::Value(asShort());
+            case INTEGER:
+                return Json::Value(asInt());
+            case LONG:
+                return Json::Value(static_cast<Json::Value::Int64>(asLong()));
+            case FLOAT:
+                return Json::Value(asFloat());
+            case DOUBLE:
+                return Json::Value(asDouble());
+            case STRING:
+                return Json::Value(asString());
+            case JSON:
+                return jsonStringToJson();
+                
+        }
+    }
+
+    operator Json::Value() const {
+        return asJson();
     }
 
     std::string getStringRepresentation() const {

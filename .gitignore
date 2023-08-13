@@ -19,6 +19,7 @@ local.properties
 .settings/
 .loadpath
 *.log
+**/.gradle
 **/messages/*.c*
 **/messages/*.h*
 foundation/*/build/

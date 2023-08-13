@@ -51,17 +51,17 @@ bool TestObject::static_init() {
     ClassAndPropertyNameSetSP classAndPropertyNameSetSP( new ClassAndPropertyNameSet() );
 
     classAndPropertyNameSetSP->emplace(
-        "ObjectRoot.TestObject", "BooleanValue1"
+        "ObjectRoot.TestObject", "BoolValue1"
     );
 
-    get_class_and_property_name_initial_value_sp_map()[ClassAndPropertyName( "ObjectRoot.TestObject", "BooleanValue1" )] =
+    get_class_and_property_name_initial_value_sp_map()[ClassAndPropertyName( "ObjectRoot.TestObject", "BoolValue1" )] =
       ValueSP( new Value( false ));
 
     classAndPropertyNameSetSP->emplace(
-        "ObjectRoot.TestObject", "BooleanValue2"
+        "ObjectRoot.TestObject", "BoolValue2"
     );
 
-    get_class_and_property_name_initial_value_sp_map()[ClassAndPropertyName( "ObjectRoot.TestObject", "BooleanValue2" )] =
+    get_class_and_property_name_initial_value_sp_map()[ClassAndPropertyName( "ObjectRoot.TestObject", "BoolValue2" )] =
       ValueSP( new Value( false ));
 
     classAndPropertyNameSetSP->emplace(
@@ -90,7 +90,7 @@ bool TestObject::static_init() {
     );
 
     get_class_and_property_name_initial_value_sp_map()[ClassAndPropertyName( "ObjectRoot.TestObject", "FloatValue" )] =
-      ValueSP( new Value( static_cast<bool>(0) ));
+      ValueSP( new Value( static_cast<float>(0) ));
 
     classAndPropertyNameSetSP->emplace(
         "ObjectRoot.TestObject", "IntValue"
@@ -98,6 +98,20 @@ bool TestObject::static_init() {
 
     get_class_and_property_name_initial_value_sp_map()[ClassAndPropertyName( "ObjectRoot.TestObject", "IntValue" )] =
       ValueSP( new Value( static_cast<int>(0) ));
+
+    classAndPropertyNameSetSP->emplace(
+        "ObjectRoot.TestObject", "JSONValue1"
+    );
+
+    get_class_and_property_name_initial_value_sp_map()[ClassAndPropertyName( "ObjectRoot.TestObject", "JSONValue1" )] =
+      ValueSP( new Value( Json::Value("") ));
+
+    classAndPropertyNameSetSP->emplace(
+        "ObjectRoot.TestObject", "JSONValue2"
+    );
+
+    get_class_and_property_name_initial_value_sp_map()[ClassAndPropertyName( "ObjectRoot.TestObject", "JSONValue2" )] =
+      ValueSP( new Value( Json::Value("") ));
 
     classAndPropertyNameSetSP->emplace(
         "ObjectRoot.TestObject", "LongValue"
@@ -131,11 +145,11 @@ bool TestObject::static_init() {
     ClassAndPropertyNameSetSP allClassAndPropertyNameSetSP( new ClassAndPropertyNameSet() );
 
     allClassAndPropertyNameSetSP->emplace(
-        "ObjectRoot.TestObject", "BooleanValue1"
+        "ObjectRoot.TestObject", "BoolValue1"
     );
 
     allClassAndPropertyNameSetSP->emplace(
-        "ObjectRoot.TestObject", "BooleanValue2"
+        "ObjectRoot.TestObject", "BoolValue2"
     );
 
     allClassAndPropertyNameSetSP->emplace(
@@ -159,6 +173,14 @@ bool TestObject::static_init() {
     );
 
     allClassAndPropertyNameSetSP->emplace(
+        "ObjectRoot.TestObject", "JSONValue1"
+    );
+
+    allClassAndPropertyNameSetSP->emplace(
+        "ObjectRoot.TestObject", "JSONValue2"
+    );
+
+    allClassAndPropertyNameSetSP->emplace(
         "ObjectRoot.TestObject", "LongValue"
     );
 
@@ -168,7 +190,9 @@ bool TestObject::static_init() {
 
     allClassAndPropertyNameSetSP->emplace(
         "ObjectRoot.TestObject", "StringValue"
-    );// ADD THIS CLASS'S _allClassAndPropertyNameSet TO _classNameAllPropertyNameSetMap DEFINED
+    );
+
+    // ADD THIS CLASS'S _allClassAndPropertyNameSet TO _classNameAllPropertyNameSetMap DEFINED
     // IN ObjectRoot
     get_class_name_all_class_and_property_name_set_sp_map()[get_hla_class_name()] = allClassAndPropertyNameSetSP;
 

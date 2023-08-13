@@ -347,67 +347,67 @@ public:
 
 
     /**
-     * Set the value of the "BooleanValue1" parameter to "value" for this parameter.
+     * Set the value of the "BoolValue1" parameter to "value" for this parameter.
      *
-     * @param value the new value for the "BooleanValue1" parameter
+     * @param value the new value for the "BoolValue1" parameter
      */
-    void set_BooleanValue1(bool newValue) {
-        ClassAndPropertyName key(get_hla_class_name(), "BooleanValue1");
+    void set_BoolValue1(bool newValue) {
+        ClassAndPropertyName key(get_hla_class_name(), "BoolValue1");
         Value &value(*_classAndPropertyNameValueSPMap[key]);
         value.setValue(newValue);
         value.setTime(getTime());
     }
 
     /**
-     * Returns the value of the "BooleanValue1" parameter of this interaction.
+     * Returns the value of the "BoolValue1" parameter of this interaction.
      *
-     * @return the value of the "BooleanValue1" parameter
+     * @return the value of the "BoolValue1" parameter
      */
-    bool get_BooleanValue1() {
-        ClassAndPropertyName key(get_hla_class_name(), "BooleanValue1");
-        return static_cast<bool>(*_classAndPropertyNameValueSPMap[key]);
+    bool get_BoolValue1() {
+        ClassAndPropertyName key(get_hla_class_name(), "BoolValue1");
+        return _classAndPropertyNameValueSPMap[key]->asBool();
     }
 
     /**
-     * Returns the current timestamp of the "BooleanValue1" attribute of this object.
+     * Returns the current timestamp of the "BoolValue1" attribute of this object.
      *
-     * @return the current timestamp of the "BooleanValue1" attribute
+     * @return the current timestamp of the "BoolValue1" attribute
      */
-    double get_BooleanValue1_time() {
-        ClassAndPropertyName key(get_hla_class_name(), "BooleanValue1");
+    double get_BoolValue1_time() {
+        ClassAndPropertyName key(get_hla_class_name(), "BoolValue1");
         return _classAndPropertyNameValueSPMap[key]->getTime();
     }
 
 
     /**
-     * Set the value of the "BooleanValue2" parameter to "value" for this parameter.
+     * Set the value of the "BoolValue2" parameter to "value" for this parameter.
      *
-     * @param value the new value for the "BooleanValue2" parameter
+     * @param value the new value for the "BoolValue2" parameter
      */
-    void set_BooleanValue2(bool newValue) {
-        ClassAndPropertyName key(get_hla_class_name(), "BooleanValue2");
+    void set_BoolValue2(bool newValue) {
+        ClassAndPropertyName key(get_hla_class_name(), "BoolValue2");
         Value &value(*_classAndPropertyNameValueSPMap[key]);
         value.setValue(newValue);
         value.setTime(getTime());
     }
 
     /**
-     * Returns the value of the "BooleanValue2" parameter of this interaction.
+     * Returns the value of the "BoolValue2" parameter of this interaction.
      *
-     * @return the value of the "BooleanValue2" parameter
+     * @return the value of the "BoolValue2" parameter
      */
-    bool get_BooleanValue2() {
-        ClassAndPropertyName key(get_hla_class_name(), "BooleanValue2");
-        return static_cast<bool>(*_classAndPropertyNameValueSPMap[key]);
+    bool get_BoolValue2() {
+        ClassAndPropertyName key(get_hla_class_name(), "BoolValue2");
+        return _classAndPropertyNameValueSPMap[key]->asBool();
     }
 
     /**
-     * Returns the current timestamp of the "BooleanValue2" attribute of this object.
+     * Returns the current timestamp of the "BoolValue2" attribute of this object.
      *
-     * @return the current timestamp of the "BooleanValue2" attribute
+     * @return the current timestamp of the "BoolValue2" attribute
      */
-    double get_BooleanValue2_time() {
-        ClassAndPropertyName key(get_hla_class_name(), "BooleanValue2");
+    double get_BoolValue2_time() {
+        ClassAndPropertyName key(get_hla_class_name(), "BoolValue2");
         return _classAndPropertyNameValueSPMap[key]->getTime();
     }
 
@@ -431,7 +431,7 @@ public:
      */
     char get_ByteValue() {
         ClassAndPropertyName key(get_hla_class_name(), "ByteValue");
-        return static_cast<char>(*_classAndPropertyNameValueSPMap[key]);
+        return _classAndPropertyNameValueSPMap[key]->asChar();
     }
 
     /**
@@ -464,7 +464,7 @@ public:
      */
     char get_CharValue() {
         ClassAndPropertyName key(get_hla_class_name(), "CharValue");
-        return static_cast<char>(*_classAndPropertyNameValueSPMap[key]);
+        return _classAndPropertyNameValueSPMap[key]->asChar();
     }
 
     /**
@@ -497,7 +497,7 @@ public:
      */
     double get_DoubleValue() {
         ClassAndPropertyName key(get_hla_class_name(), "DoubleValue");
-        return static_cast<double>(*_classAndPropertyNameValueSPMap[key]);
+        return _classAndPropertyNameValueSPMap[key]->asDouble();
     }
 
     /**
@@ -530,7 +530,7 @@ public:
      */
     float get_FloatValue() {
         ClassAndPropertyName key(get_hla_class_name(), "FloatValue");
-        return static_cast<float>(*_classAndPropertyNameValueSPMap[key]);
+        return _classAndPropertyNameValueSPMap[key]->asFloat();
     }
 
     /**
@@ -563,7 +563,7 @@ public:
      */
     int get_IntValue() {
         ClassAndPropertyName key(get_hla_class_name(), "IntValue");
-        return static_cast<int>(*_classAndPropertyNameValueSPMap[key]);
+        return _classAndPropertyNameValueSPMap[key]->asInt();
     }
 
     /**
@@ -573,6 +573,72 @@ public:
      */
     double get_IntValue_time() {
         ClassAndPropertyName key(get_hla_class_name(), "IntValue");
+        return _classAndPropertyNameValueSPMap[key]->getTime();
+    }
+
+
+    /**
+     * Set the value of the "JSONValue1" parameter to "value" for this parameter.
+     *
+     * @param value the new value for the "JSONValue1" parameter
+     */
+    void set_JSONValue1(const Json::Value & newValue) {
+        ClassAndPropertyName key(get_hla_class_name(), "JSONValue1");
+        Value &value(*_classAndPropertyNameValueSPMap[key]);
+        value.setValue(newValue);
+        value.setTime(getTime());
+    }
+
+    /**
+     * Returns the value of the "JSONValue1" parameter of this interaction.
+     *
+     * @return the value of the "JSONValue1" parameter
+     */
+    Json::Value get_JSONValue1() {
+        ClassAndPropertyName key(get_hla_class_name(), "JSONValue1");
+        return _classAndPropertyNameValueSPMap[key]->asJson();
+    }
+
+    /**
+     * Returns the current timestamp of the "JSONValue1" attribute of this object.
+     *
+     * @return the current timestamp of the "JSONValue1" attribute
+     */
+    double get_JSONValue1_time() {
+        ClassAndPropertyName key(get_hla_class_name(), "JSONValue1");
+        return _classAndPropertyNameValueSPMap[key]->getTime();
+    }
+
+
+    /**
+     * Set the value of the "JSONValue2" parameter to "value" for this parameter.
+     *
+     * @param value the new value for the "JSONValue2" parameter
+     */
+    void set_JSONValue2(const Json::Value & newValue) {
+        ClassAndPropertyName key(get_hla_class_name(), "JSONValue2");
+        Value &value(*_classAndPropertyNameValueSPMap[key]);
+        value.setValue(newValue);
+        value.setTime(getTime());
+    }
+
+    /**
+     * Returns the value of the "JSONValue2" parameter of this interaction.
+     *
+     * @return the value of the "JSONValue2" parameter
+     */
+    Json::Value get_JSONValue2() {
+        ClassAndPropertyName key(get_hla_class_name(), "JSONValue2");
+        return _classAndPropertyNameValueSPMap[key]->asJson();
+    }
+
+    /**
+     * Returns the current timestamp of the "JSONValue2" attribute of this object.
+     *
+     * @return the current timestamp of the "JSONValue2" attribute
+     */
+    double get_JSONValue2_time() {
+        ClassAndPropertyName key(get_hla_class_name(), "JSONValue2");
         return _classAndPropertyNameValueSPMap[key]->getTime();
     }
 
@@ -596,7 +662,7 @@ public:
      */
     long get_LongValue() {
         ClassAndPropertyName key(get_hla_class_name(), "LongValue");
-        return static_cast<long>(*_classAndPropertyNameValueSPMap[key]);
+        return _classAndPropertyNameValueSPMap[key]->asLong();
     }
 
     /**
@@ -629,7 +695,7 @@ public:
      */
     short get_ShortValue() {
         ClassAndPropertyName key(get_hla_class_name(), "ShortValue");
-        return static_cast<short>(*_classAndPropertyNameValueSPMap[key]);
+        return _classAndPropertyNameValueSPMap[key]->asShort();
     }
 
     /**
@@ -662,7 +728,7 @@ public:
      */
     std::string get_StringValue() {
         ClassAndPropertyName key(get_hla_class_name(), "StringValue");
-        return static_cast<std::string>(*_classAndPropertyNameValueSPMap[key]);
+        return _classAndPropertyNameValueSPMap[key]->asString();
     }
 
     /**
@@ -811,147 +877,147 @@ public:
     }
 
     /**
-    * Publishes the "BooleanValue1" attribute of the attribute's containing object
+    * Publishes the "BoolValue1" attribute of the attribute's containing object
     * class for a federate.
-    * Note:  This method only marks the "BooleanValue1" attribute for publication.
+    * Note:  This method only marks the "BoolValue1" attribute for publication.
     * To actually publish the attribute, the federate must (re)publish its containing
     * object class.
     * (using <objectClassName>.publish_object( RTIambassador *rti ) ).
     */
-    static void publish_BooleanValue1_attribute() {
-        publish_attribute( get_hla_class_name(), "BooleanValue1" );
+    static void publish_BoolValue1_attribute() {
+        publish_attribute( get_hla_class_name(), "BoolValue1" );
     }
 
     /**
-    * Unpublishes the "BooleanValue1" attribute of the attribute's containing object
+    * Unpublishes the "BoolValue1" attribute of the attribute's containing object
     * class for a federate.
-    * Note:  This method only marks the "BooleanValue1" attribute for unpublication.
+    * Note:  This method only marks the "BoolValue1" attribute for unpublication.
     * To actually publish the attribute, the federate must (re)publish its containing
     * object class.
     * (using <objectClassName>.publish_object( RTIambassador *rti ) ).
     */
-    static void unpublish_BooleanValue1_attribute() {
-        unpublish_attribute( get_hla_class_name(), "BooleanValue1" );
+    static void unpublish_BoolValue1_attribute() {
+        unpublish_attribute( get_hla_class_name(), "BoolValue1" );
     }
 
     /**
-    * Subscribes a federate to the "BooleanValue1" attribute of the attribute's
+    * Subscribes a federate to the "BoolValue1" attribute of the attribute's
     * containing object class.
-    * Note:  This method only marks the "BooleanValue1" attribute for subscription.
+    * Note:  This method only marks the "BoolValue1" attribute for subscription.
     * To actually subscribe to the attribute, the federate must (re)subscribe to its
     * containing object class.
     * (using <objectClassName>.subscribe_object( RTIambassador *rti ) ).
     */
-    static void subscribe_BooleanValue1_attribute() {
-        subscribe_attribute( get_hla_class_name(), "BooleanValue1" );
+    static void subscribe_BoolValue1_attribute() {
+        subscribe_attribute( get_hla_class_name(), "BoolValue1" );
     }
 
     /**
-    * Unsubscribes a federate from the "BooleanValue1" attribute of the attribute's
+    * Unsubscribes a federate from the "BoolValue1" attribute of the attribute's
     * containing object class.
-    * Note:  This method only marks the "BooleanValue1" attribute for unsubscription.
+    * Note:  This method only marks the "BoolValue1" attribute for unsubscription.
     * To actually unsubscribe to the attribute, the federate must (re)subscribe to its
     * containing object class.
     * (using <objectClassName>.subscribe_object( RTIambassador *rti ) ).
     */
-    static void unsubscribe_BooleanValue1_attribute() {
-        unsubscribe_attribute( get_hla_class_name(), "BooleanValue1" );
+    static void unsubscribe_BoolValue1_attribute() {
+        unsubscribe_attribute( get_hla_class_name(), "BoolValue1" );
     }
 
     /**
-    * Soft subscribes a federate to the "BooleanValue1" attribute of the attribute's
+    * Soft subscribes a federate to the "BoolValue1" attribute of the attribute's
     * containing object class.
-    * Note:  This method only marks the "BooleanValue1" attribute for soft subscription.
+    * Note:  This method only marks the "BoolValue1" attribute for soft subscription.
     * To actually soft subscribe to the attribute, the federate must (re)subscribe to its
     * containing object class.
     * (using <objectClassName>.soft_subscribe_object( RTIambassador rti ) ).
     */
-    static void soft_subscribe_BooleanValue1_attribute() {
-        soft_subscribe_attribute(get_hla_class_name(), "BooleanValue1");
+    static void soft_subscribe_BoolValue1_attribute() {
+        soft_subscribe_attribute(get_hla_class_name(), "BoolValue1");
     }
 
     /**
-    * Soft unsubscribes a federate from the "BooleanValue1" attribute of the attribute's
+    * Soft unsubscribes a federate from the "BoolValue1" attribute of the attribute's
     * containing object class.
-    * Note:  This method only marks the "BooleanValue1" attribute for soft unsubscription.
+    * Note:  This method only marks the "BoolValue1" attribute for soft unsubscription.
     * To actually soft unsubscribe to the attribute, the federate must (re)subscribe to its
     * containing object class.
     * (using <objectClassName>.unsubscribe_object( RTIambassador rti ) ).
     */
-    static void soft_unsubscribe_BooleanValue1_attribute() {
-        soft_unsubscribe_attribute(get_hla_class_name(), "BooleanValue1");
+    static void soft_unsubscribe_BoolValue1_attribute() {
+        soft_unsubscribe_attribute(get_hla_class_name(), "BoolValue1");
     }
 
     /**
-    * Publishes the "BooleanValue2" attribute of the attribute's containing object
+    * Publishes the "BoolValue2" attribute of the attribute's containing object
     * class for a federate.
-    * Note:  This method only marks the "BooleanValue2" attribute for publication.
+    * Note:  This method only marks the "BoolValue2" attribute for publication.
     * To actually publish the attribute, the federate must (re)publish its containing
     * object class.
     * (using <objectClassName>.publish_object( RTIambassador *rti ) ).
     */
-    static void publish_BooleanValue2_attribute() {
-        publish_attribute( get_hla_class_name(), "BooleanValue2" );
+    static void publish_BoolValue2_attribute() {
+        publish_attribute( get_hla_class_name(), "BoolValue2" );
     }
 
     /**
-    * Unpublishes the "BooleanValue2" attribute of the attribute's containing object
+    * Unpublishes the "BoolValue2" attribute of the attribute's containing object
     * class for a federate.
-    * Note:  This method only marks the "BooleanValue2" attribute for unpublication.
+    * Note:  This method only marks the "BoolValue2" attribute for unpublication.
     * To actually publish the attribute, the federate must (re)publish its containing
     * object class.
     * (using <objectClassName>.publish_object( RTIambassador *rti ) ).
     */
-    static void unpublish_BooleanValue2_attribute() {
-        unpublish_attribute( get_hla_class_name(), "BooleanValue2" );
+    static void unpublish_BoolValue2_attribute() {
+        unpublish_attribute( get_hla_class_name(), "BoolValue2" );
     }
 
     /**
-    * Subscribes a federate to the "BooleanValue2" attribute of the attribute's
+    * Subscribes a federate to the "BoolValue2" attribute of the attribute's
     * containing object class.
-    * Note:  This method only marks the "BooleanValue2" attribute for subscription.
+    * Note:  This method only marks the "BoolValue2" attribute for subscription.
     * To actually subscribe to the attribute, the federate must (re)subscribe to its
     * containing object class.
     * (using <objectClassName>.subscribe_object( RTIambassador *rti ) ).
     */
-    static void subscribe_BooleanValue2_attribute() {
-        subscribe_attribute( get_hla_class_name(), "BooleanValue2" );
+    static void subscribe_BoolValue2_attribute() {
+        subscribe_attribute( get_hla_class_name(), "BoolValue2" );
     }
 
     /**
-    * Unsubscribes a federate from the "BooleanValue2" attribute of the attribute's
+    * Unsubscribes a federate from the "BoolValue2" attribute of the attribute's
     * containing object class.
-    * Note:  This method only marks the "BooleanValue2" attribute for unsubscription.
+    * Note:  This method only marks the "BoolValue2" attribute for unsubscription.
     * To actually unsubscribe to the attribute, the federate must (re)subscribe to its
     * containing object class.
     * (using <objectClassName>.subscribe_object( RTIambassador *rti ) ).
     */
-    static void unsubscribe_BooleanValue2_attribute() {
-        unsubscribe_attribute( get_hla_class_name(), "BooleanValue2" );
+    static void unsubscribe_BoolValue2_attribute() {
+        unsubscribe_attribute( get_hla_class_name(), "BoolValue2" );
     }
 
     /**
-    * Soft subscribes a federate to the "BooleanValue2" attribute of the attribute's
+    * Soft subscribes a federate to the "BoolValue2" attribute of the attribute's
     * containing object class.
-    * Note:  This method only marks the "BooleanValue2" attribute for soft subscription.
+    * Note:  This method only marks the "BoolValue2" attribute for soft subscription.
     * To actually soft subscribe to the attribute, the federate must (re)subscribe to its
     * containing object class.
     * (using <objectClassName>.soft_subscribe_object( RTIambassador rti ) ).
     */
-    static void soft_subscribe_BooleanValue2_attribute() {
-        soft_subscribe_attribute(get_hla_class_name(), "BooleanValue2");
+    static void soft_subscribe_BoolValue2_attribute() {
+        soft_subscribe_attribute(get_hla_class_name(), "BoolValue2");
     }
 
     /**
-    * Soft unsubscribes a federate from the "BooleanValue2" attribute of the attribute's
+    * Soft unsubscribes a federate from the "BoolValue2" attribute of the attribute's
     * containing object class.
-    * Note:  This method only marks the "BooleanValue2" attribute for soft unsubscription.
+    * Note:  This method only marks the "BoolValue2" attribute for soft unsubscription.
     * To actually soft unsubscribe to the attribute, the federate must (re)subscribe to its
     * containing object class.
     * (using <objectClassName>.unsubscribe_object( RTIambassador rti ) ).
     */
-    static void soft_unsubscribe_BooleanValue2_attribute() {
-        soft_unsubscribe_attribute(get_hla_class_name(), "BooleanValue2");
+    static void soft_unsubscribe_BoolValue2_attribute() {
+        soft_unsubscribe_attribute(get_hla_class_name(), "BoolValue2");
     }
 
     /**
@@ -1312,6 +1378,150 @@ public:
     */
     static void soft_unsubscribe_IntValue_attribute() {
         soft_unsubscribe_attribute(get_hla_class_name(), "IntValue");
+    }
+
+    /**
+    * Publishes the "JSONValue1" attribute of the attribute's containing object
+    * class for a federate.
+    * Note:  This method only marks the "JSONValue1" attribute for publication.
+    * To actually publish the attribute, the federate must (re)publish its containing
+    * object class.
+    * (using <objectClassName>.publish_object( RTIambassador *rti ) ).
+    */
+    static void publish_JSONValue1_attribute() {
+        publish_attribute( get_hla_class_name(), "JSONValue1" );
+    }
+
+    /**
+    * Unpublishes the "JSONValue1" attribute of the attribute's containing object
+    * class for a federate.
+    * Note:  This method only marks the "JSONValue1" attribute for unpublication.
+    * To actually publish the attribute, the federate must (re)publish its containing
+    * object class.
+    * (using <objectClassName>.publish_object( RTIambassador *rti ) ).
+    */
+    static void unpublish_JSONValue1_attribute() {
+        unpublish_attribute( get_hla_class_name(), "JSONValue1" );
+    }
+
+    /**
+    * Subscribes a federate to the "JSONValue1" attribute of the attribute's
+    * containing object class.
+    * Note:  This method only marks the "JSONValue1" attribute for subscription.
+    * To actually subscribe to the attribute, the federate must (re)subscribe to its
+    * containing object class.
+    * (using <objectClassName>.subscribe_object( RTIambassador *rti ) ).
+    */
+    static void subscribe_JSONValue1_attribute() {
+        subscribe_attribute( get_hla_class_name(), "JSONValue1" );
+    }
+
+    /**
+    * Unsubscribes a federate from the "JSONValue1" attribute of the attribute's
+    * containing object class.
+    * Note:  This method only marks the "JSONValue1" attribute for unsubscription.
+    * To actually unsubscribe to the attribute, the federate must (re)subscribe to its
+    * containing object class.
+    * (using <objectClassName>.subscribe_object( RTIambassador *rti ) ).
+    */
+    static void unsubscribe_JSONValue1_attribute() {
+        unsubscribe_attribute( get_hla_class_name(), "JSONValue1" );
+    }
+
+    /**
+    * Soft subscribes a federate to the "JSONValue1" attribute of the attribute's
+    * containing object class.
+    * Note:  This method only marks the "JSONValue1" attribute for soft subscription.
+    * To actually soft subscribe to the attribute, the federate must (re)subscribe to its
+    * containing object class.
+    * (using <objectClassName>.soft_subscribe_object( RTIambassador rti ) ).
+    */
+    static void soft_subscribe_JSONValue1_attribute() {
+        soft_subscribe_attribute(get_hla_class_name(), "JSONValue1");
+    }
+
+    /**
+    * Soft unsubscribes a federate from the "JSONValue1" attribute of the attribute's
+    * containing object class.
+    * Note:  This method only marks the "JSONValue1" attribute for soft unsubscription.
+    * To actually soft unsubscribe to the attribute, the federate must (re)subscribe to its
+    * containing object class.
+    * (using <objectClassName>.unsubscribe_object( RTIambassador rti ) ).
+    */
+    static void soft_unsubscribe_JSONValue1_attribute() {
+        soft_unsubscribe_attribute(get_hla_class_name(), "JSONValue1");
+    }
+
+    /**
+    * Publishes the "JSONValue2" attribute of the attribute's containing object
+    * class for a federate.
+    * Note:  This method only marks the "JSONValue2" attribute for publication.
+    * To actually publish the attribute, the federate must (re)publish its containing
+    * object class.
+    * (using <objectClassName>.publish_object( RTIambassador *rti ) ).
+    */
+    static void publish_JSONValue2_attribute() {
+        publish_attribute( get_hla_class_name(), "JSONValue2" );
+    }
+
+    /**
+    * Unpublishes the "JSONValue2" attribute of the attribute's containing object
+    * class for a federate.
+    * Note:  This method only marks the "JSONValue2" attribute for unpublication.
+    * To actually publish the attribute, the federate must (re)publish its containing
+    * object class.
+    * (using <objectClassName>.publish_object( RTIambassador *rti ) ).
+    */
+    static void unpublish_JSONValue2_attribute() {
+        unpublish_attribute( get_hla_class_name(), "JSONValue2" );
+    }
+
+    /**
+    * Subscribes a federate to the "JSONValue2" attribute of the attribute's
+    * containing object class.
+    * Note:  This method only marks the "JSONValue2" attribute for subscription.
+    * To actually subscribe to the attribute, the federate must (re)subscribe to its
+    * containing object class.
+    * (using <objectClassName>.subscribe_object( RTIambassador *rti ) ).
+    */
+    static void subscribe_JSONValue2_attribute() {
+        subscribe_attribute( get_hla_class_name(), "JSONValue2" );
+    }
+
+    /**
+    * Unsubscribes a federate from the "JSONValue2" attribute of the attribute's
+    * containing object class.
+    * Note:  This method only marks the "JSONValue2" attribute for unsubscription.
+    * To actually unsubscribe to the attribute, the federate must (re)subscribe to its
+    * containing object class.
+    * (using <objectClassName>.subscribe_object( RTIambassador *rti ) ).
+    */
+    static void unsubscribe_JSONValue2_attribute() {
+        unsubscribe_attribute( get_hla_class_name(), "JSONValue2" );
+    }
+
+    /**
+    * Soft subscribes a federate to the "JSONValue2" attribute of the attribute's
+    * containing object class.
+    * Note:  This method only marks the "JSONValue2" attribute for soft subscription.
+    * To actually soft subscribe to the attribute, the federate must (re)subscribe to its
+    * containing object class.
+    * (using <objectClassName>.soft_subscribe_object( RTIambassador rti ) ).
+    */
+    static void soft_subscribe_JSONValue2_attribute() {
+        soft_subscribe_attribute(get_hla_class_name(), "JSONValue2");
+    }
+
+    /**
+    * Soft unsubscribes a federate from the "JSONValue2" attribute of the attribute's
+    * containing object class.
+    * Note:  This method only marks the "JSONValue2" attribute for soft unsubscription.
+    * To actually soft unsubscribe to the attribute, the federate must (re)subscribe to its
+    * containing object class.
+    * (using <objectClassName>.unsubscribe_object( RTIambassador rti ) ).
+    */
+    static void soft_unsubscribe_JSONValue2_attribute() {
+        soft_unsubscribe_attribute(get_hla_class_name(), "JSONValue2");
     }
 
     /**

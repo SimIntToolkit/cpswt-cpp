@@ -62,8 +62,8 @@ void Sender::initialize( void ) {
 
 void Sender::execute() {
 
-    TestObject_0.set_BooleanValue1(false);
-    TestObject_0.set_BooleanValue2(true);
+    TestObject_0.set_BoolValue1(false);
+    TestObject_0.set_BoolValue2(true);
     TestObject_0.set_ByteValue(42);
     TestObject_0.set_CharValue('X');
     TestObject_0.set_DoubleValue(2.7181);
@@ -72,6 +72,14 @@ void Sender::execute() {
     TestObject_0.set_ShortValue(300);
     TestObject_0.set_LongValue(1000000000000000000L);
     TestObject_0.set_StringValue("Hello");
+    TestObject_0.set_JSONValue1(Json::Value(Json::arrayValue));
+
+    Json::Value thingList(Json::arrayValue);
+    thingList.append("this");
+    thingList.append("that");
+    thingList.append("other");
+    TestObject_0.set_JSONValue2(thingList);
+
     updateAttributeValues(TestObject_0, 0.0);
 }
       } // NAMESPACE "sender"
