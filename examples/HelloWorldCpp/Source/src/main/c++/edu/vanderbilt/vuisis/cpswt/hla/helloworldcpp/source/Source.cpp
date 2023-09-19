@@ -59,10 +59,10 @@ void Source::initialize( void ) {
 void Source::execute() {
 
     std::cout << "Source:  sending ping" << std::endl;
-    ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::Ping Ping0;
-    Ping0.set_actualLogicalGenerationTime(m_currentTime);
-    Ping0.set_federateFilter( "" );
-    sendInteraction(Ping0, m_currentTime + getLookahead());
+    ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::Ping ping0;
+    ping0.set_actualLogicalGenerationTime(m_currentTime);
+    ping0.set_federateFilter( "" );
+    sendInteraction(ping0, m_currentTime + getLookahead());
 
     if (!exitCondition) {
         m_currentTime += 1;

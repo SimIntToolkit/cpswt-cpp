@@ -37,8 +37,10 @@ plugins {
 //    `maven-publish`
 }
 
-val rtiHome = System.getenv("RTI_HOME")
-val javaHome = System.getenv("JAVA_HOME")
+// THE EXPLICIT TYPE OF NULLABLE-STRING (String?) IS NEEDED HERE BECAUSE KOTLIN-SCRIPT CANNOT
+// DETERMINE THE RETURN TYPE OF "System.getenv()" (WHICH IS INDEED String?) THROUGH TYPE-INFERENCE
+val rtiHome: String? = System.getenv("RTI_HOME")
+val javaHome: String? = System.getenv("JAVA_HOME")
 
 val archivaUser: String by project
 val archivaPassword: String by project
@@ -74,7 +76,7 @@ tasks.withType(InstallExecutable::class.java).configureEach {
             val fileName = file.name
             val matcher = pattern.matcher(fileName)
             if (matcher.find()) {
-                val libName = matcher.group(1);
+                val libName = matcher.group(1)
                 val libraryFile = File(libraryDirectory, "lib${libName}.so")
                 java.nio.file.Files.createSymbolicLink(libraryFile.toPath(), File(fileName).toPath())
             }
@@ -163,9 +165,7 @@ tasks.register<Exec>("run") {
 
     val installDirectory = File(installDebugTask.installDirectory.get().asFile, "lib").absolutePath
     val libraryPathList = listOf("$javaHome/jre/lib/amd64/server", "$javaHome/lib/server", installDirectory)
-    environment.put(
-        "LD_LIBRARY_PATH", libraryPathList.joinToString(":")
-    )
+    environment["LD_LIBRARY_PATH"] = libraryPathList.joinToString(":")
 
     workingDir = project.projectDir
 
@@ -176,36 +176,28 @@ tasks.register<Exec>("run") {
 fun getCommandList(): List<String> {
     val runTask = tasks.named<Exec>("run").get()
 
-    val commandList = runTask.commandLine
-
-    return commandList
+    return runTask.commandLine
 }
 
 fun getXTermCommandList(): List<String> {
     val commandList = getCommandList()
 
-    val xtermCommandList = listOf(
+    return listOf(
             "xterm", "-geometry", "220x80", "-fg", "black", "-bg", "white", "-e", commandList.joinToString(" ")
     )
-
-    return xtermCommandList
 }
 
-var spawnedProcess: Process? = null
+lateinit var spawnedProcess: Process
 
 fun configureProcessBuilder(processBuilder: ProcessBuilder) {
+    val runTask = tasks.named<Exec>("run").get()
+
     processBuilder.directory(projectDir)
 
-    val installDebugTask = tasks.withType(InstallExecutable::class.java).filter {
-        it.name.lowercase().contains("debug")
-    }.get(0)
-
-    val installDirectory = File(installDebugTask.installDirectory.get().asFile, "lib").absolutePath
-
-    val libraryPathList = listOf("$javaHome/jre/lib/amd64/server", "$javaHome/lib/server", installDirectory)
-
     val environment = processBuilder.environment()
-    environment.put("LD_LIBRARY_PATH", libraryPathList.joinToString(":"))
+    runTask.environment.forEach { entry ->
+        environment[entry.key] = entry.value.toString()
+    }
 }
 
 fun spawnProcess() {
@@ -225,7 +217,7 @@ fun spawnProcessBatch() {
 
     val statusDirectory = File(projectDir, "StatusDirectory")
     if (!statusDirectory.exists()) {
-        Files.createDirectory(statusDirectory.toPath());
+        Files.createDirectory(statusDirectory.toPath())
     }
     val stdoutFile = File(statusDirectory, "stdout")
     val stderrFile = File(statusDirectory, "stderr")
@@ -235,7 +227,7 @@ fun spawnProcessBatch() {
 
     spawnedProcess = processBuilder.start()
 
-    val pid = spawnedProcess?.pid()
+    val pid = spawnedProcess.pid()
 
     PrintWriter(File(statusDirectory, "pid")).use {
         it.println(pid)
@@ -243,14 +235,14 @@ fun spawnProcessBatch() {
 }
 
 tasks.register("runAsynchronous") {
-    dependsOn("assemble")
+    dependsOn("build")
     doLast {
         spawnProcess()
     }
 }
 
 val runAsynchronousBatch = tasks.register("runAsynchronousBatch") {
-    dependsOn("assemble")
+    dependsOn("build")
     doLast {
         spawnProcessBatch()
     }
@@ -258,13 +250,13 @@ val runAsynchronousBatch = tasks.register("runAsynchronousBatch") {
 
 tasks.register("waitForFederate") {
     doLast {
-        spawnedProcess?.waitFor()
+        spawnedProcess.waitFor()
     }
 }
 
 tasks.register("killFederate") {
     doLast {
-        spawnedProcess?.destroy()
+        spawnedProcess.destroy()
     }
 }
 

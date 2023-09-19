@@ -43,7 +43,7 @@ PingCounter::PingCounter(FederateConfig *federateConfig): Super(federateConfig) 
 }
 
 void PingCounter::handleObjectClass_ObjectRoot_PingCounter(ObjectRoot::SP objectRootSP) {
-    ::edu::vanderbilt::vuisis::cpswt::hla::ObjectRoot_p::PingCounter::SP pingCounter0SP =
+    ::edu::vanderbilt::vuisis::cpswt::hla::ObjectRoot_p::PingCounter::SP pingCounterSP =
         boost::dynamic_pointer_cast<::edu::vanderbilt::vuisis::cpswt::hla::ObjectRoot_p::PingCounter>( objectRootSP );
 
     static int counter = 0;
@@ -51,7 +51,7 @@ void PingCounter::handleObjectClass_ObjectRoot_PingCounter(ObjectRoot::SP object
         exitCondition = true;
     }
 
-    std::cout << "PingCounter: ping count is now " << pingCounter0SP->get_pingCount() << std::endl;
+    std::cout << "PingCounter: ping count is now " << pingCounterSP->get_pingCount() << std::endl;
 }
 
 void PingCounter::checkReceivedSubscriptions() {

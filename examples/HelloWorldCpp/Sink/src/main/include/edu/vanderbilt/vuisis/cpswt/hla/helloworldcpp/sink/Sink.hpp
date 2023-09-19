@@ -35,6 +35,12 @@
 #include "edu/vanderbilt/vuisis/cpswt/hla/helloworldcpp/sink/SinkBase.hpp"
 #include "FederateConfigParser.h"
 
+#if __cplusplus >= 201703L
+#define MultiArgThrow17
+#define Throw17 noexcept
+#define throw(...) __VA_OPT__(MultiArg)##Throw17
+#endif
+
 
 namespace edu {
  namespace vanderbilt {
@@ -55,7 +61,7 @@ private:
     ////////////////////////////////////////////////////////////////////////
     // TODO instantiate objects that must be sent every logical time step //
     ////////////////////////////////////////////////////////////////////////
-    ::edu::vanderbilt::vuisis::cpswt::hla::ObjectRoot_p::PingCounter PingCounter_0;
+    ::edu::vanderbilt::vuisis::cpswt::hla::ObjectRoot_p::PingCounter pingCounter0;
 
     int pingCount;
 
@@ -98,5 +104,11 @@ public:
   } // NAMESPACE "vuisis"
  } // NAMESPACE "vanderbilt"
 } // NAMESPACE "edu"
+
+#if __cplusplus >= 201703L
+#undef MultiArgThrow17
+#undef Throw17
+#undef throw
+#endif
 
 #endif // EDU_VANDERBILT_VUISIS_CPSWT_HLA_HELLOWORLDCPP_SINK_CLASS_CLASS
