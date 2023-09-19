@@ -43,17 +43,17 @@ Sink::Sink(FederateConfig *federateConfig): Super(federateConfig) {
     //////////////////////////////////////////////////////
     // TODO register object instances after super(args) //
     //////////////////////////////////////////////////////
-    registerObject(PingCounter_0);
+    registerObject(pingCounter0);
     pingCount = 0;
 }
 
 void Sink::handleInteractionClass_InteractionRoot_C2WInteractionRoot_Ping(InteractionRoot::SP interactionRootSP) {
-    ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::Ping::SP ping1SP =
+    ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::Ping::SP pingSP =
         boost::dynamic_pointer_cast<::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::Ping>( interactionRootSP );
 
     std::cout << "Received ping.  Updating ping count to " << ++pingCount << std::endl;
-    PingCounter_0.set_pingCount(pingCount);
-    updateAttributeValues(PingCounter_0, m_currentTime + getLookahead());
+    pingCounter0.set_pingCount(pingCount);
+    updateAttributeValues(pingCounter0, m_currentTime + getLookahead());
 }
 
 void Sink::checkReceivedSubscriptions() {
@@ -92,8 +92,8 @@ void Sink::execute() {
     //////////////////////////////////////////////////////////////////////
     // TODO update objects that must be updated every logical time step //
     //////////////////////////////////////////////////////////////////////
-    //    PingCounter_0.set_('ObjectRoot.PingCounter', 'pingCount')(<YOUR VALUE HERE >);
-    //    updateAttributeValues(PingCounter_0, getCurrentTime() + getLookahead());
+    //pingCounter0.set_('ObjectRoot.PingCounter', 'pingCount')(<YOUR VALUE HERE >);
+    //updateAttributeValues(pingCounter0, getCurrentTime() + getLookahead());
     // TODO update registered object instances
 
     if (!exitCondition) {

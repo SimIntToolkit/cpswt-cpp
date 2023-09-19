@@ -365,7 +365,7 @@ public:
      */
     int get_pingCount() {
         ClassAndPropertyName key(get_hla_class_name(), "pingCount");
-        return static_cast<int>(*_classAndPropertyNameValueSPMap[key]);
+        return _classAndPropertyNameValueSPMap[key]->asInt();
     }
 
     /**
