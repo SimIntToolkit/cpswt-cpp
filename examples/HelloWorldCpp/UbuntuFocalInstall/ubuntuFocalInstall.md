@@ -51,15 +51,8 @@ cd <CPSWT-HOME>/cpswt-cpp
 ```bash
 gradle wrapper --gradle-version=8.0
 ```
-4. Install the necessary cpp and lib packages
 
-sudo apt install libcppunit-dev
-sudo apt install libcppunit-1.15.0
-sudo apt install -y boost-all-dev
-sudo apt install -y libboost-all-dev
-sudo apt install -y libjsoncpp-dev
-
-5. Execute the following sequence of commands **in order**:
+4. Execute the following sequence of commands **in order**:
 
 ```bash
 ./gradlew :foundation:CppTestHarness:publish
