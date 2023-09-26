@@ -49,7 +49,7 @@ cd <CPSWT-HOME>/cpswt-cpp
 3. Install the gradle wrapper:
 
 ```bash
-gradle wrapper --gradle-version=7.3
+gradle wrapper --gradle-version=8.0
 ```
 
 
