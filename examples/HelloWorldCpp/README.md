@@ -1,27 +1,28 @@
-## To run the HelloWorld example:
+# To Run the HelloWorldCpp Example
 
-[Note: Steps below assume that you have installed CPSWT on your computer as shown in
-[CPSWT Installation Instructions for HelloWorldJava example on Ubuntu 20.04 (Focal Fossa)](UbuntuFocalInstall/ubuntuFocalInstall.md) and
-[CPSWT Installation Instructions for HelloWorldCpp example on Ubuntu 20.04 (Focal Fossa)](UbuntuFocalInstall/ubuntuFocalInstall.md)]
+#### NOTE
+Steps below assume that you have installed CPSWT on your computer as shown in
+[CPSWT Software Installation and Instructions to Build and Publish cpswt-core Modules on Ubuntu 20.04 LTS (Focal Fossa)](https://github.com/SimIntToolkit/cpswt-core#cpswt-software-installation-and-instructions-to-build-and-publish-cpswt-core-modules-on-ubuntu-2004-lts-focal-fossa)
+[CPSWT Installation for HelloWorldCpp example on Ubuntu 20.04 LTS (Focal Fossa)](../../README.md#cpswtcppsoftwareinstallation)
 
-[Note: Steps below assume that you are already able to run [HelloWorldJava example](https://github.com/SimIntToolkit/cpswt-core/tree/develop/examples/HelloWorldJava)
-from the [cpswt-core](https://github.com/SimIntToolkit/cpswt-core) repository]
+#### NOTE
+Steps below assume that you are already able to run the [HelloWorldJava example](https://github.com/SimIntToolkit/cpswt-core/tree/develop/examples/HelloWorldJava) from the [cpswt-core](https://github.com/SimIntToolkit/cpswt-core) repository
 
-* Open a terminal and change directory to the HelloWorldCpp directory
-
+* Open a terminal and change directory to the HelloWorldJava directory
 * For the first run only, enter the following command:
-
-          gradle wrapper --gradle-version=7.4
-
+  ```bash
+  gradle wrapper --gradle-version=8.0
+  ```
 * To run the federation, enter the following command:
+  ```bash
+  ./gradlew :runFederation
+  ```
 
-          ./gradlew :runFederation
-
-### Explanation of HelloWorld example:
+## Explanation of HelloWorld example
 
 In its CPSWT model, the FOM of the HelloWorld example is shown in the figure below:
 
-![HelloWorldCppFOM](Images/HelloWorldCppFOM.png)
+![WebGME HelloWorldCpp FOM](Images/HelloWorldCppFOM.png)
 
 The Source federate published the Ping interaction and sends out an infinite sequence of them, printing a message for
 each Ping it sends.
