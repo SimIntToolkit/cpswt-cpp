@@ -1,3 +1,11 @@
+<!-- DO NOT MODIFY THIS FILE IN THE cpswt-cpp PROJECT.
+IT WAS GENERATED IN THE cpswt-docs PROJECT.  TO MODIFY, ONLY MODIFY THE "README.rst" FILES
+(WHICH ARE reStructuredText) IN THE <cpswt-docs>/DocsMain/ProjectDocs/cpswt-cpp DIRECTORY,
+WHERE <cpswt-docs> IS THE TOP-LEVEL DIRECTORY OF THE cpswt-docs PROJECT.
+THEN, IN A TERMINAL, CD TO THE <cpswt-docs>/DocsMain DIRECTORY AND EXECUTE
+"./gradlew :ProjectDocs:cpswt-cpp:build".  ONCE THIS COMMAND FINISHES, CD TO THE TOP-LEVEL
+cpswt-cpp DIRECTORY AND EXECUTE "unzip -oq <cpswt-docs>/DocsMain/ProjectDocs/cpswt-cpp/Zipfile/cpswt-cpp.zip" -->
+
 # Project `"cpswt-cpp"` for CPSWT
 
 The cpswt-cpp project contains all software needed to run C++-based federates in CPSWT.
@@ -27,7 +35,7 @@ currently being used.
 
 ### foundation/core
 
-This project contains classes needed for core functionality of any C++ class that implements an HLA interaction or
+This module contains classes needed for core functionality of any C++ class that implements an HLA interaction or
 object class.  A description of some of the more important classes follows:
 
 * TypeMedley
@@ -54,11 +62,11 @@ object class.  A description of some of the more important classes follows:
 
 ### foundation/CppTestHarness
 
-This project allows rti stubs to be created for testing of C++ federates, interactions, and objects
+This module allows rti stubs to be created for testing of C++ federates, interactions, and objects
 
 ### foundation/rti-base
 
-This project the C++ base classes for C++ classes that implement HLA interaction and object classes in CPSWT.
+This module the C++ base classes for C++ classes that implement HLA interaction and object classes in CPSWT.
 These C++ base classes, InteractionRoot and ObjectRoot, actually contain all of the functionality needed to implement
 any HLA interaction or object class. As such, they allow C++-based federates to use dynamic messaging: this enables
 the federates to manipulate any HLA interaction or object class instance using only the InteractionRoot or ObjectRoot
@@ -99,11 +107,11 @@ ObjectRoot
 
 ### foundation/config
 
-This project contains Java classes that read federate configuration files.
+This module contains Java classes that read federate configuration files.
 
 ### foundation/SyncronizedFederate
 
-This project contains the SynchronizedFederate class, which is the base class of all C++-based federates.
+This module contains the SynchronizedFederate class, which is the base class of all C++-based federates.
 
 <a id="cpswtcppsoftwareinstallation"></a>
 
