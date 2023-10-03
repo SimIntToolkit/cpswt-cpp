@@ -110,7 +110,7 @@ This project contains the SynchronizedFederate class, which is the base class of
 ## CPSWT Installation for HelloWorldCpp example on Ubuntu 20.04 LTS (Focal Fossa)
 
 Before performing these instructions, you must first perform the instructions at
-CPSWT Software Installation and Instructions to Build and Publish cpswt-core Modules on Ubuntu 20.04 LTS (Focal Fossa) <[https://github.com/SimIntToolkit/cpswt-core/blob/develop/READE.md](https://github.com/SimIntToolkit/cpswt-core/blob/develop/READE.md)>\`_
+[CPSWT Software Installation and Instructions to Build and Publish cpswt-core Modules on Ubuntu 20.04 LTS (Focal Fossa)](https://github.com/SimIntToolkit/cpswt-core/blob/develop/READE.md)
 
 The following CPSWT installation instructions were performed on a VirtualBox VM with 128 GB Disk and 12GB RAM.
 
