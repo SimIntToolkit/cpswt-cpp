@@ -38,7 +38,6 @@ plugins {
 }
 
 val rtiHome: String? = System.getenv("RTI_HOME")
-print("RTI_HOME=\"$rtiHome\"\n")
 
 val archivaUser: String by project
 val archivaPassword: String by project

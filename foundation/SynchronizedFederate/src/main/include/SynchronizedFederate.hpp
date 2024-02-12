@@ -73,11 +73,14 @@
 
 #include "InteractionRoot.hpp"
 #include "ObjectRoot.hpp"
-#include "InteractionRoot_p/C2WInteractionRoot_p/SimulationControl_p/SimEnd.hpp"
-#include "InteractionRoot_p/C2WInteractionRoot_p/EmbeddedMessaging.hpp"
 
+#include "InteractionRoot_p/AddProxy.hpp"
+#include "InteractionRoot_p/C2WInteractionRoot_p/EmbeddedMessaging.hpp"
 #include "InteractionRoot_p/C2WInteractionRoot_p/FederateResignInteraction.hpp"
 #include "InteractionRoot_p/C2WInteractionRoot_p/FederateJoinInteraction.hpp"
+#include "InteractionRoot_p/C2WInteractionRoot_p/SimulationControl_p/SimEnd.hpp"
+#include "InteractionRoot_p/DeleteProxy.hpp"
+
 
 #include "FederateLogger.hpp"
 
@@ -110,23 +113,47 @@ class SynchronizedFederate : public NullFederateAmbassador {
 public:
     typedef logging_source::severity_logger< severity_level > severity_logger;
 
-    using ObjectRoot = ::edu::vanderbilt::vuisis::cpswt::hla::ObjectRoot;
-    using ObjectReflector = ObjectRoot::ObjectReflector;
-    using ObjectReflectorSPComparator = ObjectRoot::ObjectReflectorSPComparator;
-    using InteractionRoot = ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot;
+    using AddProxy = ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::AddProxy;
     using C2WInteractionRoot = ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot;
+    using DeleteProxy = ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::DeleteProxy;
     using EmbeddedMessaging = ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::EmbeddedMessaging;
-    using SimEnd = ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::SimulationControl_p::SimEnd;
     using FederateJoinInteraction =
       ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::FederateJoinInteraction;
     using FederateResignInteraction =
       ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::FederateResignInteraction;
+    using InteractionRoot = ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot;
+    using ObjectRoot = ::edu::vanderbilt::vuisis::cpswt::hla::ObjectRoot;
+    using ObjectReflector = ObjectRoot::ObjectReflector;
+    using ObjectReflectorSPComparator = ObjectRoot::ObjectReflectorSPComparator;
+    using SimEnd = ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::SimulationControl_p::SimEnd;
 
-    static const std::string FEDERATION_MANAGER_NAME;
+    typedef boost::shared_ptr<std::string> StringSP;
 
-    static const std::string ReadyToPopulateSynch;
-    static const std::string ReadyToRunSynch;
-    static const std::string ReadyToResignSynch;
+    typedef std::set<std::string> StringSet;
+    typedef boost::shared_ptr<StringSet> StringSetSP;
+
+    typedef std::map<std::string, StringSP> StringStringSPMap;
+    typedef std::map<std::string, StringSetSP> StringStringSetSPMap;
+
+    static const std::string &get_federation_manager_name() {
+        static const std::string federationManagerName("FederationManager");
+        return federationManagerName;
+    }
+
+    static const std::string &get_ready_to_populate_synch() {
+        static const std::string readyToPopulateSynch("readyToPopulate");
+        return readyToPopulateSynch;
+    }
+
+    static const std::string &get_ready_to_run_synch() {
+        static const std::string readyToRunSynch("readyToRun");
+        return readyToRunSynch;
+    }
+
+    static const std::string &get_ready_to_resign_synch() {
+        static const std::string readyToResignSynch("readyToResign");
+        return readyToResignSynch;
+    }
 
     enum TimeAdvanceMode {
         SF_TIME_ADVANCE_REQUEST,
@@ -134,6 +161,29 @@ public:
         SF_TIME_ADVANCE_REQUEST_AVAILABLE,
         SF_NEXT_EVENT_REQUEST_AVAILABLE
     };
+
+private:
+    StringStringSPMap federateNameToProxyFederateNameSPMap;
+    StringStringSetSPMap proxyFederateNameToFederateNameSetSPMap;
+
+protected:
+    bool hasProxy(const std::string &federateName) {
+        return federateNameToProxyFederateNameSPMap.find(federateName) != federateNameToProxyFederateNameSPMap.end();
+    }
+
+    const StringSP getProxyFor(const std::string &federateName) {
+        StringStringSPMap::const_iterator ssmCit = federateNameToProxyFederateNameSPMap.find(federateName);
+        return ssmCit == federateNameToProxyFederateNameSPMap.end() ? StringSP() : ssmCit->second;
+    }
+
+    const StringSetSP getProxiedFederateNameSet(const std::string &federateName) {
+        StringStringSetSPMap::const_iterator ssmCit = proxyFederateNameToFederateNameSetSPMap.find(federateName);
+        return ssmCit == proxyFederateNameToFederateNameSetSPMap.end() ? StringSetSP(new StringSet()) : ssmCit->second;
+    }
+
+private:
+    void deleteProxy(const std::string &federateName);
+    void addProxy(const std::string &federateName, const std::string &proxyFederateName);
 
 protected:
     RTI::RTIambassador *_rti;
@@ -163,8 +213,6 @@ private:
 
     bool _isLateJoiner;
 
-    typedef boost::shared_ptr<StringSet> StringSetSP;
-
     StringSet _achievedSynchronizationPoints;
 
     bool _timeConstrainedNotEnabled;
@@ -188,10 +236,6 @@ public:
     static severity_logger &get_logger() {
         static severity_logger &logger = get_logger_aux();
         return logger;
-    }
-
-    std::string getFederationManagerName( void ) const {
-        return SynchronizedFederate::FEDERATION_MANAGER_NAME;
     }
 
     RTI::RTIambassador *getRTI( void ) {
@@ -565,13 +609,13 @@ public:
 protected:
 
     void readyToPopulate( void ) throw( RTI::FederateNotExecutionMember, RTI::RTIinternalError ) {
-        achieveSynchronizationPoint( ReadyToPopulateSynch );
+        achieveSynchronizationPoint( get_ready_to_populate_synch() );
     }
     void readyToRun( void ) throw( RTI::FederateNotExecutionMember, RTI::RTIinternalError ) {
-        achieveSynchronizationPoint( ReadyToRunSynch );
+        achieveSynchronizationPoint( get_ready_to_run_synch() );
     }
     void readyToResign( void ) throw( RTI::FederateNotExecutionMember, RTI::RTIinternalError ) {
-        achieveSynchronizationPoint( ReadyToResignSynch );
+        achieveSynchronizationPoint( get_ready_to_resign_synch() );
     }
     void achieveSynchronizationPoint( const std::string &label )
      throw( RTI::FederateNotExecutionMember, RTI::RTIinternalError );
@@ -744,24 +788,7 @@ public:
      RTI::InteractionClassHandle theInteraction,
      const RTI::ParameterHandleValuePairSet& theParameters,
      const char *theTag
-    )
-     throw ( RTI::InteractionClassNotKnown, RTI::InteractionParameterNotKnown, RTI::FederateInternalError) {
-
-        if ( getMoreATRs() ) {
-            // Himanshu: We normally use only TSO updates, so this shouldn't be
-            // called, but due to an RTI bug, it seemingly is getting called. So,
-            // for now, use the federate's current time or LBTS whichever is greater
-            // as the timestamp
-            double assumedTimestamp = std::max(getLBTS(), getCurrentTime());
-
-            InteractionRoot::SP interactionRootSP = InteractionRoot::create_interaction(theInteraction, theParameters);
-            if (interactionRootSP->isInstanceOfHlaClass(SimEnd::get_hla_class_name())) {
-                exitImmediately();
-            }
-
-            receiveInteractionAux(interactionRootSP, assumedTimestamp);
-        }
-    }
+    ) throw ( RTI::InteractionClassNotKnown, RTI::InteractionParameterNotKnown, RTI::FederateInternalError);
 
 private:
     void receiveInteractionAux(

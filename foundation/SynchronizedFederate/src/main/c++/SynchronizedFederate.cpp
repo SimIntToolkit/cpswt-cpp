@@ -42,13 +42,6 @@
 #include <sstream>
 
 
-const std::string SynchronizedFederate::FEDERATION_MANAGER_NAME( "manager" );
-
-const std::string SynchronizedFederate::ReadyToPopulateSynch( "readyToPopulate" );
-const std::string SynchronizedFederate::ReadyToRunSynch( "readyToRun" );
-const std::string SynchronizedFederate::ReadyToResignSynch( "readyToResign" );
-
-
 // const double SynchronizedFederate::_stepSize = 0.2;
 
 #if __cplusplus >= 201703L
@@ -57,11 +50,54 @@ const std::string SynchronizedFederate::ReadyToResignSynch( "readyToResign" );
 #define throw(...) __VA_OPT__(MultiArg)##Throw17
 #endif
 
+void SynchronizedFederate::deleteProxy(const std::string &federateName) {
+    if (!hasProxy(federateName)) {
+        BOOST_LOG_SEV( get_logger(), warning ) << "deleteProxy:  There is currently no proxy for federate \""
+           << federateName << "\".  Nothing to delete.";
+        return;
+    }
+
+    const StringSP currentProxyFederateNameSP = federateNameToProxyFederateNameSPMap[federateName];
+    const std::string &currentProxyFederateName = *currentProxyFederateNameSP;
+    federateNameToProxyFederateNameSPMap.erase(federateName);
+
+    StringSetSP proxiedFederateNameSetSP = proxyFederateNameToFederateNameSetSPMap[currentProxyFederateName];
+    StringSet proxiedFederateNameSet = *proxiedFederateNameSetSP;
+    proxiedFederateNameSet.erase(federateName);
+
+    if (proxiedFederateNameSet.empty()) {
+        proxyFederateNameToFederateNameSetSPMap.erase(currentProxyFederateName);
+    }
+}
+
+void SynchronizedFederate::addProxy(const std::string &federateName, const std::string &proxyFederateName) {
+    if (hasProxy(federateName)) {
+        const StringSP currentProxyFederateNameSP = federateNameToProxyFederateNameSPMap[federateName];
+        const std::string &currentProxyFederateName = *currentProxyFederateNameSP;
+
+        BOOST_LOG_SEV( get_logger(), warning ) << "Federate \"" << federateName
+          << "\" is already proxied by federate \"" << currentProxyFederateName
+          << "SynchronizedFederate::\".  You should delete this proxy before establishing a new one.  Federate \"" << federateName
+          << "\" will now be proxied by federate \"" << proxyFederateName << "\"";
+        deleteProxy(federateName);
+    }
+
+    if (
+      proxyFederateNameToFederateNameSetSPMap.find(proxyFederateName) ==
+        proxyFederateNameToFederateNameSetSPMap.end()
+    ) {
+        proxyFederateNameToFederateNameSetSPMap.insert(
+          std::make_pair(proxyFederateName, StringSetSP(new StringSet()))
+        );
+    }
+    proxyFederateNameToFederateNameSetSPMap[proxyFederateName]->insert(federateName);
+}
+
 void SynchronizedFederate::createRTI( void ) {
 
     bool rtiNotPresent = true;
     
-    if ( SynchronizedFederate::FEDERATION_MANAGER_NAME.compare( getFederateId() ) != 0 ) {
+    if ( get_federation_manager_name().compare( getFederateId() ) != 0 ) {
         // Himanshu: This is a regular federate, wait 1 seconds for federation manager to initialize first
         std::cout << "Regular federate waiting 1 secs for Federation Manager to initialize" << std:: endl << std::flush;
 #ifdef _WIN32
@@ -590,6 +626,41 @@ double SynchronizedFederate::getMinTSOTimestamp( void ) {
         return fedTime.getTime();
     else
         return lbtsTime.getTime();
+}
+
+void SynchronizedFederate::receiveInteraction(
+ RTI::InteractionClassHandle theInteraction,
+ const RTI::ParameterHandleValuePairSet& theParameters,
+ const char *theTag
+)
+ throw ( RTI::InteractionClassNotKnown, RTI::InteractionParameterNotKnown, RTI::FederateInternalError) {
+
+    if ( getMoreATRs() ) {
+        // Himanshu: We normally use only TSO updates, so this shouldn't be
+        // called, but due to an RTI bug, it seemingly is getting called. So,
+        // for now, use the federate's current time or LBTS whichever is greater
+        // as the timestamp
+        double assumedTimestamp = std::max(getLBTS(), getCurrentTime());
+
+        InteractionRoot::SP interactionRootSP = InteractionRoot::create_interaction(theInteraction, theParameters);
+        if (interactionRootSP->isInstanceOfHlaClass(SimEnd::get_hla_class_name())) {
+            exitImmediately();
+        }
+
+        if (interactionRootSP->isInstanceOfHlaClass(AddProxy::get_hla_class_name())) {
+            AddProxy::SP addProxySP = boost::static_pointer_cast<AddProxy>(interactionRootSP);
+            addProxy(addProxySP->get_federateName(), addProxySP->get_proxyFederateName());
+            return;
+        }
+
+        if (interactionRootSP->isInstanceOfHlaClass(DeleteProxy::get_hla_class_name())) {
+            DeleteProxy::SP deleteProxySP = boost::static_pointer_cast<DeleteProxy>(interactionRootSP);
+            deleteProxy(deleteProxySP->get_federateName());
+            return;
+        }
+
+        receiveInteractionAux(interactionRootSP, assumedTimestamp);
+    }
 }
 
 void SynchronizedFederate::run( void ) {

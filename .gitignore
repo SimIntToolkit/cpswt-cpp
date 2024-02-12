@@ -22,8 +22,10 @@ local.properties
 **/.gradle
 **/messages/*.c*
 **/messages/*.h*
-foundation/*/build/
+
+**/build/
 foundation/OmnetFederate/OmnetFederateInfo.json
+**/StatusDirectory/
 
 # Sublime project files
 *.sublime-project
