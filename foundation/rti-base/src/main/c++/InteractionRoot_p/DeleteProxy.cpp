@@ -57,13 +57,6 @@ bool DeleteProxy::static_init() {
     get_class_and_property_name_initial_value_sp_map()[ClassAndPropertyName( "InteractionRoot.DeleteProxy", "federateName" )] =
       ValueSP( new Value( std::string("") ));
 
-    classAndPropertyNameSetSP->emplace(
-        "InteractionRoot.DeleteProxy", "proxyFederateName"
-    );
-
-    get_class_and_property_name_initial_value_sp_map()[ClassAndPropertyName( "InteractionRoot.DeleteProxy", "proxyFederateName" )] =
-      ValueSP( new Value( std::string("") ));
-
     // ADD THIS CLASS'S _classAndPropertyNameSet TO _classNamePropertyNameSetMap DEFINED
     // IN InteractionRoot
     get_class_name_class_and_property_name_set_sp_map()[get_hla_class_name()] = classAndPropertyNameSetSP;
@@ -76,10 +69,6 @@ bool DeleteProxy::static_init() {
 
     allClassAndPropertyNameSetSP->emplace(
         "InteractionRoot.DeleteProxy", "federateName"
-    );
-
-    allClassAndPropertyNameSetSP->emplace(
-        "InteractionRoot.DeleteProxy", "proxyFederateName"
     );
 
     // ADD THIS CLASS'S _allClassAndPropertyNameSet TO _classNameAllPropertyNameSetMap DEFINED

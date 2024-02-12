@@ -210,6 +210,12 @@ void SynchronizedFederate::joinFederation() {
 
     ensureSimEndPubsub();
 
+    AddProxy::subscribe_interaction(getRTI());
+    AddProxy::publish_interaction(getRTI());
+
+    DeleteProxy::subscribe_interaction(getRTI());
+    DeleteProxy::publish_interaction(getRTI());
+
     notifyFederationOfJoin();
 }
 

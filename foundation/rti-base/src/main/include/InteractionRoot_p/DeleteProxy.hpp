@@ -327,28 +327,6 @@ public:
         return _classAndPropertyNameValueSPMap[key]->asString();
     }
 
-
-    /**
-     * Set the value of the "proxyFederateName" parameter to "value" for this parameter.
-     *
-     * @param value the new value for the "proxyFederateName" parameter
-     */
-    void set_proxyFederateName(const std::string & newValue) {
-        ClassAndPropertyName key(get_hla_class_name(), "proxyFederateName");
-        Value &value(*_classAndPropertyNameValueSPMap[key]);
-        value.setValue(newValue);
-    }
-
-    /**
-     * Returns the value of the "proxyFederateName" parameter of this interaction.
-     *
-     * @return the value of the "proxyFederateName" parameter
-     */
-    std::string get_proxyFederateName() {
-        ClassAndPropertyName key(get_hla_class_name(), "proxyFederateName");
-        return _classAndPropertyNameValueSPMap[key]->asString();
-    }
-
     //------------------------------------
     // END PROPERTY MANIPULATION METHODS
     //------------------------------------
