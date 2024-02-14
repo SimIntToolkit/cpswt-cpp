@@ -130,6 +130,8 @@ void MessagingTests::interactionClassNamesTest() {
 
     std::set<std::string> expectedInteractionClassNameSet;
     expectedInteractionClassNameSet.insert("InteractionRoot");
+    expectedInteractionClassNameSet.insert("InteractionRoot.AddProxy");
+    expectedInteractionClassNameSet.insert("InteractionRoot.DeleteProxy");
     expectedInteractionClassNameSet.insert("InteractionRoot.C2WInteractionRoot");
     expectedInteractionClassNameSet.insert("InteractionRoot.C2WInteractionRoot.ActionBase");
     expectedInteractionClassNameSet.insert("InteractionRoot.C2WInteractionRoot.EmbeddedMessaging");

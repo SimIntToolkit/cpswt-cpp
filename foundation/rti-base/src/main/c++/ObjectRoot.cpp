@@ -197,10 +197,11 @@ ObjectRoot::ClassAndPropertyNameValueSPMap ObjectRoot::getClassAndPropertyNameVa
     return classAndPropertyNameValueSPMap;
 }
 
-std::string ObjectRoot::ObjectReflector::toJson() const {
+std::string ObjectRoot::ObjectReflector::toJson(double time) const {
     Json::Value topLevelJSONObject(Json::objectValue);
     topLevelJSONObject["messaging_type"] = "object";
     topLevelJSONObject["messaging_name"] = _hlaClassName;
+    topLevelJSONObject["time"] = time;
     topLevelJSONObject["object_handle"] = static_cast<Json::Value::UInt64>(_objectHandle);
     topLevelJSONObject["federateSequence"] = _federateSequence;
 
@@ -854,10 +855,11 @@ void ObjectRoot::updateAttributeValues( RTI::RTIambassador *rti, bool force ) {
     }
 }
 
-std::string ObjectRoot::toJson(bool force) {
+std::string ObjectRoot::toJson(bool force, double time) {
     Json::Value topLevelJSONObject(Json::objectValue);
     topLevelJSONObject["messaging_type"] = "object";
     topLevelJSONObject["messaging_name"] = getInstanceHlaClassName();
+    topLevelJSONObject["time"] = time;
     topLevelJSONObject["object_handle"] = getObjectHandle();
     topLevelJSONObject["federateSequence"] = "[]";
 
@@ -912,11 +914,7 @@ std::string ObjectRoot::toJson(bool force) {
     return stringOutputStream.str();
 }
 
-ObjectRoot::ObjectReflector::SP ObjectRoot::fromJson(const std::string &jsonString) {
-    std::istringstream jsonInputStream(jsonString);
-
-    Json::Value topLevelJSONObject;
-    jsonInputStream >> topLevelJSONObject;
+ObjectRoot::ObjectReflector::SP ObjectRoot::fromJson(const Json::Value &topLevelJSONObject) {
 
     int objectHandle = topLevelJSONObject["object_handle"].asInt();
     std::string className = topLevelJSONObject["messaging_name"].asString();
@@ -1005,6 +1003,10 @@ ObjectRoot::ObjectReflector::SP ObjectRoot::fromJson(const std::string &jsonStri
 
     ObjectReflector::SP objectReflectorSP(new ObjectReflector(objectHandle, className, classAndPropertyNameValueSPMap));
     objectReflectorSP->setFederateSequence(federateSequence);
+
+    double time = topLevelJSONObject["time"].asDouble();
+    objectReflectorSP->setTime(time);
+
     return objectReflectorSP;
 }
 

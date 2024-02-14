@@ -80,7 +80,7 @@ void EmbeddedMessagingInteractionTests::testInteractionNetworkPropagation() {
 
     // SuppliedParameters SHOULD BE PRESENT IN THE SENT INTERACTION DATA, AND SHOULD
     // CONTAIN DATA FOR 6 PARAMETERS -- ALL THOSE PRESENT IN AN EMBEDDEDMESSAGING INTERACTION.
-    CPPUNIT_ASSERT_EQUAL(6, static_cast<int>(sentInteractionEmbeddedMessagingOmnetFederateSuppliedParameters.size()));
+    CPPUNIT_ASSERT_EQUAL(4, static_cast<int>(sentInteractionEmbeddedMessagingOmnetFederateSuppliedParameters.size()));
 
 
     // CREATE A LOCAL INTERACTION INSTANCE FROM THE INTERACTION-DATA THAT WAS SENT OUT FROM THE "sendInteraction"
@@ -98,18 +98,18 @@ void EmbeddedMessagingInteractionTests::testInteractionNetworkPropagation() {
     TestOmnetFederate &localEmbeddedMessagingOmnetFederateInteraction =
             *localEmbeddedMessagingOmnetFederateInteractionSP;
 
-    // THE command FOR THE LOCAL EmbeddedMessaging.TestOmnetFederate INTERACTION SHOULD BE "interaction"
-    CPPUNIT_ASSERT_EQUAL(localEmbeddedMessagingOmnetFederateInteraction.get_command(), std::string("interaction"));
-
-    // THE hlaClassName SHOULD BE FOR TestInteraction
-    CPPUNIT_ASSERT_EQUAL(
-            localEmbeddedMessagingOmnetFederateInteraction.get_hlaClassName(), TestInteraction::get_hla_class_name()
-    );
-
     std::istringstream jsonInputStream(localEmbeddedMessagingOmnetFederateInteraction.get_messagingJson());
 
     Json::Value sentInteractionJson;
     jsonInputStream >> sentInteractionJson;
+
+    // THE messaging_type FOR THE LOCAL EmbeddedMessaging.TestOmnetFederate INTERACTION SHOULD BE "interaction"
+    std::string messagingType = sentInteractionJson["messaging_type"].asString();
+    CPPUNIT_ASSERT_EQUAL(messagingType, std::string("interaction"));
+
+    // THE hlaClassName SHOULD BE FOR TestInteraction
+    std::string messagingName = sentInteractionJson["messaging_name"].asString();
+    CPPUNIT_ASSERT_EQUAL(messagingName, TestInteraction::get_hla_class_name());
 
     Json::Value sentInteractionJsonPropertiesMap = sentInteractionJson["properties"];
 

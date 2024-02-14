@@ -67,14 +67,6 @@ const std::map<ClassAndPropertyName, int>
     ] = get_unique_no();
     
     interactionClassAndPropertyNameHandleMap[
-      ClassAndPropertyName("InteractionRoot.C2WInteractionRoot.EmbeddedMessaging", "command")
-    ] = get_unique_no();
-    
-    interactionClassAndPropertyNameHandleMap[
-      ClassAndPropertyName("InteractionRoot.C2WInteractionRoot.EmbeddedMessaging", "hlaClassName")
-    ] = get_unique_no();
-    
-    interactionClassAndPropertyNameHandleMap[
       ClassAndPropertyName("InteractionRoot.C2WInteractionRoot.EmbeddedMessaging", "messagingJson")
     ] = get_unique_no();
     

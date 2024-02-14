@@ -52,20 +52,6 @@ bool EmbeddedMessaging::static_init() {
     ClassAndPropertyNameSetSP classAndPropertyNameSetSP( new ClassAndPropertyNameSet() );
 
     classAndPropertyNameSetSP->emplace(
-        "InteractionRoot.C2WInteractionRoot.EmbeddedMessaging", "command"
-    );
-
-    get_class_and_property_name_initial_value_sp_map()[ClassAndPropertyName( "InteractionRoot.C2WInteractionRoot.EmbeddedMessaging", "command" )] =
-      ValueSP( new Value( std::string("") ));
-
-    classAndPropertyNameSetSP->emplace(
-        "InteractionRoot.C2WInteractionRoot.EmbeddedMessaging", "hlaClassName"
-    );
-
-    get_class_and_property_name_initial_value_sp_map()[ClassAndPropertyName( "InteractionRoot.C2WInteractionRoot.EmbeddedMessaging", "hlaClassName" )] =
-      ValueSP( new Value( std::string("") ));
-
-    classAndPropertyNameSetSP->emplace(
         "InteractionRoot.C2WInteractionRoot.EmbeddedMessaging", "messagingJson"
     );
 
@@ -81,14 +67,6 @@ bool EmbeddedMessaging::static_init() {
     );
 
     ClassAndPropertyNameSetSP allClassAndPropertyNameSetSP( new ClassAndPropertyNameSet() );
-
-    allClassAndPropertyNameSetSP->emplace(
-        "InteractionRoot.C2WInteractionRoot.EmbeddedMessaging", "command"
-    );
-
-    allClassAndPropertyNameSetSP->emplace(
-        "InteractionRoot.C2WInteractionRoot.EmbeddedMessaging", "hlaClassName"
-    );
 
     allClassAndPropertyNameSetSP->emplace(
         "InteractionRoot.C2WInteractionRoot.EmbeddedMessaging", "messagingJson"

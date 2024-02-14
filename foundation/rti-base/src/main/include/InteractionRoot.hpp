@@ -1505,9 +1505,18 @@ public:
     // END INSTANCE VERSIONS OF STATIC METHODS DEFINED IN DERIVED CLASSES
     //-------------------------------------------------------------------
 
-    std::string toJson();
+    std::string toJson(double time = -1);
 
-    static SP fromJson(const std::string &jsonString);
+    static SP fromJson(const Json::Value &topLevelJSONObject);
+
+    static SP fromJson(const std::string &jsonString) {
+        std::istringstream jsonInputStream(jsonString);
+
+        Json::Value topLevelJSONObject;
+        jsonInputStream >> topLevelJSONObject;
+
+        return fromJson(topLevelJSONObject);
+    }
 
 private:
     static StringStringSetSPMap &get_hla_class_name_to_federate_name_soft_publish_set_sp_map() {

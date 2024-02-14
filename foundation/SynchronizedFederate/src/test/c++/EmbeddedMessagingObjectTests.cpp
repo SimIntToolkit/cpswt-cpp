@@ -161,18 +161,18 @@ void EmbeddedMessagingObjectTests::testObjectNetworkPropagation() {
     TestOmnetFederate &localEmbeddedMessagingOmnetFederateInteraction =
       *localEmbeddedMessagingOmnetFederateInteractionSP;
 
-    // THE command FOR THE LOCAL EmbeddedMessaging.TestOmnetFederate INTERACTION SHOULD BE "object"
-    CPPUNIT_ASSERT_EQUAL(localEmbeddedMessagingOmnetFederateInteraction.get_command(), std::string("object"));
-
-    // THE hlaClassName SHOULD BE FOR TestObject
-    CPPUNIT_ASSERT_EQUAL(
-            localEmbeddedMessagingOmnetFederateInteraction.get_hlaClassName(), TestObject::get_hla_class_name()
-    );
-
     std::istringstream jsonInputStream2(localEmbeddedMessagingOmnetFederateInteraction.get_messagingJson());
 
     Json::Value objectReflectorJson;
     jsonInputStream2 >> objectReflectorJson;
+
+    // THE messaging_type FOR THE LOCAL EmbeddedMessaging.TestOmnetFederate INTERACTION SHOULD BE "object"
+    std::string messagingType = objectReflectorJson["messaging_type"].asString();
+    CPPUNIT_ASSERT_EQUAL(messagingType, std::string("object"));
+
+    // THE hlaClassName SHOULD BE FOR TestObject
+    std::string messagingName = objectReflectorJson["messaging_name"].asString();
+    CPPUNIT_ASSERT_EQUAL(messagingName, TestObject::get_hla_class_name());
 
     Json::Value objectReflectorJsonPropertiesMap = objectReflectorJson["properties"];
 

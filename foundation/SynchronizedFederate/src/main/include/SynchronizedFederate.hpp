@@ -465,7 +465,7 @@ public:
 
     void sendInteraction(ObjectReflector &objectReflector, const StringSet &federateNameSet, double time) {
         sendInteraction(
-          objectReflector.toJson(),
+          objectReflector.toJson(time),
           objectReflector.getHlaClassName(),
           objectReflector.getFederateSequence(),
           federateNameSet,
@@ -475,7 +475,7 @@ public:
 
     void sendInteraction(ObjectRoot &objectRoot, const StringSet &federateNameSet, double time, bool force) {
         sendInteraction(
-          objectRoot.toJson(force), objectRoot.getInstanceHlaClassName(), std::string("[]"), federateNameSet, time
+          objectRoot.toJson(force, time), objectRoot.getInstanceHlaClassName(), std::string("[]"), federateNameSet, time
         );
     }
 
@@ -774,70 +774,79 @@ public:
       RTI::FederateInternalError
     ) {
         if ( getMoreATRs() ) {
-            RTIfedTime rtitime(theTime);
-            double ltime = rtitime.getTime();
 
-            InteractionRoot::SP interactionRootSP = InteractionRoot::create_interaction( theInteraction, theParameters, theTime );
-            receiveInteractionAux(interactionRootSP, ltime);
-//          interactionRootSP->createLog( ltime, false );
+            InteractionRoot::SP interactionRootSP = InteractionRoot::create_interaction(
+              theInteraction, theParameters, theTime
+            );
+            receiveInteractionAux(interactionRootSP);
         }
 
     }
 
     virtual void receiveInteraction(
-     RTI::InteractionClassHandle theInteraction,
-     const RTI::ParameterHandleValuePairSet& theParameters,
-     const char *theTag
-    ) throw ( RTI::InteractionClassNotKnown, RTI::InteractionParameterNotKnown, RTI::FederateInternalError);
+      RTI::InteractionClassHandle theInteraction,
+      const RTI::ParameterHandleValuePairSet& theParameters,
+      const char *theTag
+    ) throw ( RTI::InteractionClassNotKnown, RTI::InteractionParameterNotKnown, RTI::FederateInternalError) {
+
+        if ( getMoreATRs() ) {
+
+            InteractionRoot::SP interactionRootSP = InteractionRoot::create_interaction(theInteraction, theParameters);
+
+            receiveInteractionAux(interactionRootSP);
+        }
+    }
+
 
 private:
-    void receiveInteractionAux(
-      InteractionRoot::SP interactionRootSP, double timestamp
-    )
-     throw ( RTI::InteractionClassNotKnown, RTI::InteractionParameterNotKnown, RTI::FederateInternalError) {
+    void receiveEmbeddedMessagingInteraction(EmbeddedMessaging::SP embeddedMessagingSP) {
+        const std::string jsonValueString = embeddedMessagingSP->get_messagingJson();
+        std::istringstream jsonInputStream(jsonValueString);
+
+        Json::Value jsonValue;
+        jsonInputStream >> jsonValue;
+
+        if (jsonValue.isArray()) {
+            for(const Json::Value &item : jsonValue) {
+                processEmbeddedMessagingInteraction(item);
+            }
+        } else {
+            processEmbeddedMessagingInteraction(jsonValue);
+        }
+    }
+
+    void receiveInteractionAux(InteractionRoot::SP interactionRootSP)
+      throw ( RTI::InteractionClassNotKnown, RTI::InteractionParameterNotKnown, RTI::FederateInternalError) {
+
+        if (interactionRootSP->isInstanceOfHlaClass(SimEnd::get_hla_class_name())) {
+            exitImmediately();
+        }
+
+        if (interactionRootSP->isInstanceOfHlaClass(AddProxy::get_hla_class_name())) {
+            AddProxy::SP addProxySP = boost::static_pointer_cast<AddProxy>(interactionRootSP);
+            addProxy(addProxySP->get_federateName(), addProxySP->get_proxyFederateName());
+            return;
+        }
+
+        if (interactionRootSP->isInstanceOfHlaClass(DeleteProxy::get_hla_class_name())) {
+            DeleteProxy::SP deleteProxySP = boost::static_pointer_cast<DeleteProxy>(interactionRootSP);
+            deleteProxy(deleteProxySP->get_federateName());
+            return;
+        }
+
         if (!unmatchingFedFilterProvided(interactionRootSP)) {
 
             if (interactionRootSP->isInstanceHlaClassDerivedFromHlaClass(EmbeddedMessaging::get_hla_class_name())) {
-                receiveEmbeddedInteraction(boost::static_pointer_cast<EmbeddedMessaging>(interactionRootSP), timestamp);
+                receiveEmbeddedMessagingInteraction(boost::static_pointer_cast<EmbeddedMessaging>(interactionRootSP));
                 return;
             }
 
-            handleIfSimEnd(*interactionRootSP, timestamp);
             addInteraction( interactionRootSP );
 //             interactionRootSP->createLog( assumedTimestamp, false );
         }
     }
 
-    void receiveEmbeddedInteraction(EmbeddedMessaging::SP embeddedMessagingSP, double timestamp);
-
-protected:
-
-    void finalizeAndTerminate() {
-        std::cout << getFederateId() << ": resigning from federation...";
-        resignFederationExecution();
-        std::cout << "done." << std::endl;
-
-        // Wait for 10 seconds for Federation Manager to recognize that the federate has resigned.
-#ifdef _WIN32
-        Sleep( 10000 );
-#else
-        usleep( 10000000 );
-#endif
-
-        // TODO: Kill the entire process group (like in SynchronizedFederate.java)
-
-        // Exit
-        exit(0);
-    }
-
-    void handleIfSimEnd(InteractionRoot &interactionRoot, double timestamp) {
-        int classHandle = interactionRoot.getClassHandle();
-        if(  SimEnd::match( classHandle )  ) {
-            std::cout << getFederateId() << ": SimEnd interaction received, exiting..." << std::endl;
-//             interactionRootSP->createLog( timestamp, false );
-            finalizeAndTerminate();
-        }
-    }
+    void processEmbeddedMessagingInteraction(const Json::Value &jsonValue);
 
 public:
     void run( void );

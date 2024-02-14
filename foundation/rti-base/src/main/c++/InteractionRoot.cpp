@@ -468,10 +468,11 @@ void InteractionRoot::sendInteraction( RTI::RTIambassador *rti ) {
     }
 }
 
-std::string InteractionRoot::toJson() {
+std::string InteractionRoot::toJson(double time) {
     Json::Value topLevelJSONObject(Json::objectValue);
     topLevelJSONObject["messaging_type"] = "interaction";
     topLevelJSONObject["messaging_name"] = getInstanceHlaClassName();
+    topLevelJSONObject["time"] = time;
 
     Json::Value propertyJSONObject(Json::objectValue);
     for(
@@ -521,16 +522,12 @@ std::string InteractionRoot::toJson() {
     return stringOutputStream.str();
 }
 
-InteractionRoot::SP InteractionRoot::fromJson(const std::string &jsonString) {
-    std::istringstream jsonInputStream(jsonString);
-
-    Json::Value topLevelJSONObject;
-    jsonInputStream >> topLevelJSONObject;
+InteractionRoot::SP InteractionRoot::fromJson(const Json::Value &topLevelJSONObject) {
 
     const std::string hlaClassName(topLevelJSONObject["messaging_name"].asString());
     SP interactionRootSP = create_interaction(hlaClassName);
     if (!interactionRootSP) {
-        BOOST_LOG_SEV(get_logger(), error) << "fromJson(std::string):  no such interaction class \""
+        BOOST_LOG_SEV(get_logger(), error) << "fromJson:  no such interaction class \""
           << hlaClassName << "\"";
         return SP();
     }
@@ -608,6 +605,9 @@ InteractionRoot::SP InteractionRoot::fromJson(const std::string &jsonString) {
             }
         }
     }
+
+    double time = topLevelJSONObject["time"].asDouble();
+    interactionRootSP->setTime(time);
 
     return interactionRootSP;
 }

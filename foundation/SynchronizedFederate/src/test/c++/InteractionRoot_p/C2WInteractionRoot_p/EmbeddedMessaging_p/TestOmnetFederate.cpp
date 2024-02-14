@@ -63,14 +63,6 @@ bool TestOmnetFederate::static_init() {
     ClassAndPropertyNameSetSP allClassAndPropertyNameSetSP( new ClassAndPropertyNameSet() );
 
     allClassAndPropertyNameSetSP->emplace(
-        "InteractionRoot.C2WInteractionRoot.EmbeddedMessaging", "command"
-    );
-
-    allClassAndPropertyNameSetSP->emplace(
-        "InteractionRoot.C2WInteractionRoot.EmbeddedMessaging", "hlaClassName"
-    );
-
-    allClassAndPropertyNameSetSP->emplace(
         "InteractionRoot.C2WInteractionRoot.EmbeddedMessaging", "messagingJson"
     );
 

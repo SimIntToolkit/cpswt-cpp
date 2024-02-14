@@ -417,7 +417,7 @@ public:
             return _federateSequence;
         }
 
-        std::string toJson() const;
+        std::string toJson(double time = -1) const;
 
         ObjectRoot::SP getObjectRootSP() const {
             return ObjectRoot::get_object( _objectHandle );
@@ -2254,13 +2254,22 @@ public:
     // END INSTANCE VERSIONS OF STATIC METHODS DEFINED IN DERIVED CLASSES
     //-------------------------------------------------------------------
 
-    std::string toJson(bool force);
+    std::string toJson(bool force, double time = -1);
 
-    std::string toJson() {
-        return toJson(false);
+    std::string toJson(double time = -1) {
+        return toJson(false, time);
     }
 
-    static ObjectReflector::SP fromJson(const std::string &jsonString);
+    static ObjectReflector::SP fromJson(const Json::Value &jsonValue);
+
+    static ObjectReflector::SP fromJson(const std::string &jsonString) {
+        std::istringstream jsonInputStream(jsonString);
+
+        Json::Value topLevelJSONObject;
+        jsonInputStream >> topLevelJSONObject;
+
+        return fromJson(topLevelJSONObject);
+    }
 
 private:
     static StringStringSetSPMap &get_hla_class_name_to_federate_name_soft_publish_direct_set_sp_map() {

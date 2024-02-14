@@ -308,50 +308,6 @@ public:
 
 
     /**
-     * Set the value of the "command" parameter to "value" for this parameter.
-     *
-     * @param value the new value for the "command" parameter
-     */
-    void set_command(const std::string & newValue) {
-        ClassAndPropertyName key(get_hla_class_name(), "command");
-        Value &value(*_classAndPropertyNameValueSPMap[key]);
-        value.setValue(newValue);
-    }
-
-    /**
-     * Returns the value of the "command" parameter of this interaction.
-     *
-     * @return the value of the "command" parameter
-     */
-    std::string get_command() {
-        ClassAndPropertyName key(get_hla_class_name(), "command");
-        return _classAndPropertyNameValueSPMap[key]->asString();
-    }
-
-
-    /**
-     * Set the value of the "hlaClassName" parameter to "value" for this parameter.
-     *
-     * @param value the new value for the "hlaClassName" parameter
-     */
-    void set_hlaClassName(const std::string & newValue) {
-        ClassAndPropertyName key(get_hla_class_name(), "hlaClassName");
-        Value &value(*_classAndPropertyNameValueSPMap[key]);
-        value.setValue(newValue);
-    }
-
-    /**
-     * Returns the value of the "hlaClassName" parameter of this interaction.
-     *
-     * @return the value of the "hlaClassName" parameter
-     */
-    std::string get_hlaClassName() {
-        ClassAndPropertyName key(get_hla_class_name(), "hlaClassName");
-        return _classAndPropertyNameValueSPMap[key]->asString();
-    }
-
-
-    /**
      * Set the value of the "messagingJson" parameter to "value" for this parameter.
      *
      * @param value the new value for the "messagingJson" parameter

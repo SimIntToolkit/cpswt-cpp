@@ -225,7 +225,7 @@ void SynchronizedFederate::sendInteraction(
 
     if (!interactionRoot.isInstanceHlaClassDerivedFromHlaClass(EmbeddedMessaging::get_hla_class_name())) {
 
-        std::string interactionJson = interactionRoot.toJson();
+        std::string interactionJson = interactionRoot.toJson(time);
 
         for (const std::string &federateName : federateNameSet) {
 
@@ -241,10 +241,6 @@ void SynchronizedFederate::sendInteraction(
                 );
                 embeddedMessagingForNetworkFederateSP->setFederateAppendedToFederateSequence(true);
             }
-            embeddedMessagingForNetworkFederateSP->setParameter("command", "interaction");
-            embeddedMessagingForNetworkFederateSP->setParameter(
-                    "hlaClassName", interactionRoot.getInstanceHlaClassName()
-            );
             embeddedMessagingForNetworkFederateSP->setParameter("messagingJson", interactionJson);
 
             if (time >= 0) {
@@ -271,9 +267,7 @@ void SynchronizedFederate::sendInteraction(
         const std::string embeddedMessagingHlaClassName =
           EmbeddedMessaging::get_hla_class_name() + "." + federateName;
         InteractionRoot::SP embeddedMessagingForNetworkFederateSP(new InteractionRoot(embeddedMessagingHlaClassName));
-        embeddedMessagingForNetworkFederateSP->setParameter("command", "object");
         embeddedMessagingForNetworkFederateSP->setParameter("federateSequence", federateSequence);
-        embeddedMessagingForNetworkFederateSP->setParameter("hlaClassName", hlaClassName);
         embeddedMessagingForNetworkFederateSP->setParameter("messagingJson", objectReflectorJson);
 
         if (time >= 0) {
@@ -487,37 +481,32 @@ void SynchronizedFederate::achieveSynchronizationPoint( const std::string &label
     }
 }
 
-void SynchronizedFederate::receiveEmbeddedInteraction(EmbeddedMessaging::SP embeddedMessagingSP, double timestamp) {
-    const std::string command = embeddedMessagingSP->get_command();
-    const std::string hlaClassName = embeddedMessagingSP->get_hlaClassName();
-    const std::string federateSequence = embeddedMessagingSP->get_federateSequence();
+void SynchronizedFederate::processEmbeddedMessagingInteraction(const Json::Value &jsonValue) {
 
-    if (command == "interaction") {
+    std::string messagingType = jsonValue["messaging_type"].asString();
+    std::string hlaClassName = jsonValue["messaging_name"].asString();
+
+    if (messagingType == "interaction") {
         if (!InteractionRoot::get_is_soft_subscribed(hlaClassName)) {
-            BOOST_LOG_SEV( get_logger(), warning ) << "SynchronizedFederate.receiveEmbeddedInteraction: "
+            BOOST_LOG_SEV( get_logger(), warning ) << "SynchronizedFederate.processEmbeddedMessagingInteraction: "
               << "interaction class \"" << hlaClassName << "\" not soft subscribed";
             return;
         }
 
-        InteractionRoot::SP embeddedInteractionSP =
-          InteractionRoot::fromJson(embeddedMessagingSP->get_messagingJson());
-        embeddedInteractionSP->setTime(embeddedMessagingSP->getTime());
+        InteractionRoot::SP unwrappedInteractionSP = InteractionRoot::fromJson(jsonValue);
 
-        receiveInteractionAux(embeddedInteractionSP, timestamp);
+        receiveInteractionAux(unwrappedInteractionSP);
         return;
     }
 
-    if (command == "object") {
+    if (messagingType == "object") {
         if (!ObjectRoot::get_is_soft_subscribed(hlaClassName)) {
-            BOOST_LOG_SEV( get_logger(), warning ) << "SynchronizedFederate.receiveEmbeddedInteraction: "
+            BOOST_LOG_SEV( get_logger(), warning ) << "SynchronizedFederate.processEmbeddedMessagingInteraction: "
               << "object class \"" << hlaClassName << "\" neither subscribed nor soft subscribed";
             return;
         }
 
-        ObjectRoot::ObjectReflector::SP objectReflectorSP =
-          ObjectRoot::fromJson(embeddedMessagingSP->get_messagingJson());
-        objectReflectorSP->setTime(embeddedMessagingSP->getTime());
-        objectReflectorSP->setFederateSequence(federateSequence);
+        ObjectRoot::ObjectReflector::SP objectReflectorSP = ObjectRoot::fromJson(jsonValue);
 
         const ClassAndPropertyNameSet &attributeClassAndPropertyNameSet =
           *ObjectRoot::get_soft_subscribed_class_and_property_name_set_sp(objectReflectorSP->getHlaClassName());
@@ -544,8 +533,8 @@ void SynchronizedFederate::receiveEmbeddedInteraction(EmbeddedMessaging::SP embe
         return;
     }
 
-    BOOST_LOG_SEV( get_logger(), warning ) << "SynchronizedFederate.receiveEmbeddedInteraction: "
-      << "unrecognized command \"" << command << "\"";
+    BOOST_LOG_SEV( get_logger(), warning ) << "SynchronizedFederate.processEmbeddedMessagingInteraction: "
+      << "unrecognized messaging type \"" << messagingType << "\"";
 }
 
 
@@ -632,41 +621,6 @@ double SynchronizedFederate::getMinTSOTimestamp( void ) {
         return fedTime.getTime();
     else
         return lbtsTime.getTime();
-}
-
-void SynchronizedFederate::receiveInteraction(
- RTI::InteractionClassHandle theInteraction,
- const RTI::ParameterHandleValuePairSet& theParameters,
- const char *theTag
-)
- throw ( RTI::InteractionClassNotKnown, RTI::InteractionParameterNotKnown, RTI::FederateInternalError) {
-
-    if ( getMoreATRs() ) {
-        // Himanshu: We normally use only TSO updates, so this shouldn't be
-        // called, but due to an RTI bug, it seemingly is getting called. So,
-        // for now, use the federate's current time or LBTS whichever is greater
-        // as the timestamp
-        double assumedTimestamp = std::max(getLBTS(), getCurrentTime());
-
-        InteractionRoot::SP interactionRootSP = InteractionRoot::create_interaction(theInteraction, theParameters);
-        if (interactionRootSP->isInstanceOfHlaClass(SimEnd::get_hla_class_name())) {
-            exitImmediately();
-        }
-
-        if (interactionRootSP->isInstanceOfHlaClass(AddProxy::get_hla_class_name())) {
-            AddProxy::SP addProxySP = boost::static_pointer_cast<AddProxy>(interactionRootSP);
-            addProxy(addProxySP->get_federateName(), addProxySP->get_proxyFederateName());
-            return;
-        }
-
-        if (interactionRootSP->isInstanceOfHlaClass(DeleteProxy::get_hla_class_name())) {
-            DeleteProxy::SP deleteProxySP = boost::static_pointer_cast<DeleteProxy>(interactionRootSP);
-            deleteProxy(deleteProxySP->get_federateName());
-            return;
-        }
-
-        receiveInteractionAux(interactionRootSP, assumedTimestamp);
-    }
 }
 
 void SynchronizedFederate::run( void ) {
