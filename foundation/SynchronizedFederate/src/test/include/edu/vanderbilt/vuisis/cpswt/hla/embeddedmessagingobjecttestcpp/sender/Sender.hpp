@@ -63,6 +63,8 @@ private:
 
     TestObject TestObject_0;
 
+    int state;
+
 public:
     Sender(FederateConfig *federateConfig);
 

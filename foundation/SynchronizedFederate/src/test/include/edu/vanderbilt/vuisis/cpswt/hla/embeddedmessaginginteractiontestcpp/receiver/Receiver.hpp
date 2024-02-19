@@ -59,9 +59,12 @@ using C2WInteractionRoot = ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoo
 //    private final static Logger log = LogManager.getLogger();
 public:
     typedef ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::TestInteraction TestInteraction;
-    typedef boost::shared_ptr<TestInteraction> TestInteractionSP;
+    typedef std::list<TestInteraction::SP> TestInteractionSPList;
+
 private:
     double m_currentTime;
+
+    int state;
 
 public:
     Receiver(FederateConfig *federateConfig);
@@ -70,7 +73,7 @@ public:
 
 private:
 
-    TestInteractionSP _testInteractionSP;
+    TestInteractionSPList _testInteractionSPList;
 
     void handleInteractionClass_InteractionRoot_C2WInteractionRoot_TestInteraction(InteractionRoot::SP interactionRootSP);
 
@@ -94,8 +97,8 @@ public:
             }
     };
 
-    TestInteractionSP getTestInteractionSP() {
-        return _testInteractionSP;
+    TestInteractionSPList &getTestInteractionSPList() {
+        return _testInteractionSPList;
     }
 
     void initialize();

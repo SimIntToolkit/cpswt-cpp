@@ -135,6 +135,13 @@ public:
     typedef std::map<std::string, StringSP> StringStringSPMap;
     typedef std::map<std::string, StringSetSP> StringStringSetSPMap;
 
+    typedef std::list<InteractionRoot::SP> InteractionRootSPList;
+
+    typedef std::map<double, InteractionRootSPList> DoubleToInteractionSPListMap;
+    typedef std::map<std::string, InteractionRootSPList> StringToInteractionSPListMap;
+
+    typedef std::set<double> DoubleSet;
+
     static const std::string &get_federation_manager_name() {
         static const std::string federationManagerName("FederationManager");
         return federationManagerName;
@@ -166,6 +173,8 @@ private:
     StringStringSPMap federateNameToProxyFederateNameSPMap;
     StringStringSetSPMap proxyFederateNameToFederateNameSetSPMap;
 
+    DoubleToInteractionSPListMap timeToSentInteractionSPListMap;
+
 protected:
     bool hasProxy(const std::string &federateName) {
         return federateNameToProxyFederateNameSPMap.find(federateName) != federateNameToProxyFederateNameSPMap.end();
@@ -181,12 +190,21 @@ protected:
         return ssmCit == proxyFederateNameToFederateNameSetSPMap.end() ? StringSetSP(new StringSet()) : ssmCit->second;
     }
 
+    void queueInteraction(InteractionRoot &interactionRoot, double time) {
+        if (timeToSentInteractionSPListMap.find(time) == timeToSentInteractionSPListMap.end()) {
+            timeToSentInteractionSPListMap.insert(std::make_pair(time, InteractionRootSPList()));
+        }
+        timeToSentInteractionSPListMap[time].push_back(InteractionRoot::SP( new InteractionRoot(interactionRoot)) );
+    }
+
 private:
     void deleteProxy(const std::string &federateName);
     void addProxy(const std::string &federateName, const std::string &proxyFederateName);
 
 protected:
     RTI::RTIambassador *_rti;
+
+    double _currentTime;
 
     bool exitCondition;
 
@@ -223,8 +241,6 @@ private:
     double _lookahead;
     double _stepSize;
     TimeAdvanceMode _timeAdvanceMode;
-
-    double _currentTime;
 
     static severity_logger &get_logger_aux() {
         static severity_logger logger;
@@ -426,7 +442,7 @@ public:
         C2WInteractionRoot::update_federate_sequence(interactionRoot, getFederateType());
 
         if (interactionRoot.getIsPublished()) {
-            interactionRoot.sendInteraction(getRTI(), time);
+            queueInteraction(interactionRoot, time);
         }
 
         sendInteraction(interactionRoot, *interactionRoot.getFederateNameSoftPublishSetSP(), time);
@@ -606,8 +622,6 @@ public:
         _achievedSynchronizationPoints.insert( label );
     }
 
-protected:
-
     void readyToPopulate( void ) throw( RTI::FederateNotExecutionMember, RTI::RTIinternalError ) {
         achieveSynchronizationPoint( get_ready_to_populate_synch() );
     }
@@ -625,7 +639,6 @@ protected:
         _timeAdvanceNotGranted = false;
     }
 
-public:
     double getCurrentTime( void );
     double getLBTS( void );
     double getMinTSOTimestamp( void );
@@ -728,22 +741,29 @@ private:
     };
 
     typedef std::multiset< InteractionRoot::SP, InteractionRootSPComparator > InteractionQueue;
-    static InteractionQueue &getInteractionQueue( void ) {
-        static InteractionQueue interactionQueue;
-        return interactionQueue;
-    }
+
+    InteractionQueue interactionQueue;
 
 public:
-    static void addInteraction( InteractionRoot::SP interactionRootSP ) {
-        getInteractionQueue().insert( interactionRootSP );
+    void addInteraction( InteractionRoot::SP interactionRootSP ) {
+        interactionQueue.insert( interactionRootSP );
     }
 
-    static InteractionRoot::SP getNextInteraction( void ) {
-        if ( getInteractionQueue().empty() ) return InteractionRoot::SP( (InteractionRoot*)0 );
+    InteractionRoot::SP getNextInteraction( void ) {
 
-        InteractionQueue::iterator inqItr = getInteractionQueue().begin();
+        InteractionRoot::SP nullInteractionRootSP;
+        if ( interactionQueue.empty() ) {
+            return nullInteractionRootSP;
+        }
+
+        InteractionQueue::iterator inqItr = interactionQueue.begin();
         InteractionRoot::SP interactionRootSP = *inqItr;
-        getInteractionQueue().erase( inqItr );
+
+        if (interactionRootSP->getTime() > getCurrentTime()) {
+            return nullInteractionRootSP;
+        }
+
+        interactionQueue.erase( inqItr );
         return interactionRootSP;
     }
 
@@ -849,6 +869,7 @@ private:
     void processEmbeddedMessagingInteraction(const Json::Value &jsonValue);
 
 public:
+    bool iteration( void );
     void run( void );
     void advanceTime( double time );
     void advanceTimeStep( double timeStep ) {
@@ -862,29 +883,32 @@ public:
 
 private:
     typedef std::multiset< ObjectReflector::SP, ObjectReflectorSPComparator > ObjectReflectorSPQueue;
-    static ObjectReflectorSPQueue &getObjectReflectorSPQueue( void ) {
-        static ObjectReflectorSPQueue objectReflectorSPQueue;
-        return objectReflectorSPQueue;
-    }
+
+    ObjectReflectorSPQueue objectReflectorSPQueue;
 
 public:
-    static void addObjectReflectorSP( const ObjectReflector::SP &objectReflectorSP ) {
-        getObjectReflectorSPQueue().insert( objectReflectorSP );
+    void addObjectReflectorSP( const ObjectReflector::SP &objectReflectorSP ) {
+        objectReflectorSPQueue.insert( objectReflectorSP );
     }
 
-    static void addObjectReflectorSP( int objectHandle, const RTI::AttributeHandleValuePairSet& theAttributes ) {
+    void addObjectReflectorSP( int objectHandle, const RTI::AttributeHandleValuePairSet& theAttributes ) {
         addObjectReflectorSP(ObjectReflector::SP(new ObjectReflector(objectHandle, theAttributes)));
     }
-    static void addObjectReflectorSP( int objectHandle, const RTI::AttributeHandleValuePairSet& theAttributes, const RTI::FedTime &theTime ) {
+    void addObjectReflectorSP( int objectHandle, const RTI::AttributeHandleValuePairSet& theAttributes, const RTI::FedTime &theTime ) {
         addObjectReflectorSP(ObjectReflector::SP(new ObjectReflector( objectHandle, theAttributes, theTime)));
     }
 
-    static ObjectReflector::SP getNextObjectReflectorSP( void ) {
-        if ( getObjectReflectorSPQueue().empty() ) return ObjectReflector::SP();
+    ObjectReflector::SP getNextObjectReflectorSP( void ) {
+        if ( objectReflectorSPQueue.empty() ) return ObjectReflector::SP();
 
-        ObjectReflectorSPQueue::iterator orqItr = getObjectReflectorSPQueue().begin();
+        ObjectReflectorSPQueue::iterator orqItr = objectReflectorSPQueue.begin();
         ObjectReflector::SP objectReflectorSP = *orqItr;
-        getObjectReflectorSPQueue().erase( orqItr );
+
+        if (objectReflectorSP->getTime() > getCurrentTime()) {
+            return ObjectReflector::SP();
+        }
+
+        objectReflectorSPQueue.erase( orqItr );
         return objectReflectorSP;
     }
 

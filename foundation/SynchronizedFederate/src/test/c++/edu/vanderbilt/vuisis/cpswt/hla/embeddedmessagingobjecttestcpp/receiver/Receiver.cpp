@@ -39,7 +39,7 @@ namespace edu {
      namespace embeddedmessagingobjecttestcpp {
       namespace receiver {
 
-Receiver::Receiver(FederateConfig *federateConfig): Super(federateConfig) {
+Receiver::Receiver(FederateConfig *federateConfig): Super(federateConfig), state(0) {
 }
 
 void Receiver::handleObjectClass_ObjectRoot_TestObject(ObjectRoot::SP objectRootSP) {
@@ -74,20 +74,28 @@ void Receiver::checkReceivedSubscriptions() {
 
 void Receiver::initialize( void ) {
     m_currentTime = 0;
-    if ( this->get_IsLateJoiner() ) {
-        m_currentTime = getLBTS() - getLookahead();
-        disableTimeRegulation();
-    }
     ReceiverATRCallback advanceTimeRequest(*this);
     putAdvanceTimeRequest(m_currentTime, advanceTimeRequest);
-    if ( !this->get_IsLateJoiner() ) {
-        readyToPopulate();
-        readyToRun();
-    }
 }
 
 void Receiver::execute() {
+
     checkReceivedSubscriptions();
+
+    // state == 0 PUT IN REQUEST FOR TIME = 1
+    if (state == 0) {
+        m_currentTime = getStepSize();
+    }
+
+    // state == 1 MAKE DIRECT UPDATE OCCUR -- NO NEED TO UPDATE TIME AS TIME == 1 AND DIRECT UPDATE WAS AT 0.5
+    // state == 2 MAKE INDIRECT UPDATE OCCUR -- NO NEED TO UPDATE TIME AS TIME == 1 AND DIRECT UPDATE WAS AT 0.5
+
+    if (state < 3) {
+        ReceiverATRCallback advanceTimeRequest(*this);
+        putAdvanceTimeRequest(m_currentTime, advanceTimeRequest);
+    }
+
+    ++state;
 }
       } // NAMESPACE "receiver"
      } // NAMESPACE "embeddedmessagingobjecttestcpp"

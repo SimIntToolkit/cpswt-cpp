@@ -17,7 +17,8 @@ public:
     SynchronizedFederateMockRTI(FederateConfig *federateConfig) : Super(federateConfig) {}
 
     void createRTI() {
-        _rti = RTIAmbassadorTest2::get_rti_ambassador_2_ptr();
+        _rti = RTIAmbassadorTest2::get_instance_ptr();
+        _currentTime = getCurrentTime();
     }
 };
 

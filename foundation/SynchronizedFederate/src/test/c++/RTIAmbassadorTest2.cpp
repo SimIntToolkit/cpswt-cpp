@@ -283,6 +283,18 @@ RTI::FederateHandle RTIAmbassadorTest2::joinFederationExecution (
     return 0;
 }
 
+void RTIAmbassadorTest2::queryFederateTime (
+  RTI::FedTime& theTime  // returned C5
+) throw (
+  RTI::FederateNotExecutionMember,
+  RTI::ConcurrentAccessAttempted,
+  RTI::SaveInProgress,
+  RTI::RestoreInProgress,
+  RTI::RTIinternalError
+) {
+    theTime = RTIfedTime(_currentTime);
+}
+
 RTI::ObjectHandle RTIAmbassadorTest2::registerObjectInstance(RTI::ObjectClassHandle theClass) throw (
   RTI::ObjectClassNotDefined,
   RTI::ObjectClassNotPublished,
@@ -363,6 +375,24 @@ RTI::Boolean RTIAmbassadorTest2::tick(RTI::TickTime minimum, RTI::TickTime maxim
   RTI::RTIinternalError
 ) {
     return tick();
+}
+
+void RTIAmbassadorTest2::timeAdvanceRequest (
+ const RTI::FedTime& theTime  // supplied C4
+) throw (
+  RTI::InvalidFederationTime,
+  RTI::FederationTimeAlreadyPassed,
+  RTI::TimeAdvanceAlreadyInProgress,
+  RTI::EnableTimeRegulationPending,
+  RTI::EnableTimeConstrainedPending,
+  RTI::FederateNotExecutionMember,
+  RTI::ConcurrentAccessAttempted,
+  RTI::SaveInProgress,
+  RTI::RestoreInProgress,
+  RTI::RTIinternalError
+) {
+    _currentTime = static_cast<RTIfedTime>(theTime).getTime();
+    synchronizedFederatePtr->timeAdvanceGrant(RTIfedTime(_currentTime));
 }
 
 RTI::EventRetractionHandle RTIAmbassadorTest2::updateAttributeValues (

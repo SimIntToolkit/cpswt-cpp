@@ -64,6 +64,8 @@ private:
 
     TestInteraction TestInteraction_0;
 
+    int state;
+
 public:
     Sender(FederateConfig *federateConfig);
 

@@ -63,6 +63,8 @@ public:
 private:
     double m_currentTime;
 
+    int state;
+
 public:
     Receiver(FederateConfig *federateConfig);
 

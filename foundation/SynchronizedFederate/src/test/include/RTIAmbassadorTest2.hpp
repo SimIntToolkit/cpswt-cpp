@@ -5,6 +5,7 @@
 #include "PropertyHandleValuePairSetForTesting.hpp"
 #include "ClassAndPropertyName.hpp"
 #include "FederateConfig.h"
+#include "SynchronizedFederate.hpp"
 
 #include <list>
 #include <map>
@@ -25,13 +26,13 @@ public:
     typedef RTI::AttributeHandleValuePairSet AttributeHandleValuePairSet;
     typedef std::map<std::string, RTI::InteractionClassHandle> ClassNameHandleMap;
 
-    static RTIAmbassadorTest2 &get_rti_ambassador_test_2() {
+    static RTIAmbassadorTest2 &get_instance() {
         static RTIAmbassadorTest2 rtiAmbassadorTest2;
         return rtiAmbassadorTest2;
     }
 
-    static RTI::RTIambassador *get_rti_ambassador_2_ptr() {
-        static RTI::RTIambassador rtiAmbassador(&get_rti_ambassador_test_2());
+    static RTI::RTIambassador *get_instance_ptr() {
+        static RTI::RTIambassador rtiAmbassador(&get_instance());
         return &rtiAmbassador;
     }
 
@@ -41,6 +42,14 @@ private:
         return unique_no++;
     };
 
+    SynchronizedFederate *synchronizedFederatePtr = nullptr;
+
+public:
+    void setSynchronizedFederate(SynchronizedFederate &localSynchronizedFederate) {
+        synchronizedFederatePtr = &localSynchronizedFederate;
+    }
+
+private:
     static const ClassNameHandleMap &get_interaction_class_name_handle_map_aux();
 
     static const std::map<ClassAndPropertyName, int> &get_interaction_class_and_property_name_handle_map_aux();
@@ -59,7 +68,10 @@ private:
 
 
 public:
-    RTIAmbassadorTest2() : _timeConstrainedRequestOutstanding(false), _timeRegulationRequestOutstanding(false) {}
+    RTIAmbassadorTest2() :
+      _timeConstrainedRequestOutstanding(false),
+      _timeRegulationRequestOutstanding(false),
+      _currentTime(0) {}
 
     static void remove_federate_ptr(RTI::FederateAmbassadorPtr federateAmbassadorReference) {
         get_federate_ambassador_ptr_set().erase(federateAmbassadorReference);
@@ -209,7 +221,15 @@ public:
         get_updated_object_data_sp_list().clear();
     }
 
+private:
     RTIfedTime defaultRTIfedTime;
+
+    double _currentTime;
+
+public:
+    void resetCurrentTime() {
+        _currentTime = 0;
+    }
 
     void enableTimeConstrained() throw (
       RTI::TimeConstrainedAlreadyEnabled,
@@ -286,6 +306,16 @@ public:
       RTI::RTIinternalError
     ) override;
 
+    void queryFederateTime (
+      RTI::FedTime& theTime  // returned C5
+    ) throw (
+      RTI::FederateNotExecutionMember,
+      RTI::ConcurrentAccessAttempted,
+      RTI::SaveInProgress,
+      RTI::RestoreInProgress,
+      RTI::RTIinternalError
+    ) override;
+
     RTI::ObjectHandle registerObjectInstance (RTI::ObjectClassHandle theClass) throw (
       RTI::ObjectClassNotDefined,
       RTI::ObjectClassNotPublished,
@@ -337,6 +367,21 @@ public:
     RTI::Boolean tick(RTI::TickTime minimum, RTI::TickTime maximum) throw (
       RTI::SpecifiedSaveLabelDoesNotExist,
       RTI::ConcurrentAccessAttempted,
+      RTI::RTIinternalError
+    ) override;
+
+    void timeAdvanceRequest (
+     const RTI::FedTime& theTime  // supplied C4
+    ) throw (
+      RTI::InvalidFederationTime,
+      RTI::FederationTimeAlreadyPassed,
+      RTI::TimeAdvanceAlreadyInProgress,
+      RTI::EnableTimeRegulationPending,
+      RTI::EnableTimeConstrainedPending,
+      RTI::FederateNotExecutionMember,
+      RTI::ConcurrentAccessAttempted,
+      RTI::SaveInProgress,
+      RTI::RestoreInProgress,
       RTI::RTIinternalError
     ) override;
 

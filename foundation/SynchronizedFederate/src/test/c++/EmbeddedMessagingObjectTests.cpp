@@ -20,11 +20,18 @@ typedef ::edu::vanderbilt::vuisis::cpswt::hla::embeddedmessagingobjecttestcpp::r
 
 void EmbeddedMessagingObjectTests::testObjectNetworkPropagation() {
 
+    std::cout << "STARTING \"EmbeddedMessagingObjectTests::testObjectNetworkPropagation\"" << std::endl;
+    std::cout << std::endl;
+
+    RTIAmbassadorTest2 &rtiAmbassadorTest2 = RTIAmbassadorTest2::get_instance();
+
     //
     // CREATE Sender -- ALSO INITIALIZES TABLES IN InteractionRoot AND ObjectRoot
     //
     FederateConfigSP senderFederateConfigSP = getNewFederateConfigSP("Sender");
     Sender sender(senderFederateConfigSP.get());
+
+    rtiAmbassadorTest2.setSynchronizedFederate(sender);
 
     //
     // CLASS HANDLES FOR FEDERATE-SPECIFIC EmbeddedMessaging INTERACTIONS
@@ -73,7 +80,10 @@ void EmbeddedMessagingObjectTests::testObjectNetworkPropagation() {
 
     // EXECUTE THE SENDER -- SHOULD ASSIGN ATTRIBUTE VALUES TO REGISTERED OBJECT AND SEND OUT
     // THE NEW VALUES OF THE ATTRIBUTES IT PUBLISHES VIA AN "updateAttributes" CALL.
-    sender.execute();
+    sender.initialize();
+
+    sender.iteration();
+    sender.iteration();
 
     // NUMBER OF OBJECTS UPDATED BY SENDER SHOULD BE 1
     CPPUNIT_ASSERT_EQUAL(1, static_cast<int>(updatedObjectDataSPList.size()));
@@ -152,7 +162,6 @@ void EmbeddedMessagingObjectTests::testObjectNetworkPropagation() {
 
     TestOmnetFederate::SP localEmbeddedMessagingOmnetFederateInteractionSP =
       boost::dynamic_pointer_cast<TestOmnetFederate>(localEmbeddedMessagingOmnetFederateInteractionRootSP);
-
 
     // THE LOCAL INTERACTION SHOULD BE OF THE TestOmnetFederate-SPECIFIC EmbeddedMessaging CLASS
     CPPUNIT_ASSERT(localEmbeddedMessagingOmnetFederateInteractionSP);
@@ -250,12 +259,19 @@ void EmbeddedMessagingObjectTests::testObjectNetworkPropagation() {
     // CLEAR OBJECTS IN ObjectRoot._objectHandleInstanceMap, SINCE THE Receiver FEDERATE ALSO USES IT.
     sender.unregisterObject(senderTestObject);
 
+    sender.iteration(); // EMPTY THE ATRQUEUE
+
     // CLEAR THE AMBASSADOR PROXY FOR THE Receiver FEDERATE
     RTIAmbassadorTest2::clear();
+    rtiAmbassadorTest2.resetCurrentTime();
 
+    //
     // CREATE THE RECEIVER FEDERATE
+    //
     FederateConfigSP receiverFederateConfigSP = getNewFederateConfigSP("Receiver");
     Receiver receiver(receiverFederateConfigSP.get());
+
+    rtiAmbassadorTest2.setSynchronizedFederate(receiver);
 
     // THE RECEIVER SHOULD NOT HAVE THE TestObject YET
     CPPUNIT_ASSERT(!receiver.getTestObjectSP());
@@ -263,9 +279,9 @@ void EmbeddedMessagingObjectTests::testObjectNetworkPropagation() {
     // HAVE THE RECEIVER FEDERATE DISCOVER THE OBJECT INSTANCE SENT BY THE SENDER
     receiver.discoverObjectInstance(objectHandle, objectClassHandle, nullptr);
 
-    Receiver::ReceiverATRCallback advanceTimeRequest(receiver);
-    receiver.putAdvanceTimeRequest(0, advanceTimeRequest);
-
+//    Receiver::ReceiverATRCallback advanceTimeRequest(receiver);
+//    receiver.putAdvanceTimeRequest(0, advanceTimeRequest);
+//
     ObjectRoot::AttributeHandleSet &attributeHandleSet = *TestObject::get_subscribed_attribute_handle_set_sp();
     CPPUNIT_ASSERT_EQUAL(5, static_cast<int>(attributeHandleSet.size()));
 
@@ -296,8 +312,14 @@ void EmbeddedMessagingObjectTests::testObjectNetworkPropagation() {
             RTI::EventRetractionHandle()
     );
 
-    // THE Receiver SHOULD IGNORE THE "reflectAttributeValues" CALL ABOVE, SO PERFORMED THE ACTIONS ASSOCIATED T
-    receiver.execute();
+    // THE Receiver SHOULD ONLY UPDATE THOSE ATTRIBUTES THAT ARE DIRECTLY SUBSCRIBED (NOT SOFT SUBSCRIBED
+    receiver.initialize();
+    receiver.iteration();
+
+    // THE RECEIVER SHOULD NOt HAVE THE OBJECT YET
+    CPPUNIT_ASSERT(!receiver.getTestObjectSP());
+
+    receiver.iteration();
 
     // THE RECEIVER SHOULD NOW HAVE THE OBJECT
     CPPUNIT_ASSERT(receiver.getTestObjectSP());
@@ -337,7 +359,7 @@ void EmbeddedMessagingObjectTests::testObjectNetworkPropagation() {
 
     // THIS WILL CAUSE THE Receiver TO APPLY THE ObjectReflector TO ITS LOCAL COPY OF THE TestObject INSTANCE
     // AND MAKE THE INSTANCE ACCESSIBLE THROUGH ITS getTestObject() METHOD
-    receiver.execute();
+    receiver.iteration();
 
     // NOT SUBSCRIBED BY Receiver, SO receivedTestObject.get_BoolValue1() HAS DEFAULT VALUE OF false,
     // BUT localTestObject.get_BoolValue1 IS INCIDENTALLY false
@@ -358,6 +380,14 @@ void EmbeddedMessagingObjectTests::testObjectNetworkPropagation() {
     CPPUNIT_ASSERT_EQUAL(receivedTestObject.get_LongValue(), localTestObject.get_LongValue());
     CPPUNIT_ASSERT_EQUAL(receivedTestObject.get_ShortValue(), localTestObject.get_ShortValue());
     CPPUNIT_ASSERT_EQUAL(receivedTestObject.get_JSONValue2(), localTestObject.get_JSONValue2());
+
+    receiver.iteration();  // EMPTY THE ATRQUEUE
+
+    RTIAmbassadorTest2::clear();
+    rtiAmbassadorTest2.resetCurrentTime();
+
+    std::cout << "ENDING \"EmbeddedMessagingObjectTests::testObjectNetworkPropagation\"" << std::endl;
+    std::cout << std::endl;
 }
 
 CPPUNIT_TEST_SUITE_REGISTRATION( EmbeddedMessagingObjectTests );

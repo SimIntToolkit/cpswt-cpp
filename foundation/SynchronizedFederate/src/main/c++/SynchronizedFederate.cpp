@@ -40,6 +40,7 @@
 #include <ctime>
 #include <cstdlib>
 #include <sstream>
+#include <limits>
 
 
 // const double SynchronizedFederate::_stepSize = 0.2;
@@ -122,6 +123,7 @@ void SynchronizedFederate::createRTI( void ) {
         }
     }
 
+    _currentTime = getCurrentTime();
 }
 
 void SynchronizedFederate::notifyFederationOfJoin() {
@@ -138,7 +140,7 @@ void SynchronizedFederate::notifyFederationOfJoin() {
 
 
     std::cout << "Sending Join interaction #-"  << std::endl;
-    sendInteraction(intJoin, _currentTime);
+    sendInteraction(intJoin);
 }
 
 void SynchronizedFederate::notifyFederationOfResign() {
@@ -148,7 +150,7 @@ void SynchronizedFederate::notifyFederationOfResign() {
     intResign.set_IsLateJoiner(get_IsLateJoiner());
 
     std::cout << "Sending Resign interaction #-"  << std::endl;
-    sendInteraction(intResign, _currentTime);
+    sendInteraction(intResign);
 }
 
 void SynchronizedFederate::initializeDynamicMessaging(
@@ -623,23 +625,29 @@ double SynchronizedFederate::getMinTSOTimestamp( void ) {
         return lbtsTime.getTime();
 }
 
+bool SynchronizedFederate::iteration( void ) {
+
+    AdvanceTimeRequest advanceTimeRequest = takeNextAdvanceTimeRequest();
+    // NO MORE ADVANCE TIME REQUESTS (REMEMBER, WE'RE SINGLE THREADED)
+    if ( advanceTimeRequest.isNull() ) {
+        return false;
+    }
+
+    double timeRequest = advanceTimeRequest.getRequestedTime();
+    advanceTime( timeRequest );
+
+    advanceTimeRequest.getATRCallback().execute();
+
+    return true;
+}
+
 void SynchronizedFederate::run( void ) {
 
     std::cout << "run called." << std::endl;
     _currentTime = getCurrentTime();
     if ( _currentTime < 0 ) return;
 
-    double timeRequest = -1;
-    while( true ) {
-        AdvanceTimeRequest advanceTimeRequest = takeNextAdvanceTimeRequest();
-        if ( advanceTimeRequest.isNull() ) break;  // NO MORE ADVANCE TIME REQUESTS (REMEMBER, WE'RE SINGLE THREADED)
-
-        timeRequest = advanceTimeRequest.getRequestedTime();
-
-        advanceTime( timeRequest );
-
-        advanceTimeRequest.getATRCallback().execute();
-    }
+    while( iteration() );
 
 //    noMoreATRs();
 
@@ -648,9 +656,102 @@ void SynchronizedFederate::run( void ) {
     exitGracefully();
 }
 
-void SynchronizedFederate::advanceTime( double time ) {
+void SynchronizedFederate::advanceTime( double requestedTime ) {
 
-    if ( getTimeAdvanceMode() != SF_TIME_ADVANCE_REQUEST_AVAILABLE && getTimeAdvanceMode() != SF_NEXT_EVENT_REQUEST_AVAILABLE &&  time <= _currentTime ) return;
+    StringToInteractionSPListMap hlaClassNameToInteractionSPListMap;
+
+    DoubleSet keySet;
+    for(
+      DoubleToInteractionSPListMap::const_iterator dimCit = timeToSentInteractionSPListMap.begin() ;
+      dimCit != timeToSentInteractionSPListMap.end() ;
+      ++dimCit
+    ) {
+        keySet.insert(dimCit->first);
+    }
+
+    for (double key : keySet) {
+        if (key > requestedTime) {
+            break;
+        }
+
+        InteractionRootSPList &interactionRootSPList = timeToSentInteractionSPListMap[key];
+        for (InteractionRoot::SP &interactionRootSP : interactionRootSPList) {
+
+            interactionRootSP->setTime(key);
+
+            std::string hlaClassName = interactionRootSP->getHlaClassName();
+            if (hlaClassNameToInteractionSPListMap.find(hlaClassName) == hlaClassNameToInteractionSPListMap.end()) {
+                hlaClassNameToInteractionSPListMap.insert(std::make_pair(hlaClassName, InteractionRootSPList()));
+            }
+            hlaClassNameToInteractionSPListMap[hlaClassName].push_back(interactionRootSP);
+        }
+
+        timeToSentInteractionSPListMap.erase(key);
+    }
+
+    Json::Value dummyArrayNode(Json::arrayValue);
+    for(
+      StringToInteractionSPListMap::iterator hisItr = hlaClassNameToInteractionSPListMap.begin() ;
+      hisItr != hlaClassNameToInteractionSPListMap.end() ;
+      ++hisItr
+    ) {
+        InteractionRootSPList &interactionRootSPList = hisItr->second;
+        if (
+                interactionRootSPList.size() > 1 &&
+                        interactionRootSPList.front()->isInstanceHlaClassDerivedFromHlaClass(
+                                EmbeddedMessaging::get_hla_class_name()
+                        )
+        ) {
+            double minTime = std::numeric_limits<double>::max();
+            Json::Value arrayNode(Json::arrayValue);
+            for (InteractionRoot::SP &interactionRootSP : interactionRootSPList) {
+                double time = interactionRootSP->getTime();
+                if (time < minTime) {
+                    minTime = time;
+                }
+                std::string messagingJson = interactionRootSP->getParameter("messagingJson").asString();
+
+                std::istringstream jsonInputStream(messagingJson);
+
+                Json::Value jsonNode;
+                jsonInputStream >> jsonNode;
+
+                if (jsonNode.isArray()) {
+                    for(Json::Value item : jsonNode) {
+                        arrayNode.append(item);
+                    }
+                } else {
+                    arrayNode.append(jsonNode);
+                }
+            }
+
+            Json::StreamWriterBuilder streamWriterBuilder;
+            streamWriterBuilder["commentStyle"] = "None";
+            streamWriterBuilder["indentation"] = "    ";
+            std::unique_ptr<Json::StreamWriter> streamWriterUPtr(streamWriterBuilder.newStreamWriter());
+            std::ostringstream stringOutputStream;
+            streamWriterUPtr->write(arrayNode, &stringOutputStream);
+            std::string newMessagingJson = stringOutputStream.str();
+
+            InteractionRoot &sendInteractionRoot = *interactionRootSPList.front();
+            sendInteractionRoot.setParameter("messagingJson", newMessagingJson);
+            try {
+                sendInteractionRoot.sendInteraction(getRTI(), minTime);
+            } catch (...) { }
+
+        } else {
+            for(InteractionRoot::SP interactionRootSP: interactionRootSPList) {
+                double time = interactionRootSP->getTime();
+                try {
+                    interactionRootSP->sendInteraction(getRTI(), time);
+                } catch (...) { }
+            }
+        }
+    }
+
+    if (requestedTime <= _currentTime) {
+        return;
+    }
 
     setTimeAdvanceNotGranted( true );
 
@@ -658,16 +759,16 @@ void SynchronizedFederate::advanceTime( double time ) {
     while( tarNotCalled ) {
         try {
             if ( getTimeAdvanceMode() == SF_TIME_ADVANCE_REQUEST ) {
-                getRTI()->timeAdvanceRequest(  RTIfedTime( time )  );
+                getRTI()->timeAdvanceRequest(  RTIfedTime( requestedTime )  );
             }
             else if ( getTimeAdvanceMode() == SF_TIME_ADVANCE_REQUEST_AVAILABLE ) {
-                getRTI()->timeAdvanceRequestAvailable(  RTIfedTime( time )  );
+                getRTI()->timeAdvanceRequestAvailable(  RTIfedTime( requestedTime )  );
             }
             else if ( getTimeAdvanceMode() == SF_NEXT_EVENT_REQUEST ) {
-                getRTI()->nextEventRequest(  RTIfedTime( time )  );
+                getRTI()->nextEventRequest(  RTIfedTime( requestedTime )  );
             }
             else if ( getTimeAdvanceMode() == SF_NEXT_EVENT_REQUEST_AVAILABLE ) {
-                getRTI()->nextEventRequestAvailable(  RTIfedTime( time )  );
+                getRTI()->nextEventRequestAvailable(  RTIfedTime( requestedTime )  );
             }
             tarNotCalled = false;
         } catch ( RTI::FederationTimeAlreadyPassed &f ) {
@@ -686,7 +787,7 @@ void SynchronizedFederate::advanceTime( double time ) {
 #endif
     }
 
-    _currentTime = time;
+    _currentTime = requestedTime;
 }
 
 // void SynchronizedFederate::createLog(

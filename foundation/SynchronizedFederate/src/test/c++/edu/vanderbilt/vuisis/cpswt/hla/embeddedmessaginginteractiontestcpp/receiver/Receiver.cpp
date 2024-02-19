@@ -39,14 +39,13 @@ namespace edu {
      namespace embeddedmessaginginteractiontestcpp {
       namespace receiver {
 
-Receiver::Receiver(FederateConfig *federateConfig): Super(federateConfig) {
-}
+Receiver::Receiver(FederateConfig *federateConfig): Super(federateConfig), state(0) { }
 
 void Receiver::handleInteractionClass_InteractionRoot_C2WInteractionRoot_TestInteraction(InteractionRoot::SP interactionRootSP) {
     ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::TestInteraction::SP testInteraction0SP =
         boost::dynamic_pointer_cast<::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::TestInteraction>( interactionRootSP );
 
-    _testInteractionSP = testInteraction0SP;
+    _testInteractionSPList.push_back(testInteraction0SP);
 }
 
 void Receiver::checkReceivedSubscriptions() {
@@ -66,21 +65,23 @@ void Receiver::checkReceivedSubscriptions() {
 
 void Receiver::initialize( void ) {
     m_currentTime = 0;
-    if ( this->get_IsLateJoiner() ) {
-        m_currentTime = getLBTS() - getLookahead();
-        disableTimeRegulation();
-    }
     ReceiverATRCallback advanceTimeRequest(*this);
     putAdvanceTimeRequest(m_currentTime, advanceTimeRequest);
-    if ( !this->get_IsLateJoiner() ) {
-        readyToPopulate();
-        readyToRun();
-    }
 }
 
 void Receiver::execute() {
+
     checkReceivedSubscriptions();
+
+    if (state < 3) {
+        m_currentTime += getStepSize();
+        ReceiverATRCallback advanceTimeRequest(*this);
+        putAdvanceTimeRequest(m_currentTime, advanceTimeRequest);
+    }
+
+    ++state;
 }
+
       } // NAMESPACE "receiver"
      } // NAMESPACE "embeddedmessaginginteractiontestcpp"
     } // NAMESPACE "hla"

@@ -39,28 +39,11 @@ namespace edu {
      namespace embeddedmessagingobjecttestcpp {
       namespace sender {
 
-Sender::Sender(FederateConfig *federateConfig): Super(federateConfig) {
+Sender::Sender(FederateConfig *federateConfig): Super(federateConfig), state(0) {
     //////////////////////////////////////////////////////
     // TODO register object instances after super(args) //
     //////////////////////////////////////////////////////
     registerObject(TestObject_0);
-}
-
-void Sender::initialize( void ) {
-    m_currentTime = 0;
-    if ( this->get_IsLateJoiner() ) {
-        m_currentTime = getLBTS() - getLookahead();
-        disableTimeRegulation();
-    }
-    SenderATRCallback advanceTimeRequest(*this);
-    putAdvanceTimeRequest(m_currentTime, advanceTimeRequest);
-    if ( !this->get_IsLateJoiner() ) {
-        readyToPopulate();
-        readyToRun();
-    }
-}
-
-void Sender::execute() {
 
     TestObject_0.set_BoolValue1(false);
     TestObject_0.set_BoolValue2(true);
@@ -79,8 +62,29 @@ void Sender::execute() {
     thingList.append("that");
     thingList.append("other");
     TestObject_0.set_JSONValue2(thingList);
+}
 
-    updateAttributeValues(TestObject_0, 0.0);
+void Sender::initialize( void ) {
+    m_currentTime = 0;
+    SenderATRCallback advanceTimeRequest(*this);
+    putAdvanceTimeRequest(m_currentTime, advanceTimeRequest);
+}
+
+void Sender::execute() {
+
+    if (state == 0) {
+        updateAttributeValues(TestObject_0, 0.5);
+    }
+
+    if (state < 2) {
+        // TO GET THE FIRST INTERACTION (AT TIME 0.5) SENT
+        m_currentTime += getStepSize();
+
+        SenderATRCallback advanceTimeRequest(*this);
+        putAdvanceTimeRequest(m_currentTime, advanceTimeRequest);
+    }
+
+    ++state;
 }
       } // NAMESPACE "sender"
      } // NAMESPACE "embeddedmessagingobjecttestcpp"

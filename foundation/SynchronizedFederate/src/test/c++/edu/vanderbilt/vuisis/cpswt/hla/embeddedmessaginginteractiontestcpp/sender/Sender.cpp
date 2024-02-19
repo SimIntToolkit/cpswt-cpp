@@ -40,24 +40,6 @@ namespace edu {
       namespace sender {
 
 Sender::Sender(FederateConfig *federateConfig): Super(federateConfig) {
-}
-
-void Sender::initialize( void ) {
-    m_currentTime = 0;
-    if ( this->get_IsLateJoiner() ) {
-        m_currentTime = getLBTS() - getLookahead();
-        disableTimeRegulation();
-    }
-    SenderATRCallback advanceTimeRequest(*this);
-    putAdvanceTimeRequest(m_currentTime, advanceTimeRequest);
-    if ( !this->get_IsLateJoiner() ) {
-        readyToPopulate();
-        readyToRun();
-    }
-}
-
-void Sender::execute() {
-
     TestInteraction_0.set_BoolValue1(false);
     TestInteraction_0.set_BoolValue2(true);
     TestInteraction_0.set_ByteValue(42);
@@ -78,7 +60,40 @@ void Sender::execute() {
     TestInteraction_0.set_actualLogicalGenerationTime(0.0);
     TestInteraction_0.set_federateFilter("");
 
-    sendInteraction(TestInteraction_0, 0.0);
+    state = 0;
+}
+
+void Sender::initialize( void ) {
+    m_currentTime = 0;
+    SenderATRCallback advanceTimeRequest(*this);
+    putAdvanceTimeRequest(m_currentTime, advanceTimeRequest);
+}
+
+void Sender::execute() {
+
+    if (state == 0) {
+
+        sendInteraction(TestInteraction_0, 0.5);
+
+        sendInteraction(TestInteraction_0, 1.5);
+        sendInteraction(TestInteraction_0, 1.6);
+
+    }
+
+    // AFTER 3 ITERATIONS, DON'T PUT ANYTHING ON THE ATRQueue TO LEAVE IT EMPTY
+    // THE ATRQueue IS A STATIC DATA MEMBER OF THE SynchronizedFederate CLASS
+    // AND SO CAN CAUSE TESTS TO STOMP ON ONE ANOTHER
+    if (state < 3) {
+    // TO GET THE FIRST INTERACTION (AT TIME 0.5) SENT
+        m_currentTime += getStepSize();
+        SenderATRCallback advanceTimeRequest(*this);
+        putAdvanceTimeRequest(m_currentTime, advanceTimeRequest);
+    }
+
+    ++state;
+
+    // FINAL EXECUTION, FOR WHICH THERE IS NO STATE
+    // GETS LAST 2 INTERACTIONS SENT
 }
       } // NAMESPACE "sender"
      } // NAMESPACE "embeddedmessaginginteractiontestcpp"
