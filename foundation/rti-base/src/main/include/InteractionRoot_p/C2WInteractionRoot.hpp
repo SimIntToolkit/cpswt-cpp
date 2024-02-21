@@ -457,24 +457,43 @@ public:
 private:
     static bool is_federate_sequence(const std::string &federateSequence);
 
-    static void update_federate_sequence_aux(::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot &interactionRoot, const std::string &federateId);
+    static ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot::SP update_federate_sequence_aux(::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot &interactionRoot, const StringList &federateTypeList);
     static StringList get_federate_sequence_list_aux(const ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot &interactionRoot);
 
 public:
-    static void update_federate_sequence(::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot &interactionRoot, const std::string &federateId) {
-        const std::string &instanceHlaClassName = interactionRoot.getInstanceHlaClassName();
+    static ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot::SP update_federate_sequence(
+      ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot &interactionRoot, const StringList &federateTypeList
+    ) {
 
-        if ( instanceHlaClassName.find("InteractionRoot.C2WInteractionRoot", 0) == 0 ) {
-            update_federate_sequence_aux(interactionRoot, federateId);
-        }
+        return interactionRoot.isInstanceHlaClassDerivedFromHlaClass(C2WInteractionRoot::get_hla_class_name()) ?
+          update_federate_sequence_aux(interactionRoot, federateTypeList) :
+          ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot::create_interaction(interactionRoot);
     }
 
-    static void update_federate_sequence(::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot::SP &interactionRootSP, const std::string &federateId) {
-        return update_federate_sequence(*interactionRootSP, federateId);
+    static ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot::SP update_federate_sequence(
+      ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot &interactionRoot, const std::string &federateType
+    ) {
+        return update_federate_sequence(interactionRoot, StringList({ federateType }));
     }
 
-    void updateFederateSequence(const std::string &federateId) {
-        update_federate_sequence_aux(*this, federateId);
+    static ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot::SP update_federate_sequence(
+      ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot::SP &interactionRootSP, const StringList &federateTypeList
+    ) {
+        return update_federate_sequence(*interactionRootSP, federateTypeList);
+    }
+
+    static ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot::SP update_federate_sequence(
+      ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot::SP &interactionRootSP, const std::string &federateType
+    ) {
+        return update_federate_sequence(*interactionRootSP, StringList({ federateType }));
+    }
+
+    ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot::SP updateFederateSequence(const StringList &federateTypeList) {
+        return update_federate_sequence_aux(*this, federateTypeList);
+    }
+
+    ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot::SP updateFederateSequence(const std::string &federateType) {
+        return update_federate_sequence_aux(*this, StringList({ federateType }));
     }
 
     static StringList get_federate_sequence_list(const ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot &interactionRoot) {
@@ -568,6 +587,12 @@ protected:
       const std::string &hlaClassName, const PropertyHandleValuePairSet &propertyMap, const RTIfedTime &rtiFedTime
     ) : Super( hlaClassName, propertyMap, rtiFedTime ) { }
 
+public:
+    C2WInteractionRoot::SP create_interaction( C2WInteractionRoot messaging_var ) {
+        return boost::static_pointer_cast<C2WInteractionRoot>(
+          ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot::create_interaction( messaging_var )
+        );
+    }
 };
      } // NAMESPACE "InteractionRoot_p"
     } // NAMESPACE "hla"

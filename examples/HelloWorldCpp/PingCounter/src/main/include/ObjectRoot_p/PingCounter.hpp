@@ -613,6 +613,12 @@ protected:
       const std::string &hlaClassName, const PropertyHandleValuePairSet &propertyMap, const RTIfedTime &rtiFedTime
     ) : Super( hlaClassName, propertyMap, rtiFedTime ) { }
 
+public:
+    PingCounter::SP create_object( PingCounter messaging_var ) {
+        return boost::static_pointer_cast<PingCounter>(
+          ::edu::vanderbilt::vuisis::cpswt::hla::ObjectRoot::create_object( messaging_var )
+        );
+    }
 };
      } // NAMESPACE "ObjectRoot_p"
     } // NAMESPACE "hla"

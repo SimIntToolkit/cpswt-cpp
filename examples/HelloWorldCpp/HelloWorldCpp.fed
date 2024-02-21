@@ -259,6 +259,10 @@
           )
         )
       )
+      (class AddProxy reliable timestamp
+        (parameter federateName)
+        (parameter proxyFederateName)
+      )
       (class C2WInteractionRoot reliable timestamp
         (parameter federateSequence)
         (parameter actualLogicalGenerationTime)
@@ -266,9 +270,7 @@
         (class ActionBase reliable timestamp
         )
         (class EmbeddedMessaging reliable timestamp
-          (parameter command)
           (parameter messagingJson)
-          (parameter hlaClassName)
         )
         (class FederateJoinInteraction reliable timestamp
           (parameter IsLateJoiner)
@@ -305,6 +307,9 @@
           (class SimResume reliable timestamp
           )
         )
+      )
+      (class DeleteProxy reliable timestamp
+        (parameter federateName)
       )
     )
   )

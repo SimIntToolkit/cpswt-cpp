@@ -112,7 +112,7 @@ fun spawnProcessBatch() {
 
     val statusDirectory = File(projectDir, "StatusDirectory")
     if (!statusDirectory.exists()) {
-        Files.createDirectory(statusDirectory.toPath());
+        Files.createDirectory(statusDirectory.toPath())
     }
     val stdoutFile = File(statusDirectory, "stdout")
     val stderrFile = File(statusDirectory, "stderr")

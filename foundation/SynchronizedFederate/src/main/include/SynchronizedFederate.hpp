@@ -132,6 +132,8 @@ public:
     typedef std::set<std::string> StringSet;
     typedef boost::shared_ptr<StringSet> StringSetSP;
 
+    typedef std::list<std::string> StringList;
+
     typedef std::map<std::string, StringSP> StringStringSPMap;
     typedef std::map<std::string, StringSetSP> StringStringSetSPMap;
 
@@ -187,7 +189,7 @@ protected:
 
     const StringSetSP getProxiedFederateNameSet(const std::string &federateName) {
         StringStringSetSPMap::const_iterator ssmCit = proxyFederateNameToFederateNameSetSPMap.find(federateName);
-        return ssmCit == proxyFederateNameToFederateNameSetSPMap.end() ? StringSetSP(new StringSet()) : ssmCit->second;
+        return ssmCit == proxyFederateNameToFederateNameSetSPMap.end() ? StringSetSP() : ssmCit->second;
     }
 
     void queueInteraction(InteractionRoot &interactionRoot, double time) {
@@ -430,8 +432,9 @@ public:
 
     void sendInteraction(InteractionRoot &interactionRoot, const StringSet &federateNameSet, double time);
 
+    InteractionRoot::SP updateFederateSequence(InteractionRoot &interactionRoot);
+
     void sendInteraction(InteractionRoot &interactionRoot, const std::string &federateName, double time) {
-        C2WInteractionRoot::update_federate_sequence(interactionRoot, getFederateType());
 
         std::set<std::string> stringSet;
         stringSet.emplace(federateName);
@@ -439,7 +442,6 @@ public:
     }
 
     void sendInteraction( InteractionRoot &interactionRoot, double time ) {
-        C2WInteractionRoot::update_federate_sequence(interactionRoot, getFederateType());
 
         if (interactionRoot.getIsPublished()) {
             queueInteraction(interactionRoot, time);
@@ -449,16 +451,15 @@ public:
     }
 
     void sendInteraction(InteractionRoot &interactionRoot) {
-        C2WInteractionRoot::update_federate_sequence(interactionRoot, getFederateType());
 
         if (interactionRoot.getIsPublished()) {
-            interactionRoot.sendInteraction(getRTI());
+            InteractionRoot::SP newInteractionRootSP = updateFederateSequence(interactionRoot);
+            newInteractionRootSP->sendInteraction(getRTI());
         }
         sendInteraction(interactionRoot, *interactionRoot.getFederateNameSoftPublishSetSP(), -1);
     }
 
     void sendInteraction(InteractionRoot &interactionRoot, const std::string &federateName) {
-        C2WInteractionRoot::update_federate_sequence(interactionRoot, getFederateType());
 
         std::set<std::string> stringSet;
         stringSet.emplace(federateName);
@@ -798,6 +799,16 @@ public:
             InteractionRoot::SP interactionRootSP = InteractionRoot::create_interaction(
               theInteraction, theParameters, theTime
             );
+
+            std::string sourceFederateId = C2WInteractionRoot::get_source_federate_id(*interactionRootSP);
+            if (
+              !sourceFederateId.empty() &&
+                hasProxy(sourceFederateId) &&
+                *getProxyFor(sourceFederateId) == getFederateType()
+            ) {
+                interactionRootSP->setProxiedFederateName(sourceFederateId);
+            }
+
             receiveInteractionAux(interactionRootSP);
         }
 
@@ -812,6 +823,15 @@ public:
         if ( getMoreATRs() ) {
 
             InteractionRoot::SP interactionRootSP = InteractionRoot::create_interaction(theInteraction, theParameters);
+
+            std::string sourceFederateId = C2WInteractionRoot::get_source_federate_id(*interactionRootSP);
+            if (
+              !sourceFederateId.empty() &&
+                hasProxy(sourceFederateId) &&
+                *getProxyFor(sourceFederateId) == getFederateType()
+            ) {
+                interactionRootSP->setProxiedFederateName(sourceFederateId);
+            }
 
             receiveInteractionAux(interactionRootSP);
         }

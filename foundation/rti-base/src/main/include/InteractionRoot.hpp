@@ -42,7 +42,6 @@
 #include <fstream>
 #include <set>
 #include <map>
-#include <unordered_map>
 #include <list>
 #include <cctype>
 #include <cstdlib>
@@ -116,7 +115,7 @@ public:
     typedef TypeMedley Value;
 
     typedef boost::shared_ptr<Value> ValueSP;
-    typedef std::unordered_map<ClassAndPropertyName, ValueSP> ClassAndPropertyNameValueSPMap;
+    typedef std::map<ClassAndPropertyName, ValueSP> ClassAndPropertyNameValueSPMap;
 
     typedef void (*PubsubFunctionPtr)( RTI::RTIambassador * );
     typedef std::map< std::string, PubsubFunctionPtr > ClassNamePubSubMap;
@@ -216,19 +215,26 @@ protected:
         _instanceHlaClassName = instanceHlaClassName;
     }
 
-    // FOR INTERACTIONS DERIVED FROM InteractionRoot.C2WInteractionRoot
-    bool federateAppendedToFederateSequence = false;
+private:
+    std::string proxiedFederateName;
 
 public:
-    void setFederateAppendedToFederateSequence(bool value) {
-        federateAppendedToFederateSequence = value;
+    void setProxiedFederateName(const std::string &localProxiedFederateName) {
+        proxiedFederateName = localProxiedFederateName;
     }
 
-    bool getFederateAppendedToFederateSequence() {
-        return federateAppendedToFederateSequence;
+    const std::string &getProxiedFederateName() {
+        return proxiedFederateName;
     }
 
-public:
+    bool hasProxiedFederateName() {
+        return !proxiedFederateName.empty();
+    }
+
+    void deleteProxiedFederateName() {
+        proxiedFederateName.clear();
+    }
+
     static std::string get_simple_class_name(const std::string &hlaClassName) {
         size_t position = hlaClassName.find_last_of('.');
         return position == std::string::npos ? hlaClassName : hlaClassName.substr(position + 1);
@@ -521,6 +527,15 @@ public:
           : cimItr->second->createInteraction( propertyMap, rtiFedTime );
     }
 
+    static SP create_interaction(InteractionRoot messaging_var) {
+        InteractionRoot::SP newMessaging_var =
+          create_interaction(messaging_var.getInstanceHlaClassName());
+
+        newMessaging_var->_time = messaging_var._time;
+        newMessaging_var->_classAndPropertyNameValueSPMap = messaging_var._classAndPropertyNameValueSPMap;
+
+        return newMessaging_var;
+    }
     //-------------------------------
     // END CLASS-NAME INSTANCE-SP MAP
     //-------------------------------
@@ -819,7 +834,17 @@ public:
 
         Value &currentValue = *_classAndPropertyNameValueSPMap[*classAndPropertyNameSP];
 
-        if (!currentValue.setValue(value)) {
+        // IN CASE INTERACTION IS COPIED USING COPY CONSTRUCTOR, _classAndPropertyNameValueSPMap
+        // WILL BE COPIES USING A SHALLOW COPY, I.E. SMART-POINTERS WILL POINT TO SAME VALUES AS THE ORIGINAL
+        // SetParameter MUST THUS CREATE A NEW SMART POINTER FOR THE COPY/ORIGINAL SO THAT CHANGING THE
+        // PARAMETER'S VALUE IS PERFORMED ONLY IN THE COPY/ORIGINAL
+        Value::SP newValueSP( new Value(currentValue) );
+
+        Value &newValue = *newValueSP;
+
+        if (newValue.setValue(value)) {
+            _classAndPropertyNameValueSPMap[*classAndPropertyNameSP] = newValueSP;
+        } else {
             BOOST_LOG_SEV(get_logger(), error) << "setParameter(\"" << propertyName << "\", "
               << typeid(T).name() << " value): \"value\" is incorrect type \"" << typeid(T).name()
               << "\" for \"" << propertyName << "\" parameter, should be of type \""
@@ -1284,7 +1309,7 @@ private:
     // THE CONSTRUCTORS IN THE ANALOGOUS POSITION TO THIS POSITION IN THE JavaMessagingRoot.jinja2 FILE ARE IN THE
     // CppMessagingHeaderCommon.jinja2 FILE FOR C++ AS C++ DOES NOT SUPPORT INSTANCE-INITIALIZATION BLOCKS.
     //
-protected:
+public:
 
     InteractionRoot(const InteractionRoot &copyFrom) :
       _uniqueId(generate_unique_id()) {

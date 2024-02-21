@@ -410,6 +410,12 @@ protected:
       const std::string &hlaClassName, const PropertyHandleValuePairSet &propertyMap, const RTIfedTime &rtiFedTime
     ) : Super( hlaClassName, propertyMap, rtiFedTime ) { }
 
+public:
+    SimPause::SP create_interaction( SimPause messaging_var ) {
+        return boost::static_pointer_cast<SimPause>(
+          ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot::create_interaction( messaging_var )
+        );
+    }
 };
        } // NAMESPACE "SimulationControl_p"
       } // NAMESPACE "C2WInteractionRoot_p"

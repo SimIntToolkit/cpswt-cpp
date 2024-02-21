@@ -65,7 +65,7 @@ void Source::execute() {
     sendInteraction(ping0, m_currentTime + getLookahead());
 
     if (!exitCondition) {
-        m_currentTime += 1;
+        m_currentTime += getStepSize();
         SourceATRCallback advanceTimeRequest( *this );
         putAdvanceTimeRequest( m_currentTime, advanceTimeRequest );
     }

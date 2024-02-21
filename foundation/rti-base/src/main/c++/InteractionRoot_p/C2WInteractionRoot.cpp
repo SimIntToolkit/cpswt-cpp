@@ -55,13 +55,11 @@ bool C2WInteractionRoot::is_federate_sequence(const std::string &federateSequenc
     return true;
 }
 
-void C2WInteractionRoot::update_federate_sequence_aux(
-  ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot &interactionRoot, const std::string &federateId
+::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot::SP C2WInteractionRoot::update_federate_sequence_aux(
+  ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot &interactionRoot, const StringList &federateTypeList
 ) {
-    if (interactionRoot.getFederateAppendedToFederateSequence()) {
-        return;
-    }
-    interactionRoot.setFederateAppendedToFederateSequence(true);
+    ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot::SP newInteractionRootSP =
+      ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot::create_interaction(interactionRoot);
 
     std::string federateSequence = interactionRoot.getParameter("federateSequence").asString();
 
@@ -71,7 +69,11 @@ void C2WInteractionRoot::update_federate_sequence_aux(
         jsonInputStream >> jsonArray;
     }
 
-    jsonArray.append( federateId );
+    for(const std::string &item : federateTypeList) {
+        if (jsonArray.empty() || jsonArray[jsonArray.size() - 1].asString() != item) {
+            jsonArray.append(item);
+        }
+    }
 
     Json::StreamWriterBuilder streamWriterBuilder;
     streamWriterBuilder["commentStyle"] = "None";
@@ -79,7 +81,9 @@ void C2WInteractionRoot::update_federate_sequence_aux(
     std::ostringstream stringOutputStream;
     streamWriterUPtr->write(jsonArray, &stringOutputStream);
 
-    interactionRoot.setParameter("federateSequence", stringOutputStream.str());
+    newInteractionRootSP->setParameter("federateSequence", stringOutputStream.str());
+
+    return newInteractionRootSP;
 }
 
 C2WInteractionRoot::StringList C2WInteractionRoot::get_federate_sequence_list(const std::string &federateSequence) {

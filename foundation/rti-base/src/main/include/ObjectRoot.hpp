@@ -42,7 +42,6 @@
 #include <fstream>
 #include <set>
 #include <map>
-#include <unordered_map>
 #include <list>
 #include <cctype>
 #include <cstdlib>
@@ -116,12 +115,12 @@ public:
     typedef Attribute Value;
 
     typedef boost::shared_ptr<Value> ValueSP;
-    typedef std::unordered_map<ClassAndPropertyName, ValueSP> ClassAndPropertyNameValueSPMap;
+    typedef std::map<ClassAndPropertyName, ValueSP> ClassAndPropertyNameValueSPMap;
 
     typedef void (*PubsubFunctionPtr)( RTI::RTIambassador * );
     typedef std::map< std::string, PubsubFunctionPtr > ClassNamePubSubMap;
     typedef std::map< std::string, std::string> PropertyTypeMap;typedef std::map< std::string, AttributeHandleSetSP > StringAttributesHandleSetSPMap;
-    typedef std::unordered_map< int, SP > ObjectHandleInstanceSPMap;
+    typedef std::map< int, SP > ObjectHandleInstanceSPMap;
     typedef std::set<int> IntegerSet;
     typedef boost::shared_ptr<IntegerSet> IntegerSetSP;
     typedef std::map<std::string, IntegerSetSP> StringIntegerSetSPMap;
@@ -220,7 +219,26 @@ protected:
         _instanceHlaClassName = instanceHlaClassName;
     }
 
+private:
+    std::string proxiedFederateName;
+
 public:
+    void setProxiedFederateName(const std::string &localProxiedFederateName) {
+        proxiedFederateName = localProxiedFederateName;
+    }
+
+    const std::string &getProxiedFederateName() {
+        return proxiedFederateName;
+    }
+
+    bool hasProxiedFederateName() {
+        return !proxiedFederateName.empty();
+    }
+
+    void deleteProxiedFederateName() {
+        proxiedFederateName.clear();
+    }
+
     static std::string get_simple_class_name(const std::string &hlaClassName) {
         size_t position = hlaClassName.find_last_of('.');
         return position == std::string::npos ? hlaClassName : hlaClassName.substr(position + 1);
@@ -733,6 +751,15 @@ public:
           : cimItr->second->createObject( propertyMap, rtiFedTime );
     }
 
+    static SP create_object(ObjectRoot messaging_var) {
+        ObjectRoot::SP newMessaging_var =
+          create_object(messaging_var.getInstanceHlaClassName());
+
+        newMessaging_var->_time = messaging_var._time;
+        newMessaging_var->_classAndPropertyNameValueSPMap = messaging_var._classAndPropertyNameValueSPMap;
+
+        return newMessaging_var;
+    }
     //-------------------------------
     // END CLASS-NAME INSTANCE-SP MAP
     //-------------------------------
@@ -1499,7 +1526,17 @@ public:
 
         Value &currentValue = *_classAndPropertyNameValueSPMap[*classAndPropertyNameSP];
 
-        if (!currentValue.setValue(value)) {
+        // IN CASE OBJECT IS COPIED USING COPY CONSTRUCTOR, _classAndPropertyNameValueSPMap
+        // WILL BE COPIES USING A SHALLOW COPY, I.E. SMART-POINTERS WILL POINT TO SAME VALUES AS THE ORIGINAL
+        // SetParameter MUST THUS CREATE A NEW SMART POINTER FOR THE COPY/ORIGINAL SO THAT CHANGING THE
+        // PARAMETER'S VALUE IS PERFORMED ONLY IN THE COPY/ORIGINAL
+        Value::SP newValueSP( new Value(currentValue) );
+
+        Value &newValue = *newValueSP;
+
+        if (newValue.setValue(value)) {
+            _classAndPropertyNameValueSPMap[*classAndPropertyNameSP] = newValueSP;
+        } else {
             BOOST_LOG_SEV(get_logger(), error) << "setAttribute(\"" << propertyName << "\", "
               << typeid(T).name() << " value): \"value\" is incorrect type \"" << typeid(T).name()
               << "\" for \"" << propertyName << "\" attribute, should be of type \""

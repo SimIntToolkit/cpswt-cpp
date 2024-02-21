@@ -823,6 +823,12 @@ protected:
       const std::string &hlaClassName, const PropertyHandleValuePairSet &propertyMap, const RTIfedTime &rtiFedTime
     ) : Super( hlaClassName, propertyMap, rtiFedTime ) { }
 
+public:
+    FederateObject::SP create_object( FederateObject messaging_var ) {
+        return boost::static_pointer_cast<FederateObject>(
+          ::edu::vanderbilt::vuisis::cpswt::hla::ObjectRoot::create_object( messaging_var )
+        );
+    }
 };
      } // NAMESPACE "ObjectRoot_p"
     } // NAMESPACE "hla"

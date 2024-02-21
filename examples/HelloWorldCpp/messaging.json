@@ -1,6 +1,20 @@
 {
     "interactions": {
         "InteractionRoot": {},
+        "InteractionRoot.AddProxy": {
+            "federateName": {
+                "Hidden": false,
+                "ParameterType": "String",
+                "full_hla_class_name": "InteractionRoot.AddProxy",
+                "property_name": "federateName"
+            },
+            "proxyFederateName": {
+                "Hidden": false,
+                "ParameterType": "String",
+                "full_hla_class_name": "InteractionRoot.AddProxy",
+                "property_name": "proxyFederateName"
+            }
+        },
         "InteractionRoot.C2WInteractionRoot": {
             "actualLogicalGenerationTime": {
                 "Hidden": false,
@@ -23,18 +37,6 @@
         },
         "InteractionRoot.C2WInteractionRoot.ActionBase": {},
         "InteractionRoot.C2WInteractionRoot.EmbeddedMessaging": {
-            "command": {
-                "Hidden": false,
-                "ParameterType": "String",
-                "full_hla_class_name": "InteractionRoot.C2WInteractionRoot.EmbeddedMessaging",
-                "property_name": "command"
-            },
-            "hlaClassName": {
-                "Hidden": false,
-                "ParameterType": "String",
-                "full_hla_class_name": "InteractionRoot.C2WInteractionRoot.EmbeddedMessaging",
-                "property_name": "hlaClassName"
-            },
             "messagingJson": {
                 "Hidden": false,
                 "ParameterType": "String",
@@ -111,7 +113,15 @@
         "InteractionRoot.C2WInteractionRoot.SimulationControl": {},
         "InteractionRoot.C2WInteractionRoot.SimulationControl.SimEnd": {},
         "InteractionRoot.C2WInteractionRoot.SimulationControl.SimPause": {},
-        "InteractionRoot.C2WInteractionRoot.SimulationControl.SimResume": {}
+        "InteractionRoot.C2WInteractionRoot.SimulationControl.SimResume": {},
+        "InteractionRoot.DeleteProxy": {
+            "federateName": {
+                "Hidden": false,
+                "ParameterType": "String",
+                "full_hla_class_name": "InteractionRoot.DeleteProxy",
+                "property_name": "federateName"
+            }
+        }
     },
     "objects": {
         "ObjectRoot": {},

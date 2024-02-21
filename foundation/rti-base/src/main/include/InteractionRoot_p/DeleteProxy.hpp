@@ -430,6 +430,12 @@ protected:
       const std::string &hlaClassName, const PropertyHandleValuePairSet &propertyMap, const RTIfedTime &rtiFedTime
     ) : Super( hlaClassName, propertyMap, rtiFedTime ) { }
 
+public:
+    DeleteProxy::SP create_interaction( DeleteProxy messaging_var ) {
+        return boost::static_pointer_cast<DeleteProxy>(
+          ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot::create_interaction( messaging_var )
+        );
+    }
 };
      } // NAMESPACE "InteractionRoot_p"
     } // NAMESPACE "hla"

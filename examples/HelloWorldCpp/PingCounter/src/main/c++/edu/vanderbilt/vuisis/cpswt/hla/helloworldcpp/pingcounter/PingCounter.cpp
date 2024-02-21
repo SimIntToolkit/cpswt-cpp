@@ -91,7 +91,7 @@ void PingCounter::execute() {
     // TODO update registered object instances
 
     if (!exitCondition) {
-        m_currentTime += 1;
+        m_currentTime += getStepSize();
         PingCounterATRCallback advanceTimeRequest( *this );
         putAdvanceTimeRequest( m_currentTime, advanceTimeRequest );
     }

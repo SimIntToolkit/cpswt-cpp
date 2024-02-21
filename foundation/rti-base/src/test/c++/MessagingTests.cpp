@@ -724,16 +724,17 @@ void MessagingTests::dynamicMessagingTest() {
     std::string string2("string2");
     double doubleValue2(3.4);
 
-    C2WInteractionRoot::update_federate_sequence(dynamicSimLogInteraction, string2);
-    dynamicSimLogInteraction.setParameter("Time", doubleValue2);
+    InteractionRoot::SP newDynamicSimLogInteractionSP =
+      C2WInteractionRoot::update_federate_sequence(dynamicSimLogInteraction, string2);
+    newDynamicSimLogInteractionSP->setParameter("Time", doubleValue2);
 
     C2WInteractionRoot::StringList federateSequenceList1 =
-      C2WInteractionRoot::get_federate_sequence_list(dynamicSimLogInteraction);
+      C2WInteractionRoot::get_federate_sequence_list(*newDynamicSimLogInteractionSP);
 
     CPPUNIT_ASSERT_EQUAL(string1, federateSequenceList1.front());
     CPPUNIT_ASSERT_EQUAL(string2, federateSequenceList1.back());
     CPPUNIT_ASSERT_DOUBLES_EQUAL(
-      doubleValue2, static_cast<double>(dynamicSimLogInteraction.getParameter("Time")), 0.01
+      doubleValue2, static_cast<double>(newDynamicSimLogInteractionSP->getParameter("Time")), 0.01
     );
 
     InteractionRoot::SP staticSimLogInteractionSP1 = InteractionRoot::create_interaction(SimLog::get_hla_class_name());
@@ -750,27 +751,36 @@ void MessagingTests::dynamicMessagingTest() {
     double doubleValue3(5.6);
 
     SimLog &simLogInteraction = *simLogPtr2;
-    C2WInteractionRoot::update_federate_sequence(simLogInteraction, string3);
-    simLogInteraction.setParameter("Time", doubleValue3);
+    InteractionRoot::SP newStaticSimLogInteractionSP1 =
+      C2WInteractionRoot::update_federate_sequence(simLogInteraction, string3);
 
-    CPPUNIT_ASSERT_EQUAL(string3, C2WInteractionRoot::get_source_federate_id(simLogInteraction));
-    CPPUNIT_ASSERT_DOUBLES_EQUAL(doubleValue3, static_cast<double>(simLogInteraction.getParameter("Time")), 0.01);
+    InteractionRoot *newStaticSimLogInteraction1Ptr = newStaticSimLogInteractionSP1.get();
 
-    CPPUNIT_ASSERT_EQUAL(string3, simLogInteraction.getSourceFederateId());
-    CPPUNIT_ASSERT_DOUBLES_EQUAL(doubleValue3, simLogInteraction.get_Time(), 0.01);
+    SimLog *newSimLogPtr2 = dynamic_cast<SimLog *>(newStaticSimLogInteraction1Ptr);
+    CPPUNIT_ASSERT(newSimLogPtr2 != nullptr);
+
+    SimLog &newSimLogInteraction = *newSimLogPtr2;
+
+    newSimLogInteraction.setParameter("Time", doubleValue3);
+
+    CPPUNIT_ASSERT_EQUAL(string3, C2WInteractionRoot::get_source_federate_id(newSimLogInteraction));
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(doubleValue3, static_cast<double>(newSimLogInteraction.getParameter("Time")), 0.01);
+
+    CPPUNIT_ASSERT_EQUAL(string3, newSimLogInteraction.getSourceFederateId());
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(doubleValue3, newSimLogInteraction.get_Time(), 0.01);
 
     std::string string4("string4");
     double doubleValue4(17.3);
 
     // federateSequence SHOULD NOT BE UPDATED (CAN ONLY UPDATE ONCE PER INTERACTION)
-    simLogInteraction.updateFederateSequence(string4);
-    simLogInteraction.set_Time(doubleValue4);
+    newSimLogInteraction.updateFederateSequence(string4);
+    newSimLogInteraction.set_Time(doubleValue4);
 
-    CPPUNIT_ASSERT_EQUAL(string3, C2WInteractionRoot::get_source_federate_id(simLogInteraction));
-    CPPUNIT_ASSERT_DOUBLES_EQUAL(doubleValue4, simLogInteraction.getParameter("Time").asDouble(), 0.01);
+    CPPUNIT_ASSERT_EQUAL(string3, C2WInteractionRoot::get_source_federate_id(newSimLogInteraction));
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(doubleValue4, newSimLogInteraction.getParameter("Time").asDouble(), 0.01);
 
-    CPPUNIT_ASSERT_EQUAL(string3, simLogInteraction.getSourceFederateId());
-    CPPUNIT_ASSERT_DOUBLES_EQUAL(doubleValue4, simLogInteraction.get_Time(), 0.01);
+    CPPUNIT_ASSERT_EQUAL(string3, newSimLogInteraction.getSourceFederateId());
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(doubleValue4, newSimLogInteraction.get_Time(), 0.01);
 
     std::cout << "END dynamicMessagingTest" << std::endl;
 }
@@ -851,21 +861,22 @@ void MessagingTests::federateSequenceTest() {
     std::string federateName1("federateName1");
 
     // ADD federateName1 TO federateSequence
-    C2WInteractionRoot::update_federate_sequence(interactionRoot1, federateName1);
+    InteractionRoot::SP newInteractionRootSP1 =
+      C2WInteractionRoot::update_federate_sequence(interactionRoot1, federateName1);
 
     // MAKE SURE IT'S THERE
     C2WInteractionRoot::StringList federateSequenceList1 =
-      C2WInteractionRoot::get_federate_sequence_list(interactionRoot1);
+      C2WInteractionRoot::get_federate_sequence_list(*newInteractionRootSP1);
 
     CPPUNIT_ASSERT_EQUAL(1, static_cast<int>(federateSequenceList1.size()));
     CPPUNIT_ASSERT_EQUAL(federateName1, federateSequenceList1.front());
 
     // ADD IT AGAIN
-    C2WInteractionRoot::update_federate_sequence(interactionRoot1, federateName1);
+    C2WInteractionRoot::update_federate_sequence(newInteractionRootSP1, federateName1);
 
     // MAKE SURE federateSequence IS UNCHANGED
     C2WInteractionRoot::StringList federateSequenceList2 =
-      C2WInteractionRoot::get_federate_sequence_list(interactionRoot1);
+      C2WInteractionRoot::get_federate_sequence_list(*newInteractionRootSP1);
 
     CPPUNIT_ASSERT_EQUAL(1, static_cast<int>(federateSequenceList2.size()));
     CPPUNIT_ASSERT_EQUAL(federateName1, federateSequenceList2.front());
@@ -890,11 +901,12 @@ void MessagingTests::federateSequenceTest() {
     interactionRoot2.setParameter("federateSequence", jsonToString(jsonArray));
 
     // ADD federateName1 TO federateSequence
-    C2WInteractionRoot::update_federate_sequence(interactionRoot2, federateName1);
+    InteractionRoot::SP newInteractionRootSP2 =
+      C2WInteractionRoot::update_federate_sequence(interactionRoot2, federateName1);
 
     // MAKE SURE IT'S THERE
     C2WInteractionRoot::StringList federateSequenceList3 =
-      C2WInteractionRoot::get_federate_sequence_list(interactionRoot2);
+      C2WInteractionRoot::get_federate_sequence_list(*newInteractionRootSP2);
     federateNameList.push_back(federateName1);
 
     CPPUNIT_ASSERT_EQUAL(federateNameList.size(), federateSequenceList3.size());
@@ -907,11 +919,11 @@ void MessagingTests::federateSequenceTest() {
     }
 
     // ADD IT AGAIN
-    C2WInteractionRoot::update_federate_sequence(interactionRoot2, federateName1);
+    C2WInteractionRoot::update_federate_sequence(*newInteractionRootSP2, federateName1);
 
     // MAKE SURE federateSequence IS UNCHANGED
     C2WInteractionRoot::StringList federateSequenceList4 =
-      C2WInteractionRoot::get_federate_sequence_list(interactionRoot2);
+      C2WInteractionRoot::get_federate_sequence_list(newInteractionRootSP2);
 
     CPPUNIT_ASSERT_EQUAL(federateNameList.size(), federateSequenceList3.size());
     fnlCit = federateNameList.begin();
@@ -1057,13 +1069,15 @@ void MessagingTests::printInteractionTest() {
     std::cout << "START printInteractionTest" << std::endl;
 
     C2WInteractionRoot c2wInteractionRoot;
-    c2wInteractionRoot.updateFederateSequence( "Hello" );
-    c2wInteractionRoot.set_actualLogicalGenerationTime( 2.1 );
-    c2wInteractionRoot.set_federateFilter( "GoodBye" );
+    C2WInteractionRoot::SP newC2wInteractionRootSP = boost::static_pointer_cast<C2WInteractionRoot>(
+      c2wInteractionRoot.updateFederateSequence( "Hello" )
+    );
+    newC2wInteractionRootSP->set_actualLogicalGenerationTime( 2.1 );
+    newC2wInteractionRootSP->set_federateFilter( "GoodBye" );
 
     std::ostringstream testStream;
 
-    testStream << c2wInteractionRoot;
+    testStream << *newC2wInteractionRootSP;
 
     std::string expectedOutput =
       std::string("InteractionRoot.C2WInteractionRoot(") +

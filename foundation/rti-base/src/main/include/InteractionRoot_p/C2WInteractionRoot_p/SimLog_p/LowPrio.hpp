@@ -410,6 +410,12 @@ protected:
       const std::string &hlaClassName, const PropertyHandleValuePairSet &propertyMap, const RTIfedTime &rtiFedTime
     ) : Super( hlaClassName, propertyMap, rtiFedTime ) { }
 
+public:
+    LowPrio::SP create_interaction( LowPrio messaging_var ) {
+        return boost::static_pointer_cast<LowPrio>(
+          ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot::create_interaction( messaging_var )
+        );
+    }
 };
        } // NAMESPACE "SimLog_p"
       } // NAMESPACE "C2WInteractionRoot_p"

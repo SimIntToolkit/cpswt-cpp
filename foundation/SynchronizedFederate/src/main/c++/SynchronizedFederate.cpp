@@ -241,7 +241,6 @@ void SynchronizedFederate::sendInteraction(
                         "federateSequence",
                         interactionRoot.getParameter("federateSequence")
                 );
-                embeddedMessagingForNetworkFederateSP->setFederateAppendedToFederateSequence(true);
             }
             embeddedMessagingForNetworkFederateSP->setParameter("messagingJson", interactionJson);
 
@@ -252,6 +251,33 @@ void SynchronizedFederate::sendInteraction(
             }
         }
     }
+}
+
+SynchronizedFederate::InteractionRoot::SP SynchronizedFederate::updateFederateSequence(
+  InteractionRoot &interactionRoot
+) {
+
+    const std::string &proxiedFederateName = interactionRoot.getProxiedFederateName();
+
+    StringList federateTypeList;
+
+    if ( !proxiedFederateName.empty() && hasProxy(proxiedFederateName) ) {
+
+        StringSP proxyFederateNameSP = getProxyFor(proxiedFederateName);
+        const std::string &proxyFederateName = *proxyFederateNameSP;
+        if (proxyFederateName == getFederateType()) {
+            federateTypeList.push_back(proxiedFederateName);
+        }
+        federateTypeList.push_back(proxiedFederateName);
+        federateTypeList.push_back(proxiedFederateName);
+
+    } else {
+
+        federateTypeList.push_back(getFederateType());
+    }
+
+    return C2WInteractionRoot::update_federate_sequence(interactionRoot, federateTypeList);
+
 }
 
 void SynchronizedFederate::registerObject(ObjectRoot &objectRoot) {
