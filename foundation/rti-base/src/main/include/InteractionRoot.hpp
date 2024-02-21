@@ -1284,7 +1284,7 @@ private:
     // THE CONSTRUCTORS IN THE ANALOGOUS POSITION TO THIS POSITION IN THE JavaMessagingRoot.jinja2 FILE ARE IN THE
     // CppMessagingHeaderCommon.jinja2 FILE FOR C++ AS C++ DOES NOT SUPPORT INSTANCE-INITIALIZATION BLOCKS.
     //
-protected:
+public:
 
     InteractionRoot(const InteractionRoot &copyFrom) :
       _uniqueId(generate_unique_id()) {
