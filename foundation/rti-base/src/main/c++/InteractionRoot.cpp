@@ -752,16 +752,27 @@ InteractionRoot::operator std::string() const {
     std::ostringstream stringOutputStream;
 
     const ClassAndPropertyNameValueSPMap &classAndPropertyNameValueSPMap = getClassAndPropertyNameValueSPMap();
-    stringOutputStream << getInstanceHlaClassName() << "(";
-    bool first = true;
+
+    ClassAndPropertyNameSet classAndPropertyNameSet;
     for(
       ClassAndPropertyNameValueSPMap::const_iterator cvmCit = classAndPropertyNameValueSPMap.begin() ;
       cvmCit != classAndPropertyNameValueSPMap.end() ;
       ++cvmCit
     ) {
+        classAndPropertyNameSet.insert(cvmCit->first);
+    }
+
+    stringOutputStream << getInstanceHlaClassName() << "(";
+    bool first = true;
+    for(
+      ClassAndPropertyNameSet::const_iterator cpsCit = classAndPropertyNameSet.begin() ;
+      cpsCit != classAndPropertyNameSet.end() ;
+      ++cpsCit
+    ) {
         if (first) first = false;
         else stringOutputStream << ", ";
 
+        ClassAndPropertyNameValueSPMap::const_iterator cvmCit = classAndPropertyNameValueSPMap.find(*cpsCit);
         stringOutputStream << static_cast<std::string>(cvmCit->first) << ": ";
         TypeMedley &value = *cvmCit->second;
         switch(value.getDataType()) {

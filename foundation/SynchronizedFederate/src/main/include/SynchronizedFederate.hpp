@@ -192,18 +192,21 @@ protected:
         return ssmCit == proxyFederateNameToFederateNameSetSPMap.end() ? StringSetSP() : ssmCit->second;
     }
 
-    void queueInteraction(InteractionRoot &interactionRoot, double time) {
+    void queueInteraction(InteractionRoot::SP &interactionRootSP, double time) {
         if (timeToSentInteractionSPListMap.find(time) == timeToSentInteractionSPListMap.end()) {
             timeToSentInteractionSPListMap.insert(std::make_pair(time, InteractionRootSPList()));
         }
-        timeToSentInteractionSPListMap[time].push_back(InteractionRoot::SP( new InteractionRoot(interactionRoot)) );
+        timeToSentInteractionSPListMap[time].emplace_back(interactionRootSP);
     }
 
 private:
-    void deleteProxy(const std::string &federateName);
     void addProxy(const std::string &federateName, const std::string &proxyFederateName);
+    void deleteProxy(const std::string &federateName);
 
 protected:
+    void addProxiedFederate(const std::string &federateName);
+    void deleteProxiedFederate(const std::string &federateName);
+
     RTI::RTIambassador *_rti;
 
     double _currentTime;
@@ -430,9 +433,9 @@ public:
     // void joinFederation( const std::string &federation_id, const std::string &federate_id, bool ignoreLockFile = true );
     void joinFederation();
 
-    void sendInteraction(InteractionRoot &interactionRoot, const StringSet &federateNameSet, double time);
-
     InteractionRoot::SP updateFederateSequence(InteractionRoot &interactionRoot);
+
+    void sendInteraction(InteractionRoot &interactionRoot, const StringSet &federateNameSet, double time);
 
     void sendInteraction(InteractionRoot &interactionRoot, const std::string &federateName, double time) {
 
@@ -444,7 +447,9 @@ public:
     void sendInteraction( InteractionRoot &interactionRoot, double time ) {
 
         if (interactionRoot.getIsPublished()) {
-            queueInteraction(interactionRoot, time);
+            InteractionRoot::SP newInteractionRootSP = updateFederateSequence(interactionRoot);
+            queueInteraction(newInteractionRootSP, time);
+//            newInteractionRootSP->sendInteraction(getRTI());
         }
 
         sendInteraction(interactionRoot, *interactionRoot.getFederateNameSoftPublishSetSP(), time);
@@ -856,35 +861,7 @@ private:
     }
 
     void receiveInteractionAux(InteractionRoot::SP interactionRootSP)
-      throw ( RTI::InteractionClassNotKnown, RTI::InteractionParameterNotKnown, RTI::FederateInternalError) {
-
-        if (interactionRootSP->isInstanceOfHlaClass(SimEnd::get_hla_class_name())) {
-            exitImmediately();
-        }
-
-        if (interactionRootSP->isInstanceOfHlaClass(AddProxy::get_hla_class_name())) {
-            AddProxy::SP addProxySP = boost::static_pointer_cast<AddProxy>(interactionRootSP);
-            addProxy(addProxySP->get_federateName(), addProxySP->get_proxyFederateName());
-            return;
-        }
-
-        if (interactionRootSP->isInstanceOfHlaClass(DeleteProxy::get_hla_class_name())) {
-            DeleteProxy::SP deleteProxySP = boost::static_pointer_cast<DeleteProxy>(interactionRootSP);
-            deleteProxy(deleteProxySP->get_federateName());
-            return;
-        }
-
-        if (!unmatchingFedFilterProvided(interactionRootSP)) {
-
-            if (interactionRootSP->isInstanceHlaClassDerivedFromHlaClass(EmbeddedMessaging::get_hla_class_name())) {
-                receiveEmbeddedMessagingInteraction(boost::static_pointer_cast<EmbeddedMessaging>(interactionRootSP));
-                return;
-            }
-
-            addInteraction( interactionRootSP );
-//             interactionRootSP->createLog( assumedTimestamp, false );
-        }
-    }
+      throw ( RTI::InteractionClassNotKnown, RTI::InteractionParameterNotKnown, RTI::FederateInternalError);
 
     void processEmbeddedMessagingInteraction(const Json::Value &jsonValue);
 
@@ -978,6 +955,7 @@ public:
         SimEnd simEnd;
 
         sendInteraction(simEnd);
+        getRTI()->tick();
     }
 
     void writeStatus() {

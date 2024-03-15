@@ -51,6 +51,34 @@
 #define throw(...) __VA_OPT__(MultiArg)##Throw17
 #endif
 
+void SynchronizedFederate::addProxy(const std::string &federateName, const std::string &proxyFederateName) {
+
+    if (hasProxy(federateName)) {
+        const StringSP currentProxyFederateNameSP = federateNameToProxyFederateNameSPMap[federateName];
+        const std::string &currentProxyFederateName = *currentProxyFederateNameSP;
+
+        BOOST_LOG_SEV( get_logger(), warning ) << "Federate \"" << federateName
+          << "\" is already proxied by federate \"" << currentProxyFederateName
+          << "SynchronizedFederate::\".  You should delete this proxy before establishing a new one.  Federate \"" << federateName
+          << "\" will now be proxied by federate \"" << proxyFederateName << "\"";
+        deleteProxy(federateName);
+    }
+
+    federateNameToProxyFederateNameSPMap.insert(
+      std::make_pair(federateName, StringSP(new std::string(proxyFederateName)))
+    );
+
+    if (
+      proxyFederateNameToFederateNameSetSPMap.find(proxyFederateName) ==
+        proxyFederateNameToFederateNameSetSPMap.end()
+    ) {
+        proxyFederateNameToFederateNameSetSPMap.insert(
+          std::make_pair(proxyFederateName, StringSetSP(new StringSet()))
+        );
+    }
+    proxyFederateNameToFederateNameSetSPMap[proxyFederateName]->insert(federateName);
+}
+
 void SynchronizedFederate::deleteProxy(const std::string &federateName) {
     if (!hasProxy(federateName)) {
         BOOST_LOG_SEV( get_logger(), warning ) << "deleteProxy:  There is currently no proxy for federate \""
@@ -71,27 +99,34 @@ void SynchronizedFederate::deleteProxy(const std::string &federateName) {
     }
 }
 
-void SynchronizedFederate::addProxy(const std::string &federateName, const std::string &proxyFederateName) {
-    if (hasProxy(federateName)) {
-        const StringSP currentProxyFederateNameSP = federateNameToProxyFederateNameSPMap[federateName];
-        const std::string &currentProxyFederateName = *currentProxyFederateNameSP;
+void SynchronizedFederate::addProxiedFederate(const std::string &federateName) {
+    addProxy(federateName, getFederateType());
 
-        BOOST_LOG_SEV( get_logger(), warning ) << "Federate \"" << federateName
-          << "\" is already proxied by federate \"" << currentProxyFederateName
-          << "SynchronizedFederate::\".  You should delete this proxy before establishing a new one.  Federate \"" << federateName
-          << "\" will now be proxied by federate \"" << proxyFederateName << "\"";
-        deleteProxy(federateName);
-    }
+    AddProxy addProxyInteraction;
+    addProxyInteraction.set_proxyFederateName(getFederateType());
+    addProxyInteraction.set_federateName(federateName);
 
-    if (
-      proxyFederateNameToFederateNameSetSPMap.find(proxyFederateName) ==
-        proxyFederateNameToFederateNameSetSPMap.end()
-    ) {
-        proxyFederateNameToFederateNameSetSPMap.insert(
-          std::make_pair(proxyFederateName, StringSetSP(new StringSet()))
-        );
+    try {
+        sendInteraction(addProxyInteraction);
+        getRTI()->tick();
+    } catch (RTI::Exception &e) {
+        BOOST_LOG_SEV( get_logger(), error ) << "Could not send \"AddProxy\" interaction: \"" << e._name
+            << "\": " << e._reason;
     }
-    proxyFederateNameToFederateNameSetSPMap[proxyFederateName]->insert(federateName);
+}
+
+void SynchronizedFederate::deleteProxiedFederate(const std::string &federateName) {
+    deleteProxy(federateName);
+
+    DeleteProxy deleteProxyInteraction;
+    deleteProxyInteraction.set_federateName(federateName);
+    try {
+        sendInteraction(deleteProxyInteraction);
+        getRTI()->tick();
+    } catch (RTI::Exception &e) {
+         BOOST_LOG_SEV( get_logger(), error ) << "Could not send \"DeleteProxy\" interaction: \"" << e._name
+             << "\": " << e._reason;
+     }
 }
 
 void SynchronizedFederate::createRTI( void ) {
@@ -221,38 +256,6 @@ void SynchronizedFederate::joinFederation() {
     notifyFederationOfJoin();
 }
 
-void SynchronizedFederate::sendInteraction(
-  InteractionRoot &interactionRoot, const StringSet &federateNameSet, double time
-) {
-
-    if (!interactionRoot.isInstanceHlaClassDerivedFromHlaClass(EmbeddedMessaging::get_hla_class_name())) {
-
-        std::string interactionJson = interactionRoot.toJson(time);
-
-        for (const std::string &federateName : federateNameSet) {
-
-            const std::string embeddedMessagingHlaClassName =
-              EmbeddedMessaging::get_hla_class_name() + "." + federateName;
-            InteractionRoot::SP embeddedMessagingForNetworkFederateSP(
-              new InteractionRoot(embeddedMessagingHlaClassName)
-            );
-            if (interactionRoot.isInstanceHlaClassDerivedFromHlaClass(C2WInteractionRoot::get_hla_class_name())) {
-                embeddedMessagingForNetworkFederateSP->setParameter(
-                        "federateSequence",
-                        interactionRoot.getParameter("federateSequence")
-                );
-            }
-            embeddedMessagingForNetworkFederateSP->setParameter("messagingJson", interactionJson);
-
-            if (time >= 0) {
-                sendInteraction(*embeddedMessagingForNetworkFederateSP, time);
-            } else {
-                sendInteraction(*embeddedMessagingForNetworkFederateSP);
-            }
-        }
-    }
-}
-
 SynchronizedFederate::InteractionRoot::SP SynchronizedFederate::updateFederateSequence(
   InteractionRoot &interactionRoot
 ) {
@@ -277,7 +280,40 @@ SynchronizedFederate::InteractionRoot::SP SynchronizedFederate::updateFederateSe
     }
 
     return C2WInteractionRoot::update_federate_sequence(interactionRoot, federateTypeList);
+}
 
+void SynchronizedFederate::sendInteraction(
+  InteractionRoot &interactionRoot, const StringSet &federateNameSet, double time
+) {
+
+    if (!interactionRoot.isInstanceHlaClassDerivedFromHlaClass(EmbeddedMessaging::get_hla_class_name())) {
+
+        InteractionRoot::SP newInteractionRootSP = updateFederateSequence(interactionRoot);
+
+        std::string interactionJson = newInteractionRootSP->toJson(time);
+
+        for (const std::string &federateName : federateNameSet) {
+
+            const std::string embeddedMessagingHlaClassName =
+              EmbeddedMessaging::get_hla_class_name() + "." + federateName;
+            InteractionRoot::SP embeddedMessagingForNetworkFederateSP(
+              new InteractionRoot(embeddedMessagingHlaClassName)
+            );
+            if (interactionRoot.isInstanceHlaClassDerivedFromHlaClass(C2WInteractionRoot::get_hla_class_name())) {
+                embeddedMessagingForNetworkFederateSP->setParameter(
+                        "federateSequence",
+                        interactionRoot.getParameter("federateSequence")
+                );
+            }
+            embeddedMessagingForNetworkFederateSP->setParameter("messagingJson", interactionJson);
+
+            if (time >= 0) {
+                sendInteraction(*embeddedMessagingForNetworkFederateSP, time);
+            } else {
+                sendInteraction(*embeddedMessagingForNetworkFederateSP);
+            }
+        }
+    }
 }
 
 void SynchronizedFederate::registerObject(ObjectRoot &objectRoot) {
@@ -506,6 +542,47 @@ void SynchronizedFederate::achieveSynchronizationPoint( const std::string &label
             usleep( 500000 );
 #endif
         }
+    }
+}
+
+void SynchronizedFederate::receiveInteractionAux(InteractionRoot::SP interactionRootSP)
+  throw ( RTI::InteractionClassNotKnown, RTI::InteractionParameterNotKnown, RTI::FederateInternalError) {
+
+    if (interactionRootSP->isInstanceOfHlaClass(SimEnd::get_hla_class_name())) {
+        exitImmediately();
+    }
+
+    if (interactionRootSP->isInstanceOfHlaClass(AddProxy::get_hla_class_name())) {
+        AddProxy::SP addProxySP = boost::static_pointer_cast<AddProxy>(interactionRootSP);
+        addProxy(addProxySP->get_federateName(), addProxySP->get_proxyFederateName());
+        return;
+    }
+
+    if (interactionRootSP->isInstanceOfHlaClass(DeleteProxy::get_hla_class_name())) {
+        DeleteProxy::SP deleteProxySP = boost::static_pointer_cast<DeleteProxy>(interactionRootSP);
+        deleteProxy(deleteProxySP->get_federateName());
+        return;
+    }
+
+    if (!unmatchingFedFilterProvided(interactionRootSP)) {
+
+        std::string sourceFederateId = C2WInteractionRoot::get_source_federate_id(*interactionRootSP);
+        if (
+                !sourceFederateId.empty() &&
+                        hasProxy(sourceFederateId) &&
+                        *getProxyFor(sourceFederateId) == getFederateType()
+        ) {
+            interactionRootSP->setProxiedFederateName(sourceFederateId);
+        }
+
+
+        if (interactionRootSP->isInstanceHlaClassDerivedFromHlaClass(EmbeddedMessaging::get_hla_class_name())) {
+            receiveEmbeddedMessagingInteraction(boost::static_pointer_cast<EmbeddedMessaging>(interactionRootSP));
+            return;
+        }
+
+        addInteraction( interactionRootSP );
+//        interactionRootSP->createLog( assumedTimestamp, false );
     }
 }
 

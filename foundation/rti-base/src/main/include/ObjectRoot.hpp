@@ -42,6 +42,7 @@
 #include <fstream>
 #include <set>
 #include <map>
+#include <unordered_map>
 #include <list>
 #include <cctype>
 #include <cstdlib>
@@ -115,12 +116,12 @@ public:
     typedef Attribute Value;
 
     typedef boost::shared_ptr<Value> ValueSP;
-    typedef std::map<ClassAndPropertyName, ValueSP> ClassAndPropertyNameValueSPMap;
+    typedef std::unordered_map<ClassAndPropertyName, ValueSP> ClassAndPropertyNameValueSPMap;
 
     typedef void (*PubsubFunctionPtr)( RTI::RTIambassador * );
     typedef std::map< std::string, PubsubFunctionPtr > ClassNamePubSubMap;
     typedef std::map< std::string, std::string> PropertyTypeMap;typedef std::map< std::string, AttributeHandleSetSP > StringAttributesHandleSetSPMap;
-    typedef std::map< int, SP > ObjectHandleInstanceSPMap;
+    typedef std::unordered_map< int, SP > ObjectHandleInstanceSPMap;
     typedef std::set<int> IntegerSet;
     typedef boost::shared_ptr<IntegerSet> IntegerSetSP;
     typedef std::map<std::string, IntegerSetSP> StringIntegerSetSPMap;

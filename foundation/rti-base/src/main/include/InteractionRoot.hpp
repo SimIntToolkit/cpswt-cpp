@@ -42,6 +42,7 @@
 #include <fstream>
 #include <set>
 #include <map>
+#include <unordered_map>
 #include <list>
 #include <cctype>
 #include <cstdlib>
@@ -115,7 +116,7 @@ public:
     typedef TypeMedley Value;
 
     typedef boost::shared_ptr<Value> ValueSP;
-    typedef std::map<ClassAndPropertyName, ValueSP> ClassAndPropertyNameValueSPMap;
+    typedef std::unordered_map<ClassAndPropertyName, ValueSP> ClassAndPropertyNameValueSPMap;
 
     typedef void (*PubsubFunctionPtr)( RTI::RTIambassador * );
     typedef std::map< std::string, PubsubFunctionPtr > ClassNamePubSubMap;
