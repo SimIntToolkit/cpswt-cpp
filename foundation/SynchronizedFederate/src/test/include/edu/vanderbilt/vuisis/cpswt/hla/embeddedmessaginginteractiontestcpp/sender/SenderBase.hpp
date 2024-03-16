@@ -47,6 +47,7 @@
 #include "FederateConfigParser.h"
 
 
+#include "InteractionRoot_p/C2WInteractionRoot_p/EmbeddedMessaging_p/Sender.hpp"
 #include "InteractionRoot_p/C2WInteractionRoot_p/EmbeddedMessaging_p/TestOmnetFederate.hpp"
 #include "InteractionRoot_p/C2WInteractionRoot_p/TestInteraction.hpp"
 
@@ -55,6 +56,7 @@
 #define Throw17 noexcept
 #define throw(...) __VA_OPT__(MultiArg)##Throw17
 #endif
+
 
 namespace edu {
  namespace vanderbilt {

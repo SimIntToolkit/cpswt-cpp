@@ -39,7 +39,12 @@ namespace edu {
      namespace embeddedmessaginginteractiontestcpp {
       namespace sender {
 
-Sender::Sender(FederateConfig *federateConfig): Super(federateConfig) {
+Sender::Sender(FederateConfig *federateConfig, int executeMethodNumber):
+  Super(federateConfig), virtualFederateName1("VirtualFederate1"), virtualFederateName2("VirtualFederate2") {
+
+    executeMethodPtr = executeMethodNumber == 0 ? &Sender::executeForProxyFederateInteractions :
+      &Sender::executeForInteractionNetworkPropagation;
+
     TestInteraction_0.set_BoolValue1(false);
     TestInteraction_0.set_BoolValue2(true);
     TestInteraction_0.set_ByteValue(42);
@@ -63,13 +68,70 @@ Sender::Sender(FederateConfig *federateConfig): Super(federateConfig) {
     state = 0;
 }
 
+void Sender::handleInteractionClass_InteractionRoot_C2WInteractionRoot_TestInteraction(InteractionRoot::SP interactionRootSP) {
+    TestInteraction::SP testInteractionSP = boost::dynamic_pointer_cast<TestInteraction>( interactionRootSP );
+
+    _testInteractionSPList.push_back(testInteractionSP);
+}
+
+void Sender::checkReceivedSubscriptions() {
+
+    InteractionRoot::SP interactionRootSP;
+    while (interactionRootSP = getNextInteraction()) {
+        if (interactionRootSP->isInstanceHlaClassDerivedFromHlaClass("InteractionRoot.C2WInteractionRoot.TestInteraction")) {
+
+            handleInteractionClass_InteractionRoot_C2WInteractionRoot_TestInteraction(interactionRootSP);
+            continue;
+        }
+
+        std::cerr << "unhandled interaction " << interactionRootSP->getInstanceHlaClassName() << std::endl;
+    }
+
+}
+
 void Sender::initialize( void ) {
     m_currentTime = 0;
     SenderATRCallback advanceTimeRequest(*this);
     putAdvanceTimeRequest(m_currentTime, advanceTimeRequest);
 }
 
-void Sender::execute() {
+void Sender::executeForProxyFederateInteractions() {
+    if (state == 0) {
+        addProxiedFederate(virtualFederateName1);
+        addProxiedFederate(virtualFederateName2);
+
+        // FIRST SENT-INTERACTION SHOULD BE SENT ON FIRST ADVANCE-TIME-REQUEST (TO 1 SEC)
+        TestInteraction testInteraction;
+        testInteraction.setProxiedFederateName(virtualFederateName2);
+
+        sendInteraction(testInteraction, 0);
+
+        m_currentTime += getStepSize();
+        SenderATRCallback advanceTimeRequest(*this);
+        putAdvanceTimeRequest(m_currentTime, advanceTimeRequest);
+
+    } else if (state == 1) {
+        // SEND QUEUED TIME-BASED-INTERACTIONS
+        SenderATRCallback advanceTimeRequest(*this);
+        putAdvanceTimeRequest(m_currentTime, advanceTimeRequest);
+
+    } else if (state == 2) {
+
+        deleteProxiedFederate(virtualFederateName1);
+        deleteProxiedFederate(virtualFederateName2);
+
+        checkReceivedSubscriptions();
+
+        m_currentTime += getStepSize();
+        SenderATRCallback advanceTimeRequest(*this);
+        putAdvanceTimeRequest(m_currentTime, advanceTimeRequest);
+    }
+
+    ++state;
+
+}
+
+void Sender::executeForInteractionNetworkPropagation() {
 
     if (state == 0) {
 
@@ -77,7 +139,6 @@ void Sender::execute() {
 
         sendInteraction(TestInteraction_0, 1.5);
         sendInteraction(TestInteraction_0, 1.6);
-
     }
 
     // AFTER 3 ITERATIONS, DON'T PUT ANYTHING ON THE ATRQueue TO LEAVE IT EMPTY

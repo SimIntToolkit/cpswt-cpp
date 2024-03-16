@@ -91,7 +91,7 @@ void SynchronizedFederate::deleteProxy(const std::string &federateName) {
     federateNameToProxyFederateNameSPMap.erase(federateName);
 
     StringSetSP proxiedFederateNameSetSP = proxyFederateNameToFederateNameSetSPMap[currentProxyFederateName];
-    StringSet proxiedFederateNameSet = *proxiedFederateNameSetSP;
+    StringSet &proxiedFederateNameSet = *proxiedFederateNameSetSP;
     proxiedFederateNameSet.erase(federateName);
 
     if (proxiedFederateNameSet.empty()) {
@@ -271,7 +271,7 @@ SynchronizedFederate::InteractionRoot::SP SynchronizedFederate::updateFederateSe
         if (proxyFederateName == getFederateType()) {
             federateTypeList.push_back(proxiedFederateName);
         }
-        federateTypeList.push_back(proxiedFederateName);
+        federateTypeList.push_back(proxyFederateName);
         federateTypeList.push_back(proxiedFederateName);
 
     } else {

@@ -192,6 +192,10 @@ protected:
         return ssmCit == proxyFederateNameToFederateNameSetSPMap.end() ? StringSetSP() : ssmCit->second;
     }
 
+    const StringSetSP getProxiedFederateNameSet() {
+        return getProxiedFederateNameSet(getFederateType());
+    }
+
     void queueInteraction(InteractionRoot::SP &interactionRootSP, double time) {
         if (timeToSentInteractionSPListMap.find(time) == timeToSentInteractionSPListMap.end()) {
             timeToSentInteractionSPListMap.insert(std::make_pair(time, InteractionRootSPList()));

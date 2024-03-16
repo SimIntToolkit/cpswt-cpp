@@ -62,17 +62,18 @@ public:
     typedef std::list<TestInteraction::SP> TestInteractionSPList;
 
 private:
+    void (Receiver::*executeMethodPtr)();
+
     double m_currentTime;
 
     int state;
 
 public:
-    Receiver(FederateConfig *federateConfig);
+    Receiver(FederateConfig *federateConfig, int executeMethodNumber);
 
     virtual ~Receiver() throw (RTI::FederateInternalError) {}
 
 private:
-
     TestInteractionSPList _testInteractionSPList;
 
     void handleInteractionClass_InteractionRoot_C2WInteractionRoot_TestInteraction(InteractionRoot::SP interactionRootSP);
@@ -80,6 +81,16 @@ private:
     void checkReceivedSubscriptions();
 
 public:
+    StringSP getProxyFederateName(const std::string &federateName) {
+        StringSP proxyFederateNameSP(getProxyFor(federateName));
+        return proxyFederateNameSP ? StringSP( new std::string(*proxyFederateNameSP)) : StringSP();
+    }
+
+    StringSetSP getProxiedFederateNameSetCopy(const std::string &federateName) {
+        StringSetSP proxiedFederateNameSetSP(getProxiedFederateNameSet(federateName));
+        return proxiedFederateNameSetSP ? StringSetSP( new StringSet(*proxiedFederateNameSetSP) ) : StringSetSP();
+    }
+
     typedef ReceiverBase Super;
 
     class ReceiverATRCallback : public ATRCallback {
@@ -102,7 +113,13 @@ public:
     }
 
     void initialize();
-    void execute();
+
+    void execute() {
+        (this->*executeMethodPtr)();
+    }
+
+    void executeForProxyFederateInteractions();
+    void executeForInteractionNetworkPropagation();
 };
       } // NAMESPACE "receiver"
      } // NAMESPACE "embeddedmessaginginteractiontestcpp"

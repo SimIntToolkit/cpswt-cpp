@@ -61,6 +61,19 @@ void SenderBase::init() {
 
     // SOFT INTERACTION PUBLICATIONS
     ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::TestInteraction::add_federate_name_soft_publish("TestOmnetFederate");
+
+    // INTERACTION SUBSCRIPTIONS
+
+    ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::EmbeddedMessaging_p::Sender::subscribe_interaction(getRTI());
+
+    // SOFT INTERACTION SUBSCRIPTIONS
+
+    ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::TestInteraction::soft_subscribe_interaction(getRTI());
+    _subscribedInteractionFilter.setFedFilters(
+        ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::TestInteraction::get_class_handle(),
+        SubscribedInteractionFilter::ORIGIN_FILTER_DISABLED,
+        SubscribedInteractionFilter::SOURCE_FILTER_DISABLED
+    );
 }
 
 SenderBase::SenderBase(FederateConfig *federateConfig): Super(federateConfig) {

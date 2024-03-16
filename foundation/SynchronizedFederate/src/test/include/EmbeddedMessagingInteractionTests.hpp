@@ -74,10 +74,12 @@ public:
 
 private:
     CPPUNIT_TEST_SUITE( EmbeddedMessagingInteractionTests );
+    CPPUNIT_TEST(testProxyFederateInteractions);
     CPPUNIT_TEST(testInteractionNetworkPropagation);
     CPPUNIT_TEST_SUITE_END();
 
 public:
+    void testProxyFederateInteractions();
     void testInteractionNetworkPropagation();
 };
 

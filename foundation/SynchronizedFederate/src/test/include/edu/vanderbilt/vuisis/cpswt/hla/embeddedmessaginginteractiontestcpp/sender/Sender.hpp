@@ -57,9 +57,16 @@ using C2WInteractionRoot = ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoo
 
 public:
     typedef ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::TestInteraction TestInteraction;
+    typedef TestInteraction::SP TestInteractionSP;
+    typedef std::list<TestInteractionSP> TestInteractionSPList;
 //    private final static Logger log = LogManager.getLogger();
 
+    const std::string virtualFederateName1;
+    const std::string virtualFederateName2;
+
 private:
+    void (Sender::*executeMethodPtr)();
+
     double m_currentTime;
 
     TestInteraction TestInteraction_0;
@@ -67,13 +74,27 @@ private:
     int state;
 
 public:
-    Sender(FederateConfig *federateConfig);
+    Sender(FederateConfig *federateConfig, int executeMethodNumber);
 
     virtual ~Sender() throw (RTI::FederateInternalError) {}
 
 private:
+    TestInteractionSPList _testInteractionSPList;
+
+    void handleInteractionClass_InteractionRoot_C2WInteractionRoot_TestInteraction(InteractionRoot::SP interactionRootSP);
+
+    void checkReceivedSubscriptions();
 
 public:
+    StringSP getProxyFederateName(const std::string &federateName) {
+        StringSP proxyFederateNameSP(getProxyFor(federateName));
+        return proxyFederateNameSP ? StringSP( new std::string(*proxyFederateNameSP)) : StringSP();
+    }
+
+    StringSetSP getProxiedFederateNameSetCopy() {
+        return getProxiedFederateNameSet(getFederateType());
+    }
+
     typedef SenderBase Super;
 
     class SenderATRCallback : public ATRCallback {
@@ -95,8 +116,18 @@ public:
         return TestInteraction_0;
     }
 
+    TestInteractionSPList &getTestInteractionSPList() {
+        return _testInteractionSPList;
+    }
+
     void initialize();
-    void execute();
+
+    void execute() {
+        (this->*executeMethodPtr)();
+    }
+
+    void executeForProxyFederateInteractions();
+    void executeForInteractionNetworkPropagation();
 };
       } // NAMESPACE "sender"
      } // NAMESPACE "embeddedmessaginginteractiontestcpp"

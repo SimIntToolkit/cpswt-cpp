@@ -39,11 +39,13 @@ namespace edu {
      namespace embeddedmessaginginteractiontestcpp {
       namespace receiver {
 
-Receiver::Receiver(FederateConfig *federateConfig): Super(federateConfig), state(0) { }
+Receiver::Receiver(FederateConfig *federateConfig, int executeMethodNumber): Super(federateConfig), state(0) {
+    executeMethodPtr = executeMethodNumber == 0 ? &Receiver::executeForProxyFederateInteractions :
+      &Receiver::executeForInteractionNetworkPropagation;
+}
 
 void Receiver::handleInteractionClass_InteractionRoot_C2WInteractionRoot_TestInteraction(InteractionRoot::SP interactionRootSP) {
-    ::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::TestInteraction::SP testInteraction0SP =
-        boost::dynamic_pointer_cast<::edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::TestInteraction>( interactionRootSP );
+    TestInteraction::SP testInteraction0SP = boost::dynamic_pointer_cast<TestInteraction>( interactionRootSP );
 
     _testInteractionSPList.push_back(testInteraction0SP);
 }
@@ -69,7 +71,15 @@ void Receiver::initialize( void ) {
     putAdvanceTimeRequest(m_currentTime, advanceTimeRequest);
 }
 
-void Receiver::execute() {
+void Receiver::executeForProxyFederateInteractions() {
+    checkReceivedSubscriptions();
+
+    m_currentTime += getStepSize();
+    ReceiverATRCallback advanceTimeRequest(*this);
+    putAdvanceTimeRequest(m_currentTime, advanceTimeRequest);
+}
+
+void Receiver::executeForInteractionNetworkPropagation() {
 
     checkReceivedSubscriptions();
 

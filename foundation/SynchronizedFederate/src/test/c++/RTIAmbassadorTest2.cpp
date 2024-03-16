@@ -15,6 +15,8 @@ const RTIAmbassadorTest2::ClassNameHandleMap &RTIAmbassadorTest2::get_interactio
     static ClassNameHandleMap interactionClassNameHandleMap;
 
     interactionClassNameHandleMap["InteractionRoot"] = get_unique_no();
+    interactionClassNameHandleMap["InteractionRoot.AddProxy"] = get_unique_no();
+    interactionClassNameHandleMap["InteractionRoot.DeleteProxy"] = get_unique_no();
     interactionClassNameHandleMap["InteractionRoot.C2WInteractionRoot"] = get_unique_no();
     interactionClassNameHandleMap["InteractionRoot.C2WInteractionRoot.ActionBase"] = get_unique_no();
     interactionClassNameHandleMap["InteractionRoot.C2WInteractionRoot.EmbeddedMessaging"] = get_unique_no();
@@ -41,6 +43,18 @@ const RTIAmbassadorTest2::ClassNameHandleMap &RTIAmbassadorTest2::get_interactio
 const std::map<ClassAndPropertyName, int>
   &RTIAmbassadorTest2::get_interaction_class_and_property_name_handle_map_aux() {
     static std::map<ClassAndPropertyName, int> interactionClassAndPropertyNameHandleMap;
+
+    interactionClassAndPropertyNameHandleMap[
+      ClassAndPropertyName("InteractionRoot.AddProxy", "federateName")
+    ] = get_unique_no();
+
+    interactionClassAndPropertyNameHandleMap[
+      ClassAndPropertyName("InteractionRoot.AddProxy", "proxyFederateName")
+    ] = get_unique_no();
+
+    interactionClassAndPropertyNameHandleMap[
+      ClassAndPropertyName("InteractionRoot.DeleteProxy", "federateName")
+    ] = get_unique_no();
 
     interactionClassAndPropertyNameHandleMap[
       ClassAndPropertyName("InteractionRoot.C2WInteractionRoot", "actualLogicalGenerationTime")
