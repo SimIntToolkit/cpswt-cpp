@@ -58,12 +58,11 @@ public:
     }
 
     static RTI::RTIambassador *get_rti_ambassador_1_ptr() {
-        static RTI::RTIambassador rtiAmbassador(&get_rti_ambassador_test_1());
-        return &rtiAmbassador;
+        return &get_rti_ambassador_test_1().getRTIAmbassador();
     }
 
 private:
-    static int get_new_int_value() {
+    static int get_unique_no() {
         static int value = 0;
         return value++;
     }

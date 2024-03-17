@@ -126,56 +126,56 @@ const RTIAmbassadorTest1::ClassAndPropertyNameHandleMap
 
     interactionClassAndPropertyNameHandleMap[
             ClassAndPropertyName("InteractionRoot.C2WInteractionRoot", "actualLogicalGenerationTime")
-    ] = get_new_int_value();
+    ] = get_unique_no();
     interactionClassAndPropertyNameHandleMap[
             ClassAndPropertyName("InteractionRoot.C2WInteractionRoot", "federateFilter")
-    ] = get_new_int_value();
+    ] = get_unique_no();
     interactionClassAndPropertyNameHandleMap[
             ClassAndPropertyName("InteractionRoot.C2WInteractionRoot", "federateSequence")
-    ] = get_new_int_value();
+    ] = get_unique_no();
     interactionClassAndPropertyNameHandleMap[
             ClassAndPropertyName("InteractionRoot.C2WInteractionRoot.SimLog", "Comment")
-    ] = get_new_int_value();
+    ] = get_unique_no();
     interactionClassAndPropertyNameHandleMap[
             ClassAndPropertyName("InteractionRoot.C2WInteractionRoot.SimLog", "FedName")
-    ] = get_new_int_value();
+    ] = get_unique_no();
     interactionClassAndPropertyNameHandleMap[
             ClassAndPropertyName("InteractionRoot.C2WInteractionRoot.SimLog", "Time")
-    ] = get_new_int_value();
+    ] = get_unique_no();
     interactionClassAndPropertyNameHandleMap[
             ClassAndPropertyName("InteractionRoot.C2WInteractionRoot.FederateJoinInteraction", "FederateId")
-    ] = get_new_int_value();
+    ] = get_unique_no();
     interactionClassAndPropertyNameHandleMap[
             ClassAndPropertyName("InteractionRoot.C2WInteractionRoot.FederateJoinInteraction", "FederateType")
-    ] = get_new_int_value();
+    ] = get_unique_no();
     interactionClassAndPropertyNameHandleMap[
             ClassAndPropertyName("InteractionRoot.C2WInteractionRoot.FederateJoinInteraction", "IsLateJoiner")
-    ] = get_new_int_value();
+    ] = get_unique_no();
     interactionClassAndPropertyNameHandleMap[
             ClassAndPropertyName("InteractionRoot.C2WInteractionRoot.FederateResignInteraction", "FederateId")
-    ] = get_new_int_value();
+    ] = get_unique_no();
     interactionClassAndPropertyNameHandleMap[
             ClassAndPropertyName("InteractionRoot.C2WInteractionRoot.FederateResignInteraction", "FederateType")
-    ] = get_new_int_value();
+    ] = get_unique_no();
     interactionClassAndPropertyNameHandleMap[
             ClassAndPropertyName("InteractionRoot.C2WInteractionRoot.FederateResignInteraction", "IsLateJoiner")
-    ] = get_new_int_value();
+    ] = get_unique_no();
 
     interactionClassAndPropertyNameHandleMap[
             ClassAndPropertyName("InteractionRoot.TestBase", "field1")
-    ] = get_new_int_value();
+    ] = get_unique_no();
     interactionClassAndPropertyNameHandleMap[
             ClassAndPropertyName("InteractionRoot.TestBase", "field2")
-    ] = get_new_int_value();
+    ] = get_unique_no();
     interactionClassAndPropertyNameHandleMap[
             ClassAndPropertyName("InteractionRoot.TestBase.TestDerived", "field3")
-    ] = get_new_int_value();
+    ] = get_unique_no();
     interactionClassAndPropertyNameHandleMap[
             ClassAndPropertyName("InteractionRoot.TestBase.TestDerived", "field4")
-    ] = get_new_int_value();
+    ] = get_unique_no();
     interactionClassAndPropertyNameHandleMap[
             ClassAndPropertyName("InteractionRoot.TestBase.TestDerived", "field5")
-    ] = get_new_int_value();
+    ] = get_unique_no();
 
     return interactionClassAndPropertyNameHandleMap;
 }
@@ -207,13 +207,13 @@ const RTIAmbassadorTest1::ClassAndPropertyNameHandleMap
 
     objectClassAndPropertyNameHandleMap[
             ClassAndPropertyName("ObjectRoot.FederateObject", "FederateHandle")
-    ] = get_new_int_value();
+    ] = get_unique_no();
     objectClassAndPropertyNameHandleMap[
             ClassAndPropertyName("ObjectRoot.FederateObject", "FederateHost")
-    ] = get_new_int_value();
+    ] = get_unique_no();
     objectClassAndPropertyNameHandleMap[
             ClassAndPropertyName("ObjectRoot.FederateObject", "FederateType")
-    ] = get_new_int_value();
+    ] = get_unique_no();
 
     return objectClassAndPropertyNameHandleMap;
 }
