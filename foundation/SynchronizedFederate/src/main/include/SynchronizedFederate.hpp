@@ -334,6 +334,7 @@ private:
 
 public:
     SynchronizedFederate( void ):
+      _moreATRs(true),
       _rti(nullptr),
 
       exitCondition(false),
@@ -362,7 +363,8 @@ public:
          _timeAdvanceMode = SF_TIME_ADVANCE_REQUEST;
     }
 
-    SynchronizedFederate( FederateConfig *fedconfig) : _rti(nullptr), exitCondition(false), _status(0) {
+    SynchronizedFederate( FederateConfig *fedconfig) :
+      _moreATRs(true), _rti(nullptr), exitCondition(false), _status(0) {
         this->_federationId = fedconfig->federationId;
         this->_federateType = fedconfig->federateType;
         this->_federateId = fedconfig->federateType + std::to_string(rand());
@@ -677,12 +679,10 @@ public:
 
 private:
     typedef std::multimap< double, ATRCallback::SP > ATRQueue;
-    static ATRQueue &getATRQueue( void ) {
-        static ATRQueue atrQueue;
-        return atrQueue;
-    }
+    ATRQueue _atrQueue;
+    bool _moreATRs;
 
-    static void noMoreATRs( void ) { getMoreATRs() = false; }
+    void noMoreATRs( void ) { _moreATRs = false; }
 
     class AdvanceTimeRequest {
     private:
@@ -708,20 +708,19 @@ private:
     };
 
 public:
-    static bool &getMoreATRs( void ) {
-        static bool moreATRs = true;
-        return moreATRs;
+    bool getMoreATRs( void ) {
+        return _moreATRs;
     }
 
-    static void putAdvanceTimeRequest( double time, ATRCallback &atrCallback ) {
-        getATRQueue().insert(  std::make_pair( time, atrCallback.clone() )  );
+    void putAdvanceTimeRequest( double time, ATRCallback &atrCallback ) {
+        _atrQueue.insert(  std::make_pair( time, atrCallback.clone() )  );
     }
 
 private:
-    static AdvanceTimeRequest takeNextAdvanceTimeRequest( void ) {
-        if ( getATRQueue().empty() ) return AdvanceTimeRequest();
-        AdvanceTimeRequest advanceTimeRequest( *getATRQueue().begin() );
-        getATRQueue().erase( getATRQueue().begin() );
+    AdvanceTimeRequest takeNextAdvanceTimeRequest( void ) {
+        if ( _atrQueue.empty() ) return AdvanceTimeRequest();
+        AdvanceTimeRequest advanceTimeRequest( *_atrQueue.begin() );
+        _atrQueue.erase( _atrQueue.begin() );
         return advanceTimeRequest;
     }
 
