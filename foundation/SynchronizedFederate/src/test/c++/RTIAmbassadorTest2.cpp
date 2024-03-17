@@ -293,7 +293,10 @@ RTI::FederateHandle RTIAmbassadorTest2::joinFederationExecution (
   RTI::RestoreInProgress,
   RTI::RTIinternalError
 ) {
-    get_federate_ambassador_ptr_set().insert(federateAmbassadorReference);
+    if (federateAmbassadorReference != &getNullFederateAmbassador()) {
+        std::cerr << "WARNING:  joinFederateExecution:  federateAmbassadorReference does not match "
+          << "NullFederateAmabassador" << std::endl;
+    }
     return 0;
 }
 
@@ -319,7 +322,7 @@ RTI::ObjectHandle RTIAmbassadorTest2::registerObjectInstance(RTI::ObjectClassHan
   RTI::RTIinternalError
 ) {
     RegisteredObjectDataSP registeredObjectDataSP(new RegisteredObjectData(theClass, get_unique_no()));
-    get_registered_object_data_sp_list().push_back(registeredObjectDataSP);
+    _registeredObjectDataSPList.push_back(registeredObjectDataSP);
     return registeredObjectDataSP->getObjectHandle();
 }
 
@@ -338,7 +341,7 @@ void RTIAmbassadorTest2::sendInteraction(
   RTI::RTIinternalError
 ) {
     SentInteractionDataSP sentInteractionDataSP( new SentInteractionData(theInteraction, theParameters, RTIfedTime()));
-    get_sent_interaction_data_sp_list().push_back(sentInteractionDataSP);
+    _sentInteractionDataSPList.push_back(sentInteractionDataSP);
 }
 
 RTI::EventRetractionHandle RTIAmbassadorTest2::sendInteraction (
@@ -358,7 +361,7 @@ RTI::EventRetractionHandle RTIAmbassadorTest2::sendInteraction (
   RTI::RTIinternalError
 ) {
     SentInteractionDataSP sentInteractionDataSP(new SentInteractionData(theInteraction, theParameters, theTime));
-    get_sent_interaction_data_sp_list().push_back(sentInteractionDataSP);
+    _sentInteractionDataSPList.push_back(sentInteractionDataSP);
 
     return RTI::EventRetractionHandle();
 }
@@ -370,15 +373,11 @@ RTI::Boolean RTIAmbassadorTest2::tick() throw (
 ) {
     if (_timeConstrainedRequestOutstanding) {
         _timeConstrainedRequestOutstanding = false;
-        for (RTI::FederateAmbassadorPtr federateAmbassadorPtr : get_federate_ambassador_ptr_set()) {
-            federateAmbassadorPtr->timeConstrainedEnabled(defaultRTIfedTime);
-        }
+        getNullFederateAmbassador().timeConstrainedEnabled(defaultRTIfedTime);
     }
     if (_timeRegulationRequestOutstanding) {
         _timeRegulationRequestOutstanding = false;
-        for (RTI::FederateAmbassadorPtr federateAmbassadorPtr : get_federate_ambassador_ptr_set()) {
-            federateAmbassadorPtr->timeRegulationEnabled(defaultRTIfedTime);
-        }
+        getNullFederateAmbassador().timeRegulationEnabled(defaultRTIfedTime);
     }
     return RTI::RTI_TRUE;
 }
@@ -406,7 +405,7 @@ void RTIAmbassadorTest2::timeAdvanceRequest (
   RTI::RTIinternalError
 ) {
     _currentTime = static_cast<RTIfedTime>(theTime).getTime();
-    synchronizedFederatePtr->timeAdvanceGrant(RTIfedTime(_currentTime));
+    getNullFederateAmbassador().timeAdvanceGrant(RTIfedTime(_currentTime));
 }
 
 RTI::EventRetractionHandle RTIAmbassadorTest2::updateAttributeValues (
@@ -426,7 +425,7 @@ RTI::EventRetractionHandle RTIAmbassadorTest2::updateAttributeValues (
   RTI::RTIinternalError
 ) {
     UpdatedObjectDataSP updatedObjectDataSP(new UpdatedObjectData(theObject, theAttributes, theTime));
-    get_updated_object_data_sp_list().push_back(updatedObjectDataSP);
+    _updatedObjectDataSPList.push_back(updatedObjectDataSP);
 
     return RTI::EventRetractionHandle(); // DUMMY EventRetractionHandle
 }

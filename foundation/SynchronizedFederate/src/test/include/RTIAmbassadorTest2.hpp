@@ -22,19 +22,10 @@
 class RTIAmbassadorTest2: public RTIProxy::RTIAmbassadorProxy {
 
 public:
+    typedef RTIProxy::RTIAmbassadorProxy Super;
     typedef RTI::ParameterHandleValuePairSet ParameterHandleValuePairSet;
     typedef RTI::AttributeHandleValuePairSet AttributeHandleValuePairSet;
     typedef std::map<std::string, RTI::InteractionClassHandle> ClassNameHandleMap;
-
-    static RTIAmbassadorTest2 &get_instance() {
-        static RTIAmbassadorTest2 rtiAmbassadorTest2;
-        return rtiAmbassadorTest2;
-    }
-
-    static RTI::RTIambassador *get_instance_ptr() {
-        static RTI::RTIambassador rtiAmbassador(&get_instance());
-        return &rtiAmbassador;
-    }
 
 private:
     static int get_unique_no() {
@@ -42,14 +33,6 @@ private:
         return unique_no++;
     };
 
-    SynchronizedFederate *synchronizedFederatePtr = nullptr;
-
-public:
-    void setSynchronizedFederate(SynchronizedFederate &localSynchronizedFederate) {
-        synchronizedFederatePtr = &localSynchronizedFederate;
-    }
-
-private:
     static const ClassNameHandleMap &get_interaction_class_name_handle_map_aux();
 
     static const std::map<ClassAndPropertyName, int> &get_interaction_class_and_property_name_handle_map_aux();
@@ -58,31 +41,24 @@ private:
 
     static const std::map<ClassAndPropertyName, int> &get_object_class_and_property_name_handle_map_aux();
 
-    static std::set<RTI::FederateAmbassadorPtr> &get_federate_ambassador_ptr_set() {
-        static std::set<RTI::FederateAmbassadorPtr> federateAmbassadorPtrSet;
-        return federateAmbassadorPtrSet;
-    }
-
     bool _timeConstrainedRequestOutstanding;
     bool _timeRegulationRequestOutstanding;
 
-
 public:
-    RTIAmbassadorTest2() :
+    RTIAmbassadorTest2(NullFederateAmbassador &nullFederateAmbassador) :
+      Super(nullFederateAmbassador),
       _timeConstrainedRequestOutstanding(false),
       _timeRegulationRequestOutstanding(false),
       _currentTime(0) {}
 
-    static void remove_federate_ptr(RTI::FederateAmbassadorPtr federateAmbassadorReference) {
-        get_federate_ambassador_ptr_set().erase(federateAmbassadorReference);
-    }
-
+    // STATIC BECAUSE IT IS USED GLOBALLY AND NEVER CHANGES
     static const ClassNameHandleMap &get_interaction_class_name_handle_map() {
         static const ClassNameHandleMap &interactionClassNameHandleMap =
           get_interaction_class_name_handle_map_aux();
         return interactionClassNameHandleMap;
     }
 
+    // STATIC BECAUSE IT IS USED GLOBALLY AND NEVER CHANGES
     static const std::map<ClassAndPropertyName, int> &get_interaction_class_and_property_name_handle_map() {
         static const std::map<ClassAndPropertyName, int> &interactionClassAndPropertyNameHandleMap =
           get_interaction_class_and_property_name_handle_map_aux();
@@ -126,20 +102,24 @@ public:
     };
 
     typedef boost::shared_ptr<SentInteractionData> SentInteractionDataSP;
+    typedef std::list<SentInteractionDataSP> SentInteractionDataSPList;
+
+private:
+    SentInteractionDataSPList _sentInteractionDataSPList;
 
 public:
-    typedef std::list<SentInteractionDataSP> SentInteractionDataSPList;
-    static SentInteractionDataSPList &get_sent_interaction_data_sp_list() {
-        static SentInteractionDataSPList _sentInteractionDataSPList;
+    SentInteractionDataSPList &getSentInteractionDataSPList() {
         return _sentInteractionDataSPList;
     }
 
+    // STATIC BECAUSE IT IS USED GLOBALLY AND NEVER CHANGES
     static const ClassNameHandleMap &get_object_class_name_handle_map() {
         static const ClassNameHandleMap &objectClassNameHandleMap =
           get_object_class_name_handle_map_aux();
         return objectClassNameHandleMap;
     }
 
+    // STATIC BECAUSE IT IS USED GLOBALLY AND NEVER CHANGES
     static const std::map<ClassAndPropertyName, int> &get_object_class_and_property_name_handle_map() {
         static const std::map<ClassAndPropertyName, int> &objectClassAndPropertyNameHandleMap =
           get_object_class_and_property_name_handle_map_aux();
@@ -166,12 +146,13 @@ public:
     };
 
     typedef boost::shared_ptr<RegisteredObjectData> RegisteredObjectDataSP;
-
-public:
     typedef std::list<RegisteredObjectDataSP> RegisteredObjectDataSPList;
 
-    static RegisteredObjectDataSPList &get_registered_object_data_sp_list() {
-        static RegisteredObjectDataSPList _registeredObjectDataSPList;
+private:
+    RegisteredObjectDataSPList _registeredObjectDataSPList;
+
+public:
+    RegisteredObjectDataSPList &getRegisteredObjectDataSPList() {
         return _registeredObjectDataSPList;
     }
 
@@ -206,19 +187,21 @@ public:
     };
 
     typedef boost::shared_ptr<UpdatedObjectData> UpdatedObjectDataSP;
-
-public:
     typedef std::list<UpdatedObjectDataSP> UpdatedObjectDataSPList;
 
-    static UpdatedObjectDataSPList &get_updated_object_data_sp_list() {
-        static UpdatedObjectDataSPList _updatedObjectDataList;
-        return _updatedObjectDataList;
+private:
+    UpdatedObjectDataSPList _updatedObjectDataSPList;
+
+public:
+
+    UpdatedObjectDataSPList &getUpdatedObjectDataSPList() {
+        return _updatedObjectDataSPList;
     }
 
-    static void clear() {
-        get_sent_interaction_data_sp_list().clear();
-        get_registered_object_data_sp_list().clear();
-        get_updated_object_data_sp_list().clear();
+    void clear() {
+        getSentInteractionDataSPList().clear();
+        getRegisteredObjectDataSPList().clear();
+        getUpdatedObjectDataSPList().clear();
     }
 
 private:

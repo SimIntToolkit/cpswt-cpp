@@ -39,8 +39,12 @@ namespace edu {
      namespace embeddedmessaginginteractiontestcpp {
       namespace sender {
 
-Sender::Sender(FederateConfig *federateConfig, int executeMethodNumber):
-  Super(federateConfig), virtualFederateName1("VirtualFederate1"), virtualFederateName2("VirtualFederate2") {
+Sender::Sender(
+  FederateConfig *federateConfig, int executeMethodNumber
+):
+  Super(federateConfig),
+  virtualFederateName1("VirtualFederate1"),
+  virtualFederateName2("VirtualFederate2") {
 
     executeMethodPtr = executeMethodNumber == 0 ? &Sender::executeForProxyFederateInteractions :
       &Sender::executeForInteractionNetworkPropagation;

@@ -115,21 +115,19 @@ void EmbeddedMessagingInteractionTests::testProxyFederateInteractions() {
     std::cout << "STARTING \"EmbeddedMessagingInteractionTests::testProxyFederateInteractions\"" << std::endl;
     std::cout << std::endl;
 
-    RTIAmbassadorTest2 &rtiAmbassadorTest2 = RTIAmbassadorTest2::get_instance();
-
     //
     // CREATE Sender -- ALSO INITIALIZES TABLES IN InteractionRoot AND ObjectRoot
     //
     FederateConfigSP senderFederateConfigSP = getNewFederateConfigSP("Sender");
     Sender sender(senderFederateConfigSP.get(), 0);
 
-    rtiAmbassadorTest2.setSynchronizedFederate(sender);
+    RTIAmbassadorTest2 &senderRTIiAmbassadorTest2 = sender.getRTIAmbassadorTest2();
 
     //
     // LIST OF INTERACTION-DATA FOR INTERACTIONS SENT BY SENDER
     //
     RTIAmbassadorTest2::SentInteractionDataSPList &sentInteractionDataSPList =
-            RTIAmbassadorTest2::get_sent_interaction_data_sp_list();
+            senderRTIiAmbassadorTest2.getSentInteractionDataSPList();
 
     // ERASE FederateJoinInteraction INTERACTION
     sentInteractionDataSPList.clear();
@@ -233,7 +231,7 @@ void EmbeddedMessagingInteractionTests::testProxyFederateInteractions() {
         CPPUNIT_ASSERT_EQUAL(*stlItr1++, *stlItr2++);
     }
 
-    rtiAmbassadorTest2.clear();
+    senderRTIiAmbassadorTest2.clear();
 
     // SENDER RECEIVES
     // edu::vanderbilt::vuisis::cpswt::hla::InteractionRoot_p::C2WInteractionRoot_p::EmbeddedMessaging_p::TestOmnetFederate
@@ -333,7 +331,7 @@ void EmbeddedMessagingInteractionTests::testProxyFederateInteractions() {
     FederateConfigSP receiverFederateConfigSP = getNewFederateConfigSP("Receiver");
     Receiver receiver(receiverFederateConfigSP.get(), 0);
 
-    rtiAmbassadorTest2.setSynchronizedFederate(receiver);
+    RTIAmbassadorTest2 &receiverRTIiAmbassadorTest2 = receiver.getRTIAmbassadorTest2();
 
     // RECEIVER FIRST ADDPROXY INTERACTION
     receiver.receiveInteraction(
@@ -438,7 +436,8 @@ void EmbeddedMessagingInteractionTests::testProxyFederateInteractions() {
     StringSetSP actualProxiedFederateNameSetSP4 = receiver.getProxiedFederateNameSetCopy(sender.getFederateType());
     CPPUNIT_ASSERT(!actualProxiedFederateNameSetSP4);
 
-    rtiAmbassadorTest2.clear();
+    std::cout << "ENDING \"EmbeddedMessagingInteractionTests::testProxyFederateInteractions\"" << std::endl;
+    std::cout << std::endl;
 }
 
 void EmbeddedMessagingInteractionTests::testInteractionNetworkPropagation() {
@@ -446,15 +445,13 @@ void EmbeddedMessagingInteractionTests::testInteractionNetworkPropagation() {
     std::cout << "STARTING \"EmbeddedMessagingInteractionTests::testInteractionNetworkPropagation\"" << std::endl;
     std::cout << std::endl;
 
-    RTIAmbassadorTest2 &rtiAmbassadorTest2 = RTIAmbassadorTest2::get_instance();
-
     //
     // CREATE Sender -- ALSO INITIALIZES TABLES IN InteractionRoot AND ObjectRoot
     //
     FederateConfigSP senderFederateConfigSP = getNewFederateConfigSP("Sender");
     Sender sender(senderFederateConfigSP.get(), 1);
 
-    rtiAmbassadorTest2.setSynchronizedFederate(sender);
+    RTIAmbassadorTest2 &senderRTIAmbassadorTest2 = sender.getRTIAmbassadorTest2();
 
     //
     // CLASS HANDLES FOR FEDERATE-SPECIFIC EmbeddedMessaging INTERACTIONS
@@ -467,7 +464,7 @@ void EmbeddedMessagingInteractionTests::testInteractionNetworkPropagation() {
     // LIST OF INTERACTION-DATA FOR INTERACTIONS SENT BY SENDER
     //
     RTIAmbassadorTest2::SentInteractionDataSPList &sentInteractionDataSPList =
-            RTIAmbassadorTest2::get_sent_interaction_data_sp_list();
+            senderRTIAmbassadorTest2.getSentInteractionDataSPList();
 
     // ALSO WHEN SENDER WAS CREATED, IT SENT OUT 2 INTERACTIONS
     // * FederateJoinInteraction
@@ -539,7 +536,7 @@ void EmbeddedMessagingInteractionTests::testInteractionNetworkPropagation() {
     checkTestInteractionJson(senderTestInteraction, sentInteractionJson1, 0.5);
 
     // CLEAR THE AMBASSADOR PROXY FOR THE Receiver FEDERATE
-    RTIAmbassadorTest2::clear();
+    senderRTIAmbassadorTest2.clear();
 
     sender.iteration();
 
@@ -597,17 +594,13 @@ void EmbeddedMessagingInteractionTests::testInteractionNetworkPropagation() {
     checkTestInteractionJson(senderTestInteraction, sentInteractionJson2[0], 1.5);
     checkTestInteractionJson(senderTestInteraction, sentInteractionJson2[1], 1.6);
 
-    sender.iteration();  // EMPTY THE ATRQUEUE
-
-    RTIAmbassadorTest2::clear();
-    rtiAmbassadorTest2.resetCurrentTime();
-
     //
     // CREATE THE RECEIVER FEDERATE
     //
     FederateConfigSP receiverFederateConfigSP = getNewFederateConfigSP("Receiver");
     Receiver receiver(receiverFederateConfigSP.get(), 1);
-    rtiAmbassadorTest2.setSynchronizedFederate(receiver);
+
+    RTIAmbassadorTest2 &receiverRTIAmbassadorTest2 = receiver.getRTIAmbassadorTest2();
 
     // SEND THE TWO TEST-INTERACTIONS TO THE receiver
     receiver.receiveInteraction(
@@ -664,10 +657,6 @@ void EmbeddedMessagingInteractionTests::testInteractionNetworkPropagation() {
     CPPUNIT_ASSERT_EQUAL(2, static_cast<int>(receiverTestInteractionSPList.size()));
     CPPUNIT_ASSERT_DOUBLES_EQUAL(1.5, receiverTestInteractionSPList.front()->getTime(), 0.001);
     CPPUNIT_ASSERT_DOUBLES_EQUAL(1.6, receiverTestInteractionSPList.back()->getTime(), 0.001);
-
-    receiver.iteration();   // EMPTY THE ATRQUEUE
-    RTIAmbassadorTest2::clear();
-    rtiAmbassadorTest2.resetCurrentTime();
 
     std::cout << "ENDING \"EmbeddedMessagingInteractionTests::testInteractionNetworkPropagation\"" << std::endl;
     std::cout << std::endl;

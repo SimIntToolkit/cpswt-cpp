@@ -7,18 +7,25 @@ typedef RTI::FederateAmbassador NullFederateAmbassador;
 #include "SynchronizedFederate.hpp"
 
 class SynchronizedFederateMockRTI: public SynchronizedFederate {
+
+private:
+    RTIAmbassadorTest2 rtiAmbassadorTest2;
+
 public:
-
-    virtual ~SynchronizedFederateMockRTI() {
-        RTIAmbassadorTest2::remove_federate_ptr(this);
-    }
-
     typedef SynchronizedFederate Super;
-    SynchronizedFederateMockRTI(FederateConfig *federateConfig) : Super(federateConfig) {}
+
+    SynchronizedFederateMockRTI(FederateConfig *federateConfig) :
+      Super(federateConfig), rtiAmbassadorTest2(*this) {}
+
+    virtual ~SynchronizedFederateMockRTI() {}
 
     void createRTI() {
-        _rti = RTIAmbassadorTest2::get_instance_ptr();
+        _rti = &rtiAmbassadorTest2.getRTIAmbassador();
         _currentTime = getCurrentTime();
+    }
+
+    RTIAmbassadorTest2 &getRTIAmbassadorTest2() {
+        return rtiAmbassadorTest2;
     }
 };
 

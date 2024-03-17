@@ -23,7 +23,6 @@ void EmbeddedMessagingObjectTests::testObjectNetworkPropagation() {
     std::cout << "STARTING \"EmbeddedMessagingObjectTests::testObjectNetworkPropagation\"" << std::endl;
     std::cout << std::endl;
 
-    RTIAmbassadorTest2 &rtiAmbassadorTest2 = RTIAmbassadorTest2::get_instance();
 
     //
     // CREATE Sender -- ALSO INITIALIZES TABLES IN InteractionRoot AND ObjectRoot
@@ -31,7 +30,7 @@ void EmbeddedMessagingObjectTests::testObjectNetworkPropagation() {
     FederateConfigSP senderFederateConfigSP = getNewFederateConfigSP("Sender");
     Sender sender(senderFederateConfigSP.get());
 
-    rtiAmbassadorTest2.setSynchronizedFederate(sender);
+    RTIAmbassadorTest2 &senderRTIAmbassadorTest2 = sender.getRTIAmbassadorTest2();
 
     //
     // CLASS HANDLES FOR FEDERATE-SPECIFIC EmbeddedMessaging INTERACTIONS
@@ -44,19 +43,19 @@ void EmbeddedMessagingObjectTests::testObjectNetworkPropagation() {
     // LIST OF INTERACTION-DATA FOR INTERACTIONS SENT BY SENDER
     //
     RTIAmbassadorTest2::SentInteractionDataSPList &sentInteractionDataSPList =
-            RTIAmbassadorTest2::get_sent_interaction_data_sp_list();
+            senderRTIAmbassadorTest2.getSentInteractionDataSPList();
 
     //
     // LIST OF REGISTERED-OBJECT-DATA FOR OBJECTS REGISTERED BY SENDER
     //
     RTIAmbassadorTest2::RegisteredObjectDataSPList &registeredObjectDataSPList =
-            RTIAmbassadorTest2::get_registered_object_data_sp_list();
+            senderRTIAmbassadorTest2.getRegisteredObjectDataSPList();
 
     //
     // LIST OF UPDATED-OBJECT-DATA FOR OBJECTS FOR WHICH "updateAttibutes" WAS CALLED BY SENDER
     //
     RTIAmbassadorTest2::UpdatedObjectDataSPList &updatedObjectDataSPList =
-            RTIAmbassadorTest2::get_updated_object_data_sp_list();
+            senderRTIAmbassadorTest2.getUpdatedObjectDataSPList();
 
     // WHEN SENDER WAS CREATED, IT REGISTERED ONE OBJECT
     CPPUNIT_ASSERT_EQUAL(1, static_cast<int>(registeredObjectDataSPList.size()));
@@ -261,17 +260,11 @@ void EmbeddedMessagingObjectTests::testObjectNetworkPropagation() {
 
     sender.iteration(); // EMPTY THE ATRQUEUE
 
-    // CLEAR THE AMBASSADOR PROXY FOR THE Receiver FEDERATE
-    RTIAmbassadorTest2::clear();
-    rtiAmbassadorTest2.resetCurrentTime();
-
     //
     // CREATE THE RECEIVER FEDERATE
     //
     FederateConfigSP receiverFederateConfigSP = getNewFederateConfigSP("Receiver");
     Receiver receiver(receiverFederateConfigSP.get());
-
-    rtiAmbassadorTest2.setSynchronizedFederate(receiver);
 
     // THE RECEIVER SHOULD NOT HAVE THE TestObject YET
     CPPUNIT_ASSERT(!receiver.getTestObjectSP());
@@ -380,11 +373,6 @@ void EmbeddedMessagingObjectTests::testObjectNetworkPropagation() {
     CPPUNIT_ASSERT_EQUAL(receivedTestObject.get_LongValue(), localTestObject.get_LongValue());
     CPPUNIT_ASSERT_EQUAL(receivedTestObject.get_ShortValue(), localTestObject.get_ShortValue());
     CPPUNIT_ASSERT_EQUAL(receivedTestObject.get_JSONValue2(), localTestObject.get_JSONValue2());
-
-    receiver.iteration();  // EMPTY THE ATRQUEUE
-
-    RTIAmbassadorTest2::clear();
-    rtiAmbassadorTest2.resetCurrentTime();
 
     std::cout << "ENDING \"EmbeddedMessagingObjectTests::testObjectNetworkPropagation\"" << std::endl;
     std::cout << std::endl;

@@ -76,7 +76,8 @@ void SenderBase::init() {
     );
 }
 
-SenderBase::SenderBase(FederateConfig *federateConfig): Super(federateConfig) {
+SenderBase::SenderBase(FederateConfig *federateConfig):
+  Super(federateConfig) {
     init();
 }
 
