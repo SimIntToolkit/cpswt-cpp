@@ -37,6 +37,22 @@
 #define throw(...) __VA_OPT__(MultiArg)##Tuple17
 #endif
 
+
+RTI::RTIambassador::RTIambassador() throw (
+  MemoryExhausted,
+  RTIinternalError
+) : rtiAmbassadorProxy(nullptr) { }
+
+RTI::RTIambassador::RTIambassador(RTIProxy::RTIAmbassadorProxy &inputRTIAmbassadorProxy) :
+  rtiAmbassadorProxy(&inputRTIAmbassadorProxy) { }
+
+RTI::RTIambassador::RTIambassador(RTIProxy::RTIAmbassadorProxy *inputRTIAmbassadorProxy) :
+  rtiAmbassadorProxy(inputRTIAmbassadorProxy) { }
+
+RTI::RTIambassador::~RTIambassador() throw (
+  RTIinternalError
+) { }
+
 // 4.2
 void RTI::RTIambassador::createFederationExecution (
   const char *executionName, // supplied C4
@@ -1688,21 +1704,6 @@ RTI::Boolean RTI::RTIambassador::tick (  // returned C3
 ) {
     return rtiAmbassadorProxy->tick(minimum, maximum);
 }
-
-RTI::RTIambassador::RTIambassador() throw (
-  MemoryExhausted,
-  RTIinternalError
-) : rtiAmbassadorProxy(nullptr) { }
-
-RTI::RTIambassador::RTIambassador(RTIProxy::RTIAmbassadorProxy &inputRTIAmbassadorProxy) :
-  rtiAmbassadorProxy(&inputRTIAmbassadorProxy) { }
-
-RTI::RTIambassador::RTIambassador(RTIProxy::RTIAmbassadorProxy *inputRTIAmbassadorProxy) :
-  rtiAmbassadorProxy(inputRTIAmbassadorProxy) { }
-
-RTI::RTIambassador::~RTIambassador() throw (
-  RTIinternalError
-) { }
 
 RTI::RegionToken RTI::RTIambassador::getRegionToken(
   Region *returnPtr

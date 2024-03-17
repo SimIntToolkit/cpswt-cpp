@@ -42,7 +42,34 @@
 namespace RTIProxy {
 
 class RTIAmbassadorProxy {
+private:
+    RTI::RTIambassador rtiAmbassador;
+
+    NullFederateAmbassador *nullFederateAmbassadorPtr;
+
 public:
+    RTI::RTIambassador &getRTIAmbassador() {
+        return rtiAmbassador;
+    }
+
+    NullFederateAmbassador &getNullFederateAmbassador() {
+        static NullFederateAmbassador nullFederateAmbassador;
+        return nullFederateAmbassadorPtr == nullptr ? nullFederateAmbassador : *nullFederateAmbassadorPtr;
+    }
+
+    RTIAmbassadorProxy() throw (
+      RTI::MemoryExhausted,
+      RTI::RTIinternalError
+    );
+
+    RTIAmbassadorProxy(NullFederateAmbassador &localNullFederateAmbassador) throw (
+      RTI::MemoryExhausted,
+      RTI::RTIinternalError
+    );
+
+    virtual ~RTIAmbassadorProxy() throw (
+      RTI::RTIinternalError
+    );
 
     ////////////////////////////////////
     // Federation Management Services //
@@ -1479,15 +1506,6 @@ public:
     ) throw (
       RTI::SpecifiedSaveLabelDoesNotExist,
       RTI::ConcurrentAccessAttempted,
-      RTI::RTIinternalError
-    );
-
-    RTIAmbassadorProxy() throw (
-      RTI::MemoryExhausted,
-      RTI::RTIinternalError
-    );
-
-    virtual ~RTIAmbassadorProxy() throw (
       RTI::RTIinternalError
     );
 

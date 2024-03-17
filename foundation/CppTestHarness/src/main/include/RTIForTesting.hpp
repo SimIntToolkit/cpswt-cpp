@@ -64,6 +64,18 @@ public:
     public:
         typedef FederateAmbassador *FederateAmbassadorPtr;
 
+        RTIambassador() throw (
+          MemoryExhausted,
+          RTIinternalError
+        );
+
+        RTIambassador(RTIProxy::RTIAmbassadorProxy &inputRTIAmbassadorProxy);
+        RTIambassador(RTIProxy::RTIAmbassadorProxy *inputRTIAmbassadorProxy);
+
+        ~RTIambassador() throw (
+          RTIinternalError
+        );
+
         ////////////////////////////////////
         // Federation Management Services //
         ////////////////////////////////////
@@ -1499,18 +1511,6 @@ public:
         ) throw (
           SpecifiedSaveLabelDoesNotExist,
           ConcurrentAccessAttempted,
-          RTIinternalError
-        );
-
-        RTIambassador() throw (
-          MemoryExhausted,
-          RTIinternalError
-        );
-
-        RTIambassador(RTIProxy::RTIAmbassadorProxy &inputRTIAmbassadorProxy);
-        RTIambassador(RTIProxy::RTIAmbassadorProxy *inputRTIAmbassadorProxy);
-
-        ~RTIambassador() throw (
           RTIinternalError
         );
 

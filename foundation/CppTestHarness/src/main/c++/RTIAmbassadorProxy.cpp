@@ -38,6 +38,24 @@
 
 namespace RTIProxy {
 
+RTIAmbassadorProxy::RTIAmbassadorProxy() :
+  rtiAmbassador(this), nullFederateAmbassadorPtr(nullptr)
+throw (
+  RTI::MemoryExhausted,
+  RTI::RTIinternalError
+) { }
+
+RTIAmbassadorProxy::RTIAmbassadorProxy(NullFederateAmbassador &localNullFederateAmbassador) :
+  rtiAmbassador(this), nullFederateAmbassadorPtr( &localNullFederateAmbassador )
+throw (
+  RTI::MemoryExhausted,
+  RTI::RTIinternalError
+) { }
+
+RTIAmbassadorProxy::~RTIAmbassadorProxy() throw (
+  RTI::RTIinternalError
+) { }
+
 
 void RTIAmbassadorProxy::createFederationExecution (
   const char *executionName, // supplied C4
@@ -1553,15 +1571,6 @@ RTI::Boolean RTIAmbassadorProxy::tick (  // returned C3
 ) {
     return RTI::RTI_FALSE;
 }
-
-RTIAmbassadorProxy::RTIAmbassadorProxy() throw (
-  RTI::MemoryExhausted,
-  RTI::RTIinternalError
-) { }
-
-RTIAmbassadorProxy::~RTIAmbassadorProxy() throw (
-  RTI::RTIinternalError
-) { }
 
 RTI::RegionToken RTIAmbassadorProxy::getRegionToken(
   RTI::Region *returnPtr
